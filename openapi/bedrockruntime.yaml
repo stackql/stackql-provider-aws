@@ -49,6 +49,10 @@ components:
     AccountId:
       type: string
       pattern: ^[0-9]{12}$
+    AdditionalModelResponseFieldPaths:
+      type: array
+      items:
+        type: string
     AsyncInvokeArn:
       type: string
       pattern: ^arn:[a-z0-9\-]+:bedrock:[a-z0-9\-]*:[0-9]*:(provisioned-model|foundation-model)/.+$
@@ -67,34 +71,482 @@ components:
     AsyncInvokeMessage:
       type: string
       maxLength: 2048
+    AsyncInvokeOutputDataConfig:
+      allOf:
+      - allOf:
+        - $ref: '#/components/schemas/AsyncInvokeS3OutputDataConfig'
+        description: |-
+          A storage location for the output data in an S3 bucket
+      description: |-
+        Asynchronous invocation output data settings.
+    AsyncInvokeStatus:
+      type: string
+      enum:
+      - InProgress
+      - Completed
+      - Failed
+    AsyncInvokeSummaries:
+      type: array
+      items:
+        $ref: '#/components/schemas/AsyncInvokeSummary'
+    Body:
+      type: string
+      format: byte
+      maxLength: 25000000
+      x-sensitive: true
+    CachePointType:
+      type: string
+      enum:
+      - default
+    ContentBlock:
+      allOf:
+      - allOf:
+        - $ref: '#/components/schemas/String'
+        description: |-
+          Text to include in the message.
+      - allOf:
+        - $ref: '#/components/schemas/ImageBlock'
+        description: |-
+          Image to include in the message.
+
+          This field is only supported by Anthropic Claude 3 models.
+      - allOf:
+        - $ref: '#/components/schemas/DocumentBlock'
+        description: |-
+          A document to include in the message.
+      - allOf:
+        - $ref: '#/components/schemas/VideoBlock'
+        description: |-
+          Video to include in the message.
+      - allOf:
+        - $ref: '#/components/schemas/ToolUseBlock'
+        description: |-
+          Information about a tool use request from a model.
+      - allOf:
+        - $ref: '#/components/schemas/ToolResultBlock'
+        description: |-
+          The result for a tool request that a model makes.
+      - allOf:
+        - $ref: '#/components/schemas/GuardrailConverseContentBlock'
+        description: |-
+          Contains the content to assess with the guardrail. If you don't specify `guardContent` in a call to the Converse API, the guardrail (if passed in the Converse API) assesses the entire message.
+
+          For more information, see _Use a guardrail with the Converse API_ in the _Amazon Bedrock User Guide_.
+      - allOf:
+        - $ref: '#/components/schemas/CachePointBlock'
+        description: |-
+          CachePoint to include in the message.
+      - allOf:
+        - $ref: '#/components/schemas/ReasoningContentBlock'
+        description: |-
+          Contains content regarding the reasoning that is carried out by the model. Reasoning refers to a Chain of Thought (CoT) that the model generates to enhance the accuracy of its final response.
+      description: |-
+        A block of content for a message that you pass to, or receive from, a model with the [Converse](https://docs.aws.amazon.com/bedrock/latest/APIReference/API_runtime_Converse.html) or [ConverseStream](https://docs.aws.amazon.com/bedrock/latest/APIReference/API_runtime_ConverseStream.html) API operations.
+    ContentBlockDelta:
+      allOf:
+      - allOf:
+        - $ref: '#/components/schemas/String'
+        description: |-
+          The content text.
+      - allOf:
+        - $ref: '#/components/schemas/ToolUseBlockDelta'
+        description: |-
+          Information about a tool that the model is requesting to use.
+      - allOf:
+        - $ref: '#/components/schemas/ReasoningContentBlockDelta'
+        description: |-
+          Contains content regarding the reasoning that is carried out by the model. Reasoning refers to a Chain of Thought (CoT) that the model generates to enhance the accuracy of its final response.
+      description: |-
+        A block of content in a streaming response.
+    ContentBlockStart:
+      allOf:
+      - allOf:
+        - $ref: '#/components/schemas/ToolUseBlockStart'
+        description: |-
+          Information about a tool that the model is requesting to use.
+      description: |-
+        Content block start information.
+    ContentBlocks:
+      type: array
+      items:
+        $ref: '#/components/schemas/ContentBlock'
+    ConversationRole:
+      type: string
+      enum:
+      - user
+      - assistant
     ConversationalModelId:
       type: string
       pattern: ^(arn:aws(-[^:]+)?:bedrock:[a-z0-9-]{1,20}:(([0-9]{12}:custom-model/[a-z0-9-]{1,63}[.]{1}[a-z0-9-]{1,63}/[a-z0-9]{12})|(:foundation-model/[a-z0-9-]{1,63}[.]{1}[a-z0-9-]{1,63}([.:]?[a-z0-9-]{1,63}))|([0-9]{12}:imported-model/[a-z0-9]{12})|([0-9]{12}:provisioned-model/[a-z0-9]{12})|([0-9]{12}:(inference-profile|application-inference-profile)/[a-zA-Z0-9-:.]+)))|([a-z0-9-]{1,63}[.]{1}[a-z0-9-]{1,63}([.:]?[a-z0-9-]{1,63}))|(([0-9a-zA-Z][_-]?)+)|([a-zA-Z0-9-:.]+)|(^(arn:aws(-[^:]+)?:bedrock:[a-z0-9-]{1,20}:[0-9]{12}:prompt/[0-9a-zA-Z]{10}(?::[0-9]{1,5})?))$|(^arn:aws:sagemaker:[a-z0-9-]+:[0-9]{12}:endpoint/[a-zA-Z0-9-]+$)|(^arn:aws(-[^:]+)?:bedrock:([0-9a-z-]{1,20}):([0-9]{12}):(default-)?prompt-router/[a-zA-Z0-9-:.]+$)$
       minLength: 1
       maxLength: 2048
+    ConverseOutput:
+      allOf:
+      - allOf:
+        - $ref: '#/components/schemas/Message'
+        description: |-
+          The message that the model generates.
+      description: |-
+        The output from a call to [Converse](https://docs.aws.amazon.com/bedrock/latest/APIReference/API_runtime_Converse.html).
+    ConverseStreamOutput:
+      allOf:
+      - allOf:
+        - $ref: '#/components/schemas/MessageStartEvent'
+        description: |-
+          Message start information.
+      - allOf:
+        - $ref: '#/components/schemas/ContentBlockStartEvent'
+        description: |-
+          Start information for a content block.
+      - allOf:
+        - $ref: '#/components/schemas/ContentBlockDeltaEvent'
+        description: |-
+          The messages output content block delta.
+      - allOf:
+        - $ref: '#/components/schemas/ContentBlockStopEvent'
+        description: |-
+          Stop information for a content block.
+      - allOf:
+        - $ref: '#/components/schemas/MessageStopEvent'
+        description: |-
+          Message stop information.
+      - allOf:
+        - $ref: '#/components/schemas/ConverseStreamMetadataEvent'
+        description: |-
+          Metadata for the converse output stream.
+      - allOf:
+        - $ref: '#/components/schemas/InternalServerException'
+        description: |-
+          An internal server error occurred. Retry your request.
+      - allOf:
+        - $ref: '#/components/schemas/ModelStreamErrorException'
+        description: |-
+          A streaming error occurred. Retry your request.
+      - allOf:
+        - $ref: '#/components/schemas/ValidationException'
+        description: |-
+          The input fails to satisfy the constraints specified by _Amazon Bedrock_. For troubleshooting this error, see [ValidationError](https://docs.aws.amazon.com/bedrock/latest/userguide/troubleshooting-api-error-codes.html#ts-validation-error) in the Amazon Bedrock User Guide
+      - allOf:
+        - $ref: '#/components/schemas/ThrottlingException'
+        description: |-
+          Your request was denied due to exceeding the account quotas for _Amazon Bedrock_. For troubleshooting this error, see [ThrottlingException](https://docs.aws.amazon.com/bedrock/latest/userguide/troubleshooting-api-error-codes.html#ts-throttling-exception) in the Amazon Bedrock User Guide
+      - allOf:
+        - $ref: '#/components/schemas/ServiceUnavailableException'
+        description: |-
+          The service isn't currently available. For troubleshooting this error, see [ServiceUnavailable](https://docs.aws.amazon.com/bedrock/latest/userguide/troubleshooting-api-error-codes.html#ts-service-unavailable) in the Amazon Bedrock User Guide
+      description: |-
+        The messages output stream
+    DocumentFormat:
+      type: string
+      enum:
+      - pdf
+      - csv
+      - doc
+      - docx
+      - xls
+      - xlsx
+      - html
+      - txt
+      - md
+    DocumentSource:
+      allOf:
+      - allOf:
+        - $ref: '#/components/schemas/Blob'
+        description: |-
+          The raw bytes for the document. If you use an Amazon Web Services SDK, you don't need to encode the bytes in base64.
+      - allOf:
+        - $ref: '#/components/schemas/S3Location'
+        description: |-
+          The location of a document object in an Amazon S3 bucket. To see which models support S3 uploads, see [Supported models and features for Converse](https://docs.aws.amazon.com/bedrock/latest/userguide/conversation-inference-supported-models-features.html).
+      description: |-
+        Contains the content of a document.
+    GuardrailAction:
+      type: string
+      enum:
+      - NONE
+      - GUARDRAIL_INTERVENED
+    GuardrailAssessmentList:
+      type: array
+      items:
+        $ref: '#/components/schemas/GuardrailAssessment'
+    GuardrailAssessmentListMap:
+      type: object
+      additionalProperties:
+        $ref: '#/components/schemas/GuardrailAssessmentList'
+    GuardrailAssessmentMap:
+      type: object
+      additionalProperties:
+        $ref: '#/components/schemas/GuardrailAssessment'
+    GuardrailContentBlock:
+      allOf:
+      - allOf:
+        - $ref: '#/components/schemas/GuardrailTextBlock'
+        description: |-
+          Text within content block to be evaluated by the guardrail.
+      - allOf:
+        - $ref: '#/components/schemas/GuardrailImageBlock'
+        description: |-
+          Image within guardrail content block to be evaluated by the guardrail.
+      description: |-
+        The content block to be evaluated by the guardrail.
+    GuardrailContentBlockList:
+      type: array
+      items:
+        $ref: '#/components/schemas/GuardrailContentBlock'
+    GuardrailContentFilterConfidence:
+      type: string
+      enum:
+      - NONE
+      - LOW
+      - MEDIUM
+      - HIGH
+    GuardrailContentFilterList:
+      type: array
+      items:
+        $ref: '#/components/schemas/GuardrailContentFilter'
+    GuardrailContentFilterStrength:
+      type: string
+      enum:
+      - NONE
+      - LOW
+      - MEDIUM
+      - HIGH
+    GuardrailContentFilterType:
+      type: string
+      enum:
+      - INSULTS
+      - HATE
+      - SEXUAL
+      - VIOLENCE
+      - MISCONDUCT
+      - PROMPT_ATTACK
+    GuardrailContentPolicyAction:
+      type: string
+      enum:
+      - BLOCKED
+      - NONE
     GuardrailContentPolicyImageUnitsProcessed:
       type: integer
     GuardrailContentPolicyUnitsProcessed:
       type: integer
+    GuardrailContentQualifier:
+      type: string
+      enum:
+      - grounding_source
+      - query
+      - guard_content
+    GuardrailContentQualifierList:
+      type: array
+      items:
+        $ref: '#/components/schemas/GuardrailContentQualifier'
+    GuardrailContentSource:
+      type: string
+      enum:
+      - INPUT
+      - OUTPUT
+    GuardrailContextualGroundingFilterType:
+      type: string
+      enum:
+      - GROUNDING
+      - RELEVANCE
+    GuardrailContextualGroundingFilters:
+      type: array
+      items:
+        $ref: '#/components/schemas/GuardrailContextualGroundingFilter'
+    GuardrailContextualGroundingPolicyAction:
+      type: string
+      enum:
+      - BLOCKED
+      - NONE
     GuardrailContextualGroundingPolicyUnitsProcessed:
       type: integer
+    GuardrailConverseContentBlock:
+      allOf:
+      - allOf:
+        - $ref: '#/components/schemas/GuardrailConverseTextBlock'
+        description: |-
+          The text to guard.
+      - allOf:
+        - $ref: '#/components/schemas/GuardrailConverseImageBlock'
+        description: |-
+          Image within converse content block to be evaluated by the guardrail.
+      description: |-
+        A content block for selective guarding with the [Converse](https://docs.aws.amazon.com/bedrock/latest/APIReference/API_runtime_Converse.html) or [ConverseStream](https://docs.aws.amazon.com/bedrock/latest/APIReference/API_runtime_ConverseStream.html) API operations.
+    GuardrailConverseContentQualifier:
+      type: string
+      enum:
+      - grounding_source
+      - query
+      - guard_content
+    GuardrailConverseContentQualifierList:
+      type: array
+      items:
+        $ref: '#/components/schemas/GuardrailConverseContentQualifier'
+    GuardrailConverseImageFormat:
+      type: string
+      enum:
+      - png
+      - jpeg
+    GuardrailConverseImageSource:
+      allOf:
+      - allOf:
+        - $ref: '#/components/schemas/Blob'
+        description: |-
+          The raw image bytes for the image.
+      description: |-
+        The image source (image bytes) of the guardrail converse image source.
+      x-sensitive: true
+    GuardrailCustomWordList:
+      type: array
+      items:
+        $ref: '#/components/schemas/GuardrailCustomWord'
     GuardrailIdentifier:
       type: string
       pattern: ^(([a-z0-9]+)|(arn:aws(-[^:]+)?:bedrock:[a-z0-9-]{1,20}:[0-9]{12}:guardrail/[a-z0-9]+))$
       maxLength: 2048
+    GuardrailImageFormat:
+      type: string
+      enum:
+      - png
+      - jpeg
+    GuardrailImageSource:
+      allOf:
+      - allOf:
+        - $ref: '#/components/schemas/Blob'
+        description: |-
+          The bytes details of the guardrail image source. Object used in independent api.
+      description: |-
+        The image source (image bytes) of the guardrail image source. Object used in independent api.
+      x-sensitive: true
+    GuardrailManagedWordList:
+      type: array
+      items:
+        $ref: '#/components/schemas/GuardrailManagedWord'
+    GuardrailManagedWordType:
+      type: string
+      enum:
+      - PROFANITY
+    GuardrailOutputContentList:
+      type: array
+      items:
+        $ref: '#/components/schemas/GuardrailOutputContent'
+    GuardrailOutputScope:
+      type: string
+      enum:
+      - INTERVENTIONS
+      - FULL
     GuardrailOutputText:
       type: string
+    GuardrailPiiEntityFilterList:
+      type: array
+      items:
+        $ref: '#/components/schemas/GuardrailPiiEntityFilter'
+    GuardrailPiiEntityType:
+      type: string
+      enum:
+      - ADDRESS
+      - AGE
+      - AWS_ACCESS_KEY
+      - AWS_SECRET_KEY
+      - CA_HEALTH_NUMBER
+      - CA_SOCIAL_INSURANCE_NUMBER
+      - CREDIT_DEBIT_CARD_CVV
+      - CREDIT_DEBIT_CARD_EXPIRY
+      - CREDIT_DEBIT_CARD_NUMBER
+      - DRIVER_ID
+      - EMAIL
+      - INTERNATIONAL_BANK_ACCOUNT_NUMBER
+      - IP_ADDRESS
+      - LICENSE_PLATE
+      - MAC_ADDRESS
+      - NAME
+      - PASSWORD
+      - PHONE
+      - PIN
+      - SWIFT_CODE
+      - UK_NATIONAL_HEALTH_SERVICE_NUMBER
+      - UK_NATIONAL_INSURANCE_NUMBER
+      - UK_UNIQUE_TAXPAYER_REFERENCE_NUMBER
+      - URL
+      - USERNAME
+      - US_BANK_ACCOUNT_NUMBER
+      - US_BANK_ROUTING_NUMBER
+      - US_INDIVIDUAL_TAX_IDENTIFICATION_NUMBER
+      - US_PASSPORT_NUMBER
+      - US_SOCIAL_SECURITY_NUMBER
+      - VEHICLE_IDENTIFICATION_NUMBER
+    GuardrailProcessingLatency:
+      type: integer
+      format: int64
+    GuardrailRegexFilterList:
+      type: array
+      items:
+        $ref: '#/components/schemas/GuardrailRegexFilter'
+    GuardrailSensitiveInformationPolicyAction:
+      type: string
+      enum:
+      - ANONYMIZED
+      - BLOCKED
+      - NONE
     GuardrailSensitiveInformationPolicyFreeUnitsProcessed:
       type: integer
     GuardrailSensitiveInformationPolicyUnitsProcessed:
       type: integer
+    GuardrailStreamProcessingMode:
+      type: string
+      enum:
+      - sync
+      - async
+    GuardrailTopicList:
+      type: array
+      items:
+        $ref: '#/components/schemas/GuardrailTopic'
+    GuardrailTopicPolicyAction:
+      type: string
+      enum:
+      - BLOCKED
+      - NONE
     GuardrailTopicPolicyUnitsProcessed:
       type: integer
+    GuardrailTopicType:
+      type: string
+      enum:
+      - DENY
+    GuardrailTrace:
+      type: string
+      enum:
+      - enabled
+      - disabled
+      - enabled_full
     GuardrailVersion:
       type: string
       pattern: ^(([1-9][0-9]{0,7})|(DRAFT))$
+    GuardrailWordPolicyAction:
+      type: string
+      enum:
+      - BLOCKED
+      - NONE
     GuardrailWordPolicyUnitsProcessed:
       type: integer
+    ImageFormat:
+      type: string
+      enum:
+      - png
+      - jpeg
+      - gif
+      - webp
+    ImageSource:
+      allOf:
+      - allOf:
+        - $ref: '#/components/schemas/Blob'
+        description: |-
+          The raw image bytes for the image. If you use an AWS SDK, you don't need to encode the image bytes in base64.
+      - allOf:
+        - $ref: '#/components/schemas/S3Location'
+        description: |-
+          The location of an image object in an Amazon S3 bucket. To see which models support S3 uploads, see [Supported models and features for Converse](https://docs.aws.amazon.com/bedrock/latest/userguide/conversation-inference-supported-models-features.html).
+      description: |-
+        The source for an image.
     ImagesGuarded:
       type: integer
     ImagesTotal:
@@ -109,6 +561,46 @@ components:
       pattern: ^(arn:aws(-[^:]+)?:bedrock:[a-z0-9-]{1,20}:(([0-9]{12}:custom-model/[a-z0-9-]{1,63}[.]{1}[a-z0-9-]{1,63}/[a-z0-9]{12})|(:foundation-model/[a-z0-9-]{1,63}[.]{1}[a-z0-9-]{1,63}([.:]?[a-z0-9-]{1,63}))|([0-9]{12}:imported-model/[a-z0-9]{12})|([0-9]{12}:provisioned-model/[a-z0-9]{12})|([0-9]{12}:(inference-profile|application-inference-profile)/[a-zA-Z0-9-:.]+)))|([a-z0-9-]{1,63}[.]{1}[a-z0-9-]{1,63}([.:]?[a-z0-9-]{1,63}))|(([0-9a-zA-Z][_-]?)+)|([a-zA-Z0-9-:.]+)$|(^(arn:aws(-[^:]+)?:bedrock:[a-z0-9-]{1,20}:[0-9]{12}:prompt/[0-9a-zA-Z]{10}(?::[0-9]{1,5})?))$|(^arn:aws:sagemaker:[a-z0-9-]+:[0-9]{12}:endpoint/[a-zA-Z0-9-]+$)|(^arn:aws(-[^:]+)?:bedrock:([0-9a-z-]{1,20}):([0-9]{12}):(default-)?prompt-router/[a-zA-Z0-9-:.]+$)$
       minLength: 1
       maxLength: 2048
+    InvokeModelWithBidirectionalStreamInput:
+      allOf:
+      - allOf:
+        - $ref: '#/components/schemas/BidirectionalInputPayloadPart'
+        description: |-
+          The audio chunk that is used as input for the invocation step.
+      description: |-
+        Payload content, the speech chunk, for the bidirectional input of the invocation step.
+    InvokeModelWithBidirectionalStreamOutput:
+      allOf:
+      - allOf:
+        - $ref: '#/components/schemas/BidirectionalOutputPayloadPart'
+        description: |-
+          The speech chunk that was provided as output from the invocation step.
+      - allOf:
+        - $ref: '#/components/schemas/InternalServerException'
+        description: |-
+          The request encountered an unknown internal error.
+      - allOf:
+        - $ref: '#/components/schemas/ModelStreamErrorException'
+        description: |-
+          The request encountered an error with the model stream.
+      - allOf:
+        - $ref: '#/components/schemas/ValidationException'
+        description: |-
+          The input fails to satisfy the constraints specified by an Amazon Web Services service.
+      - allOf:
+        - $ref: '#/components/schemas/ThrottlingException'
+        description: |-
+          The request was denied due to request throttling.
+      - allOf:
+        - $ref: '#/components/schemas/ModelTimeoutException'
+        description: |-
+          The connection was closed because a request was not received within the timeout period.
+      - allOf:
+        - $ref: '#/components/schemas/ServiceUnavailableException'
+        description: |-
+          The request has failed due to a temporary failure of the server.
+      description: |-
+        Output from the bidirectional stream that was used for model invocation.
     InvokedModelId:
       type: string
       pattern: ^(arn:aws(-[^:]+)?:bedrock:[a-z0-9-]{1,20}::foundation-model/[a-z0-9-]{1,63}[.]{1}[a-z0-9-]{1,63}([a-z0-9-]{1,63}[.]){0,2}[a-z0-9-]{1,63}([:][a-z0-9-]{1,63}){0,2})|(arn:aws(|-us-gov|-cn|-iso|-iso-b):bedrock:(|[0-9a-z-]{1,20}):(|[0-9]{12}):inference-profile/[a-zA-Z0-9-:.]+)$
@@ -121,14 +613,30 @@ components:
       type: integer
       minimum: 1
       maximum: 1000
+    Messages:
+      type: array
+      items:
+        $ref: '#/components/schemas/Message'
     MimeType:
       type: string
+    ModelInputPayload:
+      type: object
+      additionalProperties: true
+      x-sensitive: true
+    ModelOutputs:
+      type: array
+      items:
+        $ref: '#/components/schemas/GuardrailOutputText'
     NonBlankString:
       type: string
       pattern: ^[\s\S]*$
     NonEmptyString:
       type: string
       minLength: 1
+    NonEmptyStringList:
+      type: array
+      items:
+        $ref: '#/components/schemas/NonEmptyString'
     NonNegativeInteger:
       type: integer
       minimum: 0
@@ -137,20 +645,152 @@ components:
       pattern: ^\S*$
       minLength: 1
       maxLength: 2048
+    PartBody:
+      type: string
+      format: byte
+      maxLength: 1000000
+      x-sensitive: true
+    PerformanceConfigLatency:
+      type: string
+      enum:
+      - standard
+      - optimized
+    PromptVariableMap:
+      type: object
+      additionalProperties:
+        $ref: '#/components/schemas/PromptVariableValues'
+    PromptVariableValues:
+      allOf:
+      - allOf:
+        - $ref: '#/components/schemas/String'
+        description: |-
+          The text value that the variable maps to.
+      description: |-
+        Contains a map of variables in a prompt from Prompt management to an object containing the values to fill in for them when running model invocation. For more information, see [How Prompt management works](https://docs.aws.amazon.com/bedrock/latest/userguide/prompt-management-how.html).
+    ReasoningContentBlock:
+      allOf:
+      - allOf:
+        - $ref: '#/components/schemas/ReasoningTextBlock'
+        description: |-
+          The reasoning that the model used to return the output.
+      - allOf:
+        - $ref: '#/components/schemas/Blob'
+        description: |-
+          The content in the reasoning that was encrypted by the model provider for safety reasons. The encryption doesn't affect the quality of responses.
+      description: |-
+        Contains content regarding the reasoning that is carried out by the model with respect to the content in the content block. Reasoning refers to a Chain of Thought (CoT) that the model generates to enhance the accuracy of its final response.
+      x-sensitive: true
+    ReasoningContentBlockDelta:
+      allOf:
+      - allOf:
+        - $ref: '#/components/schemas/String'
+        description: |-
+          The reasoning that the model used to return the output.
+      - allOf:
+        - $ref: '#/components/schemas/Blob'
+        description: |-
+          The content in the reasoning that was encrypted by the model provider for safety reasons. The encryption doesn't affect the quality of responses.
+      - allOf:
+        - $ref: '#/components/schemas/String'
+        description: |-
+          A token that verifies that the reasoning text was generated by the model. If you pass a reasoning block back to the API in a multi-turn conversation, include the text and its signature unmodified.
+      description: |-
+        Contains content regarding the reasoning that is carried out by the model with respect to the content in the content block. Reasoning refers to a Chain of Thought (CoT) that the model generates to enhance the accuracy of its final response.
+      x-sensitive: true
+    RequestMetadata:
+      type: object
+      additionalProperties:
+        $ref: '#/components/schemas/String'
+    ResponseStream:
+      allOf:
+      - allOf:
+        - $ref: '#/components/schemas/PayloadPart'
+        description: |-
+          Content included in the response.
+      - allOf:
+        - $ref: '#/components/schemas/InternalServerException'
+        description: |-
+          An internal server error occurred. Retry your request.
+      - allOf:
+        - $ref: '#/components/schemas/ModelStreamErrorException'
+        description: |-
+          An error occurred while streaming the response. Retry your request.
+      - allOf:
+        - $ref: '#/components/schemas/ValidationException'
+        description: |-
+          Input validation failed. Check your request parameters and retry the request.
+      - allOf:
+        - $ref: '#/components/schemas/ThrottlingException'
+        description: |-
+          Your request was throttled because of service-wide limitations. Resubmit your request later or in a different region. You can also purchase [Provisioned Throughput](https://docs.aws.amazon.com/bedrock/latest/userguide/prov-throughput.html) to increase the rate or number of tokens you can process.
+      - allOf:
+        - $ref: '#/components/schemas/ModelTimeoutException'
+        description: |-
+          The request took too long to process. Processing time exceeded the model timeout length.
+      - allOf:
+        - $ref: '#/components/schemas/ServiceUnavailableException'
+        description: |-
+          The service isn't available. Try again later.
+      description: |-
+        Definition of content in the response stream.
     S3Uri:
       type: string
       pattern: ^s3://[a-z0-9][\.\-a-z0-9]{1,61}[a-z0-9](/.*)?$
       minLength: 1
       maxLength: 1024
+    SortAsyncInvocationBy:
+      type: string
+      enum:
+      - SubmissionTime
+    SortOrder:
+      type: string
+      enum:
+      - Ascending
+      - Descending
     StatusCode:
       type: integer
       minimum: 100
       maximum: 599
+    StopReason:
+      type: string
+      enum:
+      - end_turn
+      - tool_use
+      - max_tokens
+      - stop_sequence
+      - guardrail_intervened
+      - content_filtered
+    SystemContentBlock:
+      allOf:
+      - allOf:
+        - $ref: '#/components/schemas/NonEmptyString'
+        description: |-
+          A system prompt for the model.
+      - allOf:
+        - $ref: '#/components/schemas/GuardrailConverseContentBlock'
+        description: |-
+          A content block to assess with the guardrail. Use with the [Converse](https://docs.aws.amazon.com/bedrock/latest/APIReference/API_runtime_Converse.html) or [ConverseStream](https://docs.aws.amazon.com/bedrock/latest/APIReference/API_runtime_ConverseStream.html) API operations.
+
+          For more information, see _Use a guardrail with the Converse API_ in the _Amazon Bedrock User Guide_.
+      - allOf:
+        - $ref: '#/components/schemas/CachePointBlock'
+        description: |-
+          CachePoint to include in the system prompt.
+      description: |-
+        A system content block.
+    SystemContentBlocks:
+      type: array
+      items:
+        $ref: '#/components/schemas/SystemContentBlock'
     TagKey:
       type: string
       pattern: ^[a-zA-Z0-9\s._:/=+@-]*$
       minLength: 1
       maxLength: 128
+    TagList:
+      type: array
+      items:
+        $ref: '#/components/schemas/Tag'
     TagValue:
       type: string
       pattern: ^[a-zA-Z0-9\s._:/=+@-]*$
@@ -160,13 +800,121 @@ components:
       type: integer
     TextCharactersTotal:
       type: integer
+    Timestamp:
+      type: string
+      format: date-time
+    Tool:
+      allOf:
+      - allOf:
+        - $ref: '#/components/schemas/ToolSpecification'
+        description: |-
+          The specfication for the tool.
+      - allOf:
+        - $ref: '#/components/schemas/CachePointBlock'
+        description: |-
+          CachePoint to include in the tool configuration.
+      description: |-
+        Information about a tool that you can use with the Converse API. For more information, see [Tool use (function calling)](https://docs.aws.amazon.com/bedrock/latest/userguide/tool-use.html) in the Amazon Bedrock User Guide.
+    ToolChoice:
+      allOf:
+      - allOf:
+        - $ref: '#/components/schemas/AutoToolChoice'
+        description: |-
+          (Default). The Model automatically decides if a tool should be called or whether to generate text instead.
+      - allOf:
+        - $ref: '#/components/schemas/AnyToolChoice'
+        description: |-
+          The model must request at least one tool (no text is generated).
+      - allOf:
+        - $ref: '#/components/schemas/SpecificToolChoice'
+        description: |-
+          The Model must request the specified tool. Only supported by Anthropic Claude 3 models.
+      description: |-
+        Determines which tools the model should request in a call to `Converse` or `ConverseStream`. `ToolChoice` is only supported by Anthropic Claude 3 models and by Mistral AI Mistral Large.
+    ToolInputSchema:
+      allOf:
+      - allOf:
+        - $ref: '#/components/schemas/Document'
+        description: |-
+          The JSON schema for the tool. For more information, see [JSON Schema Reference](https://json-schema.org/understanding-json-schema/reference).
+      description: |-
+        The schema for the tool. The top level schema type must be `object`.
     ToolName:
       type: string
       pattern: ^[a-zA-Z0-9_-]+$
       minLength: 1
       maxLength: 64
+    ToolResultContentBlock:
+      allOf:
+      - allOf:
+        - $ref: '#/components/schemas/Document'
+        description: |-
+          A tool result that is JSON format data.
+      - allOf:
+        - $ref: '#/components/schemas/String'
+        description: |-
+          A tool result that is text.
+      - allOf:
+        - $ref: '#/components/schemas/ImageBlock'
+        description: |-
+          A tool result that is an image.
+
+          This field is only supported by Anthropic Claude 3 models.
+      - allOf:
+        - $ref: '#/components/schemas/DocumentBlock'
+        description: |-
+          A tool result that is a document.
+      - allOf:
+        - $ref: '#/components/schemas/VideoBlock'
+        description: |-
+          A tool result that is video.
+      description: |-
+        The tool result content block.
+    ToolResultContentBlocks:
+      type: array
+      items:
+        $ref: '#/components/schemas/ToolResultContentBlock'
+    ToolResultStatus:
+      type: string
+      enum:
+      - success
+      - error
     ToolUseId:
       type: string
       pattern: ^[a-zA-Z0-9_-]+$
       minLength: 1
       maxLength: 64
+    Tools:
+      type: array
+      items:
+        $ref: '#/components/schemas/Tool'
+    Trace:
+      type: string
+      enum:
+      - ENABLED
+      - DISABLED
+      - ENABLED_FULL
+    VideoFormat:
+      type: string
+      enum:
+      - mkv
+      - mov
+      - mp4
+      - webm
+      - flv
+      - mpeg
+      - mpg
+      - wmv
+      - three_gp
+    VideoSource:
+      allOf:
+      - allOf:
+        - $ref: '#/components/schemas/Blob'
+        description: |-
+          Video content encoded in base64.
+      - allOf:
+        - $ref: '#/components/schemas/S3Location'
+        description: |-
+          The location of a video object in an Amazon S3 bucket. To see which models support S3 uploads, see [Supported models and features for Converse](https://docs.aws.amazon.com/bedrock/latest/userguide/conversation-inference-supported-models-features.html).
+      description: |-
+        A video source. You can upload a smaller video as a base64-encoded string as long as the encoded file is less than 25MB. You can also transfer videos up to 1GB in size from an S3 bucket.

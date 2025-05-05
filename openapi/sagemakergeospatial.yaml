@@ -84,10 +84,37 @@ components:
       - Q1
       - Q3
       - SUM
+    AreaOfInterest:
+      allOf:
+      - allOf:
+        - $ref: '#/components/schemas/AreaOfInterestGeometry'
+        description: |-
+          A GeoJSON object representing the geographic extent in the coordinate space.
+      description: |-
+        The geographic extent of the Earth Observation job.
+    AreaOfInterestGeometry:
+      allOf:
+      - allOf:
+        - $ref: '#/components/schemas/PolygonGeometryInput'
+        description: |-
+          The structure representing Polygon Geometry.
+      - allOf:
+        - $ref: '#/components/schemas/MultiPolygonGeometryInput'
+        description: |-
+          The structure representing the MultiPolygon Geometry.
+      description: |-
+        A GeoJSON object representing the geographic extent in the coordinate space.
     Arn:
       type: string
       minLength: 1
       maxLength: 2048
+    AssetsMap:
+      type: object
+      additionalProperties:
+        $ref: '#/components/schemas/AssetValue'
+    BinaryFile:
+      type: string
+      format: byte
     ComparisonOperator:
       type: string
       enum:
@@ -103,6 +130,10 @@ components:
       - PUBLIC
       - PREMIUM
       - USER
+    DataCollectionsList:
+      type: array
+      items:
+        $ref: '#/components/schemas/RasterDataCollectionMetadata'
     EarthObservationJobArn:
       type: string
       pattern: ^arn:aws[a-z-]{0,12}:sagemaker-geospatial:[a-z0-9-]{1,25}:[0-9]{12}:earth-observation-job/[a-z0-9]{12,}$
@@ -117,6 +148,14 @@ components:
       - IN_PROGRESS
       - SUCCEEDED
       - FAILED
+    EarthObservationJobList:
+      type: array
+      items:
+        $ref: '#/components/schemas/ListEarthObservationJobOutputConfig'
+    EarthObservationJobOutputBands:
+      type: array
+      items:
+        $ref: '#/components/schemas/OutputBand'
     EarthObservationJobStatus:
       type: string
       enum:
@@ -138,15 +177,79 @@ components:
       enum:
       - CLIENT_ERROR
       - SERVER_ERROR
+    FilterList:
+      type: array
+      items:
+        $ref: '#/components/schemas/Filter'
     GroupBy:
       type: string
       enum:
       - ALL
       - YEARLY
+    ImageSourceBandList:
+      type: array
+      items:
+        type: string
+    ItemSourceList:
+      type: array
+      items:
+        $ref: '#/components/schemas/ItemSource'
+    JobConfigInput:
+      allOf:
+      - allOf:
+        - $ref: '#/components/schemas/BandMathConfigInput'
+        description: |-
+          An object containing information about the job configuration for BandMath.
+      - allOf:
+        - $ref: '#/components/schemas/ResamplingConfigInput'
+        description: |-
+          An object containing information about the job configuration for resampling.
+      - allOf:
+        - $ref: '#/components/schemas/TemporalStatisticsConfigInput'
+        description: |-
+          An object containing information about the job configuration for temporal statistics.
+      - allOf:
+        - $ref: '#/components/schemas/CloudRemovalConfigInput'
+        description: |-
+          An object containing information about the job configuration for cloud removal.
+      - allOf:
+        - $ref: '#/components/schemas/ZonalStatisticsConfigInput'
+        description: |-
+          An object containing information about the job configuration for zonal statistics.
+      - allOf:
+        - $ref: '#/components/schemas/GeoMosaicConfigInput'
+        description: |-
+          An object containing information about the job configuration for geomosaic.
+      - allOf:
+        - $ref: '#/components/schemas/StackConfigInput'
+        description: |-
+          An object containing information about the job configuration for a Stacking Earth Observation job.
+      - allOf:
+        - $ref: '#/components/schemas/CloudMaskingConfigInput'
+        description: |-
+          An object containing information about the job configuration for cloud masking.
+      - allOf:
+        - $ref: '#/components/schemas/LandCoverSegmentationConfigInput'
+        description: |-
+          An object containing information about the job configuration for land cover segmentation.
+      description: |-
+        The input structure for the JobConfig in an EarthObservationJob.
     KmsKey:
       type: string
       minLength: 0
       maxLength: 2048
+    LinearRing:
+      type: array
+      items:
+        $ref: '#/components/schemas/Position'
+    LinearRings:
+      type: array
+      items:
+        $ref: '#/components/schemas/LinearRing'
+    LinearRingsList:
+      type: array
+      items:
+        $ref: '#/components/schemas/LinearRings'
     LogicalOperator:
       type: string
       enum:
@@ -154,6 +257,10 @@ components:
     NextToken:
       type: string
       maxLength: 8192
+    OperationsListInput:
+      type: array
+      items:
+        $ref: '#/components/schemas/Operation'
     OutputType:
       type: string
       enum:
@@ -162,12 +269,49 @@ components:
       - INT16
       - FLOAT64
       - UINT16
+    Position:
+      type: array
+      items:
+        type: number
+      x-sensitive: true
     PredefinedResolution:
       type: string
       enum:
       - HIGHEST
       - LOWEST
       - AVERAGE
+    Property:
+      allOf:
+      - allOf:
+        - $ref: '#/components/schemas/EoCloudCoverInput'
+        description: |-
+          The structure representing EoCloudCover property filter containing a lower bound and upper bound.
+      - allOf:
+        - $ref: '#/components/schemas/ViewOffNadirInput'
+        description: |-
+          The structure representing ViewOffNadir property filter containing a lower bound and upper bound.
+      - allOf:
+        - $ref: '#/components/schemas/ViewSunAzimuthInput'
+        description: |-
+          The structure representing ViewSunAzimuth property filter containing a lower bound and upper bound.
+      - allOf:
+        - $ref: '#/components/schemas/ViewSunElevationInput'
+        description: |-
+          The structure representing ViewSunElevation property filter containing a lower bound and upper bound.
+      - allOf:
+        - $ref: '#/components/schemas/PlatformInput'
+        description: |-
+          The structure representing Platform property filter consisting of value and comparison operator.
+      - allOf:
+        - $ref: '#/components/schemas/LandsatCloudCoverLandInput'
+        description: |-
+          The structure representing Land Cloud Cover property filter for Landsat collection containing a lower bound and upper bound.
+      description: |-
+        Represents a single searchable property to search on.
+    PropertyFiltersList:
+      type: array
+      items:
+        $ref: '#/components/schemas/PropertyFilter'
     S3Uri:
       type: string
       pattern: ^s3://([^/]+)/?(.*)$
@@ -176,6 +320,18 @@ components:
       enum:
       - ASCENDING
       - DESCENDING
+    StringListInput:
+      type: array
+      items:
+        type: string
+    TagKeyList:
+      type: array
+      items:
+        type: string
+    Tags:
+      type: object
+      additionalProperties:
+        $ref: '#/components/schemas/String'
     TargetOptions:
       type: string
       enum:
@@ -187,6 +343,10 @@ components:
       - MEAN
       - MEDIAN
       - STANDARD_DEVIATION
+    TemporalStatisticsListInput:
+      type: array
+      items:
+        $ref: '#/components/schemas/TemporalStatistics'
     Unit:
       type: string
       enum:
@@ -194,6 +354,26 @@ components:
     VectorEnrichmentJobArn:
       type: string
       pattern: ^arn:aws[a-z-]{0,12}:sagemaker-geospatial:[a-z0-9-]{1,25}:[0-9]{12}:vector-enrichment-job/[a-z0-9]{12,}$
+    VectorEnrichmentJobConfig:
+      allOf:
+      - allOf:
+        - $ref: '#/components/schemas/ReverseGeocodingConfig'
+        description: |-
+          The input structure for Reverse Geocoding operation type.
+      - allOf:
+        - $ref: '#/components/schemas/MapMatchingConfig'
+        description: |-
+          The input structure for Map Matching operation type.
+      description: |-
+        It contains configs such as ReverseGeocodingConfig and MapMatchingConfig.
+    VectorEnrichmentJobDataSourceConfigInput:
+      allOf:
+      - allOf:
+        - $ref: '#/components/schemas/VectorEnrichmentJobS3Data'
+        description: |-
+          The input structure for the Amazon S3 data that represents the Amazon S3 location of the input data objects.
+      description: |-
+        The input structure for the data source that represents the storage type of the input data objects.
     VectorEnrichmentJobDocumentType:
       type: string
       enum:
@@ -214,6 +394,10 @@ components:
       - IN_PROGRESS
       - SUCCEEDED
       - FAILED
+    VectorEnrichmentJobList:
+      type: array
+      items:
+        $ref: '#/components/schemas/ListVectorEnrichmentJobOutputConfig'
     VectorEnrichmentJobStatus:
       type: string
       enum:
@@ -239,3 +423,7 @@ components:
       - MAX
       - MIN
       - SUM
+    ZonalStatisticsListInput:
+      type: array
+      items:
+        $ref: '#/components/schemas/ZonalStatistics'

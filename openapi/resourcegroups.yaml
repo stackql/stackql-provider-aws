@@ -67,6 +67,10 @@ components:
       pattern: ^arn:aws(-[a-z]+)*:resource-groups:[a-z]{2}(-[a-z]+)+-\d{1}:[0-9]{12}:group/[a-zA-Z0-9_\.-]{1,150}/[a-zA-Z0-9]{22,26}$
       minLength: 12
       maxLength: 1600
+    ApplicationTag:
+      type: object
+      additionalProperties:
+        $ref: '#/components/schemas/ApplicationArn'
     ApplicationTagKey:
       type: string
       pattern: ^awsApplication$
@@ -97,6 +101,10 @@ components:
       type: string
       minLength: 1
       maxLength: 1024
+    FailedResourceList:
+      type: array
+      items:
+        $ref: '#/components/schemas/FailedResource'
     GroupArn:
       type: string
       pattern: ^arn:aws(-[a-z]+)*:resource-groups:[a-z]{2}(-[a-z]+)+-\d{1}:[0-9]{12}:group/([a-zA-Z0-9_\.-]{1,300}|[a-zA-Z0-9_\.-]{1,150}/[a-z0-9]{26})$
@@ -109,6 +117,10 @@ components:
       maxLength: 1600
     GroupConfigurationFailureReason:
       type: string
+    GroupConfigurationList:
+      type: array
+      items:
+        $ref: '#/components/schemas/GroupConfigurationItem'
     GroupConfigurationParameterName:
       type: string
       pattern: ^[a-z-]+$
@@ -119,25 +131,75 @@ components:
       pattern: ^[a-zA-Z0-9:\/\._-]+$
       minLength: 1
       maxLength: 256
+    GroupConfigurationParameterValueList:
+      type: array
+      items:
+        $ref: '#/components/schemas/GroupConfigurationParameterValue'
+    GroupConfigurationStatus:
+      type: string
+      enum:
+      - UPDATING
+      - UPDATE_COMPLETE
+      - UPDATE_FAILED
     GroupConfigurationType:
       type: string
       pattern: ^AWS::[a-zA-Z0-9]+::[a-zA-Z0-9]+$
       minLength: 0
       maxLength: 40
+    GroupFilterList:
+      type: array
+      items:
+        $ref: '#/components/schemas/GroupFilter'
+    GroupFilterName:
+      type: string
+      enum:
+      - resource-type
+      - configuration-type
+      - owner
+      - display-name
+      - criticality
     GroupFilterValue:
       type: string
       pattern: ^AWS::(AllSupported|[a-zA-Z0-9]+::[a-zA-Z0-9]+)|[\s\p{L}0-9_\.-]*$
       minLength: 1
       maxLength: 300
+    GroupFilterValues:
+      type: array
+      items:
+        $ref: '#/components/schemas/GroupFilterValue'
+    GroupIdentifierList:
+      type: array
+      items:
+        $ref: '#/components/schemas/GroupIdentifier'
+    GroupLifecycleEventsDesiredStatus:
+      type: string
+      enum:
+      - ACTIVE
+      - INACTIVE
+    GroupLifecycleEventsStatus:
+      type: string
+      enum:
+      - ACTIVE
+      - INACTIVE
+      - IN_PROGRESS
+      - ERROR
     GroupLifecycleEventsStatusMessage:
       type: string
       minLength: 1
       maxLength: 1024
+    GroupList:
+      type: array
+      items:
+        $ref: '#/components/schemas/Group'
     GroupName:
       type: string
       pattern: ^[a-zA-Z0-9_\.-]{1,300}|[a-zA-Z0-9_\.-]{1,150}/[a-z0-9]{26}$
       minLength: 1
       maxLength: 300
+    GroupParameterList:
+      type: array
+      items:
+        $ref: '#/components/schemas/GroupConfigurationParameter'
     GroupString:
       type: string
       pattern: ^[a-zA-Z0-9_\.-]{1,300}|[a-zA-Z0-9_\.-]{1,150}/[a-z0-9]{26}|arn:aws(-[a-z]+)*:resource-groups:[a-z]{2}(-[a-z]+)+-\d{1}:[0-9]{12}:group/([a-zA-Z0-9_\.-]{1,300}|[a-zA-Z0-9_\.-]{1,150}/[a-z0-9]{26})$
@@ -148,9 +210,46 @@ components:
       pattern: ^[a-zA-Z0-9_\.-]{1,300}|[a-zA-Z0-9_\.-]{1,150}/[a-z0-9]{26}|arn:aws(-[a-z]+)*:resource-groups:[a-z]{2}(-[a-z]+)+-\d{1}:[0-9]{12}:group/([a-zA-Z0-9_\.-]{1,300}|[a-zA-Z0-9_\.-]{1,150}/[a-z0-9]{26})$
       minLength: 1
       maxLength: 1600
+    GroupingStatus:
+      type: string
+      enum:
+      - SUCCESS
+      - FAILED
+      - IN_PROGRESS
+      - SKIPPED
+    GroupingStatusesList:
+      type: array
+      items:
+        $ref: '#/components/schemas/GroupingStatusesItem'
+    GroupingType:
+      type: string
+      enum:
+      - GROUP
+      - UNGROUP
+    ListGroupResourcesItemList:
+      type: array
+      items:
+        $ref: '#/components/schemas/ListGroupResourcesItem'
+    ListGroupingStatusesFilterList:
+      type: array
+      items:
+        $ref: '#/components/schemas/ListGroupingStatusesFilter'
+    ListGroupingStatusesFilterName:
+      type: string
+      enum:
+      - status
+      - resource-arn
     ListGroupingStatusesFilterValue:
       type: string
       pattern: ^SUCCESS|FAILED|IN_PROGRESS|SKIPPED|arn:aws(-[a-z]+)*:[a-z0-9\-]*:([a-z]{2}(-[a-z]+)+-\d{1})?:([0-9]{12})?:.+$
+    ListGroupingStatusesFilterValues:
+      type: array
+      items:
+        $ref: '#/components/schemas/ListGroupingStatusesFilterValue'
+    ListTagSyncTasksFilterList:
+      type: array
+      items:
+        $ref: '#/components/schemas/ListTagSyncTasksFilter'
     MaxResults:
       type: integer
       minimum: 1
@@ -165,21 +264,65 @@ components:
       pattern: ^([\p{L}\p{Z}\p{N}_.:/=+\-@]*)$
       minLength: 0
       maxLength: 300
+    PendingResourceList:
+      type: array
+      items:
+        $ref: '#/components/schemas/PendingResource'
     Query:
       type: string
       pattern: ^[\s\S]*$
       minLength: 0
       maxLength: 4096
+    QueryErrorCode:
+      type: string
+      enum:
+      - CLOUDFORMATION_STACK_INACTIVE
+      - CLOUDFORMATION_STACK_NOT_EXISTING
+      - CLOUDFORMATION_STACK_UNASSUMABLE_ROLE
+      - RESOURCE_TYPE_NOT_SUPPORTED
+    QueryErrorList:
+      type: array
+      items:
+        $ref: '#/components/schemas/QueryError'
     QueryErrorMessage:
       type: string
+    QueryType:
+      type: string
+      enum:
+      - TAG_FILTERS_1_0
+      - CLOUDFORMATION_STACK_1_0
     ResourceArn:
       type: string
       pattern: ^arn:aws(-[a-z]+)*:[a-z0-9\-]*:([a-z]{2}(-[a-z]+)+-\d{1})?:([0-9]{12})?:.+$
+    ResourceArnList:
+      type: array
+      items:
+        $ref: '#/components/schemas/ResourceArn'
+    ResourceFilterList:
+      type: array
+      items:
+        $ref: '#/components/schemas/ResourceFilter'
+    ResourceFilterName:
+      type: string
+      enum:
+      - resource-type
     ResourceFilterValue:
       type: string
       pattern: ^AWS::[a-zA-Z0-9]+::[a-zA-Z0-9]+$
       minLength: 1
       maxLength: 128
+    ResourceFilterValues:
+      type: array
+      items:
+        $ref: '#/components/schemas/ResourceFilterValue'
+    ResourceIdentifierList:
+      type: array
+      items:
+        $ref: '#/components/schemas/ResourceIdentifier'
+    ResourceStatusValue:
+      type: string
+      enum:
+      - PENDING
     ResourceType:
       type: string
       pattern: ^AWS::[a-zA-Z0-9]+::\w+$
@@ -193,13 +336,33 @@ components:
       pattern: ^([\p{L}\p{Z}\p{N}_.:/=+\-@]*)$
       minLength: 1
       maxLength: 128
+    TagKeyList:
+      type: array
+      items:
+        $ref: '#/components/schemas/TagKey'
     TagSyncTaskArn:
       type: string
       pattern: ^arn:aws(-[a-z]+)*:resource-groups:[a-z]{2}(-[a-z]+)+-\d{1}:[0-9]{12}:group/[a-zA-Z0-9_\.-]{1,150}/[a-z0-9]{26}/tag-sync-task/[a-z0-9]{26}$
       minLength: 12
       maxLength: 1600
+    TagSyncTaskList:
+      type: array
+      items:
+        $ref: '#/components/schemas/TagSyncTaskItem'
+    TagSyncTaskStatus:
+      type: string
+      enum:
+      - ACTIVE
+      - ERROR
     TagValue:
       type: string
       pattern: ^([\p{L}\p{Z}\p{N}_.:/=+\-@]*)$
       minLength: 0
       maxLength: 256
+    Tags:
+      type: object
+      additionalProperties:
+        $ref: '#/components/schemas/TagValue'
+    timestamp:
+      type: string
+      format: date-time

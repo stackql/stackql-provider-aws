@@ -54,10 +54,32 @@ servers:
 paths: {}
 components:
   schemas:
+    EBSItemFilters:
+      type: array
+      items:
+        $ref: '#/components/schemas/EBSItemFilter'
     EncryptionKeyArn:
       type: string
     ExportJobArn:
       type: string
+    ExportJobStatus:
+      type: string
+      enum:
+      - RUNNING
+      - FAILED
+      - COMPLETED
+    ExportJobSummaries:
+      type: array
+      items:
+        $ref: '#/components/schemas/ExportJobSummary'
+    ExportSpecification:
+      allOf:
+      - allOf:
+        - $ref: '#/components/schemas/S3ExportSpecification'
+        description: |-
+          This specifies the destination Amazon S3 bucket for the export job. And, if included, it also specifies the destination prefix.
+      description: |-
+        This contains the export specification object.
     FilePath:
       type: string
     GenericId:
@@ -67,9 +89,107 @@ components:
       pattern: ^arn:(?:aws|aws-cn|aws-us-gov):iam::[a-z0-9-]+:role/(.+)$
       minLength: 20
       maxLength: 2048
+    LongConditionList:
+      type: array
+      items:
+        $ref: '#/components/schemas/LongCondition'
+    LongConditionOperator:
+      type: string
+      enum:
+      - EQUALS_TO
+      - NOT_EQUALS_TO
+      - LESS_THAN_EQUAL_TO
+      - GREATER_THAN_EQUAL_TO
     ObjectKey:
       type: string
     RecoveryPoint:
       type: string
+    RecoveryPointArnList:
+      type: array
+      items:
+        $ref: '#/components/schemas/RecoveryPoint'
+    ResourceArnList:
+      type: array
+      items:
+        type: string
+    ResourceType:
+      type: string
+      enum:
+      - S3
+      - EBS
+    ResourceTypeList:
+      type: array
+      items:
+        $ref: '#/components/schemas/ResourceType'
+    ResultItem:
+      allOf:
+      - allOf:
+        - $ref: '#/components/schemas/S3ResultItem'
+        description: |-
+          These are items returned in the search results of an Amazon S3 search.
+      - allOf:
+        - $ref: '#/components/schemas/EBSResultItem'
+        description: |-
+          These are items returned in the search results of an Amazon EBS search.
+      description: |-
+        This is an object representing the item returned in the results of a search for a specific resource type.
+    Results:
+      type: array
+      items:
+        $ref: '#/components/schemas/ResultItem'
+    S3ItemFilters:
+      type: array
+      items:
+        $ref: '#/components/schemas/S3ItemFilter'
     SearchJobArn:
       type: string
+    SearchJobBackupsResults:
+      type: array
+      items:
+        $ref: '#/components/schemas/SearchJobBackupsResult'
+    SearchJobState:
+      type: string
+      enum:
+      - RUNNING
+      - COMPLETED
+      - STOPPING
+      - STOPPED
+      - FAILED
+    SearchJobs:
+      type: array
+      items:
+        $ref: '#/components/schemas/SearchJobSummary'
+    StringConditionList:
+      type: array
+      items:
+        $ref: '#/components/schemas/StringCondition'
+    StringConditionOperator:
+      type: string
+      enum:
+      - EQUALS_TO
+      - NOT_EQUALS_TO
+      - CONTAINS
+      - DOES_NOT_CONTAIN
+      - BEGINS_WITH
+      - ENDS_WITH
+      - DOES_NOT_BEGIN_WITH
+      - DOES_NOT_END_WITH
+    TagKeys:
+      type: array
+      items:
+        type: string
+    TagMap:
+      type: object
+      additionalProperties:
+        $ref: '#/components/schemas/String'
+    TimeConditionList:
+      type: array
+      items:
+        $ref: '#/components/schemas/TimeCondition'
+    TimeConditionOperator:
+      type: string
+      enum:
+      - EQUALS_TO
+      - NOT_EQUALS_TO
+      - LESS_THAN_EQUAL_TO
+      - GREATER_THAN_EQUAL_TO

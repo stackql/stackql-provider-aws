@@ -46,18 +46,55 @@ servers:
 paths: {}
 components:
   schemas:
+    AttachedClusterList:
+      type: array
+      items:
+        $ref: '#/components/schemas/KxClusterName'
+    AttributeMap:
+      type: object
+      additionalProperties:
+        $ref: '#/components/schemas/FederationAttributeValue'
+    AutoScalingMetric:
+      type: string
+      enum:
+      - CPU_UTILIZATION_PERCENTAGE
+    AutoScalingMetricTarget:
+      type: number
+      format: double
+      minimum: 1
+      maximum: 100
     AvailabilityZoneId:
       type: string
       pattern: ^[a-zA-Z0-9-]+$
       minLength: 8
       maxLength: 12
+    AvailabilityZoneIds:
+      type: array
+      items:
+        $ref: '#/components/schemas/AvailabilityZoneId'
     BoxedInteger:
       type: integer
+    ChangeRequests:
+      type: array
+      items:
+        $ref: '#/components/schemas/ChangeRequest'
+    ChangeType:
+      type: string
+      enum:
+      - PUT
+      - DELETE
     ChangesetId:
       type: string
       pattern: ^[a-zA-Z0-9]+$
       minLength: 1
       maxLength: 26
+    ChangesetStatus:
+      type: string
+      enum:
+      - PENDING
+      - PROCESSING
+      - FAILED
+      - COMPLETED
     ClientToken:
       type: string
       pattern: \S
@@ -71,11 +108,28 @@ components:
     ClusterNodeCount:
       type: integer
       minimum: 1
+    CooldownTime:
+      type: number
+      format: double
+      minimum: 0
+      maximum: 100000
+    CpuCount:
+      type: number
+      format: double
+      minimum: 0.1
+    CustomDNSConfiguration:
+      type: array
+      items:
+        $ref: '#/components/schemas/CustomDNSServer'
     DataBundleArn:
       type: string
       pattern: ^arn:aws:finspace:[A-Za-z0-9_/.-]{0,63}:\d*:data-bundle/[0-9A-Za-z_-]{1,128}$
       minLength: 20
       maxLength: 2048
+    DataBundleArns:
+      type: array
+      items:
+        $ref: '#/components/schemas/DataBundleArn'
     DatabaseArn:
       type: string
     DatabaseName:
@@ -88,6 +142,10 @@ components:
       pattern: ^(\*)*[\/\?\*]([^\/]+\/){0,2}[^\/]*$
       minLength: 1
       maxLength: 1025
+    DbPaths:
+      type: array
+      items:
+        $ref: '#/components/schemas/DbPath'
     Description:
       type: string
       pattern: ^[a-zA-Z0-9. ]{1,1000}$
@@ -113,11 +171,42 @@ components:
       pattern: \S
       minLength: 1
       maxLength: 32
+    EnvironmentList:
+      type: array
+      items:
+        $ref: '#/components/schemas/Environment'
     EnvironmentName:
       type: string
       pattern: ^[a-zA-Z0-9][a-zA-Z0-9-]*[a-zA-Z0-9]$
       minLength: 1
       maxLength: 255
+    EnvironmentStatus:
+      type: string
+      enum:
+      - CREATE_REQUESTED
+      - CREATING
+      - CREATED
+      - DELETE_REQUESTED
+      - DELETING
+      - DELETED
+      - FAILED_CREATION
+      - RETRY_DELETION
+      - FAILED_DELETION
+      - UPDATE_NETWORK_REQUESTED
+      - UPDATING_NETWORK
+      - FAILED_UPDATING_NETWORK
+      - SUSPENDED
+    ErrorDetails:
+      type: string
+      enum:
+      - The inputs to this request are invalid.
+      - Service limits have been exceeded.
+      - Missing required permission to perform this request.
+      - One or more inputs to this request were not found.
+      - The system temporarily lacks sufficient resources to process the request.
+      - An internal error has occurred.
+      - Cancelled
+      - A user recoverable error has occurred
     ErrorMessage:
       type: string
       minLength: 0
@@ -139,6 +228,11 @@ components:
       pattern: .*
       minLength: 1
       maxLength: 1000
+    FederationMode:
+      type: string
+      enum:
+      - FEDERATED
+      - LOCAL
     FederationProviderName:
       type: string
       pattern: ^[^_\p{Z}][\p{L}\p{M}\p{S}\p{N}\p{P}][^_\p{Z}]+$
@@ -149,6 +243,10 @@ components:
       pattern: ^arn:aws:finspace:[A-Za-z0-9_/.-]{0,63}:\d+:(environment|kxEnvironment)/[0-9A-Za-z_-]{1,128}(/(kxCluster|kxUser|kxVolume|kxScalingGroup)/[a-zA-Z0-9_-]{1,255}|/(kxDatabase/[a-zA-Z0-9_-]{1,255}(/kxDataview/[a-zA-Z0-9_-]{1,255})?))?$
       minLength: 20
       maxLength: 2048
+    IPAddressType:
+      type: string
+      enum:
+      - IP_V4
     IcmpTypeOrCode:
       type: integer
       default: 0
@@ -172,12 +270,35 @@ components:
       pattern: ^[a-zA-Z-0-9-:\/]*$
       minLength: 1
       maxLength: 1000
+    KxAttachedClusters:
+      type: array
+      items:
+        $ref: '#/components/schemas/KxAttachedCluster'
+    KxAzMode:
+      type: string
+      enum:
+      - SINGLE
+      - MULTI
+    KxCacheStorageConfigurations:
+      type: array
+      items:
+        $ref: '#/components/schemas/KxCacheStorageConfiguration'
     KxCacheStorageSize:
       type: integer
     KxCacheStorageType:
       type: string
       minLength: 8
       maxLength: 10
+    KxChangesets:
+      type: array
+      items:
+        $ref: '#/components/schemas/KxChangesetListEntry'
+    KxClusterCodeDeploymentStrategy:
+      type: string
+      enum:
+      - NO_RESTART
+      - ROLLING
+      - FORCE
     KxClusterDescription:
       type: string
       pattern: ^[a-zA-Z0-9\_\-\.\s]+$
@@ -188,15 +309,42 @@ components:
       pattern: ^[a-zA-Z0-9][a-zA-Z0-9-_]*[a-zA-Z0-9]$
       minLength: 3
       maxLength: 63
+    KxClusterNameList:
+      type: array
+      items:
+        $ref: '#/components/schemas/KxClusterName'
     KxClusterNodeIdString:
       type: string
       minLength: 1
       maxLength: 40
+    KxClusterStatus:
+      type: string
+      enum:
+      - PENDING
+      - CREATING
+      - CREATE_FAILED
+      - RUNNING
+      - UPDATING
+      - DELETING
+      - DELETED
+      - DELETE_FAILED
     KxClusterStatusReason:
       type: string
       pattern: ^[a-zA-Z0-9\_\-\.\s]+$
       minLength: 1
       maxLength: 250
+    KxClusterType:
+      type: string
+      enum:
+      - HDB
+      - RDB
+      - GATEWAY
+      - GP
+      - TICKERPLANT
+    KxClusters:
+      type: array
+      items:
+        $ref: '#/components/schemas/KxCluster'
     KxCommandLineArgumentKey:
       type: string
       pattern: ^(?![Aa][Ww][Ss])(s|([a-zA-Z][a-zA-Z0-9_]+))|(AWS_ZIP_DEFAULT)$
@@ -207,21 +355,66 @@ components:
       pattern: ^[a-zA-Z0-9_:./,; ]+$
       minLength: 1
       maxLength: 1024
+    KxCommandLineArguments:
+      type: array
+      items:
+        $ref: '#/components/schemas/KxCommandLineArgument'
+    KxDatabaseCacheConfigurations:
+      type: array
+      items:
+        $ref: '#/components/schemas/KxDatabaseCacheConfiguration'
+    KxDatabaseConfigurations:
+      type: array
+      items:
+        $ref: '#/components/schemas/KxDatabaseConfiguration'
+    KxDatabases:
+      type: array
+      items:
+        $ref: '#/components/schemas/KxDatabaseListEntry'
+    KxDataviewActiveVersionList:
+      type: array
+      items:
+        $ref: '#/components/schemas/KxDataviewActiveVersion'
     KxDataviewName:
       type: string
       pattern: ^[a-zA-Z0-9][a-zA-Z0-9-_]*[a-zA-Z0-9]$
       minLength: 3
       maxLength: 63
+    KxDataviewSegmentConfigurationList:
+      type: array
+      items:
+        $ref: '#/components/schemas/KxDataviewSegmentConfiguration'
+    KxDataviewStatus:
+      type: string
+      enum:
+      - CREATING
+      - ACTIVE
+      - UPDATING
+      - FAILED
+      - DELETING
     KxDataviewStatusReason:
       type: string
       pattern: ^[a-zA-Z0-9\_\-\.\s]+$
       minLength: 1
       maxLength: 250
+    KxDataviews:
+      type: array
+      items:
+        $ref: '#/components/schemas/KxDataviewListEntry'
+    KxDeploymentStrategy:
+      type: string
+      enum:
+      - NO_RESTART
+      - ROLLING
     KxEnvironmentId:
       type: string
       pattern: ^[a-z0-9]+$
       minLength: 1
       maxLength: 32
+    KxEnvironmentList:
+      type: array
+      items:
+        $ref: '#/components/schemas/KxEnvironment'
     KxEnvironmentName:
       type: string
       pattern: ^[a-zA-Z0-9][a-zA-Z0-9-_]*[a-zA-Z0-9]$
@@ -235,20 +428,56 @@ components:
     KxNAS1Size:
       type: integer
       minimum: 1200
+    KxNAS1Type:
+      type: string
+      enum:
+      - SSD_1000
+      - SSD_250
+      - HDD_12
+    KxNodeStatus:
+      type: string
+      enum:
+      - RUNNING
+      - PROVISIONING
+    KxNodeSummaries:
+      type: array
+      items:
+        $ref: '#/components/schemas/KxNode'
     KxSavedownStorageSize:
       type: integer
       minimum: 10
       maximum: 16000
+    KxSavedownStorageType:
+      type: string
+      enum:
+      - SDS01
+    KxScalingGroupList:
+      type: array
+      items:
+        $ref: '#/components/schemas/KxScalingGroup'
     KxScalingGroupName:
       type: string
       pattern: ^[a-zA-Z0-9][a-zA-Z0-9-_]*[a-zA-Z0-9]$
       minLength: 3
       maxLength: 63
+    KxScalingGroupStatus:
+      type: string
+      enum:
+      - CREATING
+      - CREATE_FAILED
+      - ACTIVE
+      - DELETING
+      - DELETED
+      - DELETE_FAILED
     KxUserArn:
       type: string
       pattern: ^arn:aws:finspace:[A-Za-z0-9_/.-]{0,63}:\d+:kxEnvironment/[0-9A-Za-z_-]{1,128}/kxUser/[0-9A-Za-z_-]{1,128}$
       minLength: 20
       maxLength: 2048
+    KxUserList:
+      type: array
+      items:
+        $ref: '#/components/schemas/KxUser'
     KxUserNameString:
       type: string
       pattern: ^[0-9A-Za-z_-]{1,50}$
@@ -264,11 +493,31 @@ components:
       pattern: ^[a-zA-Z0-9][a-zA-Z0-9-_]*[a-zA-Z0-9]$
       minLength: 3
       maxLength: 63
+    KxVolumeStatus:
+      type: string
+      enum:
+      - CREATING
+      - CREATE_FAILED
+      - ACTIVE
+      - UPDATING
+      - UPDATED
+      - UPDATE_FAILED
+      - DELETING
+      - DELETED
+      - DELETE_FAILED
     KxVolumeStatusReason:
       type: string
       pattern: ^[a-zA-Z0-9\_\-\.\s]+$
       minLength: 1
       maxLength: 250
+    KxVolumeType:
+      type: string
+      enum:
+      - NAS_1
+    KxVolumes:
+      type: array
+      items:
+        $ref: '#/components/schemas/KxVolume'
     MaxResults:
       type: integer
       default: 0
@@ -282,6 +531,10 @@ components:
       pattern: ^[a-zA-Z0-9]{1,50}$
       minLength: 1
       maxLength: 50
+    NetworkACLConfiguration:
+      type: array
+      items:
+        $ref: '#/components/schemas/NetworkACLEntry'
     NodeCount:
       type: integer
       minimum: 1
@@ -320,6 +573,11 @@ components:
       pattern: ^arn:aws[a-z\-]*:iam::\d{12}:role/?[a-zA-Z_0-9+=,.@\-_/]+$
       minLength: 20
       maxLength: 2048
+    RuleAction:
+      type: string
+      enum:
+      - allow
+      - deny
     RuleNumber:
       type: integer
       minimum: 1
@@ -348,11 +606,19 @@ components:
       pattern: .*
       minLength: 1000
       maxLength: 10000000
+    SecurityGroupIdList:
+      type: array
+      items:
+        $ref: '#/components/schemas/SecurityGroupIdString'
     SecurityGroupIdString:
       type: string
       pattern: ^sg-([a-z0-9]{8}$|[a-z0-9]{17}$)$
       minLength: 1
       maxLength: 1024
+    SegmentConfigurationDbPathList:
+      type: array
+      items:
+        $ref: '#/components/schemas/DbPath'
     SignedKxConnectionString:
       type: string
       pattern: ^(:|:tcps:\/\/)[a-zA-Z0-9-\.\_]+:\d+:[a-zA-Z0-9-\.\_]+:\S+$
@@ -363,6 +629,10 @@ components:
       pattern: ^[a-zA-Z-0-9-:\/.]*$
       minLength: 1
       maxLength: 1000
+    SubnetIdList:
+      type: array
+      items:
+        $ref: '#/components/schemas/SubnetIdString'
     SubnetIdString:
       type: string
       pattern: ^subnet-([a-z0-9]{8}$|[a-z0-9]{17}$)$
@@ -373,11 +643,26 @@ components:
       pattern: ^(?!aws:)[a-zA-Z+-=._:/]+$
       minLength: 1
       maxLength: 128
+    TagKeyList:
+      type: array
+      items:
+        $ref: '#/components/schemas/TagKey'
+    TagMap:
+      type: object
+      additionalProperties:
+        $ref: '#/components/schemas/TagValue'
     TagValue:
       type: string
       pattern: ^[a-zA-Z0-9+-=._:@ ]+$
       minLength: 1
       maxLength: 256
+    TickerplantLogVolumes:
+      type: array
+      items:
+        $ref: '#/components/schemas/VolumeName'
+    Timestamp:
+      type: string
+      format: date-time
     TransitGatewayID:
       type: string
       minLength: 1
@@ -406,6 +691,14 @@ components:
       pattern: ^[a-zA-Z0-9][a-zA-Z0-9-_]*[a-zA-Z0-9]$
       minLength: 3
       maxLength: 63
+    VolumeType:
+      type: string
+      enum:
+      - NAS_1
+    Volumes:
+      type: array
+      items:
+        $ref: '#/components/schemas/Volume'
     VpcIdString:
       type: string
       pattern: ^vpc-([a-z0-9]{8}$|[a-z0-9]{17}$)$
@@ -419,6 +712,18 @@ components:
     booleanValue:
       type: boolean
       default: false
+    dnsStatus:
+      type: string
+      enum:
+      - NONE
+      - UPDATE_REQUESTED
+      - UPDATING
+      - FAILED_UPDATE
+      - SUCCESSFULLY_UPDATED
+    numBytes:
+      type: integer
+      format: int64
+      default: 0
     numChangesets:
       type: integer
       default: 0
@@ -429,6 +734,14 @@ components:
       type: string
       minLength: 1
       maxLength: 255
+    tgwStatus:
+      type: string
+      enum:
+      - NONE
+      - UPDATE_REQUESTED
+      - UPDATING
+      - FAILED_UPDATE
+      - SUCCESSFULLY_UPDATED
     url:
       type: string
       pattern: ^https?://[-a-zA-Z0-9+&@#/%?=~_|!:,.;]*[-a-zA-Z0-9+&@#/%=~_|]$

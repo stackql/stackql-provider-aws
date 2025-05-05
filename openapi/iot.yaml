@@ -56,29 +56,97 @@ servers:
 paths: {}
 components:
   schemas:
+    AbortAction:
+      type: string
+      enum:
+      - CANCEL
+    AbortCriteriaList:
+      type: array
+      items:
+        $ref: '#/components/schemas/AbortCriteria'
+    AbortThresholdPercentage:
+      type: number
+      format: double
+      maximum: 100
     AcmCertificateArn:
       type: string
       pattern: ^arn:aws(-cn|-us-gov|-iso-b|-iso)?:acm:[a-z]{2}-(gov-|iso-|isob-)?[a-z]{4,9}-\d{1}:\d{12}:certificate/[a-zA-Z0-9/-]+$
       minLength: 1
       maxLength: 2048
+    ActionList:
+      type: array
+      items:
+        $ref: '#/components/schemas/Action'
+    ActionType:
+      type: string
+      enum:
+      - PUBLISH
+      - SUBSCRIBE
+      - RECEIVE
+      - CONNECT
+    ActiveViolations:
+      type: array
+      items:
+        $ref: '#/components/schemas/ActiveViolation'
+    AdditionalMetricsToRetainList:
+      type: array
+      items:
+        $ref: '#/components/schemas/BehaviorMetric'
+    AdditionalMetricsToRetainV2List:
+      type: array
+      items:
+        $ref: '#/components/schemas/MetricToRetain'
+    AdditionalParameterMap:
+      type: object
+      additionalProperties:
+        $ref: '#/components/schemas/Value'
     AggregationField:
       type: string
       minLength: 1
+    AggregationTypeName:
+      type: string
+      enum:
+      - Statistics
+      - Percentiles
+      - Cardinality
     AggregationTypeValue:
       type: string
       pattern: ^[a-zA-Z0-9]+$
       minLength: 1
       maxLength: 12
+    AggregationTypeValues:
+      type: array
+      items:
+        $ref: '#/components/schemas/AggregationTypeValue'
     AlarmName:
       type: string
     AlertTargetArn:
       type: string
+    AlertTargetType:
+      type: string
+      enum:
+      - SNS
+      description: '<p>The type of alert target: one of "SNS".</p>'
+    AlertTargets:
+      type: object
+      additionalProperties:
+        $ref: '#/components/schemas/AlertTarget'
     AllowAuthorizerOverride:
       type: boolean
       default: false
     AllowAutoRegistration:
       type: boolean
       default: false
+    ApplicationProtocol:
+      type: string
+      enum:
+      - SECURE_MQTT
+      - MQTT_WSS
+      - HTTPS
+      - DEFAULT
+    ApproximateSecondsBeforeTimedOut:
+      type: integer
+      format: int64
     AscendingOrder:
       type: boolean
       default: false
@@ -107,6 +175,30 @@ components:
       maxLength: 1024
     AssetPropertyTimeInSeconds:
       type: string
+    AssetPropertyValueList:
+      type: array
+      items:
+        $ref: '#/components/schemas/AssetPropertyValue'
+    AssetPropertyVariant:
+      allOf:
+      - allOf:
+        - $ref: '#/components/schemas/AssetPropertyStringValue'
+        description: |-
+          Optional. The string value of the value entry. Accepts substitution templates.
+      - allOf:
+        - $ref: '#/components/schemas/AssetPropertyIntegerValue'
+        description: |-
+          Optional. A string that contains the integer value of the value entry. Accepts substitution templates.
+      - allOf:
+        - $ref: '#/components/schemas/AssetPropertyDoubleValue'
+        description: |-
+          Optional. A string that contains the double value of the value entry. Accepts substitution templates.
+      - allOf:
+        - $ref: '#/components/schemas/AssetPropertyBooleanValue'
+        description: |-
+          Optional. A string that contains the boolean value (`true` or `false`) of the value entry. Accepts substitution templates.
+      description: |-
+        Contains an asset property value (of a single type).
     AttributeKey:
       type: string
     AttributeName:
@@ -119,18 +211,147 @@ components:
       pattern: ^[a-zA-Z0-9_.,@/:#=\[\]-]*$
       minLength: 0
       maxLength: 800
+    Attributes:
+      type: object
+      additionalProperties:
+        $ref: '#/components/schemas/AttributeValue'
+    AttributesMap:
+      type: object
+      additionalProperties:
+        $ref: '#/components/schemas/Value'
+    AuditCheckConfigurations:
+      type: object
+      additionalProperties:
+        $ref: '#/components/schemas/AuditCheckConfiguration'
     AuditCheckName:
       type: string
+    AuditCheckRunStatus:
+      type: string
+      enum:
+      - IN_PROGRESS
+      - WAITING_FOR_DATA_COLLECTION
+      - CANCELED
+      - COMPLETED_COMPLIANT
+      - COMPLETED_NON_COMPLIANT
+      - FAILED
+    AuditCheckToActionsMapping:
+      type: object
+      additionalProperties:
+        $ref: '#/components/schemas/MitigationActionNameList'
+    AuditCheckToReasonCodeFilter:
+      type: object
+      additionalProperties:
+        $ref: '#/components/schemas/ReasonForNonComplianceCodes'
     AuditDescription:
       type: string
       pattern: ^[\p{Graph}\x20]*$
       minLength: 0
       maxLength: 1000
+    AuditDetails:
+      type: object
+      additionalProperties:
+        $ref: '#/components/schemas/AuditCheckDetails'
+    AuditFindingSeverity:
+      type: string
+      enum:
+      - CRITICAL
+      - HIGH
+      - MEDIUM
+      - LOW
+    AuditFindings:
+      type: array
+      items:
+        $ref: '#/components/schemas/AuditFinding'
+    AuditFrequency:
+      type: string
+      enum:
+      - DAILY
+      - WEEKLY
+      - BIWEEKLY
+      - MONTHLY
+    AuditMitigationActionExecutionMetadataList:
+      type: array
+      items:
+        $ref: '#/components/schemas/AuditMitigationActionExecutionMetadata'
+    AuditMitigationActionsExecutionStatus:
+      type: string
+      enum:
+      - IN_PROGRESS
+      - COMPLETED
+      - FAILED
+      - CANCELED
+      - SKIPPED
+      - PENDING
+    AuditMitigationActionsTaskMetadataList:
+      type: array
+      items:
+        $ref: '#/components/schemas/AuditMitigationActionsTaskMetadata'
+    AuditMitigationActionsTaskStatistics:
+      type: object
+      additionalProperties:
+        $ref: '#/components/schemas/TaskStatisticsForAuditCheck'
+    AuditMitigationActionsTaskStatus:
+      type: string
+      enum:
+      - IN_PROGRESS
+      - COMPLETED
+      - FAILED
+      - CANCELED
+    AuditNotificationTargetConfigurations:
+      type: object
+      additionalProperties:
+        $ref: '#/components/schemas/AuditNotificationTarget'
+    AuditNotificationType:
+      type: string
+      enum:
+      - SNS
+    AuditSuppressionList:
+      type: array
+      items:
+        $ref: '#/components/schemas/AuditSuppression'
     AuditTaskId:
       type: string
       pattern: ^[a-zA-Z0-9\-]+$
       minLength: 1
       maxLength: 40
+    AuditTaskMetadataList:
+      type: array
+      items:
+        $ref: '#/components/schemas/AuditTaskMetadata'
+    AuditTaskStatus:
+      type: string
+      enum:
+      - IN_PROGRESS
+      - COMPLETED
+      - FAILED
+      - CANCELED
+    AuditTaskType:
+      type: string
+      enum:
+      - ON_DEMAND_AUDIT_TASK
+      - SCHEDULED_AUDIT_TASK
+    AuthDecision:
+      type: string
+      enum:
+      - ALLOWED
+      - EXPLICIT_DENY
+      - IMPLICIT_DENY
+    AuthInfos:
+      type: array
+      items:
+        $ref: '#/components/schemas/AuthInfo'
+    AuthResults:
+      type: array
+      items:
+        $ref: '#/components/schemas/AuthResult'
+    AuthenticationType:
+      type: string
+      enum:
+      - CUSTOM_AUTH_X509
+      - CUSTOM_AUTH
+      - AWS_X509
+      - AWS_SIGV4
+      - DEFAULT
     AuthorizerArn:
       type: string
       minLength: 0
@@ -145,6 +366,24 @@ components:
       pattern: ^[\w=,@-]+$
       minLength: 1
       maxLength: 128
+    AuthorizerStatus:
+      type: string
+      enum:
+      - ACTIVE
+      - INACTIVE
+    Authorizers:
+      type: array
+      items:
+        $ref: '#/components/schemas/AuthorizerSummary'
+    AutoRegistrationStatus:
+      type: string
+      enum:
+      - ENABLE
+      - DISABLE
+    Average:
+      type: number
+      format: double
+      default: 0
     AwsAccountId:
       type: string
       pattern: ^[0-9]+$
@@ -158,28 +397,68 @@ components:
       type: string
     AwsIotSqlVersion:
       type: string
+    AwsJobAbortCriteriaAbortAction:
+      type: string
+      enum:
+      - CANCEL
+    AwsJobAbortCriteriaAbortThresholdPercentage:
+      type: number
+      format: double
+      maximum: 100
+    AwsJobAbortCriteriaFailureType:
+      type: string
+      enum:
+      - FAILED
+      - REJECTED
+      - TIMED_OUT
+      - ALL
+    AwsJobAbortCriteriaList:
+      type: array
+      items:
+        $ref: '#/components/schemas/AwsJobAbortCriteria'
     AwsJobAbortCriteriaMinimumNumberOfExecutedThings:
       type: integer
       minimum: 1
     AwsJobRateIncreaseCriteriaNumberOfThings:
       type: integer
       minimum: 1
+    AwsJobRolloutIncrementFactor:
+      type: number
+      format: double
+      default: 0
     AwsJobRolloutRatePerMinute:
       type: integer
       minimum: 1
       maximum: 1000
+    AwsJobTimeoutInProgressTimeoutInMinutes:
+      type: integer
+      format: int64
     BatchMode:
       type: boolean
     BeforeSubstitutionFlag:
       type: boolean
       default: false
+    BehaviorCriteriaType:
+      type: string
+      enum:
+      - STATIC
+      - STATISTICAL
+      - MACHINE_LEARNING
     BehaviorMetric:
       type: string
+    BehaviorModelTrainingSummaries:
+      type: array
+      items:
+        $ref: '#/components/schemas/BehaviorModelTrainingSummary'
     BehaviorName:
       type: string
       pattern: ^[a-zA-Z0-9:_-]+$
       minLength: 1
       maxLength: 128
+    Behaviors:
+      type: array
+      items:
+        $ref: '#/components/schemas/Behavior'
     BillingGroupArn:
       type: string
     BillingGroupDescription:
@@ -197,6 +476,18 @@ components:
       pattern: ^[a-zA-Z0-9:_-]+$
       minLength: 1
       maxLength: 128
+    BillingGroupNameAndArnList:
+      type: array
+      items:
+        $ref: '#/components/schemas/GroupNameAndArn'
+    BinaryCommandExecutionResult:
+      type: string
+      format: byte
+      minLength: 1
+    BinaryParameterValue:
+      type: string
+      format: byte
+      minLength: 1
     Boolean:
       type: boolean
     Boolean2:
@@ -214,10 +505,41 @@ components:
       type: string
     BucketName:
       type: string
+    Buckets:
+      type: array
+      items:
+        $ref: '#/components/schemas/Bucket'
+    CACertificateStatus:
+      type: string
+      enum:
+      - ACTIVE
+      - INACTIVE
+    CACertificateUpdateAction:
+      type: string
+      enum:
+      - DEACTIVATE
+    CACertificates:
+      type: array
+      items:
+        $ref: '#/components/schemas/CACertificate'
     CanceledChecksCount:
       type: integer
+    CanceledFindingsCount:
+      type: integer
+      format: int64
     CanceledThings:
       type: integer
+    CannedAccessControlList:
+      type: string
+      enum:
+      - private
+      - public-read
+      - public-read-write
+      - aws-exec-read
+      - authenticated-read
+      - bucket-owner-read
+      - bucket-owner-full-control
+      - log-delivery-write
     CertificateArn:
       type: string
     CertificateId:
@@ -225,6 +547,11 @@ components:
       pattern: ^(0x)?[a-fA-F0-9]+$
       minLength: 64
       maxLength: 64
+    CertificateMode:
+      type: string
+      enum:
+      - DEFAULT
+      - SNI_ONLY
     CertificateName:
       type: string
     CertificatePathOnDevice:
@@ -234,6 +561,10 @@ components:
       pattern: ^[\s\S]*$
       minLength: 1
       maxLength: 65536
+    CertificateProviderAccountDefaultForOperations:
+      type: array
+      items:
+        $ref: '#/components/schemas/CertificateProviderOperation'
     CertificateProviderArn:
       type: string
       minLength: 0
@@ -248,20 +579,49 @@ components:
       pattern: ^[\w=,@-]+$
       minLength: 1
       maxLength: 128
+    CertificateProviderOperation:
+      type: string
+      enum:
+      - CreateCertificateFromCsr
+    CertificateProviders:
+      type: array
+      items:
+        $ref: '#/components/schemas/CertificateProviderSummary'
     CertificateSigningRequest:
       type: string
       pattern: ^[\s\S]*$
       minLength: 1
       maxLength: 4096
+    CertificateStatus:
+      type: string
+      enum:
+      - ACTIVE
+      - INACTIVE
+      - REVOKED
+      - PENDING_TRANSFER
+      - REGISTER_INACTIVE
+      - PENDING_ACTIVATION
+    Certificates:
+      type: array
+      items:
+        $ref: '#/components/schemas/Certificate'
     ChannelName:
       type: string
     CheckCompliant:
       type: boolean
+    CheckCustomConfiguration:
+      type: object
+      additionalProperties:
+        $ref: '#/components/schemas/ConfigValue'
     Cidr:
       type: string
       pattern: ^[a-fA-F0-9:\.\/]+$
       minLength: 2
       maxLength: 43
+    Cidrs:
+      type: array
+      items:
+        $ref: '#/components/schemas/Cidr'
     ClientCertificateCallbackArn:
       type: string
       pattern: ^[\s\S]*$
@@ -269,6 +629,10 @@ components:
       maxLength: 2048
     ClientId:
       type: string
+    ClientProperties:
+      type: object
+      additionalProperties:
+        $ref: '#/components/schemas/String'
     ClientRequestToken:
       type: string
       pattern: ^[a-zA-Z0-9-_]+$
@@ -295,11 +659,36 @@ components:
       pattern: ^[a-zA-Z0-9_-]+$
       minLength: 1
       maxLength: 64
+    CommandExecutionParameterMap:
+      type: object
+      additionalProperties:
+        $ref: '#/components/schemas/CommandParameterValue'
+    CommandExecutionResultMap:
+      type: object
+      additionalProperties:
+        $ref: '#/components/schemas/CommandExecutionResult'
     CommandExecutionResultName:
       type: string
       pattern: ^[a-zA-Z0-9_-]+$
       minLength: 1
       maxLength: 32
+    CommandExecutionStatus:
+      type: string
+      enum:
+      - CREATED
+      - IN_PROGRESS
+      - SUCCEEDED
+      - FAILED
+      - REJECTED
+      - TIMED_OUT
+    CommandExecutionSummaryList:
+      type: array
+      items:
+        $ref: '#/components/schemas/CommandExecutionSummary'
+    CommandExecutionTimeoutInSeconds:
+      type: integer
+      format: int64
+      minimum: 1
     CommandId:
       type: string
       pattern: ^[a-zA-Z0-9_-]+$
@@ -309,23 +698,63 @@ components:
       type: integer
       minimum: 1
       maximum: 100
+    CommandNamespace:
+      type: string
+      enum:
+      - AWS-IoT
+      - AWS-IoT-FleetWise
     CommandParameterDescription:
       type: string
       pattern: ^[^\p{C}]*$
       minLength: 0
       maxLength: 2028
+    CommandParameterList:
+      type: array
+      items:
+        $ref: '#/components/schemas/CommandParameter'
     CommandParameterName:
       type: string
       pattern: ^[.$a-zA-Z0-9_-]+$
       minLength: 1
       maxLength: 192
+    CommandPayloadBlob:
+      type: string
+      format: byte
+    CommandSummaryList:
+      type: array
+      items:
+        $ref: '#/components/schemas/CommandSummary'
     Comment:
       type: string
       pattern: ^[^\p{C}]+$
       minLength: 0
       maxLength: 2028
+    ComparisonOperator:
+      type: string
+      enum:
+      - less-than
+      - less-than-equals
+      - greater-than
+      - greater-than-equals
+      - in-cidr-set
+      - not-in-cidr-set
+      - in-port-set
+      - not-in-port-set
+      - in-set
+      - not-in-set
     CompliantChecksCount:
       type: integer
+    ConfidenceLevel:
+      type: string
+      enum:
+      - LOW
+      - MEDIUM
+      - HIGH
+    ConfigName:
+      type: string
+      enum:
+      - CERT_AGE_THRESHOLD_IN_DAYS
+      - CERT_EXPIRATION_THRESHOLD_IN_DAYS
     ConfigValue:
       type: string
       minLength: 1
@@ -344,6 +773,9 @@ components:
       pattern: ^[a-zA-Z0-9:_-]+$
       minLength: 1
       maxLength: 128
+    ConnectivityTimestamp:
+      type: integer
+      format: int64
     ConsecutiveDatapointsToAlarm:
       type: integer
       minimum: 1
@@ -363,6 +795,12 @@ components:
     Count:
       type: integer
       default: 0
+    CreatedAtDate:
+      type: string
+      format: date-time
+    CreationDate:
+      type: string
+      format: date-time
     CredentialDurationSeconds:
       type: integer
       minimum: 900
@@ -378,12 +816,37 @@ components:
       pattern: ^[\p{Graph}\x20]*$
       minLength: 0
       maxLength: 128
+    CustomMetricType:
+      type: string
+      enum:
+      - string-list
+      - ip-address-list
+      - number-list
+      - number
     CustomerVersion:
       type: integer
       minimum: 1
+    DataCollectionPercentage:
+      type: number
+      format: double
+      minimum: 0
+      maximum: 100
+    DateType:
+      type: string
+      format: date-time
     DayOfMonth:
       type: string
       pattern: ^([1-9]|[12][0-9]|3[01])$|^LAST$
+    DayOfWeek:
+      type: string
+      enum:
+      - SUN
+      - MON
+      - TUE
+      - WED
+      - THU
+      - FRI
+      - SAT
     DeleteAdditionalMetricsToRetain:
       type: boolean
       default: false
@@ -404,21 +867,67 @@ components:
       default: false
     DeliveryStreamName:
       type: string
+    DeprecationDate:
+      type: string
+      format: date-time
     DeprecationFlag:
       type: boolean
     Description:
       type: string
+    DestinationPackageVersions:
+      type: array
+      items:
+        $ref: '#/components/schemas/PackageVersionArn'
     DetailsKey:
       type: string
       pattern: ^[a-zA-Z0-9:_-]+$
       minLength: 1
       maxLength: 128
+    DetailsMap:
+      type: object
+      additionalProperties:
+        $ref: '#/components/schemas/DetailsValue'
     DetailsValue:
       type: string
       pattern: ^[^\p{C}]+$
       minLength: 1
     DetectMitigationActionExecutionErrorCode:
       type: string
+    DetectMitigationActionExecutionList:
+      type: array
+      items:
+        $ref: '#/components/schemas/DetectMitigationActionExecution'
+    DetectMitigationActionExecutionStatus:
+      type: string
+      enum:
+      - IN_PROGRESS
+      - SUCCESSFUL
+      - FAILED
+      - SKIPPED
+    DetectMitigationActionsTaskStatus:
+      type: string
+      enum:
+      - IN_PROGRESS
+      - SUCCESSFUL
+      - FAILED
+      - CANCELED
+    DetectMitigationActionsTaskSummaryList:
+      type: array
+      items:
+        $ref: '#/components/schemas/DetectMitigationActionsTaskSummary'
+    DetectMitigationActionsToExecuteList:
+      type: array
+      items:
+        $ref: '#/components/schemas/MitigationActionName'
+    DeviceCertificateUpdateAction:
+      type: string
+      enum:
+      - DEACTIVATE
+    DeviceDefenderIndexingMode:
+      type: string
+      enum:
+      - 'OFF'
+      - VIOLATIONS
     DeviceDefenderThingName:
       type: string
       minLength: 1
@@ -430,20 +939,58 @@ components:
       pattern: ^[a-zA-Z0-9:_-]+$
       minLength: 1
       maxLength: 128
+    DimensionNames:
+      type: array
+      items:
+        $ref: '#/components/schemas/DimensionName'
     DimensionStringValue:
       type: string
       minLength: 1
       maxLength: 256
+    DimensionStringValues:
+      type: array
+      items:
+        $ref: '#/components/schemas/DimensionStringValue'
+    DimensionType:
+      type: string
+      enum:
+      - TOPIC_FILTER
+    DimensionValueOperator:
+      type: string
+      enum:
+      - IN
+      - NOT_IN
     DisableAllLogs:
       type: boolean
       default: false
     DisconnectReason:
       type: string
+    DisconnectReasonValue:
+      type: string
+      enum:
+      - AUTH_ERROR
+      - CLIENT_INITIATED_DISCONNECT
+      - CLIENT_ERROR
+      - CONNECTION_LOST
+      - DUPLICATE_CLIENTID
+      - FORBIDDEN_ACCESS
+      - MQTT_KEEP_ALIVE_TIMEOUT
+      - SERVER_ERROR
+      - SERVER_INITIATED_DISCONNECT
+      - THROTTLED
+      - WEBSOCKET_TTL_EXPIRATION
+      - CUSTOMAUTH_TTL_EXPIRATION
+      - UNKNOWN
+      - NONE
     DisplayName:
       type: string
       pattern: ^[^\p{C}]*$
       minLength: 0
       maxLength: 64
+    DocumentParameters:
+      type: array
+      items:
+        $ref: '#/components/schemas/DocumentParameter'
     DomainConfigurationArn:
       type: string
     DomainConfigurationName:
@@ -451,19 +998,52 @@ components:
       pattern: ^[\w.-]+$
       minLength: 1
       maxLength: 128
+    DomainConfigurationStatus:
+      type: string
+      enum:
+      - ENABLED
+      - DISABLED
+    DomainConfigurations:
+      type: array
+      items:
+        $ref: '#/components/schemas/DomainConfigurationSummary'
     DomainName:
       type: string
       pattern: ^[\s\S]*$
       minLength: 1
       maxLength: 253
+    DomainType:
+      type: string
+      enum:
+      - ENDPOINT
+      - AWS_MANAGED
+      - CUSTOMER_MANAGED
+    DoubleParameterValue:
+      type: number
+      format: double
     DurationInMinutes:
       type: integer
       minimum: 1
       maximum: 1430
     DurationSeconds:
       type: integer
+    DynamicGroupStatus:
+      type: string
+      enum:
+      - ACTIVE
+      - BUILDING
+      - REBUILDING
+    DynamoKeyType:
+      type: string
+      enum:
+      - STRING
+      - NUMBER
     DynamoOperation:
       type: string
+    EffectivePolicies:
+      type: array
+      items:
+        $ref: '#/components/schemas/EffectivePolicy'
     ElasticsearchEndpoint:
       type: string
       pattern: ^https?://
@@ -494,6 +1074,10 @@ components:
     Environment:
       type: string
       pattern: ^[^\p{C}]+$
+    Environments:
+      type: array
+      items:
+        $ref: '#/components/schemas/Environment'
     ErrorCode:
       type: string
     ErrorMessage:
@@ -505,19 +1089,64 @@ components:
     EvaluationStatistic:
       type: string
       pattern: ^(p0|p0\.1|p0\.01|p1|p10|p50|p90|p99|p99\.9|p99\.99|p100)$
+    EventConfigurations:
+      type: object
+      additionalProperties:
+        $ref: '#/components/schemas/Configuration'
+    EventType:
+      type: string
+      enum:
+      - THING
+      - THING_GROUP
+      - THING_TYPE
+      - THING_GROUP_MEMBERSHIP
+      - THING_GROUP_HIERARCHY
+      - THING_TYPE_ASSOCIATION
+      - JOB
+      - JOB_EXECUTION
+      - POLICY
+      - CERTIFICATE
+      - CA_CERTIFICATE
     Example:
       type: string
       pattern: ^[^\p{C}]+$
     ExecutionNamePrefix:
       type: string
+    ExecutionNumber:
+      type: integer
+      format: int64
+    ExpectedVersion:
+      type: integer
+      format: int64
+    ExpiresInSec:
+      type: integer
+      format: int64
+      minimum: 60
+      maximum: 3600
+    ExpiresInSeconds:
+      type: integer
+      format: int64
     ExportMetric:
       type: boolean
     FailedChecksCount:
       type: integer
+    FailedFindingsCount:
+      type: integer
+      format: int64
     FailedThings:
       type: integer
     FieldName:
       type: string
+    FieldType:
+      type: string
+      enum:
+      - Number
+      - String
+      - Boolean
+    Fields:
+      type: array
+      items:
+        $ref: '#/components/schemas/Field'
     FileId:
       type: integer
       minimum: 0
@@ -533,6 +1162,10 @@ components:
       pattern: ^[a-zA-Z0-9_-]+$
       minLength: 1
       maxLength: 128
+    FindingIds:
+      type: array
+      items:
+        $ref: '#/components/schemas/FindingId'
     FirehoseSeparator:
       type: string
       pattern: ^([\n\t])|(\r\n)|(,)$
@@ -551,10 +1184,44 @@ components:
       pattern: ^[a-zA-Z0-9_\-\.]+$
       minLength: 1
       maxLength: 128
+    FleetMetricNameAndArnList:
+      type: array
+      items:
+        $ref: '#/components/schemas/FleetMetricNameAndArn'
     FleetMetricPeriod:
       type: integer
       minimum: 60
       maximum: 86400
+    FleetMetricUnit:
+      type: string
+      enum:
+      - Seconds
+      - Microseconds
+      - Milliseconds
+      - Bytes
+      - Kilobytes
+      - Megabytes
+      - Gigabytes
+      - Terabytes
+      - Bits
+      - Kilobits
+      - Megabits
+      - Gigabits
+      - Terabits
+      - Percent
+      - Count
+      - Bytes/Second
+      - Kilobytes/Second
+      - Megabytes/Second
+      - Gigabytes/Second
+      - Terabytes/Second
+      - Bits/Second
+      - Kilobits/Second
+      - Megabits/Second
+      - Gigabits/Second
+      - Terabits/Second
+      - Count/Second
+      - None
     ForceDelete:
       type: boolean
       default: false
@@ -570,6 +1237,13 @@ components:
       type: string
     GenerationId:
       type: string
+    GenericLongValue:
+      type: integer
+      format: int64
+    GeoLocationsFilter:
+      type: array
+      items:
+        $ref: '#/components/schemas/GeoLocationTarget'
     HashAlgorithm:
       type: string
     HashKeyField:
@@ -580,6 +1254,10 @@ components:
       type: string
       minLength: 1
       maxLength: 256
+    HeaderList:
+      type: array
+      items:
+        $ref: '#/components/schemas/HttpActionHeader'
     HeaderValue:
       type: string
     HttpHeaderName:
@@ -592,6 +1270,10 @@ components:
       pattern: ^[\s\S]*$
       minLength: 1
       maxLength: 8192
+    HttpHeaders:
+      type: object
+      additionalProperties:
+        $ref: '#/components/schemas/HttpHeaderValue'
     HttpQueryString:
       type: string
       pattern: ^[\s\S]*$
@@ -601,13 +1283,31 @@ components:
       type: integer
     InProgressThings:
       type: integer
+    InProgressTimeoutInMinutes:
+      type: integer
+      format: int64
+    IncrementFactor:
+      type: number
+      format: double
+      minimum: 1.1
+      maximum: 5
     IndexName:
       type: string
       pattern: ^[a-zA-Z0-9:_-]+$
       minLength: 1
       maxLength: 128
+    IndexNamesList:
+      type: array
+      items:
+        $ref: '#/components/schemas/IndexName'
     IndexSchema:
       type: string
+    IndexStatus:
+      type: string
+      enum:
+      - ACTIVE
+      - BUILDING
+      - REBUILDING
     InlineDocument:
       type: string
     InputName:
@@ -655,11 +1355,59 @@ components:
       type: string
       minLength: 1
       maxLength: 1350
+    JobEndBehavior:
+      type: string
+      enum:
+      - STOP_ROLLOUT
+      - CANCEL
+      - FORCE_CANCEL
+    JobExecutionFailureType:
+      type: string
+      enum:
+      - FAILED
+      - REJECTED
+      - TIMED_OUT
+      - ALL
+    JobExecutionStatus:
+      type: string
+      enum:
+      - QUEUED
+      - IN_PROGRESS
+      - SUCCEEDED
+      - FAILED
+      - TIMED_OUT
+      - REJECTED
+      - REMOVED
+      - CANCELED
+    JobExecutionSummaryForJobList:
+      type: array
+      items:
+        $ref: '#/components/schemas/JobExecutionSummaryForJob'
+    JobExecutionSummaryForThingList:
+      type: array
+      items:
+        $ref: '#/components/schemas/JobExecutionSummaryForThing'
     JobId:
       type: string
       pattern: ^[a-zA-Z0-9_-]+$
       minLength: 1
       maxLength: 64
+    JobStatus:
+      type: string
+      enum:
+      - IN_PROGRESS
+      - CANCELED
+      - COMPLETED
+      - DELETION_IN_PROGRESS
+      - SCHEDULED
+    JobSummaryList:
+      type: array
+      items:
+        $ref: '#/components/schemas/JobSummary'
+    JobTargets:
+      type: array
+      items:
+        $ref: '#/components/schemas/TargetArn'
     JobTemplateArn:
       type: string
       pattern: ^arn:[!-~]+$
@@ -670,6 +1418,10 @@ components:
       pattern: ^[a-zA-Z0-9_-]+$
       minLength: 1
       maxLength: 64
+    JobTemplateSummaryList:
+      type: array
+      items:
+        $ref: '#/components/schemas/JobTemplateSummary'
     JsonDocument:
       type: string
     KafkaHeaderKey:
@@ -680,6 +1432,10 @@ components:
       type: string
       minLength: 0
       maxLength: 16384
+    KafkaHeaders:
+      type: array
+      items:
+        $ref: '#/components/schemas/KafkaActionHeader'
     Key:
       type: string
     KeyName:
@@ -696,6 +1452,12 @@ components:
       type: integer
       minimum: 1
       maximum: 250
+    LastModifiedDate:
+      type: string
+      format: date-time
+    LastUpdatedAtDate:
+      type: string
+      format: date-time
     ListSuppressedAlerts:
       type: boolean
     ListSuppressedFindings:
@@ -703,12 +1465,43 @@ components:
       default: false
     LogGroupName:
       type: string
+    LogLevel:
+      type: string
+      enum:
+      - DEBUG
+      - INFO
+      - ERROR
+      - WARN
+      - DISABLED
+    LogTargetConfigurations:
+      type: array
+      items:
+        $ref: '#/components/schemas/LogTargetConfiguration'
     LogTargetName:
       type: string
+    LogTargetType:
+      type: string
+      enum:
+      - DEFAULT
+      - THING_GROUP
+      - CLIENT_ID
+      - SOURCE_IP
+      - PRINCIPAL_ID
+    LongParameterValue:
+      type: integer
+      format: int64
+    MaintenanceWindows:
+      type: array
+      items:
+        $ref: '#/components/schemas/MaintenanceWindow'
     ManagedJobTemplateName:
       type: string
       minLength: 1
       maxLength: 64
+    ManagedJobTemplatesSummaryList:
+      type: array
+      items:
+        $ref: '#/components/schemas/ManagedJobTemplateSummary'
     ManagedTemplateVersion:
       type: string
       pattern: ^[1-9]+.[0-9]+$
@@ -728,6 +1521,10 @@ components:
       type: integer
       minimum: 1
       maximum: 250
+    Maximum:
+      type: number
+      format: double
+      default: 0
     MaximumPerMinute:
       type: integer
       minimum: 1
@@ -741,40 +1538,93 @@ components:
       type: string
       minLength: 0
       maxLength: 1024
+    MessageFormat:
+      type: string
+      enum:
+      - RAW
+      - JSON
     MessageId:
       type: string
       minLength: 0
       maxLength: 128
+    MetricDatumList:
+      type: array
+      items:
+        $ref: '#/components/schemas/MetricDatum'
     MetricName:
       type: string
       pattern: ^[a-zA-Z0-9:_-]+$
       minLength: 1
       maxLength: 128
+    MetricNames:
+      type: array
+      items:
+        $ref: '#/components/schemas/MetricName'
     MimeType:
       type: string
       minLength: 1
+    Minimum:
+      type: number
+      format: double
+      default: 0
     MinimumNumberOfExecutedThings:
       type: integer
       minimum: 1
     MissingContextValue:
       type: string
+    MissingContextValues:
+      type: array
+      items:
+        $ref: '#/components/schemas/MissingContextValue'
     MitigationActionArn:
       type: string
     MitigationActionId:
       type: string
+    MitigationActionIdentifierList:
+      type: array
+      items:
+        $ref: '#/components/schemas/MitigationActionIdentifier'
+    MitigationActionList:
+      type: array
+      items:
+        $ref: '#/components/schemas/MitigationAction'
     MitigationActionName:
       type: string
       pattern: ^[a-zA-Z0-9_-]+$
       minLength: 0
       maxLength: 128
+    MitigationActionNameList:
+      type: array
+      items:
+        $ref: '#/components/schemas/MitigationActionName'
+    MitigationActionType:
+      type: string
+      enum:
+      - UPDATE_DEVICE_CERTIFICATE
+      - UPDATE_CA_CERTIFICATE
+      - ADD_THINGS_TO_THING_GROUP
+      - REPLACE_DEFAULT_POLICY_VERSION
+      - ENABLE_IOT_LOGGING
+      - PUBLISH_FINDING_TO_SNS
     MitigationActionsTaskId:
       type: string
       pattern: ^[a-zA-Z0-9_-]+$
       minLength: 1
       maxLength: 128
+    ModelStatus:
+      type: string
+      enum:
+      - PENDING_BUILD
+      - ACTIVE
+      - EXPIRED
     MqttClientId:
       type: string
       pattern: ^[\s\S]*$
+      minLength: 1
+      maxLength: 65535
+    MqttPassword:
+      type: string
+      format: byte
       minLength: 1
       maxLength: 65535
     MqttTopic:
@@ -786,6 +1636,15 @@ components:
       pattern: ^[\s\S]*$
       minLength: 1
       maxLength: 65535
+    NamedShadowIndexingMode:
+      type: string
+      enum:
+      - 'OFF'
+      - 'ON'
+    NamedShadowNamesFilter:
+      type: array
+      items:
+        $ref: '#/components/schemas/ShadowName'
     NamespaceId:
       type: string
       pattern: ^[a-zA-Z0-9_-]+$
@@ -793,8 +1652,18 @@ components:
       type: string
     NonCompliantChecksCount:
       type: integer
+    NonCompliantResourcesCount:
+      type: integer
+      format: int64
     NullableBoolean:
       type: boolean
+    Number:
+      type: number
+      format: double
+    NumberList:
+      type: array
+      items:
+        $ref: '#/components/schemas/Number'
     NumberOfRetries:
       type: integer
       minimum: 0
@@ -817,14 +1686,38 @@ components:
       type: string
     OTAUpdateFileVersion:
       type: string
+    OTAUpdateFiles:
+      type: array
+      items:
+        $ref: '#/components/schemas/OTAUpdateFile'
     OTAUpdateId:
       type: string
       pattern: ^[a-zA-Z0-9_-]+$
       minLength: 1
       maxLength: 128
+    OTAUpdateStatus:
+      type: string
+      enum:
+      - CREATE_PENDING
+      - CREATE_IN_PROGRESS
+      - CREATE_COMPLETE
+      - CREATE_FAILED
+      - DELETE_IN_PROGRESS
+      - DELETE_FAILED
+    OTAUpdatesSummary:
+      type: array
+      items:
+        $ref: '#/components/schemas/OTAUpdateSummary'
     Optional:
       type: boolean
       default: false
+    OptionalVersion:
+      type: integer
+      format: int64
+    OutgoingCertificates:
+      type: array
+      items:
+        $ref: '#/components/schemas/OutgoingCertificate'
     OverrideDynamicGroups:
       type: boolean
       default: false
@@ -839,6 +1732,15 @@ components:
       pattern: ^[a-zA-Z0-9-_.]+$
       minLength: 1
       maxLength: 128
+    PackageSummaryList:
+      type: array
+      items:
+        $ref: '#/components/schemas/PackageSummary'
+    PackageVersionAction:
+      type: string
+      enum:
+      - PUBLISH
+      - DEPRECATE
     PackageVersionArn:
       type: string
       pattern: ^arn:[!-~]+$
@@ -850,6 +1752,16 @@ components:
       type: string
       minLength: 0
       maxLength: 3072
+    PackageVersionStatus:
+      type: string
+      enum:
+      - DRAFT
+      - PUBLISHED
+      - DEPRECATED
+    PackageVersionSummaryList:
+      type: array
+      items:
+        $ref: '#/components/schemas/PackageVersionSummary'
     PageSize:
       type: integer
       minimum: 1
@@ -864,11 +1776,19 @@ components:
       pattern: ^[a-zA-Z0-9_-]+$
       minLength: 1
       maxLength: 128
+    ParameterMap:
+      type: object
+      additionalProperties:
+        $ref: '#/components/schemas/ParameterValue'
     ParameterValue:
       type: string
       pattern: ^[^\p{C}]+$
       minLength: 1
       maxLength: 30720
+    Parameters:
+      type: object
+      additionalProperties:
+        $ref: '#/components/schemas/Value'
     PartitionKey:
       type: string
     PayloadField:
@@ -882,13 +1802,35 @@ components:
       pattern: ^[0-9-]+$
       minLength: 10
       maxLength: 32
+    Percent:
+      type: number
+      format: double
+      default: 0
+      minimum: 0
+      maximum: 100
+    PercentList:
+      type: array
+      items:
+        $ref: '#/components/schemas/Percent'
+    PercentValue:
+      type: number
+      format: double
+      default: 0
     Percentage:
       type: integer
       default: 0
       minimum: 0
       maximum: 100
+    Percentiles:
+      type: array
+      items:
+        $ref: '#/components/schemas/PercentPair'
     Platform:
       type: string
+    Policies:
+      type: array
+      items:
+        $ref: '#/components/schemas/Policy'
     PolicyArn:
       type: string
     PolicyDocument:
@@ -896,20 +1838,44 @@ components:
       pattern: ^[\s\S]*$
       minLength: 0
       maxLength: 404600
+    PolicyDocuments:
+      type: array
+      items:
+        $ref: '#/components/schemas/PolicyDocument'
     PolicyName:
       type: string
       pattern: ^[\w+=,.@-]+$
       minLength: 1
       maxLength: 128
+    PolicyNames:
+      type: array
+      items:
+        $ref: '#/components/schemas/PolicyName'
     PolicyTarget:
       type: string
+    PolicyTargets:
+      type: array
+      items:
+        $ref: '#/components/schemas/PolicyTarget'
+    PolicyTemplateName:
+      type: string
+      enum:
+      - BLANK_POLICY
     PolicyVersionId:
       type: string
       pattern: ^[0-9]+$
+    PolicyVersions:
+      type: array
+      items:
+        $ref: '#/components/schemas/PolicyVersion'
     Port:
       type: integer
       minimum: 0
       maximum: 65535
+    Ports:
+      type: array
+      items:
+        $ref: '#/components/schemas/Port'
     Prefix:
       type: string
     PrimitiveBoolean:
@@ -924,14 +1890,55 @@ components:
       pattern: ^[a-zA-Z0-9]+$
       minLength: 1
       maxLength: 128
+    PrincipalThingObjects:
+      type: array
+      items:
+        $ref: '#/components/schemas/PrincipalThingObject'
+    Principals:
+      type: array
+      items:
+        $ref: '#/components/schemas/PrincipalArn'
     PrivateKey:
       type: string
       minLength: 1
     ProcessingTargetName:
       type: string
+    ProcessingTargetNameList:
+      type: array
+      items:
+        $ref: '#/components/schemas/ProcessingTargetName'
+    PropagatingAttributeList:
+      type: array
+      items:
+        $ref: '#/components/schemas/PropagatingAttribute'
+    Protocol:
+      type: string
+      enum:
+      - MQTT
+      - HTTP
+    Protocols:
+      type: array
+      items:
+        $ref: '#/components/schemas/Protocol'
+    ProvisioningTemplateListing:
+      type: array
+      items:
+        $ref: '#/components/schemas/ProvisioningTemplateSummary'
+    ProvisioningTemplateVersionListing:
+      type: array
+      items:
+        $ref: '#/components/schemas/ProvisioningTemplateVersionSummary'
     PublicKey:
       type: string
       minLength: 1
+    PublicKeyMap:
+      type: object
+      additionalProperties:
+        $ref: '#/components/schemas/KeyValue'
+    PutAssetPropertyValueEntryList:
+      type: array
+      items:
+        $ref: '#/components/schemas/PutAssetPropertyValueEntry'
     Qos:
       type: integer
       minimum: 0
@@ -962,6 +1969,10 @@ components:
       type: string
     ReasonForNonComplianceCode:
       type: string
+    ReasonForNonComplianceCodes:
+      type: array
+      items:
+        $ref: '#/components/schemas/ReasonForNonComplianceCode'
     Recursive:
       type: boolean
       default: false
@@ -990,6 +2001,10 @@ components:
       maxLength: 1024
     RejectedThings:
       type: integer
+    RelatedResources:
+      type: array
+      items:
+        $ref: '#/components/schemas/RelatedResource'
     RemoveAuthorizerConfig:
       type: boolean
       default: false
@@ -1003,6 +2018,11 @@ components:
       default: false
     RemovedThings:
       type: integer
+    ReportType:
+      type: string
+      enum:
+      - ERRORS
+      - RESULTS
     ReservedDomainConfigurationName:
       type: string
       pattern: ^[\w.:-]+$
@@ -1015,6 +2035,10 @@ components:
       maxLength: 2048
     ResourceArn:
       type: string
+    ResourceArns:
+      type: object
+      additionalProperties:
+        $ref: '#/components/schemas/ResourceArn'
     ResourceAttributeKey:
       type: string
       pattern: ^[a-zA-Z0-9:_-]+$
@@ -1023,6 +2047,10 @@ components:
       type: string
       pattern: ^[^\p{C}]+$
       minLength: 1
+    ResourceAttributes:
+      type: object
+      additionalProperties:
+        $ref: '#/components/schemas/ResourceAttributeValue'
     ResourceDescription:
       type: string
       pattern: ^[^\p{C}]+$
@@ -1030,12 +2058,38 @@ components:
       maxLength: 1024
     ResourceLogicalId:
       type: string
+    ResourceType:
+      type: string
+      enum:
+      - DEVICE_CERTIFICATE
+      - CA_CERTIFICATE
+      - IOT_POLICY
+      - COGNITO_IDENTITY_POOL
+      - CLIENT_ID
+      - ACCOUNT_SETTINGS
+      - ROLE_ALIAS
+      - IAM_ROLE
+      - ISSUER_CERTIFICATE
+    Resources:
+      type: array
+      items:
+        $ref: '#/components/schemas/Resource'
     ResponseTopic:
       type: string
       minLength: 0
       maxLength: 1024
     RetryAttempt:
       type: integer
+    RetryCriteriaList:
+      type: array
+      items:
+        $ref: '#/components/schemas/RetryCriteria'
+    RetryableFailureType:
+      type: string
+      enum:
+      - FAILED
+      - TIMED_OUT
+      - ALL
     RoleAlias:
       type: string
       pattern: ^[\w=,@-]+$
@@ -1045,6 +2099,10 @@ components:
       type: string
       minLength: 1
       maxLength: 2048
+    RoleAliases:
+      type: array
+      items:
+        $ref: '#/components/schemas/RoleAlias'
     RoleArn:
       type: string
       minLength: 20
@@ -1067,6 +2125,10 @@ components:
       type: string
       minLength: 0
       maxLength: 65535
+    S3FileUrlList:
+      type: array
+      items:
+        $ref: '#/components/schemas/S3FileUrl'
     S3Key:
       type: string
       minLength: 1
@@ -1082,22 +2144,58 @@ components:
     SalesforceToken:
       type: string
       minLength: 40
+    SbomValidationErrorCode:
+      type: string
+      enum:
+      - INCOMPATIBLE_FORMAT
+      - FILE_SIZE_LIMIT_EXCEEDED
     SbomValidationErrorMessage:
       type: string
+    SbomValidationResult:
+      type: string
+      enum:
+      - FAILED
+      - SUCCEEDED
+    SbomValidationResultSummaryList:
+      type: array
+      items:
+        $ref: '#/components/schemas/SbomValidationResultSummary'
+    SbomValidationStatus:
+      type: string
+      enum:
+      - IN_PROGRESS
+      - FAILED
+      - SUCCEEDED
     ScheduledAuditArn:
       type: string
+    ScheduledAuditMetadataList:
+      type: array
+      items:
+        $ref: '#/components/schemas/ScheduledAuditMetadata'
     ScheduledAuditName:
       type: string
       pattern: ^[a-zA-Z0-9_-]+$
       minLength: 1
       maxLength: 128
+    ScheduledJobRolloutList:
+      type: array
+      items:
+        $ref: '#/components/schemas/ScheduledJobRollout'
     SearchQueryMaxResults:
       type: integer
       minimum: 1
+    SearchableAttributes:
+      type: array
+      items:
+        $ref: '#/components/schemas/AttributeName'
     Seconds:
       type: integer
     SecurityGroupId:
       type: string
+    SecurityGroupList:
+      type: array
+      items:
+        $ref: '#/components/schemas/SecurityGroupId'
     SecurityPolicy:
       type: string
       pattern: ^[\s\S]*$
@@ -1110,6 +2208,10 @@ components:
       pattern: ^[\p{Graph}\x20]*$
       minLength: 0
       maxLength: 1000
+    SecurityProfileIdentifiers:
+      type: array
+      items:
+        $ref: '#/components/schemas/SecurityProfileIdentifier'
     SecurityProfileName:
       type: string
       pattern: ^[a-zA-Z0-9:_-]+$
@@ -1117,8 +2219,29 @@ components:
       maxLength: 128
     SecurityProfileTargetArn:
       type: string
+    SecurityProfileTargetMappings:
+      type: array
+      items:
+        $ref: '#/components/schemas/SecurityProfileTargetMapping'
+    SecurityProfileTargets:
+      type: array
+      items:
+        $ref: '#/components/schemas/SecurityProfileTarget'
+    ServerCertificateArns:
+      type: array
+      items:
+        $ref: '#/components/schemas/AcmCertificateArn'
+    ServerCertificateStatus:
+      type: string
+      enum:
+      - INVALID
+      - VALID
     ServerCertificateStatusDetail:
       type: string
+    ServerCertificates:
+      type: array
+      items:
+        $ref: '#/components/schemas/ServerCertificateSummary'
     ServerName:
       type: string
       pattern: ^[\s\S]*$
@@ -1126,6 +2249,12 @@ components:
       maxLength: 253
     ServiceName:
       type: string
+    ServiceType:
+      type: string
+      enum:
+      - DATA
+      - CREDENTIAL_PROVIDER
+      - JOBS
     SetAsActive:
       type: boolean
       default: false
@@ -1139,6 +2268,9 @@ components:
       pattern: ^[$a-zA-Z0-9:_-]+$
       minLength: 1
       maxLength: 64
+    Signature:
+      type: string
+      format: byte
     SignatureAlgorithm:
       type: string
     SigningJobId:
@@ -1147,6 +2279,9 @@ components:
       type: string
     SigningRegion:
       type: string
+    SkippedFindingsCount:
+      type: integer
+      format: int64
     SkyfallMaxResults:
       type: integer
       minimum: 1
@@ -1155,12 +2290,25 @@ components:
       type: string
       minLength: 0
       maxLength: 350
+    SortOrder:
+      type: string
+      enum:
+      - ASCENDING
+      - DESCENDING
     StateMachineName:
       type: string
     StateReason:
       type: string
     StateValue:
       type: string
+    Status:
+      type: string
+      enum:
+      - InProgress
+      - Completed
+      - Failed
+      - Cancelled
+      - Cancelling
     StatusCode:
       type: integer
       default: 0
@@ -1174,6 +2322,10 @@ components:
       pattern: ^[^\p{C}]*$
       minLength: 0
       maxLength: 1024
+    StdDeviation:
+      type: number
+      format: double
+      default: 0
     StreamArn:
       type: string
     StreamDescription:
@@ -1181,6 +2333,10 @@ components:
       pattern: ^[^\p{C}]+$
       minLength: 0
       maxLength: 2028
+    StreamFiles:
+      type: array
+      items:
+        $ref: '#/components/schemas/StreamFile'
     StreamId:
       type: string
       pattern: ^[a-zA-Z0-9_-]+$
@@ -1192,6 +2348,10 @@ components:
       type: integer
       minimum: 0
       maximum: 65535
+    StreamsSummary:
+      type: array
+      items:
+        $ref: '#/components/schemas/StreamSummary'
     String:
       type: string
     StringCommandExecutionResult:
@@ -1201,17 +2361,43 @@ components:
       type: string
       minLength: 1
       maxLength: 64
+    StringList:
+      type: array
+      items:
+        $ref: '#/components/schemas/stringValue'
+    StringMap:
+      type: object
+      additionalProperties:
+        $ref: '#/components/schemas/String'
     StringParameterValue:
       type: string
       minLength: 1
     SubnetId:
       type: string
+    SubnetIdList:
+      type: array
+      items:
+        $ref: '#/components/schemas/SubnetId'
+    SucceededFindingsCount:
+      type: integer
+      format: int64
     SucceededThings:
       type: integer
+    Sum:
+      type: number
+      format: double
+      default: 0
+    SumOfSquares:
+      type: number
+      format: double
+      default: 0
     SuppressAlerts:
       type: boolean
     SuppressIndefinitely:
       type: boolean
+    SuppressedNonCompliantResourcesCount:
+      type: integer
+      format: int64
     TableName:
       type: string
     TagKey:
@@ -1219,6 +2405,18 @@ components:
       pattern: ^([\p{L}\p{Z}\p{N}_.:/=+\-@]*)$
       minLength: 1
       maxLength: 128
+    TagKeyList:
+      type: array
+      items:
+        $ref: '#/components/schemas/TagKey'
+    TagList:
+      type: array
+      items:
+        $ref: '#/components/schemas/Tag'
+    TagMap:
+      type: object
+      additionalProperties:
+        $ref: '#/components/schemas/TagValue'
     TagValue:
       type: string
       minLength: 0
@@ -1229,12 +2427,38 @@ components:
       type: string
       minLength: 0
       maxLength: 2048
+    TargetAuditCheckNames:
+      type: array
+      items:
+        $ref: '#/components/schemas/AuditCheckName'
     TargetFieldName:
       type: string
+    TargetFieldOrder:
+      type: string
+      enum:
+      - LatLon
+      - LonLat
+    TargetSelection:
+      type: string
+      enum:
+      - CONTINUOUS
+      - SNAPSHOT
+    TargetViolationIdsForDetectMitigationActions:
+      type: array
+      items:
+        $ref: '#/components/schemas/ViolationId'
+    Targets:
+      type: array
+      items:
+        $ref: '#/components/schemas/Target'
     TaskId:
       type: string
       minLength: 0
       maxLength: 40
+    TaskIdList:
+      type: array
+      items:
+        $ref: '#/components/schemas/TaskId'
     TemplateArn:
       type: string
     TemplateBody:
@@ -1252,10 +2476,28 @@ components:
       pattern: ^[0-9A-Za-z_-]+$
       minLength: 1
       maxLength: 36
+    TemplateType:
+      type: string
+      enum:
+      - FLEET_PROVISIONING
+      - JITP
     TemplateVersionId:
       type: integer
     ThingArn:
       type: string
+    ThingAttributeList:
+      type: array
+      items:
+        $ref: '#/components/schemas/ThingAttribute'
+    ThingConnectivityIndexingMode:
+      type: string
+      enum:
+      - 'OFF'
+      - STATUS
+    ThingDocumentList:
+      type: array
+      items:
+        $ref: '#/components/schemas/ThingDocument'
     ThingGroupArn:
       type: string
     ThingGroupDescription:
@@ -1263,23 +2505,67 @@ components:
       pattern: ^[\p{Graph}\x20]*$
       minLength: 0
       maxLength: 2028
+    ThingGroupDocumentList:
+      type: array
+      items:
+        $ref: '#/components/schemas/ThingGroupDocument'
     ThingGroupId:
       type: string
       pattern: ^[a-zA-Z0-9\-]+$
       minLength: 1
       maxLength: 128
+    ThingGroupIndexingMode:
+      type: string
+      enum:
+      - 'OFF'
+      - 'ON'
+    ThingGroupList:
+      type: array
+      items:
+        $ref: '#/components/schemas/ThingGroupName'
     ThingGroupName:
       type: string
       pattern: ^[a-zA-Z0-9:_-]+$
       minLength: 1
       maxLength: 128
+    ThingGroupNameAndArnList:
+      type: array
+      items:
+        $ref: '#/components/schemas/GroupNameAndArn'
+    ThingGroupNameList:
+      type: array
+      items:
+        $ref: '#/components/schemas/ThingGroupName'
+    ThingGroupNames:
+      type: array
+      items:
+        $ref: '#/components/schemas/ThingGroupName'
     ThingId:
       type: string
+    ThingIndexingMode:
+      type: string
+      enum:
+      - 'OFF'
+      - REGISTRY
+      - REGISTRY_AND_SHADOW
     ThingName:
       type: string
       pattern: ^[a-zA-Z0-9:_-]+$
       minLength: 1
       maxLength: 128
+    ThingNameList:
+      type: array
+      items:
+        $ref: '#/components/schemas/ThingName'
+    ThingPrincipalObjects:
+      type: array
+      items:
+        $ref: '#/components/schemas/ThingPrincipalObject'
+    ThingPrincipalType:
+      type: string
+      enum:
+      - EXCLUSIVE_THING
+      - NON_EXCLUSIVE_THING
     ThingTypeArn:
       type: string
     ThingTypeDescription:
@@ -1289,6 +2575,10 @@ components:
       maxLength: 2028
     ThingTypeId:
       type: string
+    ThingTypeList:
+      type: array
+      items:
+        $ref: '#/components/schemas/ThingTypeDefinition'
     ThingTypeName:
       type: string
       pattern: ^[a-zA-Z0-9:_-]+$
@@ -1296,8 +2586,15 @@ components:
       maxLength: 128
     TimedOutThings:
       type: integer
+    Timestamp:
+      type: string
+      format: date-time
     TimestreamDatabaseName:
       type: string
+    TimestreamDimensionList:
+      type: array
+      items:
+        $ref: '#/components/schemas/TimestreamDimension'
     TimestreamDimensionName:
       type: string
     TimestreamDimensionValue:
@@ -1335,17 +2632,43 @@ components:
       type: integer
       minimum: 1
       maximum: 1000
+    TopicRuleDestinationStatus:
+      type: string
+      enum:
+      - ENABLED
+      - IN_PROGRESS
+      - DISABLED
+      - ERROR
+      - DELETING
+    TopicRuleDestinationSummaries:
+      type: array
+      items:
+        $ref: '#/components/schemas/TopicRuleDestinationSummary'
+    TopicRuleList:
+      type: array
+      items:
+        $ref: '#/components/schemas/TopicRuleListItem'
     TopicRuleMaxResults:
       type: integer
       minimum: 1
       maximum: 10000
     TotalChecksCount:
       type: integer
+    TotalFindingsCount:
+      type: integer
+      format: int64
+    TotalResourcesCount:
+      type: integer
+      format: int64
     UndoDeprecate:
       type: boolean
       default: false
     UnsetDefaultVersion:
       type: boolean
+    UnsignedLong:
+      type: integer
+      format: int64
+      minimum: 0
     UnsignedLongParameterValue:
       type: string
       pattern: ^[0-9]*$
@@ -1357,6 +2680,10 @@ components:
       maxLength: 2000
     UseBase64:
       type: boolean
+    UserProperties:
+      type: array
+      items:
+        $ref: '#/components/schemas/UserProperty'
     UserPropertyKey:
       type: string
       minLength: 0
@@ -1373,21 +2700,54 @@ components:
     Valid:
       type: boolean
       default: false
+    ValidationErrors:
+      type: array
+      items:
+        $ref: '#/components/schemas/ValidationError'
     Value:
       type: string
       pattern: ^[\s\S]*$
       minLength: 0
       maxLength: 4096
+    Variance:
+      type: number
+      format: double
+      default: 0
+    VerificationState:
+      type: string
+      enum:
+      - FALSE_POSITIVE
+      - BENIGN_POSITIVE
+      - TRUE_POSITIVE
+      - UNKNOWN
     VerificationStateDescription:
       type: string
       pattern: ^[^\p{Cntrl}]*$
       minLength: 0
       maxLength: 1000
+    Version:
+      type: integer
+      format: int64
+      default: 0
     VersionName:
       type: string
       pattern: ^[a-zA-Z0-9-_.]+$
       minLength: 1
       maxLength: 64
+    VersionNumber:
+      type: integer
+      format: int64
+      default: 0
+    ViolationEventType:
+      type: string
+      enum:
+      - in-alarm
+      - alarm-cleared
+      - alarm-invalidated
+    ViolationEvents:
+      type: array
+      items:
+        $ref: '#/components/schemas/ViolationEvent'
     ViolationId:
       type: string
       pattern: ^[a-zA-Z0-9\-]+$

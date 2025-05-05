@@ -50,6 +50,11 @@ servers:
 paths: {}
 components:
   schemas:
+    Action:
+      type: string
+      enum:
+      - read
+      - write
     ActionIdentifier:
       type: string
       minLength: 1
@@ -60,13 +65,139 @@ components:
       maxLength: 1011
     AppArn:
       type: string
+    AppRequiredCapabilities:
+      type: array
+      items:
+        $ref: '#/components/schemas/AppRequiredCapability'
+    AppRequiredCapability:
+      type: string
+      enum:
+      - FileUpload
+      - CreatorMode
+      - RetrievalMode
+      - PluginMode
+    AppStatus:
+      type: string
+      enum:
+      - PUBLISHED
+      - DRAFT
+      - DELETED
     AppVersion:
       type: integer
       minimum: 0
       maximum: 2147483647
+    AttributeFilters:
+      type: array
+      items:
+        $ref: '#/components/schemas/AttributeFilter'
+    BatchCreateCategoryInputCategoryList:
+      type: array
+      items:
+        $ref: '#/components/schemas/BatchCreateCategoryInputCategory'
+    Card:
+      allOf:
+      - allOf:
+        - $ref: '#/components/schemas/TextInputCard'
+        description: |-
+          A container for the properties of the text input card.
+      - allOf:
+        - $ref: '#/components/schemas/QQueryCard'
+        description: |-
+          A container for the properties of the query card.
+      - allOf:
+        - $ref: '#/components/schemas/QPluginCard'
+        description: |-
+          A container for the properties of the plugin card.
+      - allOf:
+        - $ref: '#/components/schemas/FileUploadCard'
+        description: |-
+          A container for the properties of the file upload card.
+      - allOf:
+        - $ref: '#/components/schemas/FormInputCard'
+        description: |-
+          A container for the properties of the form input card.
+      description: |-
+        A card representing a component or step in an Amazon Q App's flow.
+    CardInput:
+      allOf:
+      - allOf:
+        - $ref: '#/components/schemas/TextInputCardInput'
+        description: |-
+          A container for the properties of the text input card.
+      - allOf:
+        - $ref: '#/components/schemas/QQueryCardInput'
+        description: |-
+          A container for the properties of the query input card.
+      - allOf:
+        - $ref: '#/components/schemas/QPluginCardInput'
+        description: |-
+          A container for the properties of the plugin input card.
+      - allOf:
+        - $ref: '#/components/schemas/FileUploadCardInput'
+        description: |-
+          A container for the properties of the file upload input card.
+      - allOf:
+        - $ref: '#/components/schemas/FormInputCardInput'
+        description: |-
+          A container for the properties of the form input card.
+      description: |-
+        The properties defining an input card in an Amazon Q App.
+    CardList:
+      type: array
+      items:
+        $ref: '#/components/schemas/CardInput'
+    CardModelList:
+      type: array
+      items:
+        $ref: '#/components/schemas/Card'
+    CardOutputSource:
+      type: string
+      enum:
+      - approved-sources
+      - llm
+    CardStatusMap:
+      type: object
+      additionalProperties:
+        $ref: '#/components/schemas/CardStatus'
+    CardType:
+      type: string
+      enum:
+      - text-input
+      - q-query
+      - file-upload
+      - q-plugin
+      - form-input
+    CardValueList:
+      type: array
+      items:
+        $ref: '#/components/schemas/CardValue'
+    CategoriesList:
+      type: array
+      items:
+        $ref: '#/components/schemas/Category'
+    CategoryIdList:
+      type: array
+      items:
+        $ref: '#/components/schemas/UUID'
+    CategoryList:
+      type: array
+      items:
+        $ref: '#/components/schemas/Category'
+    CategoryListInput:
+      type: array
+      items:
+        $ref: '#/components/schemas/CategoryInput'
     Default:
       type: string
       maxLength: 500
+    DeleteCategoryInputList:
+      type: array
+      items:
+        $ref: '#/components/schemas/UUID'
+    DependencyList:
+      type: array
+      items:
+        type: string
     Description:
       type: string
       maxLength: 500
@@ -75,17 +206,83 @@ components:
       pattern: ^[a-zA-Z0-9_][a-zA-Z0-9_-]*$
       minLength: 1
       maxLength: 200
+    DocumentAttributeStringListValue:
+      type: array
+      items:
+        $ref: '#/components/schemas/PlatoString'
     DocumentAttributeStringValue:
       type: string
       maxLength: 2048
+    DocumentAttributeValue:
+      allOf:
+      - allOf:
+        - $ref: '#/components/schemas/DocumentAttributeStringValue'
+        description: |-
+          A string.
+      - allOf:
+        - $ref: '#/components/schemas/DocumentAttributeStringListValue'
+        description: |-
+          A list of strings.
+      - allOf:
+        - $ref: '#/components/schemas/Long'
+        description: |-
+          A long integer value.
+      - allOf:
+        - $ref: '#/components/schemas/Timestamp'
+        description: |-
+          A date expressed as an ISO 8601 string.
+
+          It's important for the time zone to be included in the _ISO 8601 date-time_ format. For example, 2012-03-25T12:30:10+01:00 is the ISO 8601 date-time format for March 25th 2012 at 12:30PM (plus 10 seconds) in Central European Time.
+      description: |-
+        The value of a document attribute. You can only provide one value for a document attribute.
+    DocumentScope:
+      type: string
+      enum:
+      - APPLICATION
+      - SESSION
+    ExecutionStatus:
+      type: string
+      enum:
+      - IN_PROGRESS
+      - WAITING
+      - COMPLETED
+      - ERROR
     Filename:
       type: string
       maxLength: 100
+    FormInputCardMetadataSchema:
+      type: object
+      additionalProperties: true
     InitialPrompt:
       type: string
       maxLength: 10000
+    InputCardComputeMode:
+      type: string
+      enum:
+      - append
+      - replace
     InstanceId:
       type: string
+    LibraryItemList:
+      type: array
+      items:
+        $ref: '#/components/schemas/LibraryItemMember'
+    LibraryItemStatus:
+      type: string
+      enum:
+      - PUBLISHED
+      - DISABLED
+    Long:
+      type: integer
+      format: int64
+    MemoryReferenceList:
+      type: array
+      items:
+        type: string
+    MessageList:
+      type: array
+      items:
+        $ref: '#/components/schemas/ConversationMessage'
     PageLimit:
       type: integer
       minimum: 1
@@ -93,6 +290,16 @@ components:
     PaginationToken:
       type: string
       maxLength: 300
+    PermissionsInputList:
+      type: array
+      items:
+        $ref: '#/components/schemas/PermissionInput'
+      description: <p>A list of permissions to grant or revoke for a Amazon Q App.</p>
+    PermissionsOutputList:
+      type: array
+      items:
+        $ref: '#/components/schemas/PermissionOutput'
+      description: <p>A list of permissions granted for a Amazon Q App.</p>
     Placeholder:
       type: string
       maxLength: 500
@@ -104,9 +311,56 @@ components:
       type: string
       minLength: 36
       maxLength: 36
+    PluginType:
+      type: string
+      enum:
+      - SERVICE_NOW
+      - SALESFORCE
+      - JIRA
+      - ZENDESK
+      - CUSTOM
+      - ASANA
+      - ATLASSIAN_CONFLUENCE
+      - GOOGLE_CALENDAR
+      - JIRA_CLOUD
+      - MICROSOFT_EXCHANGE
+      - MICROSOFT_TEAMS
+      - PAGERDUTY_ADVANCE
+      - SALESFORCE_CRM
+      - SERVICENOW_NOW_PLATFORM
+      - SMARTSHEET
+      - ZENDESK_SUITE
+    PredictQAppInputOptions:
+      allOf:
+      - allOf:
+        - $ref: '#/components/schemas/MessageList'
+        description: |-
+          A conversation to use as input for generating the Q App definition.
+      - allOf:
+        - $ref: '#/components/schemas/String'
+        description: |-
+          A problem statement to use as input for generating the Q App definition.
+      description: |-
+        The input options for generating an Q App definition.
+    PresignedUrlFields:
+      type: object
+      additionalProperties:
+        $ref: '#/components/schemas/String'
     Prompt:
       type: string
       maxLength: 50000
+    QAppSessionDataList:
+      type: array
+      items:
+        $ref: '#/components/schemas/QAppSessionData'
+    QAppsTimestamp:
+      type: string
+      format: date-time
+    Sender:
+      type: string
+      enum:
+      - USER
+      - SYSTEM
     SessionName:
       type: string
       maxLength: 100
@@ -116,14 +370,39 @@ components:
       type: boolean
     SessionSharingRevealCards:
       type: boolean
+    SubmissionList:
+      type: array
+      items:
+        $ref: '#/components/schemas/Submission'
+    SubmissionMutationKind:
+      type: string
+      enum:
+      - edit
+      - delete
+      - add
     TagKey:
       type: string
       minLength: 1
       maxLength: 128
+    TagKeys:
+      type: array
+      items:
+        $ref: '#/components/schemas/TagKey'
+    TagMap:
+      type: object
+      additionalProperties:
+        $ref: '#/components/schemas/String'
     TagValue:
       type: string
       minLength: 0
       maxLength: 256
+    Tags:
+      type: object
+      additionalProperties:
+        $ref: '#/components/schemas/TagValue'
+    Timestamp:
+      type: string
+      format: date-time
     Title:
       type: string
       pattern: ^[^{}\\"<>]+$
@@ -131,5 +410,14 @@ components:
     UUID:
       type: string
       pattern: ^[\da-f]{8}-[\da-f]{4}-[45][\da-f]{3}-[89ABab][\da-f]{3}-[\da-f]{12}$
+    UserAppsList:
+      type: array
+      items:
+        $ref: '#/components/schemas/UserAppItem'
     UserId:
       type: string
+    UserType:
+      type: string
+      enum:
+      - owner
+      - user

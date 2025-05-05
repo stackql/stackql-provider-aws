@@ -46,16 +46,52 @@ servers:
 paths: {}
 components:
   schemas:
+    AliasList:
+      type: array
+      items:
+        $ref: '#/components/schemas/Alias'
+    AliasNames:
+      type: array
+      items:
+        $ref: '#/components/schemas/String'
     AmazonResourceName:
       type: string
       minLength: 1
       maxLength: 1011
     AnnotationKey:
       type: string
+    AnnotationValue:
+      allOf:
+      - allOf:
+        - $ref: '#/components/schemas/NullableDouble'
+        description: |-
+          Value for a Number annotation.
+      - allOf:
+        - $ref: '#/components/schemas/NullableBoolean'
+        description: |-
+          Value for a Boolean annotation.
+      - allOf:
+        - $ref: '#/components/schemas/String'
+        description: |-
+          Value for a String annotation.
+      description: |-
+        Value of a segment annotation. Has one of three value types: Number, Boolean, or String.
+    Annotations:
+      type: object
+      additionalProperties:
+        $ref: '#/components/schemas/ValuesWithServiceIds'
+    AnomalousServiceList:
+      type: array
+      items:
+        $ref: '#/components/schemas/AnomalousService'
     AttributeKey:
       type: string
       minLength: 1
       maxLength: 32
+    AttributeMap:
+      type: object
+      additionalProperties:
+        $ref: '#/components/schemas/AttributeValue'
     AttributeValue:
       type: string
       minLength: 1
@@ -71,24 +107,72 @@ components:
       type: string
       minLength: 24
       maxLength: 24
+    Double:
+      type: number
+      format: double
+      default: 0
     EC2InstanceId:
       type: string
       minLength: 0
       maxLength: 20
+    EdgeList:
+      type: array
+      items:
+        $ref: '#/components/schemas/Edge'
     EncryptionKeyId:
       type: string
       minLength: 1
       maxLength: 3000
+    EncryptionStatus:
+      type: string
+      enum:
+      - UPDATING
+      - ACTIVE
+    EncryptionType:
+      type: string
+      enum:
+      - NONE
+      - KMS
     EntitySelectorExpression:
       type: string
       minLength: 1
       maxLength: 500
     ErrorMessage:
       type: string
+    ErrorRootCauseEntityPath:
+      type: array
+      items:
+        $ref: '#/components/schemas/ErrorRootCauseEntity'
+    ErrorRootCauseServices:
+      type: array
+      items:
+        $ref: '#/components/schemas/ErrorRootCauseService'
+    ErrorRootCauses:
+      type: array
+      items:
+        $ref: '#/components/schemas/ErrorRootCause'
     EventSummaryText:
       type: string
+    FaultRootCauseEntityPath:
+      type: array
+      items:
+        $ref: '#/components/schemas/FaultRootCauseEntity'
+    FaultRootCauseServices:
+      type: array
+      items:
+        $ref: '#/components/schemas/FaultRootCauseService'
+    FaultRootCauses:
+      type: array
+      items:
+        $ref: '#/components/schemas/FaultRootCause'
     FilterExpression:
       type: string
+    FixedRate:
+      type: number
+      format: double
+      default: 0
+      minimum: 0
+      maximum: 1
     GetGroupsNextToken:
       type: string
       minLength: 1
@@ -109,10 +193,18 @@ components:
       type: string
       minLength: 1
       maxLength: 32
+    GroupSummaryList:
+      type: array
+      items:
+        $ref: '#/components/schemas/GroupSummary'
     HTTPMethod:
       type: string
       minLength: 0
       maxLength: 10
+    Histogram:
+      type: array
+      items:
+        $ref: '#/components/schemas/HistogramEntry'
     Host:
       type: string
       minLength: 0
@@ -121,18 +213,81 @@ components:
       type: string
       minLength: 0
       maxLength: 255
+    IndexingRuleList:
+      type: array
+      items:
+        $ref: '#/components/schemas/IndexingRule'
+    IndexingRuleValue:
+      allOf:
+      - allOf:
+        - $ref: '#/components/schemas/ProbabilisticRuleValue'
+        description: |-
+          Indexing rule configuration that is used to probabilistically sample traceIds.
+      description: |-
+        The indexing rule configuration.
+    IndexingRuleValueUpdate:
+      allOf:
+      - allOf:
+        - $ref: '#/components/schemas/ProbabilisticRuleValueUpdate'
+        description: |-
+          Indexing rule configuration that is used to probabilistically sample traceIds.
+      description: |-
+        Update to an indexing rule.
+    InsightCategory:
+      type: string
+      enum:
+      - FAULT
+    InsightCategoryList:
+      type: array
+      items:
+        $ref: '#/components/schemas/InsightCategory'
+    InsightEventList:
+      type: array
+      items:
+        $ref: '#/components/schemas/InsightEvent'
     InsightId:
       type: string
       pattern: ^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-5][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}$
+    InsightImpactGraphEdgeList:
+      type: array
+      items:
+        $ref: '#/components/schemas/InsightImpactGraphEdge'
+    InsightImpactGraphServiceList:
+      type: array
+      items:
+        $ref: '#/components/schemas/InsightImpactGraphService'
+    InsightState:
+      type: string
+      enum:
+      - ACTIVE
+      - CLOSED
+    InsightStateList:
+      type: array
+      items:
+        $ref: '#/components/schemas/InsightState'
+    InsightSummaryList:
+      type: array
+      items:
+        $ref: '#/components/schemas/InsightSummary'
     InsightSummaryText:
       type: string
     Integer:
       type: integer
       default: 0
+    LinksList:
+      type: array
+      items:
+        $ref: '#/components/schemas/GraphLink'
     NullableBoolean:
       type: boolean
+    NullableDouble:
+      type: number
+      format: double
     NullableInteger:
       type: integer
+    NullableLong:
+      type: integer
+      format: int64
     PolicyDocument:
       type: string
     PolicyName:
@@ -158,14 +313,47 @@ components:
       type: string
       minLength: 0
       maxLength: 500
+    ResourcePolicyList:
+      type: array
+      items:
+        $ref: '#/components/schemas/ResourcePolicy'
     ResourcePolicyNextToken:
       type: string
       minLength: 1
       maxLength: 100
+    ResponseTimeRootCauseEntityPath:
+      type: array
+      items:
+        $ref: '#/components/schemas/ResponseTimeRootCauseEntity'
+    ResponseTimeRootCauseServices:
+      type: array
+      items:
+        $ref: '#/components/schemas/ResponseTimeRootCauseService'
+    ResponseTimeRootCauses:
+      type: array
+      items:
+        $ref: '#/components/schemas/ResponseTimeRootCause'
+    RetrievalStatus:
+      type: string
+      enum:
+      - SCHEDULED
+      - RUNNING
+      - COMPLETE
+      - FAILED
+      - CANCELLED
+      - TIMEOUT
     RetrievalToken:
       type: string
       minLength: 0
       maxLength: 1020
+    RetrievedServicesList:
+      type: array
+      items:
+        $ref: '#/components/schemas/RetrievedService'
+    RootCauseExceptions:
+      type: array
+      items:
+        $ref: '#/components/schemas/RootCauseException'
     RuleName:
       type: string
       minLength: 1
@@ -174,15 +362,52 @@ components:
       type: integer
       default: 0
       minimum: 0
+    SamplingRuleRecordList:
+      type: array
+      items:
+        $ref: '#/components/schemas/SamplingRuleRecord'
+    SamplingStatisticSummaryList:
+      type: array
+      items:
+        $ref: '#/components/schemas/SamplingStatisticSummary'
+    SamplingStatisticsDocumentList:
+      type: array
+      items:
+        $ref: '#/components/schemas/SamplingStatisticsDocument'
+    SamplingStrategyName:
+      type: string
+      enum:
+      - PartialScan
+      - FixedRate
+    SamplingTargetDocumentList:
+      type: array
+      items:
+        $ref: '#/components/schemas/SamplingTargetDocument'
     SegmentDocument:
       type: string
       minLength: 1
     SegmentId:
       type: string
+    SegmentList:
+      type: array
+      items:
+        $ref: '#/components/schemas/Segment'
+    ServiceIds:
+      type: array
+      items:
+        $ref: '#/components/schemas/ServiceId'
+    ServiceList:
+      type: array
+      items:
+        $ref: '#/components/schemas/Service'
     ServiceName:
       type: string
       minLength: 0
       maxLength: 64
+    ServiceNames:
+      type: array
+      items:
+        $ref: '#/components/schemas/String'
     ServiceType:
       type: string
       minLength: 0
@@ -195,30 +420,130 @@ components:
       type: string
       minLength: 1
       maxLength: 16
+    SpanList:
+      type: array
+      items:
+        $ref: '#/components/schemas/Span'
     String:
       type: string
     TagKey:
       type: string
       minLength: 1
       maxLength: 128
+    TagKeyList:
+      type: array
+      items:
+        $ref: '#/components/schemas/TagKey'
+    TagList:
+      type: array
+      items:
+        $ref: '#/components/schemas/Tag'
     TagValue:
       type: string
       minLength: 0
       maxLength: 256
+    TelemetryRecordList:
+      type: array
+      items:
+        $ref: '#/components/schemas/TelemetryRecord'
+    TimeRangeType:
+      type: string
+      enum:
+      - TraceId
+      - Event
+      - Service
+    TimeSeriesServiceStatisticsList:
+      type: array
+      items:
+        $ref: '#/components/schemas/TimeSeriesServiceStatistics'
+    Timestamp:
+      type: string
+      format: date-time
     Token:
       type: string
       minLength: 1
       maxLength: 2000
+    TraceAvailabilityZones:
+      type: array
+      items:
+        $ref: '#/components/schemas/AvailabilityZoneDetail'
+    TraceFormatType:
+      type: string
+      enum:
+      - XRAY
+      - OTEL
     TraceId:
       type: string
       minLength: 1
       maxLength: 35
+    TraceIdList:
+      type: array
+      items:
+        $ref: '#/components/schemas/TraceId'
+    TraceIdListForRetrieval:
+      type: array
+      items:
+        $ref: '#/components/schemas/TraceId'
+    TraceInstanceIds:
+      type: array
+      items:
+        $ref: '#/components/schemas/InstanceIdDetail'
+    TraceList:
+      type: array
+      items:
+        $ref: '#/components/schemas/Trace'
+    TraceResourceARNs:
+      type: array
+      items:
+        $ref: '#/components/schemas/ResourceARNDetail'
+    TraceSegmentDestination:
+      type: string
+      enum:
+      - XRay
+      - CloudWatchLogs
+    TraceSegmentDestinationStatus:
+      type: string
+      enum:
+      - PENDING
+      - ACTIVE
     TraceSegmentDocument:
       type: string
+    TraceSegmentDocumentList:
+      type: array
+      items:
+        $ref: '#/components/schemas/TraceSegmentDocument'
+    TraceSpanList:
+      type: array
+      items:
+        $ref: '#/components/schemas/RetrievedTrace'
+    TraceSummaryList:
+      type: array
+      items:
+        $ref: '#/components/schemas/TraceSummary'
+    TraceUsers:
+      type: array
+      items:
+        $ref: '#/components/schemas/TraceUser'
     URLPath:
       type: string
       minLength: 0
       maxLength: 128
+    UnprocessedStatisticsList:
+      type: array
+      items:
+        $ref: '#/components/schemas/UnprocessedStatistics'
+    UnprocessedTraceIdList:
+      type: array
+      items:
+        $ref: '#/components/schemas/TraceId'
+    UnprocessedTraceSegmentList:
+      type: array
+      items:
+        $ref: '#/components/schemas/UnprocessedTraceSegment'
+    ValuesWithServiceIds:
+      type: array
+      items:
+        $ref: '#/components/schemas/ValueWithServiceIds'
     Version:
       type: integer
       minimum: 1

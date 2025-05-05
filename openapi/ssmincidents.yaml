@@ -48,24 +48,160 @@ servers:
 paths: {}
 components:
   schemas:
+    Action:
+      allOf:
+      - allOf:
+        - $ref: '#/components/schemas/SsmAutomation'
+        description: |-
+          The Systems Manager automation document to start as the runbook at the beginning of the incident.
+      description: |-
+        The action that starts at the beginning of an incident. The response plan defines the action.
+    ActionsList:
+      type: array
+      items:
+        $ref: '#/components/schemas/Action'
     Arn:
       type: string
       pattern: ^arn:aws(-cn|-us-gov)?:[a-z0-9-]*:[a-z0-9-]*:([0-9]{12})?:.+$
       maxLength: 1000
+    AttributeValueList:
+      allOf:
+      - allOf:
+        - $ref: '#/components/schemas/StringList'
+        description: |-
+          The list of string values that the filter matches.
+      - allOf:
+        - $ref: '#/components/schemas/IntegerList'
+        description: |-
+          The list of integer values that the filter matches.
+      description: |-
+        Use the AttributeValueList to filter by string or integer values.
+    AutomationExecution:
+      allOf:
+      - allOf:
+        - $ref: '#/components/schemas/Arn'
+        description: |-
+          The Amazon Resource Name (ARN) of the automation process.
+      description: |-
+        The Systems Manager automation document process to start as the runbook at the beginning of the incident.
+    AutomationExecutionSet:
+      type: array
+      items:
+        $ref: '#/components/schemas/AutomationExecution'
+    BatchGetIncidentFindingsErrorList:
+      type: array
+      items:
+        $ref: '#/components/schemas/BatchGetIncidentFindingsError'
+    ChatChannel:
+      allOf:
+      - allOf:
+        - $ref: '#/components/schemas/EmptyChatChannel'
+        description: |-
+          Used to remove the chat channel from an incident record or response plan.
+      - allOf:
+        - $ref: '#/components/schemas/ChatbotSnsConfigurationSet'
+        description: |-
+          The Amazon SNS targets that Chatbot uses to notify the chat channel of updates to an incident. You can also make updates to the incident through the chat channel by using the Amazon SNS topics.
+      description: |-
+        The Chatbot chat channel used for collaboration during an incident.
+    ChatbotSnsConfigurationSet:
+      type: array
+      items:
+        $ref: '#/components/schemas/SnsArn'
     ClientToken:
       type: string
       maxLength: 128
+    Condition:
+      allOf:
+      - allOf:
+        - $ref: '#/components/schemas/Timestamp'
+        description: |-
+          Before the specified timestamp
+      - allOf:
+        - $ref: '#/components/schemas/Timestamp'
+        description: |-
+          After the specified timestamp.
+      - allOf:
+        - $ref: '#/components/schemas/AttributeValueList'
+        description: |-
+          The value is equal to the provided string or integer.
+      description: |-
+        A conditional statement with which to compare a value, after a timestamp, before a timestamp, or equal to a string or integer. If multiple conditions are specified, the conditionals become an `AND`ed statement. If multiple values are specified for a conditional, the values are `OR`d.
     DedupeString:
       type: string
       maxLength: 1000
+    DynamicSsmParameterValue:
+      allOf:
+      - allOf:
+        - $ref: '#/components/schemas/VariableType'
+        description: |-
+          Variable dynamic parameters. A parameter value is determined when an incident is created.
+      description: |-
+        The dynamic SSM parameter value.
+    DynamicSsmParameters:
+      type: object
+      additionalProperties:
+        $ref: '#/components/schemas/DynamicSsmParameterValue'
+    EngagementSet:
+      type: array
+      items:
+        $ref: '#/components/schemas/SsmContactsArn'
     EventData:
       type: string
       maxLength: 12000
+    EventReference:
+      allOf:
+      - allOf:
+        - $ref: '#/components/schemas/Arn'
+        description: |-
+          The Amazon Resource Name (ARN) of an Amazon Web Services resource referenced in a `TimelineEvent`.
+      - allOf:
+        - $ref: '#/components/schemas/GeneratedId'
+        description: |-
+          The ID of a `RelatedItem` referenced in a `TimelineEvent`.
+      description: |-
+        An item referenced in a `TimelineEvent` that is involved in or somehow associated with an incident. You can specify an Amazon Resource Name (ARN) for an Amazon Web Services resource or a `RelatedItem` ID.
+    EventReferenceList:
+      type: array
+      items:
+        $ref: '#/components/schemas/EventReference'
+    EventSummaryList:
+      type: array
+      items:
+        $ref: '#/components/schemas/EventSummary'
     ExceptionMessage:
       type: string
+    FilterList:
+      type: array
+      items:
+        $ref: '#/components/schemas/Filter'
+    FindingDetails:
+      allOf:
+      - allOf:
+        - $ref: '#/components/schemas/CodeDeployDeployment'
+        description: |-
+          Information about the CodeDeploy deployment associated with the finding.
+      - allOf:
+        - $ref: '#/components/schemas/CloudFormationStackUpdate'
+        description: |-
+          Information about the CloudFormation stack creation or update associated with the finding.
+      description: |-
+        Extended textual information about the finding.
     FindingId:
       type: string
       maxLength: 128
+    FindingIdList:
+      type: array
+      items:
+        $ref: '#/components/schemas/FindingId'
+    FindingList:
+      type: array
+      items:
+        $ref: '#/components/schemas/Finding'
+    FindingSummaryList:
+      type: array
+      items:
+        $ref: '#/components/schemas/FindingSummary'
     GeneratedId:
       type: string
       pattern: ^related-item/(ANALYSIS|INCIDENT|METRIC|PARENT|ATTACHMENT|OTHER|AUTOMATION|INVOLVED_RESOURCE|TASK)/([0-9]|[A-F]){32}$
@@ -79,6 +215,10 @@ components:
       enum:
       - OPEN
       - RESOLVED
+    IncidentRecordSummaryList:
+      type: array
+      items:
+        $ref: '#/components/schemas/IncidentRecordSummary'
     IncidentSource:
       type: string
       maxLength: 50
@@ -88,6 +228,22 @@ components:
     IncidentTitle:
       type: string
       maxLength: 200
+    IntegerList:
+      type: array
+      items:
+        type: integer
+    Integration:
+      allOf:
+      - allOf:
+        - $ref: '#/components/schemas/PagerDutyConfiguration'
+        description: |-
+          Information about the PagerDuty service where the response plan creates an incident.
+      description: |-
+        Information about third-party services integrated into a response plan.
+    Integrations:
+      type: array
+      items:
+        $ref: '#/components/schemas/Integration'
     ItemType:
       type: string
       enum:
@@ -100,6 +256,26 @@ components:
       - AUTOMATION
       - INVOLVED_RESOURCE
       - TASK
+    ItemValue:
+      allOf:
+      - allOf:
+        - $ref: '#/components/schemas/Arn'
+        description: |-
+          The Amazon Resource Name (ARN) of the related item, if the related item is an Amazon resource.
+      - allOf:
+        - $ref: '#/components/schemas/Url'
+        description: |-
+          The URL, if the related item is a non-Amazon Web Services resource.
+      - allOf:
+        - $ref: '#/components/schemas/MetricDefinition'
+        description: |-
+          The metric definition, if the related item is a metric in Amazon CloudWatch.
+      - allOf:
+        - $ref: '#/components/schemas/PagerDutyIncidentDetail'
+        description: |-
+          Details about an incident that is associated with a PagerDuty incident.
+      description: |-
+        Describes a related item.
     MaxResults:
       type: integer
       minimum: 1
@@ -110,6 +286,18 @@ components:
     NextToken:
       type: string
       maxLength: 2000
+    NotificationTargetItem:
+      allOf:
+      - allOf:
+        - $ref: '#/components/schemas/Arn'
+        description: |-
+          The Amazon Resource Name (ARN) of the SNS topic.
+      description: |-
+        The SNS targets that are notified when updates are made to an incident.
+    NotificationTargetSet:
+      type: array
+      items:
+        $ref: '#/components/schemas/NotificationTargetItem'
     Policy:
       type: string
       maxLength: 4000
@@ -119,6 +307,14 @@ components:
     RawData:
       type: string
       maxLength: 10000
+    RegionInfoMap:
+      type: object
+      additionalProperties:
+        $ref: '#/components/schemas/RegionInfo'
+    RegionMapInput:
+      type: object
+      additionalProperties:
+        $ref: '#/components/schemas/RegionMapInputValue'
     RegionName:
       type: string
       maxLength: 20
@@ -129,6 +325,26 @@ components:
       - CREATING
       - DELETING
       - FAILED
+    RelatedItemList:
+      type: array
+      items:
+        $ref: '#/components/schemas/RelatedItem'
+    RelatedItemsUpdate:
+      allOf:
+      - allOf:
+        - $ref: '#/components/schemas/RelatedItem'
+        description: |-
+          Details about the related item you're adding.
+      - allOf:
+        - $ref: '#/components/schemas/ItemIdentifier'
+        description: |-
+          Details about the related item you're deleting.
+      description: |-
+        Details about the related item you're adding.
+    ReplicationSetArnList:
+      type: array
+      items:
+        $ref: '#/components/schemas/Arn'
     ReplicationSetStatus:
       type: string
       enum:
@@ -137,6 +353,10 @@ components:
       - UPDATING
       - DELETING
       - FAILED
+    ResourcePolicyList:
+      type: array
+      items:
+        $ref: '#/components/schemas/ResourcePolicy'
     ResourceType:
       type: string
       enum:
@@ -153,6 +373,10 @@ components:
       pattern: ^[a-zA-Z0-9-_]*$
       minLength: 1
       maxLength: 200
+    ResponsePlanSummaryList:
+      type: array
+      items:
+        $ref: '#/components/schemas/ResponsePlanSummary'
     RoleArn:
       type: string
       pattern: ^arn:aws(-cn|-us-gov)?:iam::([0-9]{12})?:role/.+$
@@ -179,16 +403,40 @@ components:
       type: string
       pattern: ^arn:aws(-cn|-us-gov)?:ssm-contacts:[a-z0-9-]*:([0-9]{12}):contact/[a-z0-9_-]+$
       maxLength: 2048
+    SsmParameterValues:
+      type: array
+      items:
+        type: string
+    SsmParameters:
+      type: object
+      additionalProperties:
+        $ref: '#/components/schemas/SsmParameterValues'
     SsmTargetAccount:
       type: string
       enum:
       - RESPONSE_PLAN_OWNER_ACCOUNT
       - IMPACTED_ACCOUNT
+    StringList:
+      type: array
+      items:
+        type: string
     TagKey:
       type: string
       pattern: ^(?!aws:)[A-Za-z0-9 _=@:.+-/]+$
       minLength: 1
       maxLength: 128
+    TagKeyList:
+      type: array
+      items:
+        $ref: '#/components/schemas/TagKey'
+    TagMap:
+      type: object
+      additionalProperties:
+        $ref: '#/components/schemas/TagValue'
+    TagMapUpdate:
+      type: object
+      additionalProperties:
+        $ref: '#/components/schemas/TagValue'
     TagValue:
       type: string
       pattern: ^[A-Za-z0-9 _=@:.+-/]*$
@@ -203,6 +451,22 @@ components:
     UUID:
       type: string
       maxLength: 50
+    UpdateActionList:
+      type: array
+      items:
+        $ref: '#/components/schemas/UpdateReplicationSetAction'
+    UpdateReplicationSetAction:
+      allOf:
+      - allOf:
+        - $ref: '#/components/schemas/AddRegionAction'
+        description: |-
+          Details about the Amazon Web Services Region that you're adding to the replication set.
+      - allOf:
+        - $ref: '#/components/schemas/DeleteRegionAction'
+        description: |-
+          Details about the Amazon Web Services Region that you're deleting to the replication set.
+      description: |-
+        Details used when updating the replication set.
     Url:
       type: string
       maxLength: 1000

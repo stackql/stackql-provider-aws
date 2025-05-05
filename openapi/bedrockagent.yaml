@@ -46,28 +46,131 @@ servers:
 paths: {}
 components:
   schemas:
+    APISchema:
+      allOf:
+      - allOf:
+        - $ref: '#/components/schemas/S3Identifier'
+        description: |-
+          Contains details about the S3 object containing the OpenAPI schema for the action group. For more information, see [Action group OpenAPI schemas](https://docs.aws.amazon.com/bedrock/latest/userguide/agents-api-schema.html).
+      - allOf:
+        - $ref: '#/components/schemas/Payload'
+        description: |-
+          The JSON or YAML-formatted payload defining the OpenAPI schema for the action group. For more information, see [Action group OpenAPI schemas](https://docs.aws.amazon.com/bedrock/latest/userguide/agents-api-schema.html).
+      description: |-
+        Contains details about the OpenAPI schema for the action group. For more information, see [Action group OpenAPI schemas](https://docs.aws.amazon.com/bedrock/latest/userguide/agents-api-schema.html). You can either include the schema directly in the `payload` field or you can upload it to an S3 bucket and specify the S3 bucket location in the `s3` field.
+    ActionGroupExecutor:
+      allOf:
+      - allOf:
+        - $ref: '#/components/schemas/LambdaArn'
+        description: |-
+          The Amazon Resource Name (ARN) of the Lambda function containing the business logic that is carried out upon invoking the action.
+      - allOf:
+        - $ref: '#/components/schemas/CustomControlMethod'
+        description: |-
+          To return the action group invocation results directly in the `InvokeAgent` response, specify `RETURN_CONTROL`.
+      description: |-
+        Contains details about the Lambda function containing the business logic that is carried out upon invoking the action or the custom control method for handling the information elicited from the user.
+    ActionGroupSignature:
+      type: string
+      enum:
+      - AMAZON.UserInput
+      - AMAZON.CodeInterpreter
+      - ANTHROPIC.Computer
+      - ANTHROPIC.Bash
+      - ANTHROPIC.TextEditor
+    ActionGroupSignatureParams:
+      type: object
+      additionalProperties:
+        $ref: '#/components/schemas/String'
+    ActionGroupState:
+      type: string
+      enum:
+      - ENABLED
+      - DISABLED
+    ActionGroupSummaries:
+      type: array
+      items:
+        $ref: '#/components/schemas/ActionGroupSummary'
     AgentAliasArn:
       type: string
       pattern: ^arn:aws:bedrock:[a-z0-9-]{1,20}:[0-9]{12}:agent-alias/[0-9a-zA-Z]{10}/[0-9a-zA-Z]{10}$
       maxLength: 2048
+    AgentAliasHistoryEvents:
+      type: array
+      items:
+        $ref: '#/components/schemas/AgentAliasHistoryEvent'
     AgentAliasId:
       type: string
       pattern: ^(\bTSTALIASID\b|[0-9a-zA-Z]+)$
       minLength: 10
       maxLength: 10
+    AgentAliasRoutingConfiguration:
+      type: array
+      items:
+        $ref: '#/components/schemas/AgentAliasRoutingConfigurationListItem'
+    AgentAliasStatus:
+      type: string
+      enum:
+      - CREATING
+      - PREPARED
+      - FAILED
+      - UPDATING
+      - DELETING
+      - DISSOCIATED
+    AgentAliasSummaries:
+      type: array
+      items:
+        $ref: '#/components/schemas/AgentAliasSummary'
     AgentArn:
       type: string
       pattern: ^arn:aws:bedrock:[a-z0-9-]{1,20}:[0-9]{12}:agent/[0-9a-zA-Z]{10}$
       maxLength: 2048
+    AgentCollaboration:
+      type: string
+      enum:
+      - SUPERVISOR
+      - SUPERVISOR_ROUTER
+      - DISABLED
+    AgentCollaboratorSummaries:
+      type: array
+      items:
+        $ref: '#/components/schemas/AgentCollaboratorSummary'
+    AgentKnowledgeBaseSummaries:
+      type: array
+      items:
+        $ref: '#/components/schemas/AgentKnowledgeBaseSummary'
     AgentRoleArn:
       type: string
       pattern: ^arn:aws(-[^:]+)?:iam::([0-9]{12})?:role/.+$
       maxLength: 2048
+    AgentStatus:
+      type: string
+      enum:
+      - CREATING
+      - PREPARING
+      - PREPARED
+      - NOT_PREPARED
+      - DELETING
+      - FAILED
+      - VERSIONING
+      - UPDATING
+    AgentSummaries:
+      type: array
+      items:
+        $ref: '#/components/schemas/AgentSummary'
+    AgentVersionSummaries:
+      type: array
+      items:
+        $ref: '#/components/schemas/AgentVersionSummary'
     AwsDataCatalogTableName:
       type: string
       pattern: ^.*\.*$
       minLength: 1
       maxLength: 200
+    AwsDataCatalogTableNames:
+      type: array
+      items:
+        $ref: '#/components/schemas/AwsDataCatalogTableName'
     BasePromptTemplate:
       type: string
       minLength: 1
@@ -87,6 +190,23 @@ components:
       pattern: ^[0-9]{12}$
       minLength: 12
       maxLength: 12
+    ByteContentBlob:
+      type: string
+      format: byte
+      minLength: 1
+      maxLength: 5242880
+      x-sensitive: true
+    CachePointType:
+      type: string
+      enum:
+      - default
+    ChunkingStrategy:
+      type: string
+      enum:
+      - FIXED_SIZE
+      - NONE
+      - HIERARCHICAL
+      - SEMANTIC
     ClientToken:
       type: string
       pattern: ^[a-zA-Z0-9](-*[a-zA-Z0-9]){0,256}$
@@ -100,10 +220,100 @@ components:
       type: string
       pattern: ^[a-zA-Z0-9_\-]+$
       maxLength: 63
+    ConfluenceAuthType:
+      type: string
+      enum:
+      - BASIC
+      - OAUTH2_CLIENT_CREDENTIALS
+    ConfluenceHostType:
+      type: string
+      enum:
+      - SAAS
+    ContentBlock:
+      allOf:
+      - allOf:
+        - $ref: '#/components/schemas/String'
+        description: |-
+          The text in the message.
+      - allOf:
+        - $ref: '#/components/schemas/CachePointBlock'
+        description: |-
+          Creates a cache checkpoint within a message.
+      description: |-
+        Contains the content for the message you pass to, or receive from a model. For more information, see [Create a prompt using Prompt management](https://docs.aws.amazon.com/bedrock/latest/userguide/prompt-management-create.html).
+      x-sensitive: true
+    ContentBlocks:
+      type: array
+      items:
+        $ref: '#/components/schemas/ContentBlock'
+    ContentDataSourceType:
+      type: string
+      enum:
+      - CUSTOM
+      - S3
+    ContextEnrichmentType:
+      type: string
+      enum:
+      - BEDROCK_FOUNDATION_MODEL
+    ConversationRole:
+      type: string
+      enum:
+      - user
+      - assistant
+    CrawlFilterConfigurationType:
+      type: string
+      enum:
+      - PATTERN
+    CreationMode:
+      type: string
+      enum:
+      - DEFAULT
+      - OVERRIDDEN
+    CuratedQueries:
+      type: array
+      items:
+        $ref: '#/components/schemas/CuratedQuery'
+    CustomControlMethod:
+      type: string
+      enum:
+      - RETURN_CONTROL
+    CustomSourceType:
+      type: string
+      enum:
+      - IN_LINE
+      - S3_LOCATION
     Data:
       type: string
       minLength: 1
       maxLength: 5242880
+    DataDeletionPolicy:
+      type: string
+      enum:
+      - RETAIN
+      - DELETE
+    DataSourceStatus:
+      type: string
+      enum:
+      - AVAILABLE
+      - DELETING
+      - DELETE_UNSUCCESSFUL
+    DataSourceSummaries:
+      type: array
+      items:
+        $ref: '#/components/schemas/DataSourceSummary'
+    DataSourceType:
+      type: string
+      enum:
+      - S3
+      - WEB
+      - CONFLUENCE
+      - SALESFORCE
+      - SHAREPOINT
+      - CUSTOM
+      - REDSHIFT_METADATA
+    DateTimestamp:
+      type: string
+      format: date-time
     Description:
       type: string
       minLength: 1
@@ -116,21 +326,64 @@ components:
       type: integer
       minimum: 0
       maximum: 4096
+    DocumentIdentifiers:
+      type: array
+      items:
+        $ref: '#/components/schemas/DocumentIdentifier'
+    DocumentStatus:
+      type: string
+      enum:
+      - INDEXED
+      - PARTIALLY_INDEXED
+      - PENDING
+      - FAILED
+      - METADATA_PARTIALLY_INDEXED
+      - METADATA_UPDATE_FAILED
+      - IGNORED
+      - NOT_FOUND
+      - STARTING
+      - IN_PROGRESS
+      - DELETING
+      - DELETE_IN_PROGRESS
     DraftVersion:
       type: string
       pattern: ^DRAFT$
       minLength: 5
       maxLength: 5
+    EmbeddingDataType:
+      type: string
+      enum:
+      - FLOAT32
+      - BINARY
+      description: <p>Bedrock models embedding data type. Can be either float32 or
+        binary.</p>
+    EnabledMemoryTypes:
+      type: array
+      items:
+        $ref: '#/components/schemas/MemoryType'
+    EnrichmentStrategyMethod:
+      type: string
+      enum:
+      - CHUNK_ENTITY_EXTRACTION
     ErrorMessage:
       type: string
       maxLength: 2048
     FailureReason:
       type: string
       maxLength: 2048
+    FailureReasons:
+      type: array
+      items:
+        $ref: '#/components/schemas/FailureReason'
     FieldName:
       type: string
       pattern: ^.*$
       maxLength: 2048
+    FilterList:
+      type: array
+      items:
+        $ref: '#/components/schemas/FilterPattern'
+      x-sensitive: true
     FilterPattern:
       type: string
       minLength: 1
@@ -148,6 +401,14 @@ components:
     FlowAliasIdentifier:
       type: string
       pattern: ^(arn:aws:bedrock:[a-z0-9-]{1,20}:[0-9]{12}:flow/[0-9a-zA-Z]{10}/alias/[0-9a-zA-Z]{10})|(TSTALIASID|[0-9a-zA-Z]{10})$
+    FlowAliasRoutingConfiguration:
+      type: array
+      items:
+        $ref: '#/components/schemas/FlowAliasRoutingConfigurationListItem'
+    FlowAliasSummaries:
+      type: array
+      items:
+        $ref: '#/components/schemas/FlowAliasSummary'
     FlowArn:
       type: string
       pattern: ^arn:aws:bedrock:[a-z0-9-]{1,20}:[0-9]{12}:flow/[0-9a-zA-Z]{10}$
@@ -158,9 +419,34 @@ components:
     FlowConditionName:
       type: string
       pattern: ^[a-zA-Z]([_]?[0-9a-zA-Z]){1,50}$
+    FlowConditions:
+      type: array
+      items:
+        $ref: '#/components/schemas/FlowCondition'
+    FlowConnectionConfiguration:
+      allOf:
+      - allOf:
+        - $ref: '#/components/schemas/FlowDataConnectionConfiguration'
+        description: |-
+          The configuration of a connection originating from a node that isn't a Condition node.
+      - allOf:
+        - $ref: '#/components/schemas/FlowConditionalConnectionConfiguration'
+        description: |-
+          The configuration of a connection originating from a Condition node.
+      description: |-
+        The configuration of the connection.
     FlowConnectionName:
       type: string
       pattern: ^[a-zA-Z]([_]?[0-9a-zA-Z]){1,100}$
+    FlowConnectionType:
+      type: string
+      enum:
+      - Data
+      - Conditional
+    FlowConnections:
+      type: array
+      items:
+        $ref: '#/components/schemas/FlowConnection'
     FlowDescription:
       type: string
       minLength: 1
@@ -178,6 +464,68 @@ components:
     FlowName:
       type: string
       pattern: ^([0-9a-zA-Z][_-]?){1,100}$
+    FlowNodeConfiguration:
+      allOf:
+      - allOf:
+        - $ref: '#/components/schemas/InputFlowNodeConfiguration'
+        description: |-
+          Contains configurations for an input flow node in your flow. The first node in the flow. `inputs` can't be specified for this node.
+      - allOf:
+        - $ref: '#/components/schemas/OutputFlowNodeConfiguration'
+        description: |-
+          Contains configurations for an output flow node in your flow. The last node in the flow. `outputs` can't be specified for this node.
+      - allOf:
+        - $ref: '#/components/schemas/KnowledgeBaseFlowNodeConfiguration'
+        description: |-
+          Contains configurations for a knowledge base node in your flow. Queries a knowledge base and returns the retrieved results or generated response.
+      - allOf:
+        - $ref: '#/components/schemas/ConditionFlowNodeConfiguration'
+        description: |-
+          Contains configurations for a Condition node in your flow. Defines conditions that lead to different branches of the flow.
+      - allOf:
+        - $ref: '#/components/schemas/LexFlowNodeConfiguration'
+        description: |-
+          Contains configurations for a Lex node in your flow. Invokes an Amazon Lex bot to identify the intent of the input and return the intent as the output.
+      - allOf:
+        - $ref: '#/components/schemas/PromptFlowNodeConfiguration'
+        description: |-
+          Contains configurations for a prompt node in your flow. Runs a prompt and generates the model response as the output. You can use a prompt from Prompt management or you can configure one in this node.
+      - allOf:
+        - $ref: '#/components/schemas/LambdaFunctionFlowNodeConfiguration'
+        description: |-
+          Contains configurations for a Lambda function node in your flow. Invokes an Lambda function.
+      - allOf:
+        - $ref: '#/components/schemas/StorageFlowNodeConfiguration'
+        description: |-
+          Contains configurations for a Storage node in your flow. Stores an input in an Amazon S3 location.
+      - allOf:
+        - $ref: '#/components/schemas/AgentFlowNodeConfiguration'
+        description: |-
+          Contains configurations for an agent node in your flow. Invokes an alias of an agent and returns the response.
+      - allOf:
+        - $ref: '#/components/schemas/RetrievalFlowNodeConfiguration'
+        description: |-
+          Contains configurations for a Retrieval node in your flow. Retrieves data from an Amazon S3 location and returns it as the output.
+      - allOf:
+        - $ref: '#/components/schemas/IteratorFlowNodeConfiguration'
+        description: |-
+          Contains configurations for an iterator node in your flow. Takes an input that is an array and iteratively sends each item of the array as an output to the following node. The size of the array is also returned in the output.
+
+          The output flow node at the end of the flow iteration will return a response for each member of the array. To return only one response, you can include a collector node downstream from the iterator node.
+      - allOf:
+        - $ref: '#/components/schemas/CollectorFlowNodeConfiguration'
+        description: |-
+          Contains configurations for a collector node in your flow. Collects an iteration of inputs and consolidates them into an array of outputs.
+      description: |-
+        Contains configurations for a node in your flow. For more information, see [Node types in Amazon Bedrock works](https://docs.aws.amazon.com/bedrock/latest/userguide/flows-nodes.html) in the Amazon Bedrock User Guide.
+    FlowNodeIODataType:
+      type: string
+      enum:
+      - String
+      - Number
+      - Boolean
+      - Object
+      - Array
     FlowNodeInputExpression:
       type: string
       minLength: 1
@@ -185,16 +533,233 @@ components:
     FlowNodeInputName:
       type: string
       pattern: ^[a-zA-Z]([_]?[0-9a-zA-Z]){1,50}$
+    FlowNodeInputs:
+      type: array
+      items:
+        $ref: '#/components/schemas/FlowNodeInput'
     FlowNodeName:
       type: string
       pattern: ^[a-zA-Z]([_]?[0-9a-zA-Z]){1,50}$
     FlowNodeOutputName:
       type: string
       pattern: ^[a-zA-Z]([_]?[0-9a-zA-Z]){1,50}$
+    FlowNodeOutputs:
+      type: array
+      items:
+        $ref: '#/components/schemas/FlowNodeOutput'
+    FlowNodeType:
+      type: string
+      enum:
+      - Input
+      - Output
+      - KnowledgeBase
+      - Condition
+      - Lex
+      - Prompt
+      - LambdaFunction
+      - Storage
+      - Agent
+      - Retrieval
+      - Iterator
+      - Collector
+    FlowNodes:
+      type: array
+      items:
+        $ref: '#/components/schemas/FlowNode'
+    FlowStatus:
+      type: string
+      enum:
+      - Failed
+      - Prepared
+      - Preparing
+      - NotPrepared
+    FlowSummaries:
+      type: array
+      items:
+        $ref: '#/components/schemas/FlowSummary'
+    FlowValidationDetails:
+      allOf:
+      - allOf:
+        - $ref: '#/components/schemas/CyclicConnectionFlowValidationDetails'
+        description: |-
+          Details about a cyclic connection in the flow.
+      - allOf:
+        - $ref: '#/components/schemas/DuplicateConnectionsFlowValidationDetails'
+        description: |-
+          Details about duplicate connections between nodes.
+      - allOf:
+        - $ref: '#/components/schemas/DuplicateConditionExpressionFlowValidationDetails'
+        description: |-
+          Details about duplicate condition expressions in a node.
+      - allOf:
+        - $ref: '#/components/schemas/UnreachableNodeFlowValidationDetails'
+        description: |-
+          Details about an unreachable node in the flow.
+      - allOf:
+        - $ref: '#/components/schemas/UnknownConnectionSourceFlowValidationDetails'
+        description: |-
+          Details about an unknown source node for a connection.
+      - allOf:
+        - $ref: '#/components/schemas/UnknownConnectionSourceOutputFlowValidationDetails'
+        description: |-
+          Details about an unknown source output for a connection.
+      - allOf:
+        - $ref: '#/components/schemas/UnknownConnectionTargetFlowValidationDetails'
+        description: |-
+          Details about an unknown target node for a connection.
+      - allOf:
+        - $ref: '#/components/schemas/UnknownConnectionTargetInputFlowValidationDetails'
+        description: |-
+          Details about an unknown target input for a connection.
+      - allOf:
+        - $ref: '#/components/schemas/UnknownConnectionConditionFlowValidationDetails'
+        description: |-
+          Details about an unknown condition for a connection.
+      - allOf:
+        - $ref: '#/components/schemas/MalformedConditionExpressionFlowValidationDetails'
+        description: |-
+          Details about a malformed condition expression in a node.
+      - allOf:
+        - $ref: '#/components/schemas/MalformedNodeInputExpressionFlowValidationDetails'
+        description: |-
+          Details about a malformed input expression in a node.
+      - allOf:
+        - $ref: '#/components/schemas/MismatchedNodeInputTypeFlowValidationDetails'
+        description: |-
+          Details about mismatched input data types in a node.
+      - allOf:
+        - $ref: '#/components/schemas/MismatchedNodeOutputTypeFlowValidationDetails'
+        description: |-
+          Details about mismatched output data types in a node.
+      - allOf:
+        - $ref: '#/components/schemas/IncompatibleConnectionDataTypeFlowValidationDetails'
+        description: |-
+          Details about incompatible data types in a connection.
+      - allOf:
+        - $ref: '#/components/schemas/MissingConnectionConfigurationFlowValidationDetails'
+        description: |-
+          Details about missing configuration for a connection.
+      - allOf:
+        - $ref: '#/components/schemas/MissingDefaultConditionFlowValidationDetails'
+        description: |-
+          Details about a missing default condition in a conditional node.
+      - allOf:
+        - $ref: '#/components/schemas/MissingEndingNodesFlowValidationDetails'
+        description: |-
+          Details about missing ending nodes in the flow.
+      - allOf:
+        - $ref: '#/components/schemas/MissingNodeConfigurationFlowValidationDetails'
+        description: |-
+          Details about missing configuration for a node.
+      - allOf:
+        - $ref: '#/components/schemas/MissingNodeInputFlowValidationDetails'
+        description: |-
+          Details about a missing required input in a node.
+      - allOf:
+        - $ref: '#/components/schemas/MissingNodeOutputFlowValidationDetails'
+        description: |-
+          Details about a missing required output in a node.
+      - allOf:
+        - $ref: '#/components/schemas/MissingStartingNodesFlowValidationDetails'
+        description: |-
+          Details about missing starting nodes in the flow.
+      - allOf:
+        - $ref: '#/components/schemas/MultipleNodeInputConnectionsFlowValidationDetails'
+        description: |-
+          Details about multiple connections to a single node input.
+      - allOf:
+        - $ref: '#/components/schemas/UnfulfilledNodeInputFlowValidationDetails'
+        description: |-
+          Details about an unfulfilled node input with no valid connections.
+      - allOf:
+        - $ref: '#/components/schemas/UnsatisfiedConnectionConditionsFlowValidationDetails'
+        description: |-
+          Details about unsatisfied conditions for a connection.
+      - allOf:
+        - $ref: '#/components/schemas/UnspecifiedFlowValidationDetails'
+        description: |-
+          Details about an unspecified validation.
+      - allOf:
+        - $ref: '#/components/schemas/UnknownNodeInputFlowValidationDetails'
+        description: |-
+          Details about an unknown input for a node.
+      - allOf:
+        - $ref: '#/components/schemas/UnknownNodeOutputFlowValidationDetails'
+        description: |-
+          Details about an unknown output for a node.
+      description: |-
+        A union type containing various possible validation issues in the flow.
+    FlowValidationSeverity:
+      type: string
+      enum:
+      - Warning
+      - Error
+    FlowValidationType:
+      type: string
+      enum:
+      - CyclicConnection
+      - DuplicateConnections
+      - DuplicateConditionExpression
+      - UnreachableNode
+      - UnknownConnectionSource
+      - UnknownConnectionSourceOutput
+      - UnknownConnectionTarget
+      - UnknownConnectionTargetInput
+      - UnknownConnectionCondition
+      - MalformedConditionExpression
+      - MalformedNodeInputExpression
+      - MismatchedNodeInputType
+      - MismatchedNodeOutputType
+      - IncompatibleConnectionDataType
+      - MissingConnectionConfiguration
+      - MissingDefaultCondition
+      - MissingEndingNodes
+      - MissingNodeConfiguration
+      - MissingNodeInput
+      - MissingNodeOutput
+      - MissingStartingNodes
+      - MultipleNodeInputConnections
+      - UnfulfilledNodeInput
+      - UnsatisfiedConnectionConditions
+      - Unspecified
+      - UnknownNodeInput
+      - UnknownNodeOutput
+    FlowValidations:
+      type: array
+      items:
+        $ref: '#/components/schemas/FlowValidation'
+    FlowVersionSummaries:
+      type: array
+      items:
+        $ref: '#/components/schemas/FlowVersionSummary'
     FunctionDescription:
       type: string
       minLength: 1
       maxLength: 1200
+    FunctionSchema:
+      allOf:
+      - allOf:
+        - $ref: '#/components/schemas/Functions'
+        description: |-
+          A list of functions that each define an action in the action group.
+      description: |-
+        Defines functions that each define parameters that the agent needs to invoke from the user. Each function represents an action in an action group.
+
+        This data type is used in the following API operations:
+
+          * [CreateAgentActionGroup request](https://docs.aws.amazon.com/bedrock/latest/APIReference/API_agent_CreateAgentActionGroup.html#API_agent_CreateAgentActionGroup_RequestSyntax)
+
+          * [CreateAgentActionGroup response](https://docs.aws.amazon.com/bedrock/latest/APIReference/API_agent_CreateAgentActionGroup.html#API_agent_CreateAgentActionGroup_ResponseSyntax)
+
+          * [UpdateAgentActionGroup request](https://docs.aws.amazon.com/bedrock/latest/APIReference/API_agent_UpdateAgentActionGroup.html#API_agent_UpdateAgentActionGroup_RequestSyntax)
+
+          * [UpdateAgentActionGroup response](https://docs.aws.amazon.com/bedrock/latest/APIReference/API_agent_UpdateAgentActionGroup.html#API_agent_UpdateAgentActionGroup_ResponseSyntax)
+
+          * [GetAgentActionGroup response](https://docs.aws.amazon.com/bedrock/latest/APIReference/API_agent_GetAgentActionGroup.html#API_agent_GetAgentActionGroup_ResponseSyntax)
+    Functions:
+      type: array
+      items:
+        $ref: '#/components/schemas/Function'
     GraphArn:
       type: string
       pattern: ^arn:aws(|-cn|-us-gov):neptune-graph:[a-zA-Z0-9-]*:[0-9]{12}:graph/g-[a-zA-Z0-9]{10}$
@@ -207,17 +772,65 @@ components:
     GuardrailVersion:
       type: string
       pattern: ^(([0-9]{1,8})|(DRAFT))$
+    HierarchicalChunkingLevelConfigurations:
+      type: array
+      items:
+        $ref: '#/components/schemas/HierarchicalChunkingLevelConfiguration'
     HttpsUrl:
       type: string
       pattern: ^https://[A-Za-z0-9][^\s]*$
     Id:
       type: string
       pattern: ^[0-9a-zA-Z]{10}$
+    IncludeExclude:
+      type: string
+      enum:
+      - INCLUDE
+      - EXCLUDE
+    IngestionJobFilterAttribute:
+      type: string
+      enum:
+      - STATUS
+    IngestionJobFilterOperator:
+      type: string
+      enum:
+      - EQ
     IngestionJobFilterValue:
       type: string
       pattern: ^.*$
       minLength: 0
       maxLength: 100
+    IngestionJobFilterValues:
+      type: array
+      items:
+        $ref: '#/components/schemas/IngestionJobFilterValue'
+    IngestionJobFilters:
+      type: array
+      items:
+        $ref: '#/components/schemas/IngestionJobFilter'
+    IngestionJobSortByAttribute:
+      type: string
+      enum:
+      - STATUS
+      - STARTED_AT
+    IngestionJobStatus:
+      type: string
+      enum:
+      - STARTING
+      - IN_PROGRESS
+      - COMPLETE
+      - FAILED
+      - STOPPING
+      - STOPPED
+    IngestionJobSummaries:
+      type: array
+      items:
+        $ref: '#/components/schemas/IngestionJobSummary'
+    InlineContentType:
+      type: string
+      enum:
+      - BYTE
+      - TEXT
     Instruction:
       type: string
       minLength: 40
@@ -238,6 +851,14 @@ components:
       type: string
       pattern: ^arn:aws(|-cn|-us-gov):bedrock:[a-zA-Z0-9-]*:[0-9]{12}:knowledge-base/[0-9a-zA-Z]+$
       maxLength: 128
+    KnowledgeBaseDocumentDetails:
+      type: array
+      items:
+        $ref: '#/components/schemas/KnowledgeBaseDocumentDetail'
+    KnowledgeBaseDocuments:
+      type: array
+      items:
+        $ref: '#/components/schemas/KnowledgeBaseDocument'
     KnowledgeBaseId:
       type: string
       pattern: ^[0-9a-zA-Z]+$
@@ -251,6 +872,40 @@ components:
       type: string
       pattern: ^arn:aws(-[^:]+)?:iam::([0-9]{12})?:role/.+$
       maxLength: 2048
+    KnowledgeBaseState:
+      type: string
+      enum:
+      - ENABLED
+      - DISABLED
+    KnowledgeBaseStatus:
+      type: string
+      enum:
+      - CREATING
+      - ACTIVE
+      - DELETING
+      - UPDATING
+      - FAILED
+      - DELETE_UNSUCCESSFUL
+    KnowledgeBaseStorageType:
+      type: string
+      enum:
+      - OPENSEARCH_SERVERLESS
+      - PINECONE
+      - REDIS_ENTERPRISE_CLOUD
+      - RDS
+      - MONGO_DB_ATLAS
+      - NEPTUNE_ANALYTICS
+      - OPENSEARCH_MANAGED_CLUSTER
+    KnowledgeBaseSummaries:
+      type: array
+      items:
+        $ref: '#/components/schemas/KnowledgeBaseSummary'
+    KnowledgeBaseType:
+      type: string
+      enum:
+      - VECTOR
+      - KENDRA
+      - SQL
     LambdaArn:
       type: string
       pattern: ^arn:(aws[a-zA-Z-]*)?:lambda:[a-z]{2}(-gov)?-[a-z]+-\d{1}:\d{12}:function:[a-zA-Z0-9-_\.]+(:(\$LATEST|[a-zA-Z0-9-_]+))?$
@@ -273,6 +928,30 @@ components:
     MaximumLength:
       type: integer
       minimum: 0
+    MemoryType:
+      type: string
+      enum:
+      - SESSION_SUMMARY
+    Messages:
+      type: array
+      items:
+        $ref: '#/components/schemas/Message'
+    MetadataAttributes:
+      type: array
+      items:
+        $ref: '#/components/schemas/MetadataAttribute'
+    MetadataSourceType:
+      type: string
+      enum:
+      - IN_LINE_ATTRIBUTE
+      - S3_LOCATION
+    MetadataValueType:
+      type: string
+      enum:
+      - BOOLEAN
+      - NUMBER
+      - STRING
+      - STRING_LIST
     Microsoft365TenantId:
       type: string
       pattern: ^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$
@@ -322,6 +1001,9 @@ components:
     NonEmptyString:
       type: string
       minLength: 1
+    NumberValue:
+      type: number
+      format: double
     NumericalVersion:
       type: string
       pattern: ^[0-9]{1,5}$
@@ -346,14 +1028,45 @@ components:
       type: string
       pattern: ^.*$
       maxLength: 2048
+    OrchestrationExecutor:
+      allOf:
+      - allOf:
+        - $ref: '#/components/schemas/LambdaArn'
+        description: |-
+          The Amazon Resource Name (ARN) of the Lambda function containing the business logic that is carried out upon invoking the action.
+      description: |-
+        Contains details about the Lambda function containing the orchestration logic carried out upon invoking the custom orchestration.
+    OrchestrationType:
+      type: string
+      enum:
+      - DEFAULT
+      - CUSTOM_ORCHESTRATION
     ParameterDescription:
       type: string
       minLength: 1
       maxLength: 500
+    ParameterMap:
+      type: object
+      additionalProperties:
+        $ref: '#/components/schemas/ParameterDetail'
+    ParsingModality:
+      type: string
+      enum:
+      - MULTIMODAL
     ParsingPromptText:
       type: string
       minLength: 1
       maxLength: 10000
+    ParsingStrategy:
+      type: string
+      enum:
+      - BEDROCK_FOUNDATION_MODEL
+      - BEDROCK_DATA_AUTOMATION
+    PatternObjectFilterList:
+      type: array
+      items:
+        $ref: '#/components/schemas/PatternObjectFilter'
+      x-sensitive: true
     Payload:
       type: string
     PineconeConnectionString:
@@ -367,24 +1080,67 @@ components:
     PromptArn:
       type: string
       pattern: ^(arn:aws:bedrock:[a-z0-9-]{1,20}:[0-9]{12}:prompt/[0-9a-zA-Z]{10}(?::[0-9]{1,5})?)$
+    PromptConfigurations:
+      type: array
+      items:
+        $ref: '#/components/schemas/PromptConfiguration'
     PromptDescription:
       type: string
       minLength: 1
       maxLength: 200
+    PromptFlowNodeSourceConfiguration:
+      allOf:
+      - allOf:
+        - $ref: '#/components/schemas/PromptFlowNodeResourceConfiguration'
+        description: |-
+          Contains configurations for a prompt from Prompt management.
+      - allOf:
+        - $ref: '#/components/schemas/PromptFlowNodeInlineConfiguration'
+        description: |-
+          Contains configurations for a prompt that is defined inline
+      description: |-
+        Contains configurations for a prompt and whether it is from Prompt management or defined inline.
+    PromptGenAiResource:
+      allOf:
+      - allOf:
+        - $ref: '#/components/schemas/PromptAgentResource'
+        description: |-
+          Specifies an Amazon Bedrock agent with which to use the prompt.
+      description: |-
+        Contains specifications for a generative AI resource with which to use the prompt. For more information, see [Create a prompt using Prompt management](https://docs.aws.amazon.com/bedrock/latest/userguide/prompt-management-create.html).
+      x-sensitive: true
     PromptId:
       type: string
       pattern: ^[0-9a-zA-Z]{10}$
     PromptIdentifier:
       type: string
       pattern: ^([0-9a-zA-Z]{10})|(arn:aws:bedrock:[a-z0-9-]{1,20}:[0-9]{12}:prompt/[0-9a-zA-Z]{10})(?::[0-9]{1,5})?$
+    PromptInferenceConfiguration:
+      allOf:
+      - allOf:
+        - $ref: '#/components/schemas/PromptModelInferenceConfiguration'
+        description: |-
+          Contains inference configurations for a text prompt.
+      description: |-
+        Contains inference configurations for the prompt.
     PromptInputVariableName:
       type: string
       pattern: ^([0-9a-zA-Z][_-]?){1,100}$
+    PromptInputVariablesList:
+      type: array
+      items:
+        $ref: '#/components/schemas/PromptInputVariable'
+      x-sensitive: true
     PromptMetadataKey:
       type: string
       pattern: ^[a-zA-Z0-9\s._:/=+@-]*$
       minLength: 1
       maxLength: 128
+    PromptMetadataList:
+      type: array
+      items:
+        $ref: '#/components/schemas/PromptMetadataEntry'
+      x-sensitive: true
     PromptMetadataValue:
       type: string
       pattern: ^[a-zA-Z0-9\s._:/=+@-]*$
@@ -398,6 +1154,45 @@ components:
     PromptName:
       type: string
       pattern: ^([0-9a-zA-Z][_-]?){1,100}$
+    PromptState:
+      type: string
+      enum:
+      - ENABLED
+      - DISABLED
+    PromptSummaries:
+      type: array
+      items:
+        $ref: '#/components/schemas/PromptSummary'
+    PromptTemplateConfiguration:
+      allOf:
+      - allOf:
+        - $ref: '#/components/schemas/TextPromptTemplateConfiguration'
+        description: |-
+          Contains configurations for the text in a message for a prompt.
+      - allOf:
+        - $ref: '#/components/schemas/ChatPromptTemplateConfiguration'
+        description: |-
+          Contains configurations to use the prompt in a conversational format.
+      description: |-
+        Contains the message for a prompt. For more information, see [Construct and store reusable prompts with Prompt management in Amazon Bedrock](https://docs.aws.amazon.com/bedrock/latest/userguide/prompt-management.html).
+    PromptTemplateType:
+      type: string
+      enum:
+      - TEXT
+      - CHAT
+    PromptType:
+      type: string
+      enum:
+      - PRE_PROCESSING
+      - ORCHESTRATION
+      - POST_PROCESSING
+      - KNOWLEDGE_BASE_RESPONSE_GENERATION
+      - MEMORY_SUMMARIZATION
+    PromptVariantList:
+      type: array
+      items:
+        $ref: '#/components/schemas/PromptVariant'
+      x-sensitive: true
     PromptVariantName:
       type: string
       pattern: ^([0-9a-zA-Z][_-]?){1,100}$
@@ -406,6 +1201,10 @@ components:
       pattern: ^((([0-9a-zA-Z][_-]?){1,63})|(arn:aws(-[^:]+)?:bedrock:[a-z0-9-]{1,20}:[0-9]{12}:provisioned-model/[a-z0-9]{12}))$
       minLength: 1
       maxLength: 2048
+    QueryEngineType:
+      type: string
+      enum:
+      - REDSHIFT
     QueryExecutionTimeoutSeconds:
       type: integer
       minimum: 1
@@ -414,9 +1213,17 @@ components:
       type: string
       minLength: 1
       maxLength: 127
+    QueryGenerationColumns:
+      type: array
+      items:
+        $ref: '#/components/schemas/QueryGenerationColumn'
     QueryGenerationTableName:
       type: string
       pattern: ^.*\..*\..*$
+    QueryGenerationTables:
+      type: array
+      items:
+        $ref: '#/components/schemas/QueryGenerationTable'
     RdsArn:
       type: string
       pattern: ^arn:aws(|-cn|-us-gov):rds:[a-zA-Z0-9-]*:[0-9]{12}:cluster:[a-zA-Z0-9-]{1,63}$
@@ -431,6 +1238,10 @@ components:
     RecommendedAction:
       type: string
       maxLength: 2048
+    RecommendedActions:
+      type: array
+      items:
+        $ref: '#/components/schemas/RecommendedAction'
     RedisEnterpriseCloudEndpoint:
       type: string
       pattern: ^.*$
@@ -447,6 +1258,50 @@ components:
       type: string
       minLength: 1
       maxLength: 200
+    RedshiftProvisionedAuthType:
+      type: string
+      enum:
+      - IAM
+      - USERNAME_PASSWORD
+      - USERNAME
+    RedshiftQueryEngineStorageConfigurations:
+      type: array
+      items:
+        $ref: '#/components/schemas/RedshiftQueryEngineStorageConfiguration'
+    RedshiftQueryEngineStorageType:
+      type: string
+      enum:
+      - REDSHIFT
+      - AWS_DATA_CATALOG
+    RedshiftQueryEngineType:
+      type: string
+      enum:
+      - SERVERLESS
+      - PROVISIONED
+    RedshiftServerlessAuthType:
+      type: string
+      enum:
+      - IAM
+      - USERNAME_PASSWORD
+    RelayConversationHistory:
+      type: string
+      enum:
+      - TO_COLLABORATOR
+      - DISABLED
+    RequireConfirmation:
+      type: string
+      enum:
+      - ENABLED
+      - DISABLED
+      description: <p>Whether the action requires user confirmation.</p>
+    RetrievalFlowNodeServiceConfiguration:
+      allOf:
+      - allOf:
+        - $ref: '#/components/schemas/RetrievalFlowNodeS3Configuration'
+        description: |-
+          Contains configurations for the Amazon S3 location from which to retrieve data to return as the output from the node.
+      description: |-
+        Contains configurations for the service to use for retrieving data to return as the output from the node.
     S3BucketArn:
       type: string
       pattern: ^arn:aws(|-cn|-us-gov):s3:::[a-z0-9][a-z0-9.-]{1,61}[a-z0-9]$
@@ -476,35 +1331,114 @@ components:
       type: string
       minLength: 1
       maxLength: 300
+    S3Prefixes:
+      type: array
+      items:
+        $ref: '#/components/schemas/S3Prefix'
+    SalesforceAuthType:
+      type: string
+      enum:
+      - OAUTH2_CLIENT_CREDENTIALS
     SecretArn:
       type: string
       pattern: ^arn:aws(|-cn|-us-gov):secretsmanager:[a-z0-9-]{1,20}:([0-9]{12}|):secret:[a-zA-Z0-9!/_+=.@-]{1,512}$
+    SeedUrls:
+      type: array
+      items:
+        $ref: '#/components/schemas/SeedUrl'
     SessionTTL:
       type: integer
       minimum: 60
       maximum: 3600
+    SharePointAuthType:
+      type: string
+      enum:
+      - OAUTH2_CLIENT_CREDENTIALS
+      - OAUTH2_SHAREPOINT_APP_ONLY_CLIENT_CREDENTIALS
     SharePointDomain:
       type: string
       minLength: 1
       maxLength: 50
+    SharePointHostType:
+      type: string
+      enum:
+      - ONLINE
+    SharePointSiteUrls:
+      type: array
+      items:
+        $ref: '#/components/schemas/HttpsUrl'
+    SortOrder:
+      type: string
+      enum:
+      - ASCENDING
+      - DESCENDING
     SqlString:
       type: string
       minLength: 1
       maxLength: 1000
+    StepType:
+      type: string
+      enum:
+      - POST_CHUNKING
+    StopSequences:
+      type: array
+      items:
+        type: string
     StorageDays:
       type: integer
       default: 30
       minimum: 0
       maximum: 365
+    StorageFlowNodeServiceConfiguration:
+      allOf:
+      - allOf:
+        - $ref: '#/components/schemas/StorageFlowNodeS3Configuration'
+        description: |-
+          Contains configurations for the Amazon S3 location in which to store the input into the node.
+      description: |-
+        Contains configurations for the service to use for storing the input into the node.
+    StringListValue:
+      type: array
+      items:
+        $ref: '#/components/schemas/StringValue'
     StringValue:
       type: string
       minLength: 1
       maxLength: 2048
+    SupplementalDataStorageLocationType:
+      type: string
+      enum:
+      - S3
+    SupplementalDataStorageLocations:
+      type: array
+      items:
+        $ref: '#/components/schemas/SupplementalDataStorageLocation'
+    SystemContentBlock:
+      allOf:
+      - allOf:
+        - $ref: '#/components/schemas/NonEmptyString'
+        description: |-
+          The text in the system prompt.
+      - allOf:
+        - $ref: '#/components/schemas/CachePointBlock'
+        description: |-
+          Creates a cache checkpoint within a tool designation
+      description: |-
+        Contains a system prompt to provide context to the model or to describe how it should behave. For more information, see [Create a prompt using Prompt management](https://docs.aws.amazon.com/bedrock/latest/userguide/prompt-management-create.html).
+      x-sensitive: true
+    SystemContentBlocks:
+      type: array
+      items:
+        $ref: '#/components/schemas/SystemContentBlock'
     TagKey:
       type: string
       pattern: ^[a-zA-Z0-9\s._:/=+@-]*$
       minLength: 1
       maxLength: 128
+    TagKeyList:
+      type: array
+      items:
+        $ref: '#/components/schemas/TagKey'
     TagValue:
       type: string
       pattern: ^[a-zA-Z0-9\s._:/=+@-]*$
@@ -515,18 +1449,86 @@ components:
       pattern: (^arn:aws:bedrock:[a-zA-Z0-9-]+:/d{12}:(agent|agent-alias|knowledge-base|flow|prompt)/[A-Z0-9]{10}(?:/[A-Z0-9]{10})?$|^arn:aws:bedrock:[a-zA-Z0-9-]+:/d{12}:flow/([A-Z0-9]{10})/alias/([A-Z0-9]{10})$|^arn:aws:bedrock:[a-zA-Z0-9-]+:/d{12}:prompt/([A-Z0-9]{10})?(?::/d+)?$)
       minLength: 20
       maxLength: 1011
+    TagsMap:
+      type: object
+      additionalProperties:
+        $ref: '#/components/schemas/TagValue'
+    Temperature:
+      type: number
+      format: float
+      minimum: 0
+      maximum: 1
     TextPrompt:
       type: string
       minLength: 1
+    Tool:
+      allOf:
+      - allOf:
+        - $ref: '#/components/schemas/ToolSpecification'
+        description: |-
+          The specification for the tool.
+      - allOf:
+        - $ref: '#/components/schemas/CachePointBlock'
+        description: |-
+          Creates a cache checkpoint within a tool designation
+      description: |-
+        Contains configurations for a tool that a model can use when generating a response. For more information, see [Use a tool to complete an Amazon Bedrock model response](https://docs.aws.amazon.com/bedrock/latest/userguide/tool-use.html).
+    ToolChoice:
+      allOf:
+      - allOf:
+        - $ref: '#/components/schemas/AutoToolChoice'
+        description: |-
+          Defines tools. The model automatically decides whether to call a tool or to generate text instead.
+      - allOf:
+        - $ref: '#/components/schemas/AnyToolChoice'
+        description: |-
+          Defines tools, at least one of which must be requested by the model. No text is generated but the results of tool use are sent back to the model to help generate a response.
+      - allOf:
+        - $ref: '#/components/schemas/SpecificToolChoice'
+        description: |-
+          Defines a specific tool that the model must request. No text is generated but the results of tool use are sent back to the model to help generate a response.
+      description: |-
+        Defines which tools the model should request when invoked. For more information, see [Use a tool to complete an Amazon Bedrock model response](https://docs.aws.amazon.com/bedrock/latest/userguide/tool-use.html).
+      x-sensitive: true
+    ToolInputSchema:
+      allOf:
+      - allOf:
+        - $ref: '#/components/schemas/Document'
+        description: |-
+          A JSON object defining the input schema for the tool.
+      description: |-
+        The input schema for the tool. For more information, see [Use a tool to complete an Amazon Bedrock model response](https://docs.aws.amazon.com/bedrock/latest/userguide/tool-use.html).
     ToolName:
       type: string
       pattern: ^[a-zA-Z][a-zA-Z0-9_]*$
       minLength: 1
       maxLength: 64
+    Tools:
+      type: array
+      items:
+        $ref: '#/components/schemas/Tool'
+      x-sensitive: true
     TopK:
       type: integer
       minimum: 0
       maximum: 500
+    TopP:
+      type: number
+      format: float
+      minimum: 0
+      maximum: 1
+    Transformations:
+      type: array
+      items:
+        $ref: '#/components/schemas/Transformation'
+    Type:
+      type: string
+      enum:
+      - string
+      - number
+      - integer
+      - boolean
+      - array
     Url:
       type: string
       pattern: ^https?://[A-Za-z0-9][^\s]*$
@@ -538,11 +1540,20 @@ components:
       type: string
       minLength: 61
       maxLength: 86
+    ValidationExceptionFieldList:
+      type: array
+      items:
+        $ref: '#/components/schemas/ValidationExceptionField'
     Version:
       type: string
       pattern: ^(DRAFT|[0-9]{0,4}[1-9][0-9]{0,4})$
       minLength: 1
       maxLength: 5
+    WebScopeType:
+      type: string
+      enum:
+      - HOST_ONLY
+      - SUBDOMAINS
     WorkgroupArn:
       type: string
       pattern: ^(arn:(aws(-[a-z]+)*):redshift-serverless:[a-z]{2}(-gov)?-[a-z]+-\d{1}:\d{12}:workgroup/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12})$

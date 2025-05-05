@@ -46,19 +46,105 @@ servers:
 paths: {}
 components:
   schemas:
+    AllowNotifications:
+      type: string
+      enum:
+      - ALL
+      - NONE
+      - FILTERED
+    BatchCreateChannelMembershipErrors:
+      type: array
+      items:
+        $ref: '#/components/schemas/BatchCreateChannelMembershipError'
     CallbackIdType:
       type: string
       minLength: 32
       maxLength: 64
+    ChannelAssociatedWithFlowSummaryList:
+      type: array
+      items:
+        $ref: '#/components/schemas/ChannelAssociatedWithFlowSummary'
+    ChannelBanSummaryList:
+      type: array
+      items:
+        $ref: '#/components/schemas/ChannelBanSummary'
     ChannelFlowExecutionOrder:
       type: integer
       minimum: 1
       maximum: 3
+    ChannelFlowSummaryList:
+      type: array
+      items:
+        $ref: '#/components/schemas/ChannelFlowSummary'
     ChannelId:
       type: string
       pattern: ^[A-Za-z0-9]([A-Za-z0-9\:\-\_\.\@]{0,62}[A-Za-z0-9])?$
       minLength: 1
       maxLength: 64
+    ChannelMemberArns:
+      type: array
+      items:
+        $ref: '#/components/schemas/ChimeArn'
+    ChannelMembershipForAppInstanceUserSummaryList:
+      type: array
+      items:
+        $ref: '#/components/schemas/ChannelMembershipForAppInstanceUserSummary'
+    ChannelMembershipSummaryList:
+      type: array
+      items:
+        $ref: '#/components/schemas/ChannelMembershipSummary'
+    ChannelMembershipType:
+      type: string
+      enum:
+      - DEFAULT
+      - HIDDEN
+    ChannelMessagePersistenceType:
+      type: string
+      enum:
+      - PERSISTENT
+      - NON_PERSISTENT
+    ChannelMessageStatus:
+      type: string
+      enum:
+      - SENT
+      - PENDING
+      - FAILED
+      - DENIED
+    ChannelMessageSummaryList:
+      type: array
+      items:
+        $ref: '#/components/schemas/ChannelMessageSummary'
+    ChannelMessageType:
+      type: string
+      enum:
+      - STANDARD
+      - CONTROL
+    ChannelMode:
+      type: string
+      enum:
+      - UNRESTRICTED
+      - RESTRICTED
+    ChannelModeratedByAppInstanceUserSummaryList:
+      type: array
+      items:
+        $ref: '#/components/schemas/ChannelModeratedByAppInstanceUserSummary'
+    ChannelModeratorArns:
+      type: array
+      items:
+        $ref: '#/components/schemas/ChimeArn'
+    ChannelModeratorSummaryList:
+      type: array
+      items:
+        $ref: '#/components/schemas/ChannelModeratorSummary'
+    ChannelPrivacy:
+      type: string
+      enum:
+      - PUBLIC
+      - PRIVATE
+    ChannelSummaryList:
+      type: array
+      items:
+        $ref: '#/components/schemas/ChannelSummary'
     ChimeArn:
       type: string
       pattern: ^arn:[a-z0-9-\.]{1,63}:[a-z0-9-\.]{0,63}:[a-z0-9-\.]{0,63}:[a-z0-9-\.]{0,63}:[^/].{0,1023}$
@@ -79,14 +165,46 @@ components:
       pattern: ^[\s\S]*$
       minLength: 0
       maxLength: 45
+    ErrorCode:
+      type: string
+      enum:
+      - BadRequest
+      - Conflict
+      - Forbidden
+      - NotFound
+      - PreconditionFailed
+      - ResourceLimitExceeded
+      - ServiceFailure
+      - AccessDenied
+      - ServiceUnavailable
+      - Throttled
+      - Throttling
+      - Unauthorized
+      - Unprocessable
+      - VoiceConnectorGroupAssociationsExist
+      - PhoneNumberAssociationsExist
+    ExpirationCriterion:
+      type: string
+      enum:
+      - CREATED_TIMESTAMP
+      - LAST_MESSAGE_TIMESTAMP
     ExpirationDays:
       type: integer
       minimum: 1
       maximum: 5475
+    FallbackAction:
+      type: string
+      enum:
+      - CONTINUE
+      - ABORT
     FilterRule:
       type: string
       pattern: ^[\s\S]*$
       minLength: 1
+    InvocationType:
+      type: string
+      enum:
+      - ASYNC
     LambdaFunctionArn:
       type: string
       pattern: ^arn:aws:lambda:[a-z]{2}-[a-z]+-\d{1}:\d{12}:function:[a-zA-Z0-9\-_\.]+(:(\$LATEST|[a-zA-Z0-9\-_]+))?$
@@ -99,8 +217,20 @@ components:
     MaximumSubChannels:
       type: integer
       minimum: 2
+    MemberArns:
+      type: array
+      items:
+        $ref: '#/components/schemas/ChimeArn'
+    Members:
+      type: array
+      items:
+        $ref: '#/components/schemas/Identity'
     MembershipCount:
       type: integer
+    MessageAttributeMap:
+      type: object
+      additionalProperties:
+        $ref: '#/components/schemas/MessageAttributeValue'
     MessageAttributeName:
       type: string
       pattern: ^[\s\S]*$
@@ -111,11 +241,20 @@ components:
       pattern: ^[\s\S]*$
       minLength: 1
       maxLength: 512
+    MessageAttributeStringValues:
+      type: array
+      items:
+        $ref: '#/components/schemas/MessageAttributeStringValue'
     MessageId:
       type: string
       pattern: ^[-_a-zA-Z0-9]*$
       minLength: 1
       maxLength: 128
+    MessagingDataType:
+      type: string
+      enum:
+      - Channel
+      - ChannelMessage
     Metadata:
       type: string
       pattern: .*
@@ -142,6 +281,10 @@ components:
     NonNullableBoolean:
       type: boolean
       default: false
+    ProcessorList:
+      type: array
+      items:
+        $ref: '#/components/schemas/Processor'
     PushNotificationBody:
       type: string
       pattern: ^[\s\S]*$
@@ -152,21 +295,52 @@ components:
       pattern: .*
       minLength: 1
       maxLength: 50
+    PushNotificationType:
+      type: string
+      enum:
+      - DEFAULT
+      - VOIP
     ResourceName:
       type: string
       pattern: ^[\u0009\u000A\u000D\u0020-\u007E\u0085\u00A0-\uD7FF\uE000-\uFFFD\u10000-\u10FFFF]*$
       minLength: 0
       maxLength: 256
+    SearchFieldKey:
+      type: string
+      enum:
+      - MEMBERS
+    SearchFieldOperator:
+      type: string
+      enum:
+      - EQUALS
+      - INCLUDES
     SearchFieldValue:
       type: string
       pattern: ^[\s\S]*$
       minLength: 1
       maxLength: 512
+    SearchFieldValues:
+      type: array
+      items:
+        $ref: '#/components/schemas/SearchFieldValue'
+    SearchFields:
+      type: array
+      items:
+        $ref: '#/components/schemas/SearchField'
+    SortOrder:
+      type: string
+      enum:
+      - ASCENDING
+      - DESCENDING
     StatusDetail:
       type: string
       pattern: ^[\s\S]*$
       minLength: 0
       maxLength: 256
+    StreamingConfigurationList:
+      type: array
+      items:
+        $ref: '#/components/schemas/StreamingConfiguration'
     String:
       type: string
     SubChannelId:
@@ -174,17 +348,36 @@ components:
       pattern: ^[-_a-zA-Z0-9]*$
       minLength: 1
       maxLength: 128
+    SubChannelSummaryList:
+      type: array
+      items:
+        $ref: '#/components/schemas/SubChannelSummary'
     TagKey:
       type: string
       minLength: 1
       maxLength: 128
+    TagKeyList:
+      type: array
+      items:
+        $ref: '#/components/schemas/TagKey'
+    TagList:
+      type: array
+      items:
+        $ref: '#/components/schemas/Tag'
     TagValue:
       type: string
       minLength: 1
       maxLength: 256
+    TargetList:
+      type: array
+      items:
+        $ref: '#/components/schemas/Target'
     TargetMembershipsPerSubChannel:
       type: integer
       minimum: 2
+    Timestamp:
+      type: string
+      format: date-time
     UrlType:
       type: string
       minLength: 0

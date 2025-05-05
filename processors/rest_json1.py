@@ -2,7 +2,26 @@
 
 import json, yaml
 from pathlib import Path
-from processors.shared_functions import LiteralStr, add_info, literal_str_representer, add_servers, init_openapi_spec, add_component_schema_string, add_component_schema_boolean, add_component_schema_integer
+from processors.shared_functions import (
+    LiteralStr,
+    literal_str_representer,
+    init_openapi_spec,
+    add_info,
+    add_servers,
+    add_component_schema_string,
+    add_component_schema_boolean,
+    add_component_schema_integer,
+    add_component_schema_timestamp,
+    add_component_schema_double,
+    add_component_schema_float,
+    add_component_schema_long,
+    add_component_schema_blob,
+    add_component_schema_enum,
+    add_component_schema_map,
+    add_component_schema_document,
+    add_component_schema_list,
+    add_component_schema_union,
+)
 
 yaml.add_representer(LiteralStr, literal_str_representer)
 
@@ -38,6 +57,26 @@ def process(model_entry):
             add_component_schema_boolean(openapi_spec, shape_name, shape)
         elif shape.get("type") == "integer":
             add_component_schema_integer(openapi_spec, shape_name, shape)
+        elif shape.get("type") == "timestamp":
+            add_component_schema_timestamp(openapi_spec, shape_name, shape)
+        elif shape.get("type") == "double":
+            add_component_schema_double(openapi_spec, shape_name, shape)
+        elif shape.get("type") == "float":
+            add_component_schema_float(openapi_spec, shape_name, shape)
+        elif shape.get("type") == "long":
+            add_component_schema_long(openapi_spec, shape_name, shape)
+        elif shape.get("type") == "blob":
+            add_component_schema_blob(openapi_spec, shape_name, shape)
+        elif shape.get("type") == "enum":
+            add_component_schema_enum(openapi_spec, shape_name, shape)
+        elif shape.get("type") == "map":
+            add_component_schema_map(openapi_spec, shape_name, shape)
+        elif shape.get("type") == "document":
+            add_component_schema_document(openapi_spec, shape_name, shape)
+        elif shape.get("type") == "list":
+            add_component_schema_list(openapi_spec, shape_name, shape)
+        elif shape.get("type") == "union":
+            add_component_schema_union(openapi_spec, shape_name, shape)
 
         # elif shape.get("type") == "structure":
         #     add_component(openapi_spec, shape_name, shape, shapes)

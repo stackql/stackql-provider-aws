@@ -50,6 +50,14 @@ servers:
 paths: {}
 components:
   schemas:
+    AccessLog:
+      allOf:
+      - allOf:
+        - $ref: '#/components/schemas/FileAccessLog'
+        description: |-
+          The file object to send virtual node access logs to.
+      description: |-
+        An object that represents the access logging information for a virtual node.
     AccountId:
       type: string
       minLength: 12
@@ -66,10 +74,42 @@ components:
       pattern: "^([a-zA-Z0-9!-~][ \ta-zA-Z0-9!-~]*){0,1}[a-zA-Z0-9!-~]{0,1}$"
       minLength: 1
       maxLength: 1024
+    AwsCloudMapInstanceAttributes:
+      type: array
+      items:
+        $ref: '#/components/schemas/AwsCloudMapInstanceAttribute'
     AwsCloudMapName:
       type: string
       minLength: 1
       maxLength: 1024
+    Backend:
+      allOf:
+      - allOf:
+        - $ref: '#/components/schemas/VirtualServiceBackend'
+        description: |-
+          Specifies a virtual service to use as a backend.
+      description: |-
+        An object that represents the backends that a virtual node is expected to send outbound traffic to.
+    Backends:
+      type: array
+      items:
+        $ref: '#/components/schemas/Backend'
+    CertificateAuthorityArns:
+      type: array
+      items:
+        $ref: '#/components/schemas/Arn'
+    ClientTlsCertificate:
+      allOf:
+      - allOf:
+        - $ref: '#/components/schemas/ListenerTlsFileCertificate'
+        description: |-
+          An object that represents a local file certificate. The certificate must meet specific requirements and you must have proxy authorization enabled. For more information, see [Transport Layer Security (TLS)](https://docs.aws.amazon.com/app-mesh/latest/userguide/tls.html).
+      - allOf:
+        - $ref: '#/components/schemas/ListenerTlsSdsCertificate'
+        description: |-
+          A reference to an object that represents a client's TLS Secret Discovery Service certificate.
+      description: |-
+        An object that represents the client's certificate.
     DefaultGatewayRouteRewrite:
       type: string
       enum:
@@ -85,6 +125,10 @@ components:
       enum:
       - s
       - ms
+    DurationValue:
+      type: integer
+      format: int64
+      minimum: 0
     EgressFilterType:
       type: string
       enum:
@@ -98,6 +142,10 @@ components:
       type: string
       minLength: 1
       maxLength: 255
+    GatewayRouteList:
+      type: array
+      items:
+        $ref: '#/components/schemas/GatewayRouteRef'
     GatewayRoutePriority:
       type: integer
       minimum: 0
@@ -108,6 +156,32 @@ components:
       - ACTIVE
       - INACTIVE
       - DELETED
+    GrpcGatewayRouteMetadataList:
+      type: array
+      items:
+        $ref: '#/components/schemas/GrpcGatewayRouteMetadata'
+    GrpcMetadataMatchMethod:
+      allOf:
+      - allOf:
+        - $ref: '#/components/schemas/HeaderMatch'
+        description: |-
+          The exact method header to be matched on.
+      - allOf:
+        - $ref: '#/components/schemas/HeaderMatch'
+        description: |-
+          The regex used to match the method header.
+      - allOf:
+        - $ref: '#/components/schemas/MatchRange'
+      - allOf:
+        - $ref: '#/components/schemas/HeaderMatch'
+        description: |-
+          The specified beginning characters of the method header to be matched on.
+      - allOf:
+        - $ref: '#/components/schemas/HeaderMatch'
+        description: |-
+          The specified ending characters of the method header to match on.
+      description: |-
+        An object representing the method header to be matched.
     GrpcRetryPolicyEvent:
       type: string
       enum:
@@ -116,20 +190,90 @@ components:
       - internal
       - resource-exhausted
       - unavailable
+    GrpcRetryPolicyEvents:
+      type: array
+      items:
+        $ref: '#/components/schemas/GrpcRetryPolicyEvent'
+    GrpcRouteMetadataList:
+      type: array
+      items:
+        $ref: '#/components/schemas/GrpcRouteMetadata'
+    GrpcRouteMetadataMatchMethod:
+      allOf:
+      - allOf:
+        - $ref: '#/components/schemas/HeaderMatch'
+        description: |-
+          The value sent by the client must match the specified value exactly.
+      - allOf:
+        - $ref: '#/components/schemas/HeaderMatch'
+        description: |-
+          The value sent by the client must include the specified characters.
+      - allOf:
+        - $ref: '#/components/schemas/MatchRange'
+        description: |-
+          An object that represents the range of values to match on.
+      - allOf:
+        - $ref: '#/components/schemas/HeaderMatch'
+        description: |-
+          The value sent by the client must begin with the specified characters.
+      - allOf:
+        - $ref: '#/components/schemas/HeaderMatch'
+        description: |-
+          The value sent by the client must end with the specified characters.
+      description: |-
+        An object that represents the match method. Specify one of the match values.
     HeaderMatch:
       type: string
       minLength: 1
       maxLength: 255
+    HeaderMatchMethod:
+      allOf:
+      - allOf:
+        - $ref: '#/components/schemas/HeaderMatch'
+        description: |-
+          The value sent by the client must match the specified value exactly.
+      - allOf:
+        - $ref: '#/components/schemas/HeaderMatch'
+        description: |-
+          The value sent by the client must include the specified characters.
+      - allOf:
+        - $ref: '#/components/schemas/MatchRange'
+        description: |-
+          An object that represents the range of values to match on.
+      - allOf:
+        - $ref: '#/components/schemas/HeaderMatch'
+        description: |-
+          The value sent by the client must begin with the specified characters.
+      - allOf:
+        - $ref: '#/components/schemas/HeaderMatch'
+        description: |-
+          The value sent by the client must end with the specified characters.
+      description: |-
+        An object that represents the method and value to match with the header value sent in a request. Specify one match method.
     HeaderName:
       type: string
       minLength: 1
       maxLength: 50
+    HealthCheckIntervalMillis:
+      type: integer
+      format: int64
+      minimum: 5000
+      maximum: 300000
     HealthCheckThreshold:
       type: integer
       minimum: 2
       maximum: 10
+    HealthCheckTimeoutMillis:
+      type: integer
+      format: int64
+      minimum: 2000
+      maximum: 60000
     Hostname:
       type: string
+    HttpGatewayRouteHeaders:
+      type: array
+      items:
+        $ref: '#/components/schemas/HttpGatewayRouteHeader'
     HttpGatewayRoutePrefix:
       type: string
       minLength: 1
@@ -154,10 +298,22 @@ components:
       type: string
       minLength: 1
       maxLength: 255
+    HttpQueryParameters:
+      type: array
+      items:
+        $ref: '#/components/schemas/HttpQueryParameter'
     HttpRetryPolicyEvent:
       type: string
       minLength: 1
       maxLength: 25
+    HttpRetryPolicyEvents:
+      type: array
+      items:
+        $ref: '#/components/schemas/HttpRetryPolicyEvent'
+    HttpRouteHeaders:
+      type: array
+      items:
+        $ref: '#/components/schemas/HttpRouteHeader'
     HttpScheme:
       type: string
       enum:
@@ -170,6 +326,10 @@ components:
       - IPv4_PREFERRED
       - IPv4_ONLY
       - IPv6_ONLY
+    JsonFormat:
+      type: array
+      items:
+        $ref: '#/components/schemas/JsonFormatRef'
     JsonKey:
       type: string
       minLength: 1
@@ -210,12 +370,74 @@ components:
       type: integer
       minimum: 1
       maximum: 65535
+    ListenerTimeout:
+      allOf:
+      - allOf:
+        - $ref: '#/components/schemas/TcpTimeout'
+        description: |-
+          An object that represents types of timeouts.
+      - allOf:
+        - $ref: '#/components/schemas/HttpTimeout'
+        description: |-
+          An object that represents types of timeouts.
+      - allOf:
+        - $ref: '#/components/schemas/HttpTimeout'
+        description: |-
+          An object that represents types of timeouts.
+      - allOf:
+        - $ref: '#/components/schemas/GrpcTimeout'
+        description: |-
+          An object that represents types of timeouts.
+      description: |-
+        An object that represents timeouts for different protocols.
+    ListenerTlsCertificate:
+      allOf:
+      - allOf:
+        - $ref: '#/components/schemas/ListenerTlsAcmCertificate'
+        description: |-
+          A reference to an object that represents an Certificate Manager certificate.
+      - allOf:
+        - $ref: '#/components/schemas/ListenerTlsFileCertificate'
+        description: |-
+          A reference to an object that represents a local file certificate.
+      - allOf:
+        - $ref: '#/components/schemas/ListenerTlsSdsCertificate'
+        description: |-
+          A reference to an object that represents a listener's Secret Discovery Service certificate.
+      description: |-
+        An object that represents a listener's Transport Layer Security (TLS) certificate.
     ListenerTlsMode:
       type: string
       enum:
       - STRICT
       - PERMISSIVE
       - DISABLED
+    ListenerTlsValidationContextTrust:
+      allOf:
+      - allOf:
+        - $ref: '#/components/schemas/TlsValidationContextFileTrust'
+        description: |-
+          An object that represents a Transport Layer Security (TLS) validation context trust for a local file.
+      - allOf:
+        - $ref: '#/components/schemas/TlsValidationContextSdsTrust'
+        description: |-
+          A reference to an object that represents a listener's Transport Layer Security (TLS) Secret Discovery Service validation context trust.
+      description: |-
+        An object that represents a listener's Transport Layer Security (TLS) validation context trust.
+    Listeners:
+      type: array
+      items:
+        $ref: '#/components/schemas/Listener'
+    LoggingFormat:
+      allOf:
+      - allOf:
+        - $ref: '#/components/schemas/TextFormat'
+        description: ""
+      - allOf:
+        - $ref: '#/components/schemas/JsonFormat'
+        description: ""
+      description: |-
+        An object that represents the format for the logs.
     MaxConnections:
       type: integer
       minimum: 1
@@ -225,6 +447,14 @@ components:
     MaxRequests:
       type: integer
       minimum: 1
+    MaxRetries:
+      type: integer
+      format: int64
+      minimum: 0
+    MeshList:
+      type: array
+      items:
+        $ref: '#/components/schemas/MeshRef'
     MeshStatusCode:
       type: string
       enum:
@@ -239,6 +469,10 @@ components:
       type: integer
       minimum: 0
       maximum: 100
+    OutlierDetectionMaxServerErrors:
+      type: integer
+      format: int64
+      minimum: 1
     PercentInt:
       type: integer
       default: 0
@@ -255,12 +489,20 @@ components:
       - tcp
       - http2
       - grpc
+    PortSet:
+      type: array
+      items:
+        $ref: '#/components/schemas/PortNumber'
     QueryParameterName:
       type: string
     ResourceName:
       type: string
       minLength: 1
       maxLength: 255
+    RouteList:
+      type: array
+      items:
+        $ref: '#/components/schemas/RouteRef'
     RoutePriority:
       type: integer
       minimum: 0
@@ -273,12 +515,28 @@ components:
       - DELETED
     SdsSecretName:
       type: string
+    ServiceDiscovery:
+      allOf:
+      - allOf:
+        - $ref: '#/components/schemas/DnsServiceDiscovery'
+        description: |-
+          Specifies the DNS information for the virtual node.
+      - allOf:
+        - $ref: '#/components/schemas/AwsCloudMapServiceDiscovery'
+        description: |-
+          Specifies any Cloud Map information for the virtual node.
+      description: |-
+        An object that represents the service discovery information for a virtual node.
     ServiceName:
       type: string
     SubjectAlternativeName:
       type: string
       minLength: 1
       maxLength: 254
+    SubjectAlternativeNameList:
+      type: array
+      items:
+        $ref: '#/components/schemas/SubjectAlternativeName'
     SuffixHostname:
       type: string
       minLength: 1
@@ -287,6 +545,14 @@ components:
       type: string
       minLength: 1
       maxLength: 128
+    TagKeyList:
+      type: array
+      items:
+        $ref: '#/components/schemas/TagKey'
+    TagList:
+      type: array
+      items:
+        $ref: '#/components/schemas/TagRef'
     TagValue:
       type: string
       minLength: 0
@@ -299,20 +565,130 @@ components:
       type: string
       enum:
       - connection-error
+    TcpRetryPolicyEvents:
+      type: array
+      items:
+        $ref: '#/components/schemas/TcpRetryPolicyEvent'
     TextFormat:
       type: string
       minLength: 1
       maxLength: 1000
+    TlsValidationContextTrust:
+      allOf:
+      - allOf:
+        - $ref: '#/components/schemas/TlsValidationContextAcmTrust'
+        description: |-
+          A reference to an object that represents a Transport Layer Security (TLS) validation context trust for an Certificate Manager certificate.
+      - allOf:
+        - $ref: '#/components/schemas/TlsValidationContextFileTrust'
+        description: |-
+          An object that represents a Transport Layer Security (TLS) validation context trust for a local file.
+      - allOf:
+        - $ref: '#/components/schemas/TlsValidationContextSdsTrust'
+        description: |-
+          A reference to an object that represents a Transport Layer Security (TLS) Secret Discovery Service validation context trust.
+      description: |-
+        An object that represents a Transport Layer Security (TLS) validation context trust.
+    VirtualGatewayAccessLog:
+      allOf:
+      - allOf:
+        - $ref: '#/components/schemas/VirtualGatewayFileAccessLog'
+        description: |-
+          The file object to send virtual gateway access logs to.
+      description: |-
+        The access log configuration for a virtual gateway.
+    VirtualGatewayCertificateAuthorityArns:
+      type: array
+      items:
+        $ref: '#/components/schemas/Arn'
+    VirtualGatewayClientTlsCertificate:
+      allOf:
+      - allOf:
+        - $ref: '#/components/schemas/VirtualGatewayListenerTlsFileCertificate'
+        description: |-
+          An object that represents a local file certificate. The certificate must meet specific requirements and you must have proxy authorization enabled. For more information, see [ Transport Layer Security (TLS) ](https://docs.aws.amazon.com/app-mesh/latest/userguide/tls.html).
+      - allOf:
+        - $ref: '#/components/schemas/VirtualGatewayListenerTlsSdsCertificate'
+        description: |-
+          A reference to an object that represents a virtual gateway's client's Secret Discovery Service certificate.
+      description: |-
+        An object that represents the virtual gateway's client's Transport Layer Security (TLS) certificate.
+    VirtualGatewayConnectionPool:
+      allOf:
+      - allOf:
+        - $ref: '#/components/schemas/VirtualGatewayHttpConnectionPool'
+        description: |-
+          An object that represents a type of connection pool.
+      - allOf:
+        - $ref: '#/components/schemas/VirtualGatewayHttp2ConnectionPool'
+        description: |-
+          An object that represents a type of connection pool.
+      - allOf:
+        - $ref: '#/components/schemas/VirtualGatewayGrpcConnectionPool'
+        description: |-
+          An object that represents a type of connection pool.
+      description: |-
+        An object that represents the type of virtual gateway connection pool.
+
+        Only one protocol is used at a time and should be the same protocol as the one chosen under port mapping.
+
+        If not present the default value for `maxPendingRequests` is `2147483647`.
+    VirtualGatewayHealthCheckIntervalMillis:
+      type: integer
+      format: int64
+      minimum: 5000
+      maximum: 300000
     VirtualGatewayHealthCheckThreshold:
       type: integer
       minimum: 2
       maximum: 10
+    VirtualGatewayHealthCheckTimeoutMillis:
+      type: integer
+      format: int64
+      minimum: 2000
+      maximum: 60000
+    VirtualGatewayList:
+      type: array
+      items:
+        $ref: '#/components/schemas/VirtualGatewayRef'
+    VirtualGatewayListenerTlsCertificate:
+      allOf:
+      - allOf:
+        - $ref: '#/components/schemas/VirtualGatewayListenerTlsAcmCertificate'
+        description: |-
+          A reference to an object that represents an Certificate Manager certificate.
+      - allOf:
+        - $ref: '#/components/schemas/VirtualGatewayListenerTlsFileCertificate'
+        description: |-
+          A reference to an object that represents a local file certificate.
+      - allOf:
+        - $ref: '#/components/schemas/VirtualGatewayListenerTlsSdsCertificate'
+        description: |-
+          A reference to an object that represents a virtual gateway's listener's Secret Discovery Service certificate.
+      description: |-
+        An object that represents a listener's Transport Layer Security (TLS) certificate.
     VirtualGatewayListenerTlsMode:
       type: string
       enum:
       - STRICT
       - PERMISSIVE
       - DISABLED
+    VirtualGatewayListenerTlsValidationContextTrust:
+      allOf:
+      - allOf:
+        - $ref: '#/components/schemas/VirtualGatewayTlsValidationContextFileTrust'
+        description: |-
+          An object that represents a Transport Layer Security (TLS) validation context trust for a local file.
+      - allOf:
+        - $ref: '#/components/schemas/VirtualGatewayTlsValidationContextSdsTrust'
+        description: |-
+          A reference to an object that represents a virtual gateway's listener's Transport Layer Security (TLS) Secret Discovery Service validation context trust.
+      description: |-
+        An object that represents a virtual gateway's listener's Transport Layer Security (TLS) validation context trust.
+    VirtualGatewayListeners:
+      type: array
+      items:
+        $ref: '#/components/schemas/VirtualGatewayListener'
     VirtualGatewayPortProtocol:
       type: string
       enum:
@@ -327,21 +703,93 @@ components:
       - ACTIVE
       - INACTIVE
       - DELETED
+    VirtualGatewayTlsValidationContextTrust:
+      allOf:
+      - allOf:
+        - $ref: '#/components/schemas/VirtualGatewayTlsValidationContextAcmTrust'
+        description: |-
+          A reference to an object that represents a Transport Layer Security (TLS) validation context trust for an Certificate Manager certificate.
+      - allOf:
+        - $ref: '#/components/schemas/VirtualGatewayTlsValidationContextFileTrust'
+        description: |-
+          An object that represents a Transport Layer Security (TLS) validation context trust for a local file.
+      - allOf:
+        - $ref: '#/components/schemas/VirtualGatewayTlsValidationContextSdsTrust'
+        description: |-
+          A reference to an object that represents a virtual gateway's Transport Layer Security (TLS) Secret Discovery Service validation context trust.
+      description: |-
+        An object that represents a Transport Layer Security (TLS) validation context trust.
+    VirtualNodeConnectionPool:
+      allOf:
+      - allOf:
+        - $ref: '#/components/schemas/VirtualNodeTcpConnectionPool'
+        description: |-
+          An object that represents a type of connection pool.
+      - allOf:
+        - $ref: '#/components/schemas/VirtualNodeHttpConnectionPool'
+        description: |-
+          An object that represents a type of connection pool.
+      - allOf:
+        - $ref: '#/components/schemas/VirtualNodeHttp2ConnectionPool'
+        description: |-
+          An object that represents a type of connection pool.
+      - allOf:
+        - $ref: '#/components/schemas/VirtualNodeGrpcConnectionPool'
+        description: |-
+          An object that represents a type of connection pool.
+      description: |-
+        An object that represents the type of virtual node connection pool.
+
+        Only one protocol is used at a time and should be the same protocol as the one chosen under port mapping.
+
+        If not present the default value for `maxPendingRequests` is `2147483647`.
+    VirtualNodeList:
+      type: array
+      items:
+        $ref: '#/components/schemas/VirtualNodeRef'
     VirtualNodeStatusCode:
       type: string
       enum:
       - ACTIVE
       - INACTIVE
       - DELETED
+    VirtualRouterList:
+      type: array
+      items:
+        $ref: '#/components/schemas/VirtualRouterRef'
+    VirtualRouterListeners:
+      type: array
+      items:
+        $ref: '#/components/schemas/VirtualRouterListener'
     VirtualRouterStatusCode:
       type: string
       enum:
       - ACTIVE
       - INACTIVE
       - DELETED
+    VirtualServiceList:
+      type: array
+      items:
+        $ref: '#/components/schemas/VirtualServiceRef'
+    VirtualServiceProvider:
+      allOf:
+      - allOf:
+        - $ref: '#/components/schemas/VirtualNodeServiceProvider'
+        description: |-
+          The virtual node associated with a virtual service.
+      - allOf:
+        - $ref: '#/components/schemas/VirtualRouterServiceProvider'
+        description: |-
+          The virtual router associated with a virtual service.
+      description: |-
+        An object that represents the provider for a virtual service.
     VirtualServiceStatusCode:
       type: string
       enum:
       - ACTIVE
       - INACTIVE
       - DELETED
+    WeightedTargets:
+      type: array
+      items:
+        $ref: '#/components/schemas/WeightedTarget'

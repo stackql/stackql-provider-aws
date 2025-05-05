@@ -59,6 +59,11 @@ components:
       pattern: ^arn:(aws[a-zA-Z0-9-]*):acm:.+:(\d{12}):certificate/.+$
       minLength: 44
       maxLength: 2048
+    AllowAWSToRetainLogs:
+      type: string
+      enum:
+      - ENABLED
+      - DISABLED
     Base64Encoded:
       type: string
       pattern: ^([A-Za-z0-9+/]{4})*([A-Za-z0-9+/]{4}|[A-Za-z0-9+/]{3}=|[A-Za-z0-9+/]{2}==)?$
@@ -66,6 +71,10 @@ components:
       maxLength: 5000
     Boolean:
       type: boolean
+    CertificateProviderType:
+      type: string
+      enum:
+      - PEM
     ClientToken:
       type: string
       pattern: \S
@@ -76,31 +85,89 @@ components:
       pattern: ^[0-9A-Za-z][A-Za-z0-9\-_]*$
       minLength: 1
       maxLength: 100
+    ConfigurationList:
+      type: array
+      items:
+        $ref: '#/components/schemas/Configuration'
+    ContainerInfo:
+      allOf:
+      - allOf:
+        - $ref: '#/components/schemas/EksInfo'
+        description: |-
+          The information about the Amazon EKS cluster.
+      description: |-
+        The information about the container used for a job run or a managed endpoint.
+    ContainerProviderType:
+      type: string
+      enum:
+      - EKS
     CredentialType:
       type: string
       pattern: ^.*\S.*$
       minLength: 1
       maxLength: 64
+    Credentials:
+      allOf:
+      - allOf:
+        - $ref: '#/components/schemas/Token'
+        description: |-
+          The actual session token being returned.
+      description: |-
+        The structure containing the session token being returned.
+    Date:
+      type: string
+      format: date-time
     EndpointArn:
       type: string
       pattern: ^arn:(aws[a-zA-Z0-9-]*):emr-containers:.+:(\d{12}):\/virtualclusters\/[0-9a-zA-Z]+\/endpoints\/[0-9a-zA-Z]+$
       minLength: 60
       maxLength: 1024
+    EndpointState:
+      type: string
+      enum:
+      - CREATING
+      - ACTIVE
+      - TERMINATING
+      - TERMINATED
+      - TERMINATED_WITH_ERRORS
+    EndpointStates:
+      type: array
+      items:
+        $ref: '#/components/schemas/EndpointState'
     EndpointType:
       type: string
       pattern: \S
       minLength: 1
       maxLength: 64
+    EndpointTypes:
+      type: array
+      items:
+        $ref: '#/components/schemas/EndpointType'
+    Endpoints:
+      type: array
+      items:
+        $ref: '#/components/schemas/Endpoint'
     EntryPointArgument:
       type: string
       pattern: \S
       minLength: 1
       maxLength: 10280
+    EntryPointArguments:
+      type: array
+      items:
+        $ref: '#/components/schemas/EntryPointArgument'
     EntryPointPath:
       type: string
       pattern: \S
       minLength: 1
       maxLength: 256
+    FailureReason:
+      type: string
+      enum:
+      - INTERNAL_ERROR
+      - USER_ERROR
+      - VALIDATION_ERROR
+      - CLUSTER_UNAVAILABLE
     IAMRoleArn:
       type: string
       pattern: ^arn:(aws[a-zA-Z0-9-]*):iam::(\d{12})?:(role((\u002F)|(\u002F[\u0021-\u007F]+\u002F))[\w+=,.@-]+)$
@@ -113,11 +180,33 @@ components:
       pattern: ^arn:(aws[a-zA-Z0-9-]*):emr-containers:.+:(\d{12}):\/virtualclusters\/[0-9a-zA-Z]+\/jobruns\/[0-9a-zA-Z]+$
       minLength: 60
       maxLength: 1024
+    JobRunState:
+      type: string
+      enum:
+      - PENDING
+      - SUBMITTED
+      - RUNNING
+      - FAILED
+      - CANCELLED
+      - CANCEL_PENDING
+      - COMPLETED
+    JobRunStates:
+      type: array
+      items:
+        $ref: '#/components/schemas/JobRunState'
+    JobRuns:
+      type: array
+      items:
+        $ref: '#/components/schemas/JobRun'
     JobTemplateArn:
       type: string
       pattern: ^arn:(aws[a-zA-Z0-9-]*):emr-containers:.+:(\d{12}):\/jobtemplates\/[0-9a-zA-Z]+$
       minLength: 60
       maxLength: 1024
+    JobTemplates:
+      type: array
+      items:
+        $ref: '#/components/schemas/JobTemplate'
     KmsKeyArn:
       type: string
       pattern: ^(arn:(aws[a-zA-Z0-9-]*):kms:.+:(\d{12})?:key\/[(0-9a-zA-Z)-?]+|\$\{[a-zA-Z]\w*\})$
@@ -157,6 +246,11 @@ components:
       pattern: ^([\.\-_/A-Za-z0-9]+|\$\{[a-zA-Z]\w*\})$
       minLength: 1
       maxLength: 64
+    PersistentAppUI:
+      type: string
+      enum:
+      - ENABLED
+      - DISABLED
     ReleaseLabel:
       type: string
       pattern: ^[\.\-_/A-Za-z0-9]+$
@@ -197,6 +291,14 @@ components:
       pattern: ^arn:(aws[a-zA-Z0-9-]*):emr-containers:.+:(\d{12}):\/securityconfigurations\/[0-9a-zA-Z]+$
       minLength: 60
       maxLength: 1024
+    SecurityConfigurations:
+      type: array
+      items:
+        $ref: '#/components/schemas/SecurityConfiguration'
+    SensitivePropertiesMap:
+      type: object
+      additionalProperties:
+        $ref: '#/components/schemas/String1024'
     SessionTagValue:
       type: string
       pattern: ^[\.\-_/#A-Za-z0-9 ]+$
@@ -237,11 +339,36 @@ components:
       pattern: \S
       minLength: 0
       maxLength: 256
+    SubnetIds:
+      type: array
+      items:
+        $ref: '#/components/schemas/String256'
+    TagKeyList:
+      type: array
+      items:
+        $ref: '#/components/schemas/String128'
+    TagMap:
+      type: object
+      additionalProperties:
+        $ref: '#/components/schemas/StringEmpty256'
     TemplateParameter:
       type: string
       pattern: ^[\.\-_/#A-Za-z0-9\$\{\}]+$
       minLength: 1
       maxLength: 512
+    TemplateParameterConfigurationMap:
+      type: object
+      additionalProperties:
+        $ref: '#/components/schemas/TemplateParameterConfiguration'
+    TemplateParameterDataType:
+      type: string
+      enum:
+      - NUMBER
+      - STRING
+    TemplateParameterInputMap:
+      type: object
+      additionalProperties:
+        $ref: '#/components/schemas/String1024'
     TemplateParameterName:
       type: string
       pattern: ^[\.\-_\#A-Za-z0-9]+$
@@ -261,3 +388,18 @@ components:
       pattern: ^arn:(aws[a-zA-Z0-9-]*):emr-containers:.+:(\d{12}):\/virtualclusters\/[0-9a-zA-Z]+$
       minLength: 60
       maxLength: 1024
+    VirtualClusterState:
+      type: string
+      enum:
+      - RUNNING
+      - TERMINATING
+      - TERMINATED
+      - ARRESTED
+    VirtualClusterStates:
+      type: array
+      items:
+        $ref: '#/components/schemas/VirtualClusterState'
+    VirtualClusters:
+      type: array
+      items:
+        $ref: '#/components/schemas/VirtualCluster'

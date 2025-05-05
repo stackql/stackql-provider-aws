@@ -62,6 +62,12 @@ components:
     AddGwMetadata:
       type: boolean
       default: false
+    AggregationPeriod:
+      type: string
+      enum:
+      - OneHour
+      - OneDay
+      - OneWeek
     AmazonId:
       type: string
       minLength: 0
@@ -88,14 +94,29 @@ components:
       pattern: ^[a-fA-F0-9]{64}$
       minLength: 1
       maxLength: 4096
+    ApplicationConfigType:
+      type: string
+      enum:
+      - SemtechGeolocation
     ApplicationServerPublicKey:
       type: string
       pattern: ^[a-fA-F0-9]{64}$
       minLength: 1
       maxLength: 4096
+    Applications:
+      type: array
+      items:
+        $ref: '#/components/schemas/ApplicationConfig'
+    AssistPosition:
+      type: array
+      items:
+        $ref: '#/components/schemas/Coordinate'
     AutoCreateTasks:
       type: boolean
       default: false
+    Avg:
+      type: number
+      format: double
     BCCH:
       type: integer
       minimum: 0
@@ -104,22 +125,54 @@ components:
       type: integer
       minimum: 0
       maximum: 63
+    BaseLat:
+      type: number
+      format: float
+      minimum: -90
+      maximum: 90
+    BaseLng:
+      type: number
+      format: float
+      minimum: -180
+      maximum: 180
     BaseStationId:
       type: integer
       minimum: 0
       maximum: 65535
+    BatteryLevel:
+      type: string
+      enum:
+      - normal
+      - low
+      - critical
+      description: <p>Sidewalk device battery level.</p>
     BeaconingDataRate:
       type: integer
       minimum: 0
       maximum: 15
+    BeaconingFrequencies:
+      type: array
+      items:
+        $ref: '#/components/schemas/BeaconingFrequency'
     BeaconingFrequency:
       type: integer
       minimum: 100000000
       maximum: 1000000000
+    CaptureTimeAccuracy:
+      type: number
+      format: float
     CdmaChannel:
       type: integer
       minimum: 0
       maximum: 4095
+    CdmaList:
+      type: array
+      items:
+        $ref: '#/components/schemas/CdmaObj'
+    CdmaNmrList:
+      type: array
+      items:
+        $ref: '#/components/schemas/CdmaNmrObj'
     CellParams:
       type: integer
       minimum: 0
@@ -150,16 +203,47 @@ components:
       pattern: ^[a-zA-Z0-9-_]+$
       minLength: 1
       maxLength: 64
+    ConnectionStatus:
+      type: string
+      enum:
+      - Connected
+      - Disconnected
+    Coordinate:
+      type: number
+      format: float
+    Crc:
+      type: integer
+      format: int64
+      minimum: 1
+      maximum: 4294967295
+    CreatedAt:
+      type: string
+      format: date-time
+      description: <p>Created at timestamp for the resource.</p>
+    CreationDate:
+      type: string
+      format: date-time
+    CreationTime:
+      type: string
+      format: date-time
     DakCertificateId:
       type: string
       minLength: 0
       maxLength: 256
+    DakCertificateMetadataList:
+      type: array
+      items:
+        $ref: '#/components/schemas/DakCertificateMetadata'
     Description:
       type: string
       minLength: 0
       maxLength: 2048
     DestinationArn:
       type: string
+    DestinationList:
+      type: array
+      items:
+        $ref: '#/components/schemas/Destinations'
     DestinationName:
       type: string
       pattern: ^[a-zA-Z0-9-_]+$
@@ -175,10 +259,19 @@ components:
       type: integer
       minimum: 0
       maximum: 2147483647
+    DeviceCertificateList:
+      type: array
+      items:
+        $ref: '#/components/schemas/CertificateList'
+      description: <p>List of device certificate chain.</p>
     DeviceCreationFile:
       type: string
       minLength: 0
       maxLength: 1024
+    DeviceCreationFileList:
+      type: array
+      items:
+        $ref: '#/components/schemas/DeviceCreationFile'
     DeviceName:
       type: string
     DeviceProfileArn:
@@ -187,24 +280,56 @@ components:
       type: string
       minLength: 0
       maxLength: 256
+    DeviceProfileList:
+      type: array
+      items:
+        $ref: '#/components/schemas/DeviceProfile'
     DeviceProfileName:
       type: string
       minLength: 0
       maxLength: 256
+    DeviceProfileType:
+      type: string
+      enum:
+      - Sidewalk
+      - LoRaWAN
+    DeviceState:
+      type: string
+      enum:
+      - Provisioned
+      - RegisteredNotSeen
+      - RegisteredReachable
+      - RegisteredUnreachable
+      description: <p>Device state defines the device status of sidewalk device.</p>
     DeviceTypeId:
       type: string
       minLength: 0
       maxLength: 2048
+    DimensionName:
+      type: string
+      enum:
+      - DeviceId
+      - GatewayId
     DimensionValue:
       type: string
       minLength: 0
       maxLength: 256
+    Dimensions:
+      type: array
+      items:
+        $ref: '#/components/schemas/Dimension'
     DlAllowed:
       type: boolean
     DlBucketSize:
       type: integer
       minimum: 0
       maximum: 2147483647
+    DlClass:
+      type: string
+      enum:
+      - ClassB
+      - ClassC
+      description: <p>DlClass for LoRaWAM, valid values are ClassB and ClassC.</p>
     DlDr:
       type: integer
       minimum: 0
@@ -223,10 +348,23 @@ components:
       type: string
       minLength: 0
       maxLength: 256
+    Double:
+      type: number
+      format: double
     DownlinkFrequency:
       type: integer
       minimum: 100000000
       maximum: 1000000000
+    DownlinkMode:
+      type: string
+      enum:
+      - SEQUENTIAL
+      - CONCURRENT
+      - USING_UPLINK_GATEWAY
+    DownlinkQueueMessagesList:
+      type: array
+      items:
+        $ref: '#/components/schemas/DownlinkQueueMessage'
     DrMax:
       type: integer
       default: 0
@@ -257,10 +395,44 @@ components:
       type: integer
       minimum: 0
       maximum: 268435455
+    Event:
+      type: string
+      enum:
+      - discovered
+      - lost
+      - ack
+      - nack
+      - passthrough
+      description: <p>Sidewalk device status notification.</p>
+    EventConfigurationsList:
+      type: array
+      items:
+        $ref: '#/components/schemas/EventConfigurationItem'
+    EventNotificationPartnerType:
+      type: string
+      enum:
+      - Sidewalk
+    EventNotificationResourceType:
+      type: string
+      enum:
+      - FuotaTask
+      - SidewalkAccount
+      - WirelessDevice
+      - WirelessGateway
+    EventNotificationTopicStatus:
+      type: string
+      enum:
+      - Enabled
+      - Disabled
     Expression:
       type: string
       minLength: 0
       maxLength: 2048
+    ExpressionType:
+      type: string
+      enum:
+      - RuleName
+      - MqttTopic
     FCntStart:
       type: integer
       minimum: 0
@@ -274,6 +446,10 @@ components:
       minimum: 1
       maximum: 223
       description: <p>The Fport value.</p>
+    FactoryPresetFreqsList:
+      type: array
+      items:
+        $ref: '#/components/schemas/PresetFreq'
     FactorySupport:
       type: boolean
     FileDescriptor:
@@ -309,24 +485,94 @@ components:
       minimum: 1
       description: "<p>The size of each fragment in bytes. This parameter is supported\
         \ only for FUOTA tasks\n            with multicast groups.</p>"
+    FuotaDeviceStatus:
+      type: string
+      enum:
+      - Initial
+      - Package_Not_Supported
+      - FragAlgo_unsupported
+      - Not_enough_memory
+      - FragIndex_unsupported
+      - Wrong_descriptor
+      - SessionCnt_replay
+      - MissingFrag
+      - MemoryError
+      - MICError
+      - Successful
+      - Device_exist_in_conflict_fuota_task
+      description: <p>The status of a wireless device in a FUOTA task.</p>
     FuotaTaskArn:
       type: string
       minLength: 0
       maxLength: 128
+    FuotaTaskEvent:
+      type: string
+      enum:
+      - Fuota
+      description: <p>The event for a log message, if the log message is tied to a
+        FUOTA task.</p>
+    FuotaTaskEventLogOptionList:
+      type: array
+      items:
+        $ref: '#/components/schemas/FuotaTaskEventLogOption'
+      description: <p>The list of FUOTA task event log options.</p>
     FuotaTaskId:
       type: string
       minLength: 0
       maxLength: 256
+    FuotaTaskList:
+      type: array
+      items:
+        $ref: '#/components/schemas/FuotaTask'
+      description: <p>Lists the FUOTA tasks registered to your AWS account.</p>
+    FuotaTaskLogOptionList:
+      type: array
+      items:
+        $ref: '#/components/schemas/FuotaTaskLogOption'
+      description: <p>The list of FUOTA task log options.</p>
     FuotaTaskName:
       type: string
       minLength: 0
       maxLength: 256
+    FuotaTaskStatus:
+      type: string
+      enum:
+      - Pending
+      - FuotaSession_Waiting
+      - In_FuotaSession
+      - FuotaDone
+      - Delete_Waiting
+      description: <p>The status of a FUOTA task.</p>
+    FuotaTaskType:
+      type: string
+      enum:
+      - LoRaWAN
+      description: <p>The FUOTA task type.</p>
+    GPST:
+      type: number
+      format: float
     GatewayEui:
       type: string
       pattern: ^(([0-9A-Fa-f]{2}-){7}|([0-9A-Fa-f]{2}:){7}|([0-9A-Fa-f]{2}\s){7}|([0-9A-Fa-f]{2}){7})([0-9A-Fa-f]{2})$
+    GatewayList:
+      type: array
+      items:
+        $ref: '#/components/schemas/GatewayListItem'
+    GatewayListMulticast:
+      type: array
+      items:
+        $ref: '#/components/schemas/WirelessGatewayId'
+    GatewayMaxEirp:
+      type: number
+      format: float
+      minimum: 0
+      maximum: 30
     GenAppKey:
       type: string
       pattern: ^[a-fA-F0-9]{32}$
+    GeoJsonPayload:
+      type: string
+      format: byte
     GeranCid:
       type: integer
       minimum: 0
@@ -335,10 +581,22 @@ components:
       type: string
       minLength: 0
       maxLength: 2048
+    GsmList:
+      type: array
+      items:
+        $ref: '#/components/schemas/GsmObj'
+    GsmNmrList:
+      type: array
+      items:
+        $ref: '#/components/schemas/GsmNmrObj'
     GsmTimingAdvance:
       type: integer
       minimum: 0
       maximum: 63
+    HorizontalAccuracy:
+      type: number
+      format: float
+      minimum: 0
     HrAllowed:
       type: boolean
       default: false
@@ -355,6 +613,15 @@ components:
       type: string
       minLength: 0
       maxLength: 256
+    IdentifierType:
+      type: string
+      enum:
+      - PartnerAccountId
+      - DevEui
+      - FuotaTaskId
+      - GatewayEui
+      - WirelessDeviceId
+      - WirelessGatewayId
     ImportTaskArn:
       type: string
       minLength: 0
@@ -363,6 +630,22 @@ components:
       type: string
       minLength: 0
       maxLength: 256
+    ImportTaskStatus:
+      type: string
+      enum:
+      - INITIALIZING
+      - INITIALIZED
+      - PENDING
+      - COMPLETE
+      - FAILED
+      - DELETING
+    ImportedWirelessDeviceCount:
+      type: integer
+      format: int64
+    ImportedWirelessDeviceList:
+      type: array
+      items:
+        $ref: '#/components/schemas/ImportedWirelessDevice'
     Integer:
       type: integer
     IotCertificateId:
@@ -372,10 +655,51 @@ components:
     JoinEui:
       type: string
       pattern: ^[a-fA-F0-9]{16}$
+    JoinEuiFilters:
+      type: array
+      items:
+        $ref: '#/components/schemas/JoinEuiRange'
+      description: <p>A list of JoinEuiRange used by LoRa gateways to filter LoRa
+        frames.</p>
+    JoinEuiRange:
+      type: array
+      items:
+        $ref: '#/components/schemas/JoinEui'
+      description: "<p>A pair of join EUI describing a range [BegEui, EndEui], both\
+        \ ends are\n            inclusive.</p>"
     LAC:
       type: integer
       minimum: 1
       maximum: 65535
+    LastUpdateTime:
+      type: string
+      format: date-time
+    LoRaWANGatewayMetadataList:
+      type: array
+      items:
+        $ref: '#/components/schemas/LoRaWANGatewayMetadata'
+    LoRaWANPublicGatewayMetadataList:
+      type: array
+      items:
+        $ref: '#/components/schemas/LoRaWANPublicGatewayMetadata'
+    LogLevel:
+      type: string
+      enum:
+      - INFO
+      - ERROR
+      - DISABLED
+      description: "<p>The log level for a log message. The log levels can be disabled,\
+        \ or set to\n                <code>ERROR</code> to display less verbose logs\
+        \ containing only error information,\n            or to <code>INFO</code>\
+        \ for more detailed logs.</p>"
+    LteList:
+      type: array
+      items:
+        $ref: '#/components/schemas/LteObj'
+    LteNmrList:
+      type: array
+      items:
+        $ref: '#/components/schemas/LteNmrObj'
     LteTimingAdvance:
       type: integer
       minimum: 0
@@ -397,6 +721,9 @@ components:
       type: string
       minLength: 0
       maxLength: 64
+    Max:
+      type: number
+      format: double
     MaxAllowedSignature:
       type: integer
     MaxDutyCycle:
@@ -424,6 +751,53 @@ components:
       maxLength: 2048
     MessageId:
       type: string
+    MessageType:
+      type: string
+      enum:
+      - CUSTOM_COMMAND_ID_NOTIFY
+      - CUSTOM_COMMAND_ID_GET
+      - CUSTOM_COMMAND_ID_SET
+      - CUSTOM_COMMAND_ID_RESP
+      description: "<p>Sidewalk device message type. Default value is\n          \
+        \  <code>CUSTOM_COMMAND_ID_NOTIFY</code>.</p>"
+    MetricName:
+      type: string
+      enum:
+      - DeviceRSSI
+      - DeviceSNR
+      - DeviceRoamingRSSI
+      - DeviceRoamingSNR
+      - DeviceUplinkCount
+      - DeviceDownlinkCount
+      - DeviceUplinkLostCount
+      - DeviceUplinkLostRate
+      - DeviceJoinRequestCount
+      - DeviceJoinAcceptCount
+      - DeviceRoamingUplinkCount
+      - DeviceRoamingDownlinkCount
+      - GatewayUpTime
+      - GatewayDownTime
+      - GatewayRSSI
+      - GatewaySNR
+      - GatewayUplinkCount
+      - GatewayDownlinkCount
+      - GatewayJoinRequestCount
+      - GatewayJoinAcceptCount
+      - AwsAccountUplinkCount
+      - AwsAccountDownlinkCount
+      - AwsAccountUplinkLostCount
+      - AwsAccountUplinkLostRate
+      - AwsAccountJoinRequestCount
+      - AwsAccountJoinAcceptCount
+      - AwsAccountRoamingUplinkCount
+      - AwsAccountRoamingDownlinkCount
+      - AwsAccountDeviceCount
+      - AwsAccountGatewayCount
+      - AwsAccountActiveDeviceCount
+      - AwsAccountActiveGatewayCount
+    MetricQueryEndTimestamp:
+      type: string
+      format: date-time
     MetricQueryError:
       type: string
       minLength: 0
@@ -432,10 +806,32 @@ components:
       type: string
       minLength: 0
       maxLength: 256
+    MetricQueryStartTimestamp:
+      type: string
+      format: date-time
+    MetricQueryStatus:
+      type: string
+      enum:
+      - Succeeded
+      - Failed
+    MetricQueryTimestamp:
+      type: string
+      format: date-time
+    MetricQueryTimestamps:
+      type: array
+      items:
+        $ref: '#/components/schemas/MetricQueryTimestamp'
+    MetricQueryValues:
+      type: array
+      items:
+        $ref: '#/components/schemas/MetricQueryValue'
     MetricUnit:
       type: string
       minLength: 0
       maxLength: 256
+    Min:
+      type: number
+      format: double
     MinGwDiversity:
       type: integer
       minimum: 1
@@ -448,6 +844,15 @@ components:
       type: string
       minLength: 0
       maxLength: 256
+    MulticastFrameInfo:
+      type: string
+      enum:
+      - ENABLED
+      - DISABLED
+      description: "<p>\n            <code>FrameInfo</code> of your multicast group\
+        \ resources for the trace content. Use\n            FrameInfo to debug the\
+        \ multicast communication between your multicast groups and the\n        \
+        \    network server.</p>"
     MulticastGroupArn:
       type: string
       minLength: 0
@@ -456,6 +861,16 @@ components:
       type: string
       minLength: 0
       maxLength: 256
+    MulticastGroupList:
+      type: array
+      items:
+        $ref: '#/components/schemas/MulticastGroup'
+      description: <p>List of multicast groups.</p>
+    MulticastGroupListByFuotaTask:
+      type: array
+      items:
+        $ref: '#/components/schemas/MulticastGroupByFuotaTask'
+      description: <p>List of multicast groups associated with a FUOTA task.</p>
     MulticastGroupMessageId:
       type: string
       minLength: 0
@@ -474,15 +889,29 @@ components:
     NetId:
       type: string
       pattern: ^[a-fA-F0-9]{6}$
+    NetIdFilters:
+      type: array
+      items:
+        $ref: '#/components/schemas/NetId'
+      description: "<p>A list of NetId values that are used by LoRa gateways to filter\
+        \ the uplink\n            frames.</p>"
     NetworkAnalyzerConfigurationArn:
       type: string
       minLength: 0
       maxLength: 1124
+    NetworkAnalyzerConfigurationList:
+      type: array
+      items:
+        $ref: '#/components/schemas/NetworkAnalyzerConfigurations'
     NetworkAnalyzerConfigurationName:
       type: string
       pattern: ^[a-zA-Z0-9-_]+$
       minLength: 1
       maxLength: 1024
+    NetworkAnalyzerMulticastGroupList:
+      type: array
+      items:
+        $ref: '#/components/schemas/MulticastGroupId'
     NetworkId:
       type: integer
       minimum: 0
@@ -510,8 +939,18 @@ components:
     NwkSKey:
       type: string
       pattern: ^[a-fA-F0-9]{32}$
+    OnboardStatus:
+      type: string
+      enum:
+      - INITIALIZED
+      - PENDING
+      - ONBOARDED
+      - FAILED
     OnboardStatusReason:
       type: string
+    P90:
+      type: number
+      format: double
     PCI:
       type: integer
       minimum: 0
@@ -530,6 +969,10 @@ components:
       type: string
       minLength: 0
       maxLength: 256
+    PartnerType:
+      type: string
+      enum:
+      - Sidewalk
     PathLoss:
       type: integer
       minimum: 46
@@ -559,13 +1002,52 @@ components:
       type: integer
       minimum: 0
       maximum: 511
+    PositionConfigurationFec:
+      type: string
+      enum:
+      - ROSE
+      - NONE
+    PositionConfigurationList:
+      type: array
+      items:
+        $ref: '#/components/schemas/PositionConfigurationItem'
+    PositionConfigurationStatus:
+      type: string
+      enum:
+      - Enabled
+      - Disabled
+    PositionCoordinate:
+      type: array
+      items:
+        $ref: '#/components/schemas/PositionCoordinateValue'
+    PositionCoordinateValue:
+      type: number
+      format: float
     PositionResourceIdentifier:
       type: string
       pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+    PositionResourceType:
+      type: string
+      enum:
+      - WirelessDevice
+      - WirelessGateway
+    PositionSolverProvider:
+      type: string
+      enum:
+      - Semtech
+    PositionSolverType:
+      type: string
+      enum:
+      - GNSS
     PositionSolverVersion:
       type: string
       minLength: 0
       maxLength: 50
+    PositioningConfigStatus:
+      type: string
+      enum:
+      - Enabled
+      - Disabled
     PrAllowed:
       type: boolean
       default: false
@@ -573,6 +1055,10 @@ components:
       type: integer
       minimum: 1000000
       maximum: 16700000
+    PrivateKeysList:
+      type: array
+      items:
+        $ref: '#/components/schemas/CertificateList'
     ProviderNetId:
       type: string
       minLength: 0
@@ -591,6 +1077,11 @@ components:
       type: integer
       minimum: -140
       maximum: -44
+    RSRQ:
+      type: number
+      format: float
+      minimum: -19.5
+      maximum: -3
     RSS:
       type: integer
       minimum: -128
@@ -678,15 +1169,27 @@ components:
       type: string
       minLength: 0
       maxLength: 256
+    ServiceProfileList:
+      type: array
+      items:
+        $ref: '#/components/schemas/ServiceProfile'
     ServiceProfileName:
       type: string
       minLength: 0
       maxLength: 256
+    SessionStartTimeTimestamp:
+      type: string
+      format: date-time
+      description: <p>Timestamp of when the multicast group session is to start.</p>
     SessionTimeout:
       type: integer
       minimum: 60
       maximum: 172800
       description: <p>How long before a multicast group session is to timeout.</p>
+    SidewalkAccountList:
+      type: array
+      items:
+        $ref: '#/components/schemas/SidewalkAccountInfoWithFingerprint'
     SidewalkId:
       type: string
       minLength: 0
@@ -695,17 +1198,69 @@ components:
       type: string
       minLength: 0
       maxLength: 64
+    SigningAlg:
+      type: string
+      enum:
+      - Ed25519
+      - P256r1
+      description: <p>The certificate chain algorithm provided by sidewalk.</p>
+    StartTime:
+      type: string
+      format: date-time
+      description: <p>Start time of a FUOTA task.</p>
     Station:
       type: string
       minLength: 1
       maxLength: 4096
     StatusReason:
       type: string
+    Std:
+      type: number
+      format: double
     SubBand:
       type: integer
       minimum: 1
       maximum: 8
       description: <p>A subset of supported frequency channels in a certain RFRegion.</p>
+    SubBands:
+      type: array
+      items:
+        $ref: '#/components/schemas/SubBand'
+      description: <p>A list of integer indicating which sub bands are supported by
+        LoRa gateway.</p>
+    Sum:
+      type: number
+      format: double
+    SummaryMetricConfigurationStatus:
+      type: string
+      enum:
+      - Enabled
+      - Disabled
+    SummaryMetricQueries:
+      type: array
+      items:
+        $ref: '#/components/schemas/SummaryMetricQuery'
+    SummaryMetricQueryResults:
+      type: array
+      items:
+        $ref: '#/components/schemas/SummaryMetricQueryResult'
+    SupportedRfRegion:
+      type: string
+      enum:
+      - EU868
+      - US915
+      - AU915
+      - AS923-1
+      - AS923-2
+      - AS923-3
+      - AS923-4
+      - EU433
+      - CN470
+      - CN779
+      - RU864
+      - KR920
+      - IN865
+      description: <p>Supported RfRegions</p>
     Supports32BitFCnt:
       type: boolean
       default: false
@@ -729,6 +1284,16 @@ components:
       type: string
       minLength: 1
       maxLength: 128
+    TagKeyList:
+      type: array
+      items:
+        $ref: '#/components/schemas/TagKey'
+    TagList:
+      type: array
+      items:
+        $ref: '#/components/schemas/Tag'
+      description: "<p>The tag to attach to the specified resource. Tags are metadata\
+        \ that you can use to\n            manage a resource.</p>"
     TagValue:
       type: string
       minLength: 0
@@ -738,6 +1303,14 @@ components:
       default: 0
       minimum: 0
       maximum: 100
+    TdscdmaList:
+      type: array
+      items:
+        $ref: '#/components/schemas/TdscdmaObj'
+    TdscdmaNmrList:
+      type: array
+      items:
+        $ref: '#/components/schemas/TdscdmaNmrObj'
     TdscdmaTimingAdvance:
       type: integer
       minimum: 0
@@ -793,26 +1366,138 @@ components:
       type: integer
       minimum: 0
       maximum: 268435455
+    VerticalAccuracy:
+      type: number
+      format: float
+      minimum: 0
+    WcdmaList:
+      type: array
+      items:
+        $ref: '#/components/schemas/WcdmaObj'
+    WcdmaNmrList:
+      type: array
+      items:
+        $ref: '#/components/schemas/WcdmaNmrObj'
+    WiFiAccessPoints:
+      type: array
+      items:
+        $ref: '#/components/schemas/WiFiAccessPoint'
     WirelessDeviceArn:
       type: string
+    WirelessDeviceEvent:
+      type: string
+      enum:
+      - Join
+      - Rejoin
+      - Uplink_Data
+      - Downlink_Data
+      - Registration
+      description: <p>The event for a log message, if the log message is tied to a
+        wireless device.</p>
+    WirelessDeviceEventLogOptionList:
+      type: array
+      items:
+        $ref: '#/components/schemas/WirelessDeviceEventLogOption'
+      description: <p>The list of wireless device event log options.</p>
+    WirelessDeviceFrameInfo:
+      type: string
+      enum:
+      - ENABLED
+      - DISABLED
+      description: "<p>\n            <code>FrameInfo</code> of your wireless device\
+        \ resources for the trace content. Use\n            FrameInfo to debug the\
+        \ communication between your LoRaWAN end devices and the network\n       \
+        \     server.</p>"
     WirelessDeviceId:
       type: string
       minLength: 0
       maxLength: 256
+    WirelessDeviceIdType:
+      type: string
+      enum:
+      - WirelessDeviceId
+      - DevEui
+      - ThingName
+      - SidewalkManufacturingSn
+    WirelessDeviceImportTaskList:
+      type: array
+      items:
+        $ref: '#/components/schemas/WirelessDeviceImportTask'
+    WirelessDeviceList:
+      type: array
+      items:
+        $ref: '#/components/schemas/WirelessDeviceId'
+    WirelessDeviceLogOptionList:
+      type: array
+      items:
+        $ref: '#/components/schemas/WirelessDeviceLogOption'
+      description: <p>The list of wireless device log options.</p>
     WirelessDeviceName:
       type: string
       minLength: 0
       maxLength: 256
+    WirelessDeviceSidewalkStatus:
+      type: string
+      enum:
+      - PROVISIONED
+      - REGISTERED
+      - ACTIVATED
+      - UNKNOWN
+    WirelessDeviceStatisticsList:
+      type: array
+      items:
+        $ref: '#/components/schemas/WirelessDeviceStatistics'
+    WirelessDeviceType:
+      type: string
+      enum:
+      - Sidewalk
+      - LoRaWAN
     WirelessGatewayArn:
       type: string
+    WirelessGatewayEvent:
+      type: string
+      enum:
+      - CUPS_Request
+      - Certificate
+      description: <p>The event for a log message, if the log message is tied to a
+        wireless gateway.</p>
+    WirelessGatewayEventLogOptionList:
+      type: array
+      items:
+        $ref: '#/components/schemas/WirelessGatewayEventLogOption'
+      description: <p>The list of wireless gateway event log options.</p>
     WirelessGatewayId:
       type: string
       minLength: 0
       maxLength: 256
+    WirelessGatewayIdType:
+      type: string
+      enum:
+      - GatewayEui
+      - WirelessGatewayId
+      - ThingName
+    WirelessGatewayList:
+      type: array
+      items:
+        $ref: '#/components/schemas/WirelessGatewayId'
+    WirelessGatewayLogOptionList:
+      type: array
+      items:
+        $ref: '#/components/schemas/WirelessGatewayLogOption'
+      description: <p>The list of wireless gateway log options.</p>
     WirelessGatewayName:
       type: string
       minLength: 0
       maxLength: 256
+    WirelessGatewayServiceType:
+      type: string
+      enum:
+      - CUPS
+      - LNS
+    WirelessGatewayStatisticsList:
+      type: array
+      items:
+        $ref: '#/components/schemas/WirelessGatewayStatistics'
     WirelessGatewayTaskDefinitionArn:
       type: string
     WirelessGatewayTaskDefinitionId:
@@ -820,7 +1505,29 @@ components:
       pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
       minLength: 0
       maxLength: 36
+    WirelessGatewayTaskDefinitionList:
+      type: array
+      items:
+        $ref: '#/components/schemas/UpdateWirelessGatewayTaskEntry'
+    WirelessGatewayTaskDefinitionType:
+      type: string
+      enum:
+      - UPDATE
     WirelessGatewayTaskName:
       type: string
       minLength: 1
       maxLength: 2048
+    WirelessGatewayTaskStatus:
+      type: string
+      enum:
+      - PENDING
+      - IN_PROGRESS
+      - FIRST_RETRY
+      - SECOND_RETRY
+      - COMPLETED
+      - FAILED
+    WirelessGatewayType:
+      type: string
+      enum:
+      - LoRaWAN
+      description: <p>The wireless gateway type.</p>

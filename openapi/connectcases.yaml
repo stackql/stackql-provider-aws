@@ -54,10 +54,42 @@ components:
       type: string
       minLength: 1
       maxLength: 500
+    AssociationTime:
+      type: string
+      format: date-time
+    AuditEventDateTime:
+      type: string
+      format: date-time
     AuditEventFieldId:
       type: string
       minLength: 1
       maxLength: 500
+    AuditEventFieldList:
+      type: array
+      items:
+        $ref: '#/components/schemas/AuditEventField'
+    AuditEventFieldValueUnion:
+      allOf:
+      - allOf:
+        - $ref: '#/components/schemas/String'
+        description: |-
+          Can be either null, or have a String value type. Only one value can be provided.
+      - allOf:
+        - $ref: '#/components/schemas/Double'
+        description: |-
+          Can be either null, or have a Double value type. Only one value can be provided.
+      - allOf:
+        - $ref: '#/components/schemas/Boolean'
+        description: |-
+          Can be either null, or have a Boolean value type. Only one value can be provided.
+      - allOf:
+        - $ref: '#/components/schemas/EmptyFieldValue'
+      - allOf:
+        - $ref: '#/components/schemas/String'
+        description: |-
+          Can be either null, or have a String value type formatted as an ARN. Only one value can be provided.
+      description: |-
+        Object to store union of Field values.
     AuditEventId:
       type: string
       minLength: 1
@@ -68,10 +100,72 @@ components:
       - Case.Created
       - Case.Updated
       - RelatedItem.Created
+    AuditEventsList:
+      type: array
+      items:
+        $ref: '#/components/schemas/AuditEvent'
+    BatchGetCaseRuleErrorList:
+      type: array
+      items:
+        $ref: '#/components/schemas/CaseRuleError'
+    BatchGetCaseRuleList:
+      type: array
+      items:
+        $ref: '#/components/schemas/GetCaseRuleResponse'
+    BatchGetFieldErrorList:
+      type: array
+      items:
+        $ref: '#/components/schemas/FieldError'
+    BatchGetFieldIdentifierList:
+      type: array
+      items:
+        $ref: '#/components/schemas/FieldIdentifier'
+    BatchGetFieldList:
+      type: array
+      items:
+        $ref: '#/components/schemas/GetFieldResponse'
+    BooleanCondition:
+      allOf:
+      - allOf:
+        - $ref: '#/components/schemas/BooleanOperands'
+        description: |-
+          Tests that operandOne is equal to operandTwo.
+      - allOf:
+        - $ref: '#/components/schemas/BooleanOperands'
+        description: |-
+          Tests that operandOne is not equal to operandTwo.
+      description: |-
+        Boolean condition for a rule. In the Amazon Connect admin website, case rules are known as _case field conditions_. For more information about case field conditions, see [Add case field conditions to a case template](https://docs.aws.amazon.com/connect/latest/adminguide/case-field-conditions.html).
+    BooleanConditionList:
+      type: array
+      items:
+        $ref: '#/components/schemas/BooleanCondition'
     CaseArn:
       type: string
       minLength: 1
       maxLength: 500
+    CaseFilter:
+      allOf:
+      - allOf:
+        - $ref: '#/components/schemas/FieldFilter'
+        description: |-
+          A list of fields to filter on.
+      - allOf:
+        - $ref: '#/components/schemas/CaseFilter'
+      - allOf:
+        - $ref: '#/components/schemas/CaseFilterList'
+        description: |-
+          Provides "and all" filtering.
+      - allOf:
+        - $ref: '#/components/schemas/CaseFilterList'
+        description: |-
+          Provides "or all" filtering.
+      description: |-
+        A filter for cases. Only one value can be provided.
+    CaseFilterList:
+      type: array
+      items:
+        $ref: '#/components/schemas/CaseFilter'
     CaseId:
       type: string
       minLength: 1
@@ -83,19 +177,43 @@ components:
     CaseRuleDescription:
       type: string
       maxLength: 255
+    CaseRuleDetails:
+      allOf:
+      - allOf:
+        - $ref: '#/components/schemas/RequiredCaseRule'
+        description: |-
+          Required rule type, used to indicate whether a field is required.
+      description: |-
+        Represents what rule type should take place, under what conditions. In the Amazon Connect admin website, case rules are known as _case field conditions_. For more information about case field conditions, see [Add case field conditions to a case template](https://docs.aws.amazon.com/connect/latest/adminguide/case-field-conditions.html).
     CaseRuleId:
       type: string
       minLength: 1
       maxLength: 500
+    CaseRuleIdentifierList:
+      type: array
+      items:
+        $ref: '#/components/schemas/CaseRuleIdentifier'
     CaseRuleName:
       type: string
       pattern: ^.*[\S]$
       minLength: 1
       maxLength: 100
+    CaseRuleSummaryList:
+      type: array
+      items:
+        $ref: '#/components/schemas/CaseRuleSummary'
+    CaseSummaryList:
+      type: array
+      items:
+        $ref: '#/components/schemas/CaseSummary'
     Channel:
       type: string
       minLength: 1
       maxLength: 100
+    ChannelList:
+      type: array
+      items:
+        $ref: '#/components/schemas/Channel'
     CommentBody:
       type: string
       minLength: 1
@@ -104,10 +222,16 @@ components:
       type: string
       enum:
       - Text/Plain
+    ConnectedToSystemTime:
+      type: string
+      format: date-time
     ContactArn:
       type: string
       minLength: 1
       maxLength: 500
+    CreatedTime:
+      type: string
+      format: date-time
     CustomEntity:
       type: string
       pattern: ^[a-zA-Z0-9_\-\.@:/ ]*[a-zA-Z0-9_\-\.@:/]$
@@ -135,6 +259,10 @@ components:
       - Active
       - CreationInProgress
       - CreationFailed
+    DomainSummaryList:
+      type: array
+      items:
+        $ref: '#/components/schemas/DomainSummary'
     FieldArn:
       type: string
       minLength: 1
@@ -142,10 +270,46 @@ components:
     FieldDescription:
       type: string
       maxLength: 255
+    FieldFilter:
+      allOf:
+      - allOf:
+        - $ref: '#/components/schemas/FieldValue'
+        description: |-
+          Object containing field identifier and value information.
+      - allOf:
+        - $ref: '#/components/schemas/FieldValue'
+        description: |-
+          Object containing field identifier and value information.
+      - allOf:
+        - $ref: '#/components/schemas/FieldValue'
+        description: |-
+          Object containing field identifier and value information.
+      - allOf:
+        - $ref: '#/components/schemas/FieldValue'
+        description: |-
+          Object containing field identifier and value information.
+      - allOf:
+        - $ref: '#/components/schemas/FieldValue'
+        description: |-
+          Object containing field identifier and value information.
+      - allOf:
+        - $ref: '#/components/schemas/FieldValue'
+        description: |-
+          Object containing field identifier and value information.
+      description: |-
+        A filter for fields. Only one value can be provided.
     FieldId:
       type: string
       minLength: 1
       maxLength: 500
+    FieldIdentifierList:
+      type: array
+      items:
+        $ref: '#/components/schemas/FieldIdentifier'
+    FieldList:
+      type: array
+      items:
+        $ref: '#/components/schemas/FieldItem'
     FieldName:
       type: string
       pattern: ^.*[\S]$
@@ -156,6 +320,10 @@ components:
       enum:
       - System
       - Custom
+    FieldOptionErrorList:
+      type: array
+      items:
+        $ref: '#/components/schemas/FieldOptionError'
     FieldOptionName:
       type: string
       pattern: ^.*[\S]$
@@ -166,6 +334,14 @@ components:
       pattern: ^.*[\S]$
       minLength: 1
       maxLength: 100
+    FieldOptionsList:
+      type: array
+      items:
+        $ref: '#/components/schemas/FieldOption'
+    FieldSummaryList:
+      type: array
+      items:
+        $ref: '#/components/schemas/FieldSummary'
     FieldType:
       type: string
       enum:
@@ -176,6 +352,36 @@ components:
       - SingleSelect
       - Url
       - User
+    FieldValueList:
+      type: array
+      items:
+        $ref: '#/components/schemas/FieldValue'
+    FieldValueUnion:
+      allOf:
+      - allOf:
+        - $ref: '#/components/schemas/String'
+        description: |-
+          String value type.
+      - allOf:
+        - $ref: '#/components/schemas/Double'
+        description: |-
+          Can be either null, or have a Double number value type. Only one value can be provided.
+      - allOf:
+        - $ref: '#/components/schemas/Boolean'
+        description: |-
+          Can be either null, or have a Boolean value type. Only one value can be provided.
+      - allOf:
+        - $ref: '#/components/schemas/EmptyFieldValue'
+        description: |-
+          An empty value.
+      - allOf:
+        - $ref: '#/components/schemas/String'
+        description: |-
+          Represents the user that performed the audit.
+      description: |-
+        Object to store union of Field values.
+
+        The `Summary` system field accepts 3000 characters while all other fields accept 500 characters.
     FileArn:
       type: string
       minLength: 1
@@ -184,10 +390,21 @@ components:
       type: string
       minLength: 1
       maxLength: 500
+    LastModifiedTime:
+      type: string
+      format: date-time
     LayoutArn:
       type: string
       minLength: 1
       maxLength: 500
+    LayoutContent:
+      allOf:
+      - allOf:
+        - $ref: '#/components/schemas/BasicLayout'
+        description: |-
+          Content specific to `BasicLayout` type. It configures fields in the top panel and More Info tab of Cases user interface.
+      description: |-
+        Object to store union of different versions of layout content.
     LayoutId:
       type: string
       minLength: 1
@@ -197,6 +414,10 @@ components:
       pattern: ^.*[\S]$
       minLength: 1
       maxLength: 100
+    LayoutSummaryList:
+      type: array
+      items:
+        $ref: '#/components/schemas/LayoutSummary'
     MaxResults:
       type: integer
       minimum: 1
@@ -205,6 +426,34 @@ components:
       type: string
       minLength: 0
       maxLength: 9000
+    OperandOne:
+      allOf:
+      - allOf:
+        - $ref: '#/components/schemas/FieldId'
+        description: |-
+          The field ID that this operand should take the value of.
+      description: |-
+        Represents the left hand operand in the condition. In the Amazon Connect admin website, case rules are known as _case field conditions_. For more information about case field conditions, see [Add case field conditions to a case template](https://docs.aws.amazon.com/connect/latest/adminguide/case-field-conditions.html).
+    OperandTwo:
+      allOf:
+      - allOf:
+        - $ref: '#/components/schemas/String'
+        description: |-
+          String value type.
+      - allOf:
+        - $ref: '#/components/schemas/Boolean'
+        description: |-
+          Boolean value type.
+      - allOf:
+        - $ref: '#/components/schemas/Double'
+        description: |-
+          Double value type.
+      - allOf:
+        - $ref: '#/components/schemas/EmptyOperandValue'
+        description: |-
+          Empty value type.
+      description: |-
+        Represents the right hand operand in the condition. In the Amazon Connect admin website, case rules are known as _case field conditions_. For more information about case field conditions, see [Add case field conditions to a case template](https://docs.aws.amazon.com/connect/latest/adminguide/case-field-conditions.html).
     Order:
       type: string
       enum:
@@ -214,10 +463,54 @@ components:
       type: string
       minLength: 1
       maxLength: 500
+    RelatedItemContent:
+      allOf:
+      - allOf:
+        - $ref: '#/components/schemas/ContactContent'
+        description: |-
+          Represents the content of a contact to be returned to agents.
+      - allOf:
+        - $ref: '#/components/schemas/CommentContent'
+        description: |-
+          Represents the content of a comment to be returned to agents.
+      - allOf:
+        - $ref: '#/components/schemas/FileContent'
+        description: |-
+          Represents the content of a File to be returned to agents.
+      - allOf:
+        - $ref: '#/components/schemas/SlaContent'
+        description: |-
+          Represents the content of an SLA to be returned to agents.
+      description: |-
+        Represents the content of a particular type of related item.
+    RelatedItemFilterList:
+      type: array
+      items:
+        $ref: '#/components/schemas/RelatedItemTypeFilter'
     RelatedItemId:
       type: string
       minLength: 1
       maxLength: 500
+    RelatedItemInputContent:
+      allOf:
+      - allOf:
+        - $ref: '#/components/schemas/Contact'
+        description: |-
+          Object representing a contact in Amazon Connect as an API request field.
+      - allOf:
+        - $ref: '#/components/schemas/CommentContent'
+        description: |-
+          Represents the content of a comment to be returned to agents.
+      - allOf:
+        - $ref: '#/components/schemas/FileContent'
+        description: |-
+          A file of related items.
+      - allOf:
+        - $ref: '#/components/schemas/SlaInputContent'
+        description: |-
+          Represents the content of an SLA to be created.
+      description: |-
+        Represents the content of a related item to be created.
     RelatedItemType:
       type: string
       enum:
@@ -225,10 +518,71 @@ components:
       - Comment
       - File
       - Sla
+    RelatedItemTypeFilter:
+      allOf:
+      - allOf:
+        - $ref: '#/components/schemas/ContactFilter'
+        description: |-
+          A filter for related items of type `Contact`.
+      - allOf:
+        - $ref: '#/components/schemas/CommentFilter'
+        description: |-
+          A filter for related items of type `Comment`.
+      - allOf:
+        - $ref: '#/components/schemas/FileFilter'
+        description: |-
+          A filter for related items of this type of `File`.
+      - allOf:
+        - $ref: '#/components/schemas/SlaFilter'
+        description: |-
+          Filter for related items of type `SLA`.
+      description: |-
+        The list of types of related items and their parameters to use for filtering.
+    RequiredFieldList:
+      type: array
+      items:
+        $ref: '#/components/schemas/RequiredField'
     RuleType:
       type: string
       enum:
       - Required
+    SearchCasesResponseItemList:
+      type: array
+      items:
+        $ref: '#/components/schemas/SearchCasesResponseItem'
+    SearchRelatedItemsResponseItemList:
+      type: array
+      items:
+        $ref: '#/components/schemas/SearchRelatedItemsResponseItem'
+    Section:
+      allOf:
+      - allOf:
+        - $ref: '#/components/schemas/FieldGroup'
+        description: |-
+          Consists of a group of fields and associated properties.
+      description: |-
+        This represents a sections within a panel or tab of the page layout.
+    SectionsList:
+      type: array
+      items:
+        $ref: '#/components/schemas/Section'
+      description: <p>Ordered list containing different kinds of sections that can
+        be added.</p>
+    SlaCompletionTime:
+      type: string
+      format: date-time
+    SlaFieldValueUnionList:
+      type: array
+      items:
+        $ref: '#/components/schemas/FieldValueUnion'
+    SlaInputContent:
+      allOf:
+      - allOf:
+        - $ref: '#/components/schemas/SlaInputConfiguration'
+        description: |-
+          Represents an input SLA configuration.
+      description: |-
+        Represents the content of an SLA.
     SlaName:
       type: string
       pattern: ^.*[\S]$
@@ -241,19 +595,43 @@ components:
       - Overdue
       - Met
       - NotMet
+    SlaTargetTime:
+      type: string
+      format: date-time
     SlaType:
       type: string
       enum:
       - CaseField
+    SortList:
+      type: array
+      items:
+        $ref: '#/components/schemas/Sort'
     TagKey:
       type: string
       pattern: ^(?!aws:)[a-zA-Z+-=._:/]+$
       minLength: 1
       maxLength: 128
+    TagKeyList:
+      type: array
+      items:
+        $ref: '#/components/schemas/TagKey'
+    Tags:
+      type: object
+      additionalProperties:
+        $ref: '#/components/schemas/String'
+    TargetSlaMinutes:
+      type: integer
+      format: int64
+      minimum: 1
+      maximum: 129600
     TemplateArn:
       type: string
       minLength: 1
       maxLength: 500
+    TemplateCaseRuleList:
+      type: array
+      items:
+        $ref: '#/components/schemas/TemplateRule'
     TemplateDescription:
       type: string
       maxLength: 255
@@ -271,10 +649,34 @@ components:
       enum:
       - Active
       - Inactive
+    TemplateStatusFilters:
+      type: array
+      items:
+        $ref: '#/components/schemas/TemplateStatus'
+    TemplateSummaryList:
+      type: array
+      items:
+        $ref: '#/components/schemas/TemplateSummary'
     UserArn:
       type: string
       minLength: 1
       maxLength: 500
+    UserUnion:
+      allOf:
+      - allOf:
+        - $ref: '#/components/schemas/UserArn'
+        description: |-
+          Represents the Amazon Connect ARN of the user.
+      - allOf:
+        - $ref: '#/components/schemas/CustomEntity'
+        description: |-
+          Any provided entity.
+      description: |-
+        Represents the entity that performed the action.
     Value:
       type: string
       maxLength: 100
+    ValuesList:
+      type: array
+      items:
+        $ref: '#/components/schemas/Value'

@@ -52,6 +52,11 @@ servers:
 paths: {}
 components:
   schemas:
+    AttributeMatchingModel:
+      type: string
+      enum:
+      - ONE_TO_ONE
+      - MANY_TO_MANY
     AttributeName:
       type: string
       pattern: ^[a-zA-Z_0-9- ]*$
@@ -59,9 +64,35 @@ components:
     AwsAccountId:
       type: string
       pattern: ^\d{12}$
+    AwsAccountIdList:
+      type: array
+      items:
+        $ref: '#/components/schemas/AwsAccountId'
+    DeleteUniqueIdErrorType:
+      type: string
+      enum:
+      - SERVICE_ERROR
+      - VALIDATION_ERROR
+    DeleteUniqueIdErrorsList:
+      type: array
+      items:
+        $ref: '#/components/schemas/DeleteUniqueIdError'
+    DeleteUniqueIdStatus:
+      type: string
+      enum:
+      - COMPLETED
+      - ACCEPTED
+    DeletedUniqueIdList:
+      type: array
+      items:
+        $ref: '#/components/schemas/DeletedUniqueId'
     Description:
       type: string
       maxLength: 255
+    DisconnectedUniqueIdsList:
+      type: array
+      items:
+        $ref: '#/components/schemas/HeaderSafeUniqueId'
     EntityName:
       type: string
       pattern: ^[a-zA-Z_0-9-]*$
@@ -82,31 +113,126 @@ components:
       pattern: ^[a-zA-Z_0-9-+=/,]*$
       minLength: 1
       maxLength: 780
+    IdMappingJobOutputSourceConfig:
+      type: array
+      items:
+        $ref: '#/components/schemas/IdMappingJobOutputSource'
     IdMappingRoleArn:
       type: string
       pattern: ^$|^arn:aws:iam::\d{12}:role/?[a-zA-Z_0-9+=,.@\-_/]+$
       minLength: 0
       maxLength: 512
+    IdMappingType:
+      type: string
+      enum:
+      - PROVIDER
+      - RULE_BASED
     IdMappingWorkflowArn:
       type: string
       pattern: ^arn:(aws|aws-us-gov|aws-cn):entityresolution:[a-z]{2}-[a-z]{1,10}-[0-9]:[0-9]{12}:(idmappingworkflow/[a-zA-Z_0-9-]{1,255})$
+    IdMappingWorkflowInputSourceConfig:
+      type: array
+      items:
+        $ref: '#/components/schemas/IdMappingWorkflowInputSource'
+    IdMappingWorkflowList:
+      type: array
+      items:
+        $ref: '#/components/schemas/IdMappingWorkflowSummary'
+    IdMappingWorkflowOutputSourceConfig:
+      type: array
+      items:
+        $ref: '#/components/schemas/IdMappingWorkflowOutputSource'
+    IdMappingWorkflowRuleDefinitionType:
+      type: string
+      enum:
+      - SOURCE
+      - TARGET
+    IdMappingWorkflowRuleDefinitionTypeList:
+      type: array
+      items:
+        $ref: '#/components/schemas/IdMappingWorkflowRuleDefinitionType'
     IdNamespaceArn:
       type: string
       pattern: ^arn:(aws|aws-us-gov|aws-cn):entityresolution:[a-z]{2}-[a-z]{1,10}-[0-9]:[0-9]{12}:(idnamespace/[a-zA-Z_0-9-]{1,255})$
+    IdNamespaceIdMappingWorkflowMetadataList:
+      type: array
+      items:
+        $ref: '#/components/schemas/IdNamespaceIdMappingWorkflowMetadata'
+    IdNamespaceIdMappingWorkflowPropertiesList:
+      type: array
+      items:
+        $ref: '#/components/schemas/IdNamespaceIdMappingWorkflowProperties'
+    IdNamespaceInputSourceConfig:
+      type: array
+      items:
+        $ref: '#/components/schemas/IdNamespaceInputSource'
+    IdNamespaceList:
+      type: array
+      items:
+        $ref: '#/components/schemas/IdNamespaceSummary'
+    IdNamespaceType:
+      type: string
+      enum:
+      - SOURCE
+      - TARGET
+    IncrementalRunType:
+      type: string
+      enum:
+      - IMMEDIATE
+    InputSourceConfig:
+      type: array
+      items:
+        $ref: '#/components/schemas/InputSource'
     JobId:
       type: string
       pattern: ^[a-f0-9]{32}$
+    JobList:
+      type: array
+      items:
+        $ref: '#/components/schemas/JobSummary'
+    JobOutputSourceConfig:
+      type: array
+      items:
+        $ref: '#/components/schemas/JobOutputSource'
+    JobStatus:
+      type: string
+      enum:
+      - RUNNING
+      - SUCCEEDED
+      - FAILED
+      - QUEUED
     KMSArn:
       type: string
       pattern: ^arn:aws:kms:.*:[0-9]+:.*$
+    MatchPurpose:
+      type: string
+      enum:
+      - IDENTIFIER_GENERATION
+      - INDEXING
+    MatchingKeys:
+      type: array
+      items:
+        $ref: '#/components/schemas/AttributeName'
     MatchingWorkflowArn:
       type: string
       pattern: ^arn:(aws|aws-us-gov|aws-cn):entityresolution:[a-z]{2}-[a-z]{1,10}-[0-9]:[0-9]{12}:(matchingworkflow/[a-zA-Z_0-9-]{1,255})$
+    MatchingWorkflowList:
+      type: array
+      items:
+        $ref: '#/components/schemas/MatchingWorkflowSummary'
     NextToken:
       type: string
       pattern: ^[a-zA-Z_0-9-=+/]*$
       minLength: 1
       maxLength: 1024
+    OutputAttributes:
+      type: array
+      items:
+        $ref: '#/components/schemas/OutputAttribute'
+    OutputSourceConfig:
+      type: array
+      items:
+        $ref: '#/components/schemas/OutputSource'
     PolicyDocument:
       type: string
       minLength: 1
@@ -116,6 +242,18 @@ components:
       pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
       minLength: 36
       maxLength: 36
+    ProviderEndpointConfiguration:
+      allOf:
+      - allOf:
+        - $ref: '#/components/schemas/ProviderMarketplaceConfiguration'
+        description: |-
+          The identifiers of the provider service, from Data Exchange.
+      description: |-
+        The required configuration fields to use with the provider service.
+    ProviderSchemaAttributes:
+      type: array
+      items:
+        $ref: '#/components/schemas/ProviderSchemaAttribute'
     ProviderServiceArn:
       type: string
       pattern: ^arn:(aws|aws-us-gov|aws-cn):(entityresolution):([a-z]{2}-[a-z]{1,10}-[0-9])::providerservice/([a-zA-Z0-9_-]{1,255})/([a-zA-Z0-9_-]{1,255})$
@@ -124,28 +262,115 @@ components:
     ProviderServiceDisplayName:
       type: string
       maxLength: 255
+    ProviderServiceList:
+      type: array
+      items:
+        $ref: '#/components/schemas/ProviderServiceSummary'
+    RecordAttributeMap:
+      type: object
+      additionalProperties:
+        $ref: '#/components/schemas/String'
+    RecordMatchingModel:
+      type: string
+      enum:
+      - ONE_SOURCE_TO_ONE_TARGET
+      - MANY_SOURCE_TO_ONE_TARGET
+    RecordMatchingModelList:
+      type: array
+      items:
+        $ref: '#/components/schemas/RecordMatchingModel'
+    RequiredBucketActionsList:
+      type: array
+      items:
+        type: string
+    ResolutionType:
+      type: string
+      enum:
+      - RULE_MATCHING
+      - ML_MATCHING
+      - PROVIDER
     RoleArn:
       type: string
       pattern: ^arn:aws:iam::\d{12}:role/?[a-zA-Z_0-9+=,.@\-_/]+$
       minLength: 32
       maxLength: 512
+    RuleList:
+      type: array
+      items:
+        $ref: '#/components/schemas/Rule'
     S3Path:
       type: string
       pattern: ^s3://[a-z0-9][\.\-a-z0-9]{1,61}[a-z0-9](/.*)?$
       minLength: 1
       maxLength: 1024
+    SchemaAttributeType:
+      type: string
+      enum:
+      - NAME
+      - NAME_FIRST
+      - NAME_MIDDLE
+      - NAME_LAST
+      - ADDRESS
+      - ADDRESS_STREET1
+      - ADDRESS_STREET2
+      - ADDRESS_STREET3
+      - ADDRESS_CITY
+      - ADDRESS_STATE
+      - ADDRESS_COUNTRY
+      - ADDRESS_POSTALCODE
+      - PHONE
+      - PHONE_NUMBER
+      - PHONE_COUNTRYCODE
+      - EMAIL_ADDRESS
+      - UNIQUE_ID
+      - DATE
+      - STRING
+      - PROVIDER_ID
+      - IPV4
+      - IPV6
+      - MAID
+    SchemaInputAttributes:
+      type: array
+      items:
+        $ref: '#/components/schemas/SchemaInputAttribute'
+    SchemaList:
+      type: array
+      items:
+        type: string
     SchemaMappingArn:
       type: string
       pattern: ^arn:(aws|aws-us-gov|aws-cn):entityresolution:[a-z]{2}-[a-z]{1,10}-[0-9]:[0-9]{12}:(schemamapping/[a-zA-Z_0-9-]{1,255})$
+    SchemaMappingList:
+      type: array
+      items:
+        $ref: '#/components/schemas/SchemaMappingSummary'
+    Schemas:
+      type: array
+      items:
+        $ref: '#/components/schemas/SchemaList'
+    ServiceType:
+      type: string
+      enum:
+      - ASSIGNMENT
+      - ID_MAPPING
     StatementAction:
       type: string
       pattern: ^(entityresolution:[a-zA-Z0-9]+)$
       minLength: 3
       maxLength: 64
+    StatementActionList:
+      type: array
+      items:
+        $ref: '#/components/schemas/StatementAction'
     StatementCondition:
       type: string
       minLength: 1
       maxLength: 40960
+    StatementEffect:
+      type: string
+      enum:
+      - Allow
+      - Deny
     StatementId:
       type: string
       pattern: ^[0-9A-Za-z]+$
@@ -156,14 +381,30 @@ components:
       pattern: ^(\d{12})|([a-z0-9\.]+)$
       minLength: 12
       maxLength: 64
+    StatementPrincipalList:
+      type: array
+      items:
+        $ref: '#/components/schemas/StatementPrincipal'
     TagKey:
       type: string
       minLength: 1
       maxLength: 128
+    TagKeyList:
+      type: array
+      items:
+        $ref: '#/components/schemas/TagKey'
+    TagMap:
+      type: object
+      additionalProperties:
+        $ref: '#/components/schemas/TagValue'
     TagValue:
       type: string
       minLength: 0
       maxLength: 256
+    UniqueIdList:
+      type: array
+      items:
+        $ref: '#/components/schemas/HeaderSafeUniqueId'
     VeniceGlobalArn:
       type: string
       pattern: ^arn:(aws|aws-us-gov|aws-cn):entityresolution:[a-z]{2}-[a-z]{1,10}-[0-9]:[0-9]{12}:((schemamapping|matchingworkflow|idmappingworkflow|idnamespace)/[a-zA-Z_0-9-]{1,255})$

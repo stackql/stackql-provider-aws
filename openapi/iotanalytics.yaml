@@ -62,6 +62,18 @@ components:
       type: string
       minLength: 1
       maxLength: 256
+    AttributeNameMapping:
+      type: object
+      additionalProperties:
+        $ref: '#/components/schemas/AttributeName'
+    AttributeNames:
+      type: array
+      items:
+        $ref: '#/components/schemas/AttributeName'
+    BatchPutMessageErrorEntries:
+      type: array
+      items:
+        $ref: '#/components/schemas/BatchPutMessageErrorEntry'
     BucketKeyExpression:
       type: string
       pattern: ^[a-zA-Z0-9!_.*'()/{}:-]*$
@@ -79,6 +91,16 @@ components:
       pattern: ^(^(?!_{2}))(^[a-zA-Z0-9_]+$)$
       minLength: 1
       maxLength: 128
+    ChannelStatus:
+      type: string
+      enum:
+      - CREATING
+      - ACTIVE
+      - DELETING
+    ChannelSummaries:
+      type: array
+      items:
+        $ref: '#/components/schemas/ChannelSummary'
     ColumnDataType:
       type: string
       pattern: ^[\u0020-\uD7FF\uE000-\uFFFD\uD800\uDC00-\uDBFF\uDFFF\t]*$
@@ -89,22 +111,76 @@ components:
       pattern: ^[A-Za-z_]([A-Za-z0-9]*|[A-Za-z0-9][A-Za-z0-9_]*)$
       minLength: 1
       maxLength: 255
+    Columns:
+      type: array
+      items:
+        $ref: '#/components/schemas/Column'
+    ComputeType:
+      type: string
+      enum:
+      - ACU_1
+      - ACU_2
     DatasetActionName:
       type: string
       pattern: ^[a-zA-Z0-9_]+$
       minLength: 1
       maxLength: 128
+    DatasetActionSummaries:
+      type: array
+      items:
+        $ref: '#/components/schemas/DatasetActionSummary'
+    DatasetActionType:
+      type: string
+      enum:
+      - QUERY
+      - CONTAINER
+    DatasetActions:
+      type: array
+      items:
+        $ref: '#/components/schemas/DatasetAction'
     DatasetArn:
       type: string
+    DatasetContentDeliveryRules:
+      type: array
+      items:
+        $ref: '#/components/schemas/DatasetContentDeliveryRule'
+    DatasetContentState:
+      type: string
+      enum:
+      - CREATING
+      - SUCCEEDED
+      - FAILED
+    DatasetContentSummaries:
+      type: array
+      items:
+        $ref: '#/components/schemas/DatasetContentSummary'
     DatasetContentVersion:
       type: string
       minLength: 7
       maxLength: 36
+    DatasetEntries:
+      type: array
+      items:
+        $ref: '#/components/schemas/DatasetEntry'
     DatasetName:
       type: string
       pattern: ^(^(?!_{2}))(^[a-zA-Z0-9_]+$)$
       minLength: 1
       maxLength: 128
+    DatasetStatus:
+      type: string
+      enum:
+      - CREATING
+      - ACTIVE
+      - DELETING
+    DatasetSummaries:
+      type: array
+      items:
+        $ref: '#/components/schemas/DatasetSummary'
+    DatasetTriggers:
+      type: array
+      items:
+        $ref: '#/components/schemas/DatasetTrigger'
     DatastoreArn:
       type: string
     DatastoreName:
@@ -112,12 +188,50 @@ components:
       pattern: ^(^(?!_{2}))(^[a-zA-Z0-9_]+$)$
       minLength: 1
       maxLength: 128
+    DatastoreStatus:
+      type: string
+      enum:
+      - CREATING
+      - ACTIVE
+      - DELETING
+    DatastoreStorage:
+      allOf:
+      - allOf:
+        - $ref: '#/components/schemas/ServiceManagedDatastoreS3Storage'
+        description: |-
+          Used to store data in an Amazon S3 bucket managed by IoT Analytics. You can't change the choice of Amazon S3 storage after your data store is created.
+      - allOf:
+        - $ref: '#/components/schemas/CustomerManagedDatastoreS3Storage'
+        description: |-
+          S3-customer-managed; When you choose customer-managed storage, the `retentionPeriod` parameter is ignored. You can't change the choice of Amazon S3 storage after your data store is created.
+      - allOf:
+        - $ref: '#/components/schemas/DatastoreIotSiteWiseMultiLayerStorage'
+        description: |-
+          Used to store data used by IoT SiteWise in an Amazon S3 bucket that you manage. You can't change the choice of Amazon S3 storage after your data store is created.
+      description: |-
+        Where data in a data store is stored.. You can choose `serviceManagedS3` storage, `customerManagedS3` storage, or `iotSiteWiseMultiLayerStorage` storage. The default is `serviceManagedS3`. You can't change the choice of Amazon S3 storage after your data store is created.
+    DatastoreSummaries:
+      type: array
+      items:
+        $ref: '#/components/schemas/DatastoreSummary'
+    DoubleValue:
+      type: number
+      format: double
+      default: 0
+    EndTime:
+      type: string
+      format: date-time
     EntryName:
       type: string
     ErrorCode:
       type: string
     ErrorMessage:
       type: string
+    FileFormatType:
+      type: string
+      enum:
+      - JSON
+      - PARQUET
     FilterExpression:
       type: string
       minLength: 1
@@ -154,11 +268,19 @@ components:
       pattern: ^[a-zA-Z0-9_]+$
       minLength: 1
       maxLength: 128
+    LateDataRules:
+      type: array
+      items:
+        $ref: '#/components/schemas/LateDataRule'
     LogResult:
       type: string
     LoggingEnabled:
       type: boolean
       default: false
+    LoggingLevel:
+      type: string
+      enum:
+      - ERROR
     MathExpression:
       type: string
       minLength: 1
@@ -180,6 +302,17 @@ components:
       pattern: ^\p{ASCII}*$
       minLength: 1
       maxLength: 128
+    MessagePayload:
+      type: string
+      format: byte
+    MessagePayloads:
+      type: array
+      items:
+        $ref: '#/components/schemas/MessagePayload'
+    Messages:
+      type: array
+      items:
+        $ref: '#/components/schemas/Message'
     NextToken:
       type: string
     OffsetSeconds:
@@ -192,6 +325,14 @@ components:
       pattern: ^[a-zA-Z0-9_]+$
       minLength: 1
       maxLength: 128
+    Partitions:
+      type: array
+      items:
+        $ref: '#/components/schemas/DatastorePartition'
+    PipelineActivities:
+      type: array
+      items:
+        $ref: '#/components/schemas/PipelineActivity'
     PipelineArn:
       type: string
     PipelineName:
@@ -199,12 +340,31 @@ components:
       pattern: ^(^(?!_{2}))(^[a-zA-Z0-9_]+$)$
       minLength: 1
       maxLength: 128
+    PipelineSummaries:
+      type: array
+      items:
+        $ref: '#/components/schemas/PipelineSummary'
     PresignedURI:
       type: string
+    QueryFilters:
+      type: array
+      items:
+        $ref: '#/components/schemas/QueryFilter'
     Reason:
       type: string
     ReprocessingId:
       type: string
+    ReprocessingStatus:
+      type: string
+      enum:
+      - RUNNING
+      - SUCCEEDED
+      - CANCELLED
+      - FAILED
+    ReprocessingSummaries:
+      type: array
+      items:
+        $ref: '#/components/schemas/ReprocessingSummary'
     ResourceArn:
       type: string
       minLength: 20
@@ -228,14 +388,24 @@ components:
       pattern: ^[a-zA-Z0-9/_!'(){}\*\s\.\-\=\:]+$
       minLength: 1
       maxLength: 1024
+    S3PathChannelMessages:
+      type: array
+      items:
+        $ref: '#/components/schemas/S3PathChannelMessage'
     ScheduleExpression:
       type: string
     SessionTimeoutInMinutes:
       type: integer
       minimum: 1
       maximum: 60
+    SizeInBytes:
+      type: number
+      format: double
     SqlQuery:
       type: string
+    StartTime:
+      type: string
+      format: date-time
     StringValue:
       type: string
       minLength: 0
@@ -244,12 +414,23 @@ components:
       type: string
       minLength: 1
       maxLength: 256
+    TagKeyList:
+      type: array
+      items:
+        $ref: '#/components/schemas/TagKey'
+    TagList:
+      type: array
+      items:
+        $ref: '#/components/schemas/Tag'
     TagValue:
       type: string
       minLength: 1
       maxLength: 256
     TimeExpression:
       type: string
+    Timestamp:
+      type: string
+      format: date-time
     TimestampFormat:
       type: string
       pattern: ^[a-zA-Z0-9\s\[\]_,.'/:-]*$
@@ -265,6 +446,10 @@ components:
       type: string
       minLength: 1
       maxLength: 256
+    Variables:
+      type: array
+      items:
+        $ref: '#/components/schemas/Variable'
     VolumeSizeInGB:
       type: integer
       minimum: 1

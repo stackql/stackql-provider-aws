@@ -167,3 +167,293 @@ def add_component_schema_integer(openapi_spec, shape_name, shape):
 
     openapi_spec["components"]["schemas"][shape_name] = schema
 
+def add_component_schema_timestamp(openapi_spec, shape_name, shape):
+    # Strip namespace prefix
+    if "#" in shape_name:
+        shape_name = shape_name.split("#")[-1]
+
+    schema = {
+        "type": "string",
+        "format": "date-time"  # Default to standard timestamp format
+    }
+
+    traits = shape.get("traits", {})
+
+    # Optional override if smithy.api#timestampFormat exists and is OpenAPI-compatible
+    ts_format = traits.get("smithy.api#timestampFormat")
+    if ts_format in ("date-time", "date"):
+        schema["format"] = ts_format
+
+    # Optional documentation
+    if "smithy.api#documentation" in traits:
+        schema["description"] = traits["smithy.api#documentation"]
+
+    openapi_spec["components"]["schemas"][shape_name] = schema
+
+def add_component_schema_double(openapi_spec, shape_name, shape):
+    # Strip namespace prefix
+    if "#" in shape_name:
+        shape_name = shape_name.split("#")[-1]
+
+    schema = {
+        "type": "number",
+        "format": "double"
+    }
+
+    traits = shape.get("traits", {})
+
+    # Optional documentation
+    if "smithy.api#documentation" in traits:
+        schema["description"] = traits["smithy.api#documentation"]
+
+    # Optional default value
+    if "smithy.api#default" in traits:
+        schema["default"] = traits["smithy.api#default"]
+
+    # Optional range
+    range_trait = traits.get("smithy.api#range", {})
+    if "min" in range_trait:
+        schema["minimum"] = range_trait["min"]
+    if "max" in range_trait:
+        schema["maximum"] = range_trait["max"]
+
+    openapi_spec["components"]["schemas"][shape_name] = schema
+
+def add_component_schema_float(openapi_spec, shape_name, shape):
+    shape_name = shape_name.split("#")[-1]  # strip Smithy prefix
+    schema = {
+        "type": "number",
+        "format": "float"
+    }
+
+    traits = shape.get("traits", {})
+
+    # Optional documentation
+    doc = traits.get("smithy.api#documentation")
+    if doc:
+        schema["description"] = doc.strip()
+
+    # Optional default
+    if "smithy.api#default" in traits:
+        schema["default"] = traits["smithy.api#default"]
+
+    # Optional range
+    range_trait = traits.get("smithy.api#range", {})
+    if "min" in range_trait:
+        schema["minimum"] = range_trait["min"]
+    if "max" in range_trait:
+        schema["maximum"] = range_trait["max"]
+
+    openapi_spec["components"]["schemas"][shape_name] = schema
+
+def add_component_schema_long(openapi_spec, shape_name, shape):
+    shape_name = shape_name.split("#")[-1]  # remove Smithy prefix
+    schema = {
+        "type": "integer",
+        "format": "int64"
+    }
+
+    traits = shape.get("traits", {})
+
+    # Optional documentation
+    doc = traits.get("smithy.api#documentation")
+    if doc:
+        schema["description"] = doc.strip()
+
+    # Optional default
+    if "smithy.api#default" in traits:
+        schema["default"] = traits["smithy.api#default"]
+
+    # Optional range
+    range_trait = traits.get("smithy.api#range", {})
+    if "min" in range_trait:
+        schema["minimum"] = range_trait["min"]
+    if "max" in range_trait:
+        schema["maximum"] = range_trait["max"]
+
+    openapi_spec["components"]["schemas"][shape_name] = schema
+
+def add_component_schema_blob(openapi_spec, shape_name, shape):
+    shape_name = shape_name.split("#")[-1]  # remove Smithy prefix
+    schema = {
+        "type": "string",
+        "format": "byte"
+    }
+
+    traits = shape.get("traits", {})
+
+    # Optional documentation
+    doc = traits.get("smithy.api#documentation")
+    if doc:
+        schema["description"] = doc.strip()
+
+    # Optional length constraints
+    length = traits.get("smithy.api#length", {})
+    if "min" in length:
+        schema["minLength"] = length["min"]
+    if "max" in length:
+        schema["maxLength"] = length["max"]
+
+    # Optional sensitive marker
+    if "smithy.api#sensitive" in traits:
+        schema["x-sensitive"] = True  # optional custom extension
+
+    openapi_spec["components"]["schemas"][shape_name] = schema
+
+def add_component_schema_enum(openapi_spec, shape_name, shape):
+    shape_name = shape_name.split("#")[-1]  # Remove Smithy prefix
+    schema = {
+        "type": "string",
+        "enum": []
+    }
+
+    members = shape.get("members", {})
+    for name, member in members.items():
+        traits = member.get("traits", {})
+        enum_value = traits.get("smithy.api#enumValue", name)
+        schema["enum"].append(enum_value)
+
+    # Optional documentation for the enum
+    doc = shape.get("traits", {}).get("smithy.api#documentation")
+    if doc:
+        schema["description"] = doc.strip()
+
+    openapi_spec["components"]["schemas"][shape_name] = schema
+
+def add_component_schema_map(openapi_spec, shape_name, shape):
+    shape_name = shape_name.split("#")[-1]
+    schema = {
+        "type": "object"
+    }
+
+    # Get value type
+    value_target = shape.get("value", {}).get("target", "smithy.api#String")
+    value_type = value_target.split("#")[-1]
+
+    # Handle scalar types
+    scalar_map = {
+        "string": {"type": "string"},
+        "boolean": {"type": "boolean"},
+        "integer": {"type": "integer"},
+        "long": {"type": "integer", "format": "int64"},
+        "float": {"type": "number", "format": "float"},
+        "double": {"type": "number", "format": "double"},
+        "blob": {"type": "string", "format": "byte"},
+        "timestamp": {"type": "string", "format": "date-time"}
+    }
+
+    if value_type in scalar_map:
+        schema["additionalProperties"] = scalar_map[value_type]
+    else:
+        # Assume reference to another component
+        schema["additionalProperties"] = {
+            "$ref": f"#/components/schemas/{value_type}"
+        }
+
+    # Optional documentation
+    doc = shape.get("traits", {}).get("smithy.api#documentation")
+    if doc:
+        schema["description"] = doc.strip()
+
+    openapi_spec["components"]["schemas"][shape_name] = schema
+
+def add_component_schema_document(openapi_spec, shape_name, shape):
+    shape_name = shape_name.split("#")[-1]
+
+    schema = {
+        "type": "object",
+        "additionalProperties": True  # allows any JSON structure
+    }
+
+    traits = shape.get("traits", {})
+
+    # Add optional description
+    if "smithy.api#documentation" in traits:
+        schema["description"] = traits["smithy.api#documentation"].strip()
+
+    # Add sensitivity marker (optional)
+    if "smithy.api#sensitive" in traits:
+        schema["x-sensitive"] = True
+
+    openapi_spec["components"]["schemas"][shape_name] = schema
+
+def add_component_schema_list(openapi_spec, shape_name, shape):
+    shape_name = shape_name.split("#")[-1]
+
+    schema = {
+        "type": "array",
+        "items": {}
+    }
+
+    traits = shape.get("traits", {})
+    member = shape.get("member", {})
+    target = member.get("target", "")
+
+    scalar_map = {
+        "smithy.api#string": "string",
+        "smithy.api#integer": "integer",
+        "smithy.api#boolean": "boolean",
+        "smithy.api#timestamp": "string",
+        "smithy.api#double": "number",
+        "smithy.api#float": "number",
+        "smithy.api#long": "integer",
+        "smithy.api#blob": "string",
+        "smithy.api#document": "object",
+    }
+
+    if target.lower() in scalar_map:
+        schema["items"] = {
+            "type": scalar_map[target.lower()]
+        }
+        if target.lower() == "smithy.api#timestamp":
+            schema["items"]["format"] = "date-time"
+        elif target.lower() == "smithy.api#blob":
+            schema["items"]["format"] = "byte"
+    else:
+        ref_name = target.split("#")[-1]
+        schema["items"] = {"$ref": f"#/components/schemas/{ref_name}"}
+
+    if "smithy.api#documentation" in traits:
+        schema["description"] = traits["smithy.api#documentation"].strip()
+
+    if "smithy.api#sensitive" in traits:
+        schema["x-sensitive"] = True
+
+    openapi_spec["components"]["schemas"][shape_name] = schema
+
+def add_component_schema_union(openapi_spec, shape_name, shape):
+    # Remove Smithy namespace prefix for OpenAPI schema name
+    short_name = shape_name.split("#")[-1]
+
+    schema = {
+        "allOf": []
+    }
+
+    # Optional top-level documentation
+    traits = shape.get("traits", {})
+    if "smithy.api#documentation" in traits:
+        schema["description"] = LiteralStr(html_to_md(traits["smithy.api#documentation"]))
+
+    # Optional sensitive trait
+    if "smithy.api#sensitive" in traits:
+        schema["x-sensitive"] = True
+
+    # Each member becomes an entry in allOf
+    for member_name, member_def in shape.get("members", {}).items():
+        target = member_def.get("target")
+        ref_name = target.split("#")[-1]
+
+        member_schema = {
+            "allOf": [
+                { "$ref": f"#/components/schemas/{ref_name}" }
+            ]
+        }
+
+        # Inline description if available
+        member_traits = member_def.get("traits", {})
+        if "smithy.api#documentation" in member_traits:
+            member_schema["description"] = LiteralStr(html_to_md(member_traits["smithy.api#documentation"]))
+
+        schema["allOf"].append(member_schema)
+
+    openapi_spec["components"]["schemas"][short_name] = schema

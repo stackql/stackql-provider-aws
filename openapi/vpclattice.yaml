@@ -66,6 +66,10 @@ components:
       pattern: ^((als-[0-9a-z]{17})|(arn:[a-z0-9\-]+:vpc-lattice:[a-zA-Z0-9\-]+:\d{12}:accesslogsubscription/als-[0-9a-z]{17}))$
       minLength: 17
       maxLength: 2048
+    AccessLogSubscriptionList:
+      type: array
+      items:
+        $ref: '#/components/schemas/AccessLogSubscriptionSummary'
     AccountId:
       type: string
       pattern: ^[0-9]{12}$
@@ -115,6 +119,10 @@ components:
       type: string
       minLength: 1
       maxLength: 200
+    HeaderMatchList:
+      type: array
+      items:
+        $ref: '#/components/schemas/HeaderMatch'
     HeaderMatchName:
       type: string
       minLength: 1
@@ -123,6 +131,22 @@ components:
       type: string
       minLength: 1
       maxLength: 200
+    HeaderMatchType:
+      allOf:
+      - allOf:
+        - $ref: '#/components/schemas/HeaderMatchExact'
+        description: |-
+          An exact type match.
+      - allOf:
+        - $ref: '#/components/schemas/HeaderMatchPrefix'
+        description: |-
+          A prefix type match. Matches the value with the prefix.
+      - allOf:
+        - $ref: '#/components/schemas/HeaderMatchContains'
+        description: |-
+          A contains type match.
+      description: |-
+        Describes a header match type.
     HealthCheckIntervalSeconds:
       type: integer
       minimum: 0
@@ -201,6 +225,18 @@ components:
       - HTTP
       - HTTPS
       - TLS_PASSTHROUGH
+    ListenerSummaryList:
+      type: array
+      items:
+        $ref: '#/components/schemas/ListenerSummary'
+    Matcher:
+      allOf:
+      - allOf:
+        - $ref: '#/components/schemas/HttpCodeMatcher'
+        description: |-
+          The HTTP code to use when checking for a successful response from a target.
+      description: |-
+        Describes the codes to use when checking for a successful response from a target for health checks.
     MaxResults:
       type: integer
       minimum: 1
@@ -219,6 +255,18 @@ components:
       pattern: ^/[a-zA-Z0-9@:%_+.~#?&/=-]*$
       minLength: 1
       maxLength: 200
+    PathMatchType:
+      allOf:
+      - allOf:
+        - $ref: '#/components/schemas/PathMatchExact'
+        description: |-
+          An exact match of the path.
+      - allOf:
+        - $ref: '#/components/schemas/PathMatchPrefix'
+        description: |-
+          A prefix match of the path.
+      description: |-
+        Describes a path match type. Each rule can include only one of the following types of paths.
     PolicyString:
       type: string
       pattern: ^.*\S.*$
@@ -233,6 +281,10 @@ components:
       pattern: ^((\d{1,5}\-\d{1,5})|(\d+))$
       minLength: 1
       maxLength: 11
+    PortRangeList:
+      type: array
+      items:
+        $ref: '#/components/schemas/PortRange'
     ProtocolType:
       type: string
       enum:
@@ -247,6 +299,22 @@ components:
       pattern: ^arn:[a-z0-9f\-]+:vpc-lattice:[a-zA-Z0-9\-]+:\d{12}:resourceconfiguration/rcfg-[0-9a-z]{17}$
       minLength: 20
       maxLength: 2048
+    ResourceConfigurationDefinition:
+      allOf:
+      - allOf:
+        - $ref: '#/components/schemas/DnsResource'
+        description: |-
+          The DNS name of the resource.
+      - allOf:
+        - $ref: '#/components/schemas/IpResource'
+        description: |-
+          The IP resource.
+      - allOf:
+        - $ref: '#/components/schemas/ArnResource'
+        description: |-
+          The Amazon Resource Name (ARN) of the resource.
+      description: |-
+        Describes a resource configuration.
     ResourceConfigurationId:
       type: string
       pattern: ^rcfg-[0-9a-z]{17}$
@@ -278,6 +346,10 @@ components:
       - CREATE_FAILED
       - UPDATE_FAILED
       - DELETE_FAILED
+    ResourceConfigurationSummaryList:
+      type: array
+      items:
+        $ref: '#/components/schemas/ResourceConfigurationSummary'
     ResourceConfigurationType:
       type: string
       enum:
@@ -300,6 +372,10 @@ components:
       pattern: ^((rea-[0-9a-f]{17})|(arn:[a-z0-9\-]+:vpc-lattice:[a-zA-Z0-9\-]+:\d{12}:resourceendpointassociation/rea-[0-9a-f]{17}))$
       minLength: 21
       maxLength: 2048
+    ResourceEndpointAssociationList:
+      type: array
+      items:
+        $ref: '#/components/schemas/ResourceEndpointAssociationSummary'
     ResourceGatewayArn:
       type: string
       pattern: ^arn:[a-z0-9\-]+:vpc-lattice:[a-zA-Z0-9\-]+:\d{12}:resourcegateway/rgw-[0-9a-z]{17}$
@@ -321,6 +397,10 @@ components:
       - IPV4
       - IPV6
       - DUALSTACK
+    ResourceGatewayList:
+      type: array
+      items:
+        $ref: '#/components/schemas/ResourceGatewaySummary'
     ResourceGatewayName:
       type: string
       pattern: ^(?!rgw-)(?![-])(?!.*[-]$)(?!.*[-]{2})[a-z0-9-]+$
@@ -346,6 +426,18 @@ components:
       pattern: ^((((sn)|(svc)|(rcfg))-[0-9a-z]{17})|(arn(:[a-z0-9]+([.-][a-z0-9]+)*){2}(:([a-z0-9]+([.-][a-z0-9]+)*)?){2}:((servicenetwork/sn)|(resourceconfiguration/rcfg)|(service/svc))-[0-9a-z]{17}))$
       minLength: 17
       maxLength: 200
+    RuleAction:
+      allOf:
+      - allOf:
+        - $ref: '#/components/schemas/ForwardAction'
+        description: |-
+          The forward action. Traffic that matches the rule is forwarded to the specified target groups.
+      - allOf:
+        - $ref: '#/components/schemas/FixedResponseAction'
+        description: |-
+          The fixed response action. The rule returns a custom HTTP response.
+      description: |-
+        Describes the action for a rule.
     RuleArn:
       type: string
       pattern: ^arn:[a-z0-9\-]+:vpc-lattice:[a-zA-Z0-9\-]+:\d{12}:service/svc-[0-9a-z]{17}/listener/listener-[0-9a-z]{17}/rule/rule-[0-9a-z]{17}$
@@ -361,6 +453,14 @@ components:
       pattern: ^((rule-[0-9a-z]{17})|(^arn:[a-z0-9\-]+:vpc-lattice:[a-zA-Z0-9\-]+:\d{12}:service/svc-[0-9a-z]{17}/listener/listener-[0-9a-z]{17}/rule/rule-[0-9a-z]{17}$))$
       minLength: 20
       maxLength: 2048
+    RuleMatch:
+      allOf:
+      - allOf:
+        - $ref: '#/components/schemas/HttpMatch'
+        description: |-
+          The HTTP criteria that a rule must match.
+      description: |-
+        Describes a rule match.
     RuleName:
       type: string
       pattern: ^(?!rule-)(?![-])(?!.*[-]$)(?!.*[-]{2})[a-z0-9-]+$
@@ -370,16 +470,40 @@ components:
       type: integer
       minimum: 1
       maximum: 100
+    RuleSummaryList:
+      type: array
+      items:
+        $ref: '#/components/schemas/RuleSummary'
+    RuleUpdateFailureList:
+      type: array
+      items:
+        $ref: '#/components/schemas/RuleUpdateFailure'
+    RuleUpdateList:
+      type: array
+      items:
+        $ref: '#/components/schemas/RuleUpdate'
+    RuleUpdateSuccessList:
+      type: array
+      items:
+        $ref: '#/components/schemas/RuleUpdateSuccess'
     SecurityGroupId:
       type: string
       pattern: ^sg-(([0-9a-z]{8})|([0-9a-z]{17}))$
       minLength: 5
       maxLength: 200
+    SecurityGroupList:
+      type: array
+      items:
+        $ref: '#/components/schemas/SecurityGroupId'
     ServiceArn:
       type: string
       pattern: ^arn:[a-z0-9\-]+:vpc-lattice:[a-zA-Z0-9\-]+:\d{12}:service/svc-[0-9a-z]{17}$
       minLength: 20
       maxLength: 2048
+    ServiceArnList:
+      type: array
+      items:
+        $ref: '#/components/schemas/ServiceArn'
     ServiceCustomDomainName:
       type: string
       minLength: 3
@@ -394,6 +518,10 @@ components:
       pattern: ^((svc-[0-9a-z]{17})|(arn:[a-z0-9\-]+:vpc-lattice:[a-zA-Z0-9\-]+:\d{12}:service/svc-[0-9a-z]{17}))$
       minLength: 17
       maxLength: 2048
+    ServiceList:
+      type: array
+      items:
+        $ref: '#/components/schemas/ServiceSummary'
     ServiceLoadBalancerAssociationIdentifier:
       type: string
       pattern: ^((slba-[0-9a-z]{17})|(arn:[a-z0-9\-]+:vpc-lattice:[a-zA-Z0-9\-]+:\d{12}:serviceloadbalancerassociation/slba-[0-9a-z]{17}))$
@@ -427,6 +555,10 @@ components:
       type: string
       minLength: 3
       maxLength: 2048
+    ServiceNetworkList:
+      type: array
+      items:
+        $ref: '#/components/schemas/ServiceNetworkSummary'
     ServiceNetworkLogType:
       type: string
       enum:
@@ -456,6 +588,10 @@ components:
       pattern: ^((snra-[0-9a-z]{17})|(arn:[a-z0-9\-]+:vpc-lattice:[a-zA-Z0-9\-]+:\d{12}:servicenetworkresourceassociation/snra-[0-9a-f]{17}))$
       minLength: 22
       maxLength: 2048
+    ServiceNetworkResourceAssociationList:
+      type: array
+      items:
+        $ref: '#/components/schemas/ServiceNetworkResourceAssociationSummary'
     ServiceNetworkResourceAssociationStatus:
       type: string
       enum:
@@ -475,6 +611,10 @@ components:
       pattern: ^((snsa-[0-9a-z]{17})|(arn:[a-z0-9\-]+:vpc-lattice:[a-zA-Z0-9\-]+:\d{12}:servicenetworkserviceassociation/snsa-[0-9a-z]{17}))$
       minLength: 17
       maxLength: 2048
+    ServiceNetworkServiceAssociationList:
+      type: array
+      items:
+        $ref: '#/components/schemas/ServiceNetworkServiceAssociationSummary'
     ServiceNetworkServiceAssociationStatus:
       type: string
       enum:
@@ -498,6 +638,10 @@ components:
       pattern: ^((snva-[0-9a-z]{17})|(arn:[a-z0-9\-]+:vpc-lattice:[a-zA-Z0-9\-]+:\d{12}:servicenetworkvpcassociation/snva-[0-9a-z]{17}))$
       minLength: 17
       maxLength: 2048
+    ServiceNetworkVpcAssociationList:
+      type: array
+      items:
+        $ref: '#/components/schemas/ServiceNetworkVpcAssociationSummary'
     ServiceNetworkVpcAssociationStatus:
       type: string
       enum:
@@ -508,6 +652,10 @@ components:
       - CREATE_FAILED
       - DELETE_FAILED
       - UPDATE_FAILED
+    ServiceNetworkVpcEndpointAssociationList:
+      type: array
+      items:
+        $ref: '#/components/schemas/ServiceNetworkEndpointAssociation'
     ServiceStatus:
       type: string
       enum:
@@ -520,14 +668,30 @@ components:
       type: string
       minLength: 5
       maxLength: 200
+    SubnetList:
+      type: array
+      items:
+        $ref: '#/components/schemas/SubnetId'
     TagKey:
       type: string
       minLength: 1
       maxLength: 128
+    TagKeys:
+      type: array
+      items:
+        $ref: '#/components/schemas/TagKey'
+    TagMap:
+      type: object
+      additionalProperties:
+        $ref: '#/components/schemas/TagValue'
     TagValue:
       type: string
       minLength: 0
       maxLength: 256
+    TargetFailureList:
+      type: array
+      items:
+        $ref: '#/components/schemas/TargetFailure'
     TargetGroupArn:
       type: string
       pattern: ^arn:[a-z0-9\-]+:vpc-lattice:[a-zA-Z0-9\-]+:\d{12}:targetgroup/tg-[0-9a-z]{17}$
@@ -543,6 +707,10 @@ components:
       pattern: ^((tg-[0-9a-z]{17})|(arn:[a-z0-9\-]+:vpc-lattice:[a-zA-Z0-9\-]+:\d{12}:targetgroup/tg-[0-9a-z]{17}))$
       minLength: 17
       maxLength: 2048
+    TargetGroupList:
+      type: array
+      items:
+        $ref: '#/components/schemas/TargetGroupSummary'
     TargetGroupName:
       type: string
       pattern: ^(?!tg-)(?![-])(?!.*[-]$)(?!.*[-]{2})[a-z0-9-]+$
@@ -579,6 +747,10 @@ components:
       type: integer
       minimum: 0
       maximum: 999
+    TargetList:
+      type: array
+      items:
+        $ref: '#/components/schemas/Target'
     TargetStatus:
       type: string
       enum:
@@ -588,10 +760,21 @@ components:
       - UNHEALTHY
       - INITIAL
       - UNUSED
+    TargetSummaryList:
+      type: array
+      items:
+        $ref: '#/components/schemas/TargetSummary'
+    Timestamp:
+      type: string
+      format: date-time
     UnhealthyThresholdCount:
       type: integer
       minimum: 0
       maximum: 10
+    ValidationExceptionFieldList:
+      type: array
+      items:
+        $ref: '#/components/schemas/ValidationExceptionField'
     ValidationExceptionReason:
       type: string
       enum:
@@ -614,6 +797,10 @@ components:
       pattern: ^vpc-(([0-9a-z]{8})|([0-9a-z]{17}))$
       minLength: 5
       maxLength: 50
+    WeightedTargetGroupList:
+      type: array
+      items:
+        $ref: '#/components/schemas/WeightedTargetGroup'
     WildcardArn:
       type: string
       pattern: ^arn:[a-z0-9][-.a-z0-9]{0,62}:[a-z0-9][-.a-z0-9]{0,62}:([a-z0-9][-.a-z0-9]{0,62})?:\d{12}?:[^/].{0,1023}$

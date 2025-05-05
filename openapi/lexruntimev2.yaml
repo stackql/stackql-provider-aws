@@ -51,6 +51,10 @@ components:
       pattern: ^([A-Za-z0-9]_?)+$
       minLength: 1
       maxLength: 100
+    ActiveContextParametersMap:
+      type: object
+      additionalProperties:
+        $ref: '#/components/schemas/Text'
     ActiveContextTimeToLiveInSeconds:
       type: integer
       minimum: 5
@@ -59,6 +63,10 @@ components:
       type: integer
       minimum: 1
       maximum: 20
+    ActiveContextsList:
+      type: array
+      items:
+        $ref: '#/components/schemas/ActiveContext'
     AttachmentTitle:
       type: string
       minLength: 1
@@ -67,6 +75,12 @@ components:
       type: string
       minLength: 1
       maxLength: 250
+    AudioChunk:
+      type: string
+      format: byte
+    BlobStream:
+      type: string
+      format: byte
     Boolean:
       type: boolean
       default: false
@@ -85,19 +99,86 @@ components:
       type: string
       minLength: 1
       maxLength: 50
+    ButtonsList:
+      type: array
+      items:
+        $ref: '#/components/schemas/Button'
+    ConfirmationState:
+      type: string
+      enum:
+      - Confirmed
+      - Denied
+      - None
+    ConversationMode:
+      type: string
+      enum:
+      - AUDIO
+      - TEXT
     DTMFRegex:
       type: string
       pattern: ^[A-D0-9#*]{1}$
       minLength: 1
       maxLength: 1
+    DialogActionType:
+      type: string
+      enum:
+      - Close
+      - ConfirmIntent
+      - Delegate
+      - ElicitIntent
+      - ElicitSlot
+      - None
+    Double:
+      type: number
+      format: double
+      default: 0
+    EpochMillis:
+      type: integer
+      format: int64
+      default: 0
     EventId:
       type: string
       pattern: ^[0-9a-zA-Z._:-]+$
       minLength: 2
       maxLength: 100
+    InputMode:
+      type: string
+      enum:
+      - Text
+      - Speech
+      - DTMF
+    IntentState:
+      type: string
+      enum:
+      - Failed
+      - Fulfilled
+      - InProgress
+      - ReadyForFulfillment
+      - Waiting
+      - FulfillmentInProgress
+    InterpretationSource:
+      type: string
+      enum:
+      - Bedrock
+      - Lex
+    Interpretations:
+      type: array
+      items:
+        $ref: '#/components/schemas/Interpretation'
     LocaleId:
       type: string
       minLength: 1
+    MessageContentType:
+      type: string
+      enum:
+      - CustomPayload
+      - ImageResponseCard
+      - PlainText
+      - SSML
+    Messages:
+      type: array
+      items:
+        $ref: '#/components/schemas/Message'
     Name:
       type: string
       pattern: ^([0-9a-zA-Z][_-]?)+$
@@ -110,20 +191,153 @@ components:
       type: string
       minLength: 1
       maxLength: 100
+    PlaybackInterruptionReason:
+      type: string
+      enum:
+      - DTMF_START_DETECTED
+      - TEXT_DETECTED
+      - VOICE_START_DETECTED
     RuntimeHintPhrase:
       type: string
       minLength: 1
       maxLength: 140
+    RuntimeHintValuesList:
+      type: array
+      items:
+        $ref: '#/components/schemas/RuntimeHintValue'
     SensitiveNonEmptyString:
       type: string
+    SentimentType:
+      type: string
+      enum:
+      - MIXED
+      - NEGATIVE
+      - NEUTRAL
+      - POSITIVE
     SessionId:
       type: string
       pattern: ^[0-9a-zA-Z._:-]+$
       minLength: 2
       maxLength: 100
+    Shape:
+      type: string
+      enum:
+      - Scalar
+      - List
+      - Composite
+    SlotHintsIntentMap:
+      type: object
+      additionalProperties:
+        $ref: '#/components/schemas/SlotHintsSlotMap'
+    SlotHintsSlotMap:
+      type: object
+      additionalProperties:
+        $ref: '#/components/schemas/RuntimeHintDetails'
+    Slots:
+      type: object
+      additionalProperties:
+        $ref: '#/components/schemas/Slot'
+    StartConversationRequestEventStream:
+      allOf:
+      - allOf:
+        - $ref: '#/components/schemas/ConfigurationEvent'
+        description: |-
+          Configuration information sent from your client application to Amazon Lex V2
+      - allOf:
+        - $ref: '#/components/schemas/AudioInputEvent'
+        description: |-
+          Speech audio sent from your client application to Amazon Lex V2. Audio starts accumulating when Amazon Lex V2 identifies a voice and continues until a natural pause in the speech is found before processing.
+      - allOf:
+        - $ref: '#/components/schemas/DTMFInputEvent'
+        description: |-
+          DTMF information sent to Amazon Lex V2 by your application. Amazon Lex V2 accumulates the DMTF information from when the user sends the first character and ends
+
+            * when there's a pause longer that the value configured for the end timeout.
+
+            * when there's a digit that is the configured end character.
+
+            * when Amazon Lex V2 accumulates characters equal to the maximum DTMF character configuration.
+      - allOf:
+        - $ref: '#/components/schemas/TextInputEvent'
+        description: |-
+          Text sent from your client application to Amazon Lex V2. Each `TextInputEvent` is processed individually.
+      - allOf:
+        - $ref: '#/components/schemas/PlaybackCompletionEvent'
+        description: |-
+          Event sent from the client application to Amazon Lex V2 to indicate that it has finished playing audio and that Amazon Lex V2 should start listening for user input.
+      - allOf:
+        - $ref: '#/components/schemas/DisconnectionEvent'
+        description: |-
+          Event sent from the client application to indicate to Amazon Lex V2 that the conversation is over.
+      description: |-
+        Represents a stream of events between your application and Amazon Lex V2.
+    StartConversationResponseEventStream:
+      allOf:
+      - allOf:
+        - $ref: '#/components/schemas/PlaybackInterruptionEvent'
+      - allOf:
+        - $ref: '#/components/schemas/TranscriptEvent'
+      - allOf:
+        - $ref: '#/components/schemas/IntentResultEvent'
+        description: |-
+          Event sent from Amazon Lex V2 to the client application containing the current state of the conversation between the user and Amazon Lex V2.
+      - allOf:
+        - $ref: '#/components/schemas/TextResponseEvent'
+      - allOf:
+        - $ref: '#/components/schemas/AudioResponseEvent'
+      - allOf:
+        - $ref: '#/components/schemas/HeartbeatEvent'
+      - allOf:
+        - $ref: '#/components/schemas/AccessDeniedException'
+        description: |-
+          Exception thrown when the credentials passed with the request are invalid or expired. Also thrown when the credentials in the request do not have permission to access the `StartConversation` operation.
+      - allOf:
+        - $ref: '#/components/schemas/ResourceNotFoundException'
+        description: |-
+          Exception thrown if one of the input parameters points to a resource that does not exist. For example, if the bot ID specified does not exist.
+      - allOf:
+        - $ref: '#/components/schemas/ValidationException'
+        description: |-
+          Exception thrown when one or more parameters could not be validated. The `message` contains the name of the field that isn't valid.
+      - allOf:
+        - $ref: '#/components/schemas/ThrottlingException'
+        description: |-
+          Exception thrown when your application exceeds the maximum number of concurrent requests.
+      - allOf:
+        - $ref: '#/components/schemas/InternalServerException'
+        description: |-
+          An error occurred with Amazon Lex V2.
+      - allOf:
+        - $ref: '#/components/schemas/ConflictException'
+        description: |-
+          Exception thrown when two clients are using the same AWS account, Amazon Lex V2 bot, and session ID.
+      - allOf:
+        - $ref: '#/components/schemas/DependencyFailedException'
+      - allOf:
+        - $ref: '#/components/schemas/BadGatewayException'
+      description: |-
+        Represents a stream of events between Amazon Lex V2 and your application.
     String:
       type: string
+    StringList:
+      type: array
+      items:
+        $ref: '#/components/schemas/NonEmptyString'
+    StringMap:
+      type: object
+      additionalProperties:
+        $ref: '#/components/schemas/String'
+    StyleType:
+      type: string
+      enum:
+      - Default
+      - SpellByLetter
+      - SpellByWord
     Text:
       type: string
       minLength: 1
       maxLength: 1024
+    Values:
+      type: array
+      items:
+        $ref: '#/components/schemas/Slot'

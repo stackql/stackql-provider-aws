@@ -90,13 +90,37 @@ servers:
 paths: {}
 components:
   schemas:
+    APIFailureCount:
+      type: integer
+      format: int64
+      default: 0
     APIName:
       type: string
+    APISuccessCount:
+      type: integer
+      format: int64
+      default: 0
     AccountId:
       type: string
       pattern: ^[0-9]+$
       minLength: 12
       maxLength: 12
+    AccountIdExtendedList:
+      type: array
+      items:
+        $ref: '#/components/schemas/AccountId'
+    AccountIdList:
+      type: array
+      items:
+        $ref: '#/components/schemas/AccountId'
+    AccountList:
+      type: array
+      items:
+        $ref: '#/components/schemas/Account'
+    AdministratorList:
+      type: array
+      items:
+        $ref: '#/components/schemas/Administrator'
     AiPaginationToken:
       type: string
       minLength: 1
@@ -106,6 +130,37 @@ components:
     Boolean:
       type: boolean
       default: false
+    ByteValue:
+      type: integer
+      format: int64
+    DatasourcePackage:
+      type: string
+      enum:
+      - DETECTIVE_CORE
+      - EKS_AUDIT
+      - ASFF_SECURITYHUB_FINDING
+    DatasourcePackageIngestDetails:
+      type: object
+      additionalProperties:
+        $ref: '#/components/schemas/DatasourcePackageIngestDetail'
+    DatasourcePackageIngestHistory:
+      type: object
+      additionalProperties:
+        $ref: '#/components/schemas/LastIngestStateChangeDates'
+    DatasourcePackageIngestState:
+      type: string
+      enum:
+      - STARTED
+      - STOPPED
+      - DISABLED
+    DatasourcePackageIngestStates:
+      type: object
+      additionalProperties:
+        $ref: '#/components/schemas/DatasourcePackageIngestState'
+    DatasourcePackageList:
+      type: array
+      items:
+        $ref: '#/components/schemas/DatasourcePackage'
     EmailAddress:
       type: string
       pattern: ^.+@(?:(?:(?!-)[A-Za-z0-9-]{1,62})?[A-Za-z0-9]{1}\.)+[A-Za-z]{2,63}$
@@ -118,47 +173,156 @@ components:
     EntityArn:
       type: string
       pattern: '^arn:'
+    EntityType:
+      type: string
+      enum:
+      - IAM_ROLE
+      - IAM_USER
+    ErrorCode:
+      type: string
+      enum:
+      - INVALID_GRAPH_ARN
+      - INVALID_REQUEST_BODY
+      - INTERNAL_ERROR
     ErrorCodeReason:
       type: string
     ErrorMessage:
       type: string
+    Field:
+      type: string
+      enum:
+      - SEVERITY
+      - STATUS
+      - CREATED_TIME
     GraphArn:
       type: string
       pattern: ^arn:aws[-\w]{0,10}?:detective:[-\w]{2,20}?:\d{12}?:graph:[abcdef\d]{32}?$
+    GraphArnList:
+      type: array
+      items:
+        $ref: '#/components/schemas/GraphArn'
+    GraphList:
+      type: array
+      items:
+        $ref: '#/components/schemas/Graph'
     HourlyTimeDelta:
       type: integer
     Id:
       type: string
+    IndicatorType:
+      type: string
+      enum:
+      - TTP_OBSERVED
+      - IMPOSSIBLE_TRAVEL
+      - FLAGGED_IP_ADDRESS
+      - NEW_GEOLOCATION
+      - NEW_ASO
+      - NEW_USER_AGENT
+      - RELATED_FINDING
+      - RELATED_FINDING_GROUP
+    Indicators:
+      type: array
+      items:
+        $ref: '#/components/schemas/Indicator'
+    InvestigationDetails:
+      type: array
+      items:
+        $ref: '#/components/schemas/InvestigationDetail'
     InvestigationId:
       type: string
       pattern: ^[0-9]+$
       minLength: 21
       maxLength: 21
+    InvitationType:
+      type: string
+      enum:
+      - INVITATION
+      - ORGANIZATION
     IpAddress:
       type: string
     IsNewForEntireAccount:
       type: boolean
       default: false
+    LastIngestStateChangeDates:
+      type: object
+      additionalProperties:
+        $ref: '#/components/schemas/TimestampForCollection'
     Location:
       type: string
     MaxResults:
       type: integer
       minimum: 1
       maximum: 100
+    MemberDetailList:
+      type: array
+      items:
+        $ref: '#/components/schemas/MemberDetail'
+    MemberDisabledReason:
+      type: string
+      enum:
+      - VOLUME_TOO_HIGH
+      - VOLUME_UNKNOWN
     MemberResultsLimit:
       type: integer
       minimum: 1
       maximum: 200
+    MemberStatus:
+      type: string
+      enum:
+      - INVITED
+      - VERIFICATION_IN_PROGRESS
+      - VERIFICATION_FAILED
+      - ENABLED
+      - ACCEPTED_BUT_DISABLED
+    MembershipDatasourcesList:
+      type: array
+      items:
+        $ref: '#/components/schemas/MembershipDatasources'
     PaginationToken:
       type: string
       minLength: 1
       maxLength: 1024
+    Percentage:
+      type: number
+      format: double
     Procedure:
       type: string
+    Reason:
+      type: string
+      enum:
+      - AWS_THREAT_INTELLIGENCE
     Resource:
       type: string
       minLength: 1
       maxLength: 64
+    ResourceList:
+      type: array
+      items:
+        $ref: '#/components/schemas/Resource'
+    Severity:
+      type: string
+      enum:
+      - INFORMATIONAL
+      - LOW
+      - MEDIUM
+      - HIGH
+      - CRITICAL
+    SortOrder:
+      type: string
+      enum:
+      - ASC
+      - DESC
+    State:
+      type: string
+      enum:
+      - ACTIVE
+      - ARCHIVED
+    Status:
+      type: string
+      enum:
+      - RUNNING
+      - FAILED
+      - SUCCESSFUL
     Tactic:
       type: string
     TagKey:
@@ -166,14 +330,33 @@ components:
       pattern: ^(?!aws:)[a-zA-Z+-=._:/]+$
       minLength: 1
       maxLength: 128
+    TagKeyList:
+      type: array
+      items:
+        $ref: '#/components/schemas/TagKey'
+    TagMap:
+      type: object
+      additionalProperties:
+        $ref: '#/components/schemas/TagValue'
     TagValue:
       type: string
       minLength: 0
       maxLength: 256
     Technique:
       type: string
+    Timestamp:
+      type: string
+      format: date-time
     Type:
       type: string
+    UnprocessedAccountList:
+      type: array
+      items:
+        $ref: '#/components/schemas/UnprocessedAccount'
+    UnprocessedGraphList:
+      type: array
+      items:
+        $ref: '#/components/schemas/UnprocessedGraph'
     UnprocessedReason:
       type: string
     UserAgent:
@@ -182,3 +365,7 @@ components:
       type: string
       minLength: 1
       maxLength: 500
+    VolumeUsageByDatasourcePackage:
+      type: object
+      additionalProperties:
+        $ref: '#/components/schemas/DatasourcePackageUsageInfo'

@@ -58,6 +58,34 @@ servers:
 paths: {}
 components:
   schemas:
+    APISchema:
+      allOf:
+      - allOf:
+        - $ref: '#/components/schemas/Payload'
+        description: |-
+          The JSON or YAML-formatted payload defining the OpenAPI schema for a custom plugin.
+      - allOf:
+        - $ref: '#/components/schemas/S3'
+        description: |-
+          Contains details about the S3 object containing the OpenAPI schema for a custom plugin. The schema could be in either JSON or YAML format.
+      description: |-
+        Contains details about the OpenAPI schema for a custom plugin. For more information, see [custom plugin OpenAPI schemas](https://docs.aws.amazon.com/amazonq/latest/qbusiness-ug/custom-plugin.html#plugins-api-schema). You can either include the schema directly in the payload field or you can upload it to an S3 bucket and specify the S3 bucket location in the `s3` field.
+    APISchemaType:
+      type: string
+      enum:
+      - OPEN_API_V3
+    AccessControls:
+      type: array
+      items:
+        $ref: '#/components/schemas/AccessControl'
+    ActionConfigurationList:
+      type: array
+      items:
+        $ref: '#/components/schemas/ActionConfiguration'
+    ActionExecutionPayload:
+      type: object
+      additionalProperties:
+        $ref: '#/components/schemas/ActionExecutionPayloadField'
     ActionPayloadFieldKey:
       type: string
       minLength: 1
@@ -65,6 +93,31 @@ components:
       type: string
       minLength: 1
       maxLength: 1
+    ActionPayloadFieldType:
+      type: string
+      enum:
+      - STRING
+      - NUMBER
+      - ARRAY
+      - BOOLEAN
+    ActionPayloadFieldValue:
+      type: object
+      additionalProperties: true
+    ActionReviewPayload:
+      type: object
+      additionalProperties:
+        $ref: '#/components/schemas/ActionReviewPayloadField'
+    ActionReviewPayloadFieldAllowedValues:
+      type: array
+      items:
+        $ref: '#/components/schemas/ActionReviewPayloadFieldAllowedValue'
+    ActionReviewPayloadFieldArrayItemJsonSchema:
+      type: object
+      additionalProperties: true
+    Actions:
+      type: array
+      items:
+        $ref: '#/components/schemas/ActionSummary'
     AmazonResourceName:
       type: string
       minLength: 1
@@ -84,14 +137,81 @@ components:
       pattern: ^[a-zA-Z0-9][a-zA-Z0-9_-]*$
       minLength: 1
       maxLength: 1000
+    ApplicationStatus:
+      type: string
+      enum:
+      - CREATING
+      - ACTIVE
+      - DELETING
+      - FAILED
+      - UPDATING
+    Applications:
+      type: array
+      items:
+        $ref: '#/components/schemas/Application'
+    AssociatedGroups:
+      type: array
+      items:
+        $ref: '#/components/schemas/AssociatedGroup'
+    AssociatedUsers:
+      type: array
+      items:
+        $ref: '#/components/schemas/AssociatedUser'
     AttachmentId:
       type: string
       pattern: ^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$
+    AttachmentList:
+      type: array
+      items:
+        $ref: '#/components/schemas/Attachment'
     AttachmentName:
       type: string
       pattern: ^\P{C}*$
       minLength: 1
       maxLength: 1000
+    AttachmentStatus:
+      type: string
+      enum:
+      - FAILED
+      - SUCCESS
+    AttachmentsControlMode:
+      type: string
+      enum:
+      - ENABLED
+      - DISABLED
+    AttachmentsInput:
+      type: array
+      items:
+        $ref: '#/components/schemas/AttachmentInput'
+    AttachmentsOutput:
+      type: array
+      items:
+        $ref: '#/components/schemas/AttachmentOutput'
+    AttributeFilters:
+      type: array
+      items:
+        $ref: '#/components/schemas/AttributeFilter'
+    AttributeType:
+      type: string
+      enum:
+      - STRING
+      - STRING_LIST
+      - NUMBER
+      - DATE
+    AttributeValueOperator:
+      type: string
+      enum:
+      - DELETE
+    AudioExtractionStatus:
+      type: string
+      enum:
+      - ENABLED
+      - DISABLED
+    AudioExtractionType:
+      type: string
+      enum:
+      - TRANSCRIPT
+      - SUMMARY
     AuthResponseKey:
       type: string
       minLength: 1
@@ -100,20 +220,117 @@ components:
       type: string
       minLength: 1
       maxLength: 2048
+    AuthorizationResponseMap:
+      type: object
+      additionalProperties:
+        $ref: '#/components/schemas/AuthResponseValue'
+    AutoSubscriptionStatus:
+      type: string
+      enum:
+      - ENABLED
+      - DISABLED
+    Blob:
+      type: string
+      format: byte
     BlockedPhrase:
       type: string
       pattern: ^\P{C}*$
       maxLength: 36
+    BlockedPhrases:
+      type: array
+      items:
+        $ref: '#/components/schemas/BlockedPhrase'
+    BoostingDurationInSeconds:
+      type: integer
+      format: int64
+      minimum: 0
+      maximum: 999999999
     BrowserExtension:
       type: string
       enum:
       - FIREFOX
       - CHROME
+    BrowserExtensionList:
+      type: array
+      items:
+        $ref: '#/components/schemas/BrowserExtension'
+    ChatInputStream:
+      allOf:
+      - allOf:
+        - $ref: '#/components/schemas/ConfigurationEvent'
+        description: |-
+          A configuration event activated by an end user request to select a specific chat mode.
+      - allOf:
+        - $ref: '#/components/schemas/TextInputEvent'
+        description: |-
+          Information about the payload of the `ChatInputStream` event containing the end user message input.
+      - allOf:
+        - $ref: '#/components/schemas/AttachmentInputEvent'
+        description: |-
+          A request by an end user to upload a file during chat.
+      - allOf:
+        - $ref: '#/components/schemas/ActionExecutionEvent'
+        description: |-
+          A request from an end user to perform an Amazon Q Business plugin action.
+      - allOf:
+        - $ref: '#/components/schemas/EndOfInputEvent'
+        description: |-
+          The end of the streaming input for the `Chat` API.
+      - allOf:
+        - $ref: '#/components/schemas/AuthChallengeResponseEvent'
+        description: |-
+          An authentication verification event response by a third party authentication server to Amazon Q Business.
+      description: |-
+        The streaming input for the `Chat` API.
+    ChatMode:
+      type: string
+      enum:
+      - RETRIEVAL_MODE
+      - CREATOR_MODE
+      - PLUGIN_MODE
+    ChatModeConfiguration:
+      allOf:
+      - allOf:
+        - $ref: '#/components/schemas/PluginConfiguration'
+        description: |-
+          Configuration information required to invoke chat in `PLUGIN_MODE`.
+      description: |-
+        Configuration information for Amazon Q Business conversation modes.
+
+        For more information, see [Admin controls and guardrails](https://docs.aws.amazon.com/amazonq/latest/qbusiness-ug/guardrails.html) and [Conversation settings](https://docs.aws.amazon.com/amazonq/latest/business-use-dg/using-web-experience.html#chat-source-scope).
+    ChatOutputStream:
+      allOf:
+      - allOf:
+        - $ref: '#/components/schemas/TextOutputEvent'
+        description: |-
+          Information about the payload of the `ChatOutputStream` event containing the AI-generated message output.
+      - allOf:
+        - $ref: '#/components/schemas/MetadataEvent'
+        description: |-
+          A metadata event for a AI-generated text output message in a Amazon Q Business conversation.
+      - allOf:
+        - $ref: '#/components/schemas/ActionReviewEvent'
+        description: |-
+          A request from Amazon Q Business to the end user for information Amazon Q Business needs to successfully complete a requested plugin action.
+      - allOf:
+        - $ref: '#/components/schemas/FailedAttachmentEvent'
+        description: |-
+          A failed file upload event during a web experience chat.
+      - allOf:
+        - $ref: '#/components/schemas/AuthChallengeRequestEvent'
+        description: |-
+          An authentication verification event activated by an end user request to use a custom plugin.
+      description: |-
+        The streaming output for the `Chat` API.
     ClientIdForOIDC:
       type: string
       pattern: ^[a-zA-Z0-9_.:/()*?=-]*$
       minLength: 1
       maxLength: 255
+    ClientIdsForOIDC:
+      type: array
+      items:
+        $ref: '#/components/schemas/ClientIdForOIDC'
     ClientNamespace:
       type: string
       pattern: ^[a-zA-Z0-9._-]*$
@@ -123,6 +340,29 @@ components:
       type: string
       minLength: 1
       maxLength: 100
+    ContentSource:
+      allOf:
+      - allOf:
+        - $ref: '#/components/schemas/RetrieverContentSource'
+        description: |-
+          The retriever to use as the content source.
+      description: |-
+        Specifies the source of content to search in.
+    ContentType:
+      type: string
+      enum:
+      - PDF
+      - HTML
+      - MS_WORD
+      - PLAIN_TEXT
+      - PPT
+      - RTF
+      - XML
+      - XSLT
+      - MS_EXCEL
+      - CSV
+      - JSON
+      - MD
     ConversationId:
       type: string
       pattern: ^[a-zA-Z0-9][a-zA-Z0-9-]{35}$
@@ -130,6 +370,23 @@ components:
       maxLength: 36
     ConversationTitle:
       type: string
+    Conversations:
+      type: array
+      items:
+        $ref: '#/components/schemas/Conversation'
+    CopyFromSource:
+      allOf:
+      - allOf:
+        - $ref: '#/components/schemas/ConversationSource'
+        description: |-
+          A reference to an attachment in an existing conversation.
+      description: |-
+        The source reference for an existing attachment.
+    CreatorModeControl:
+      type: string
+      enum:
+      - ENABLED
+      - DISABLED
     CustomCSSUrl:
       type: string
       pattern: ^(https?://[a-zA-Z0-9-_.+%/]+\.css)?$
@@ -150,39 +407,199 @@ components:
       pattern: ^[a-zA-Z0-9][a-zA-Z0-9_-]*$
       minLength: 1
       maxLength: 100
+    DataAccessors:
+      type: array
+      items:
+        $ref: '#/components/schemas/DataAccessor'
     DataSourceArn:
       type: string
       pattern: ^arn:[a-z0-9-\.]{1,63}:[a-z0-9-\.]{0,63}:[a-z0-9-\.]{0,63}:[a-z0-9-\.]{0,63}:[^/].{0,1023}$
       minLength: 0
       maxLength: 1284
+    DataSourceConfiguration:
+      type: object
+      additionalProperties: true
+      description: <p>Provides the configuration information for an Amazon Q Business
+        data source.</p>
     DataSourceId:
       type: string
       pattern: ^[a-zA-Z0-9][a-zA-Z0-9-]{35}$
       minLength: 36
       maxLength: 36
+    DataSourceIds:
+      type: array
+      items:
+        $ref: '#/components/schemas/DataSourceId'
     DataSourceName:
       type: string
       pattern: ^[a-zA-Z0-9][a-zA-Z0-9_-]*$
       minLength: 1
       maxLength: 1000
+    DataSourceStatus:
+      type: string
+      enum:
+      - PENDING_CREATION
+      - CREATING
+      - ACTIVE
+      - DELETING
+      - FAILED
+      - UPDATING
+    DataSourceSyncJobStatus:
+      type: string
+      enum:
+      - FAILED
+      - SUCCEEDED
+      - SYNCING
+      - INCOMPLETE
+      - STOPPING
+      - ABORTED
+      - SYNCING_INDEXING
+    DataSourceSyncJobs:
+      type: array
+      items:
+        $ref: '#/components/schemas/DataSourceSyncJob'
     DataSourceUserId:
       type: string
       pattern: ^\P{C}*$
       minLength: 1
       maxLength: 1024
+    DataSources:
+      type: array
+      items:
+        $ref: '#/components/schemas/DataSource'
+    DeleteDocuments:
+      type: array
+      items:
+        $ref: '#/components/schemas/DeleteDocument'
     Description:
       type: string
       pattern: ^[\s\S]*$
       minLength: 0
       maxLength: 1000
+    DocumentAclConditions:
+      type: array
+      items:
+        $ref: '#/components/schemas/DocumentAclCondition'
+    DocumentAclGroups:
+      type: array
+      items:
+        $ref: '#/components/schemas/DocumentAclGroup'
+    DocumentAclUsers:
+      type: array
+      items:
+        $ref: '#/components/schemas/DocumentAclUser'
+    DocumentAttributeBoostingConfiguration:
+      allOf:
+      - allOf:
+        - $ref: '#/components/schemas/NumberAttributeBoostingConfiguration'
+        description: |-
+          Provides information on boosting `NUMBER` type document attributes.
+      - allOf:
+        - $ref: '#/components/schemas/StringAttributeBoostingConfiguration'
+        description: |-
+          Provides information on boosting `STRING` type document attributes.
+      - allOf:
+        - $ref: '#/components/schemas/DateAttributeBoostingConfiguration'
+        description: |-
+          Provides information on boosting `DATE` type document attributes.
+      - allOf:
+        - $ref: '#/components/schemas/StringListAttributeBoostingConfiguration'
+        description: |-
+          Provides information on boosting `STRING_LIST` type document attributes.
+      description: |-
+        Provides information on boosting supported Amazon Q Business document attribute types. When an end user chat query matches document attributes that have been boosted, Amazon Q Business prioritizes generating responses from content that matches the boosted document attributes.
+
+        For `STRING` and `STRING_LIST` type document attributes to be used for boosting on the console and the API, they must be enabled for search using the [DocumentAttributeConfiguration](https://docs.aws.amazon.com/amazonq/latest/api-reference/API_DocumentAttributeConfiguration.html) object of the [UpdateIndex](https://docs.aws.amazon.com/amazonq/latest/api-reference/API_UpdateIndex.html) API. If you haven't enabled searching on these attributes, you can't boost attributes of these data types on either the console or the API.
+
+        For more information on how boosting document attributes work in Amazon Q Business, see [Boosting using document attributes](https://docs.aws.amazon.com/amazonq/latest/business-use-dg/metadata-boosting.html).
+    DocumentAttributeBoostingLevel:
+      type: string
+      enum:
+      - NONE
+      - LOW
+      - MEDIUM
+      - HIGH
+      - VERY_HIGH
+    DocumentAttributeBoostingOverrideMap:
+      type: object
+      additionalProperties:
+        $ref: '#/components/schemas/DocumentAttributeBoostingConfiguration'
+    DocumentAttributeConfigurations:
+      type: array
+      items:
+        $ref: '#/components/schemas/DocumentAttributeConfiguration'
     DocumentAttributeKey:
       type: string
       pattern: ^[a-zA-Z0-9_][a-zA-Z0-9_-]*$
       minLength: 1
       maxLength: 200
+    DocumentAttributeStringListValue:
+      type: array
+      items:
+        $ref: '#/components/schemas/String'
     DocumentAttributeStringValue:
       type: string
       maxLength: 2048
+    DocumentAttributeValue:
+      allOf:
+      - allOf:
+        - $ref: '#/components/schemas/DocumentAttributeStringValue'
+        description: |-
+          A string.
+      - allOf:
+        - $ref: '#/components/schemas/DocumentAttributeStringListValue'
+        description: |-
+          A list of strings.
+      - allOf:
+        - $ref: '#/components/schemas/Long'
+        description: |-
+          A long integer value.
+      - allOf:
+        - $ref: '#/components/schemas/Timestamp'
+        description: |-
+          A date expressed as an ISO 8601 string.
+
+          It's important for the time zone to be included in the ISO 8601 date-time format. For example, 2012-03-25T12:30:10+01:00 is the ISO 8601 date-time format for March 25th 2012 at 12:30PM (plus 10 seconds) in Central European Time.
+      description: |-
+        The value of a document attribute. You can only provide one value for a document attribute.
+    DocumentAttributes:
+      type: array
+      items:
+        $ref: '#/components/schemas/DocumentAttribute'
+    DocumentContent:
+      allOf:
+      - allOf:
+        - $ref: '#/components/schemas/Blob'
+        description: |-
+          The contents of the document. Documents passed to the `blob` parameter must be base64 encoded. Your code might not need to encode the document file bytes if you're using an Amazon Web Services SDK to call Amazon Q Business APIs. If you are calling the Amazon Q Business endpoint directly using REST, you must base64 encode the contents before sending.
+      - allOf:
+        - $ref: '#/components/schemas/S3'
+        description: |-
+          The path to the document in an Amazon S3 bucket.
+      description: |-
+        The contents of a document.
+    DocumentContentOperator:
+      type: string
+      enum:
+      - DELETE
+    DocumentDetailList:
+      type: array
+      items:
+        $ref: '#/components/schemas/DocumentDetails'
+    DocumentEnrichmentConditionOperator:
+      type: string
+      enum:
+      - GREATER_THAN
+      - GREATER_THAN_OR_EQUALS
+      - LESS_THAN
+      - LESS_THAN_OR_EQUALS
+      - EQUALS
+      - NOT_EQUALS
+      - CONTAINS
+      - NOT_CONTAINS
+      - EXISTS
+      - NOT_EXISTS
+      - BEGINS_WITH
     DocumentId:
       type: string
       pattern: ^\P{C}*$
@@ -193,6 +610,32 @@ components:
       pattern: ^[a-zA-Z0-9_][a-zA-Z0-9_-]*$
       minLength: 1
       maxLength: 30
+    DocumentStatus:
+      type: string
+      enum:
+      - RECEIVED
+      - PROCESSING
+      - INDEXED
+      - UPDATED
+      - FAILED
+      - DELETING
+      - DELETED
+      - DOCUMENT_FAILED_TO_INDEX
+    Documents:
+      type: array
+      items:
+        $ref: '#/components/schemas/Document'
+    EligibleDataSources:
+      type: array
+      items:
+        $ref: '#/components/schemas/EligibleDataSource'
+    ErrorCode:
+      type: string
+      enum:
+      - InternalError
+      - InvalidRequest
+      - ResourceInactive
+      - ResourceNotFound
     ErrorMessage:
       type: string
       pattern: ^[\s\S]*$
@@ -202,11 +645,19 @@ components:
       type: string
       pattern: ^\P{C}*$
       maxLength: 350
+    ExampleChatMessages:
+      type: array
+      items:
+        $ref: '#/components/schemas/ExampleChatMessage'
     ExecutionId:
       type: string
       pattern: ^[a-zA-Z0-9][a-zA-Z0-9-]{35}$
       minLength: 36
       maxLength: 36
+    FailedDocuments:
+      type: array
+      items:
+        $ref: '#/components/schemas/FailedDocument'
     FaviconUrl:
       type: string
       pattern: ^(https?://[a-zA-Z0-9-_.+%/]+\.(svg|ico))?$
@@ -227,6 +678,27 @@ components:
       pattern: ^\P{C}*$
       minLength: 1
       maxLength: 1024
+    GroupStatus:
+      type: string
+      enum:
+      - FAILED
+      - SUCCEEDED
+      - PROCESSING
+      - DELETING
+      - DELETED
+    GroupStatusDetails:
+      type: array
+      items:
+        $ref: '#/components/schemas/GroupStatusDetail'
+    GroupSummaryList:
+      type: array
+      items:
+        $ref: '#/components/schemas/GroupSummary'
+    HallucinationReductionControl:
+      type: string
+      enum:
+      - ENABLED
+      - DISABLED
     IAMIdentityProviderArn:
       type: string
       pattern: ^arn:aws:iam::\d{12}:(oidc-provider|saml-provider)/[a-zA-Z0-9_\.\/@\-]+$
@@ -237,6 +709,27 @@ components:
       pattern: ^arn:(aws|aws-us-gov|aws-cn|aws-iso|aws-iso-b):sso::\d{12}:application/(sso)?ins-[a-zA-Z0-9-.]{16}/apl-[a-zA-Z0-9]{16}$
       minLength: 10
       maxLength: 1224
+    IdentityProviderConfiguration:
+      allOf:
+      - allOf:
+        - $ref: '#/components/schemas/SamlProviderConfiguration'
+      - allOf:
+        - $ref: '#/components/schemas/OpenIDConnectProviderConfiguration'
+      description: |-
+        Provides information about the identity provider (IdP) used to authenticate end users of an Amazon Q Business web experience.
+    IdentityType:
+      type: string
+      enum:
+      - AWS_IAM_IDP_SAML
+      - AWS_IAM_IDP_OIDC
+      - AWS_IAM_IDC
+      - AWS_QUICKSIGHT_IDP
+      - ANONYMOUS
+    ImageExtractionStatus:
+      type: string
+      enum:
+      - ENABLED
+      - DISABLED
     IndexArn:
       type: string
       pattern: ^arn:[a-z0-9-\.]{1,63}:[a-z0-9-\.]{0,63}:[a-z0-9-\.]{0,63}:[a-z0-9-\.]{0,63}:[^/].{0,1023}$
@@ -255,9 +748,34 @@ components:
       pattern: ^[a-zA-Z0-9][a-zA-Z0-9_-]*$
       minLength: 1
       maxLength: 1000
+    IndexStatus:
+      type: string
+      enum:
+      - CREATING
+      - ACTIVE
+      - DELETING
+      - FAILED
+      - UPDATING
+    IndexType:
+      type: string
+      enum:
+      - ENTERPRISE
+      - STARTER
+    IndexedTextBytes:
+      type: integer
+      format: int64
+      minimum: 0
     IndexedTextDocument:
       type: integer
       minimum: 0
+    Indices:
+      type: array
+      items:
+        $ref: '#/components/schemas/Index'
+    InlineDocumentEnrichmentConfigurations:
+      type: array
+      items:
+        $ref: '#/components/schemas/InlineDocumentEnrichmentConfiguration'
     InstanceArn:
       type: string
       pattern: ^arn:(aws|aws-us-gov|aws-cn|aws-iso|aws-iso-b):sso:::instance/(sso)?ins-[a-zA-Z0-9-.]{16}$
@@ -284,11 +802,18 @@ components:
       pattern: ^arn:aws[a-zA-Z-]*:lambda:[a-z-]*-[0-9]:[0-9]{12}:function:[a-zA-Z0-9-_]+(/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12})?(:[a-zA-Z0-9-_]+)?$
       minLength: 1
       maxLength: 2048
+    ListPluginTypeMetadataSummaries:
+      type: array
+      items:
+        $ref: '#/components/schemas/PluginTypeMetadataSummary'
     LogoUrl:
       type: string
       pattern: ^(https?://[a-zA-Z0-9-_.+%/]+\.(svg|png))?$
       minLength: 0
       maxLength: 1284
+    Long:
+      type: integer
+      format: int64
     MaxResults:
       type: integer
     MaxResultsIntegerForGetTopicConfigurations:
@@ -368,6 +893,24 @@ components:
       pattern: ^[a-zA-Z0-9][a-zA-Z0-9-]{35}$
       minLength: 36
       maxLength: 36
+    MemberGroups:
+      type: array
+      items:
+        $ref: '#/components/schemas/MemberGroup'
+    MemberRelation:
+      type: string
+      enum:
+      - AND
+      - OR
+    MemberUsers:
+      type: array
+      items:
+        $ref: '#/components/schemas/MemberUser'
+    MembershipType:
+      type: string
+      enum:
+      - INDEX
+      - DATASOURCE
     MessageBody:
       type: string
       pattern: ^\P{C}*$}$
@@ -378,11 +921,40 @@ components:
       pattern: ^[a-zA-Z0-9][a-zA-Z0-9-]{35}$
       minLength: 36
       maxLength: 36
+    MessageType:
+      type: string
+      enum:
+      - USER
+      - SYSTEM
+    MessageUsefulness:
+      type: string
+      enum:
+      - USEFUL
+      - NOT_USEFUL
     MessageUsefulnessComment:
       type: string
       pattern: ^\P{C}*$
       minLength: 0
       maxLength: 1000
+    MessageUsefulnessReason:
+      type: string
+      enum:
+      - NOT_FACTUALLY_CORRECT
+      - HARMFUL_OR_UNSAFE
+      - INCORRECT_OR_MISSING_SOURCES
+      - NOT_HELPFUL
+      - FACTUALLY_CORRECT
+      - COMPLETE
+      - RELEVANT_SOURCES
+      - HELPFUL
+      - NOT_BASED_ON_DOCUMENTS
+      - NOT_COMPLETE
+      - NOT_CONCISE
+      - OTHER
+    Messages:
+      type: array
+      items:
+        $ref: '#/components/schemas/Message'
     MetricValue:
       type: string
       pattern: ^(([1-9][0-9]*)|0)$
@@ -394,6 +966,16 @@ components:
       type: string
       minLength: 1
       maxLength: 1500
+    NumberAttributeBoostingType:
+      type: string
+      enum:
+      - PRIORITIZE_LARGER_VALUES
+      - PRIORITIZE_SMALLER_VALUES
+    OrchestrationControl:
+      type: string
+      enum:
+      - ENABLED
+      - DISABLED
     Origin:
       type: string
       pattern: ^(http://|https://)[a-zA-Z0-9-_.]+(?::[0-9]{1,5})?$
@@ -401,11 +983,46 @@ components:
       maxLength: 256
     Payload:
       type: string
+    PersonalizationControlMode:
+      type: string
+      enum:
+      - ENABLED
+      - DISABLED
     PluginArn:
       type: string
       pattern: ^arn:[a-z0-9-\.]{1,63}:[a-z0-9-\.]{0,63}:[a-z0-9-\.]{0,63}:[a-z0-9-\.]{0,63}:[^/].{0,1023}$
       minLength: 0
       maxLength: 1284
+    PluginAuthConfiguration:
+      allOf:
+      - allOf:
+        - $ref: '#/components/schemas/BasicAuthConfiguration'
+        description: |-
+          Information about the basic authentication credentials used to configure a plugin.
+      - allOf:
+        - $ref: '#/components/schemas/OAuth2ClientCredentialConfiguration'
+        description: |-
+          Information about the OAuth 2.0 authentication credential/token used to configure a plugin.
+      - allOf:
+        - $ref: '#/components/schemas/NoAuthConfiguration'
+        description: |-
+          Information about invoking a custom plugin without any authentication.
+      - allOf:
+        - $ref: '#/components/schemas/IdcAuthConfiguration'
+        description: |-
+          Information about the IAM Identity Center Application used to configure authentication for a plugin.
+      description: |-
+        Authentication configuration information for an Amazon Q Business plugin.
+    PluginBuildStatus:
+      type: string
+      enum:
+      - READY
+      - CREATE_IN_PROGRESS
+      - CREATE_FAILED
+      - UPDATE_IN_PROGRESS
+      - UPDATE_FAILED
+      - DELETE_IN_PROGRESS
+      - DELETE_FAILED
     PluginDescription:
       type: string
       minLength: 1
@@ -420,21 +1037,109 @@ components:
       pattern: ^[a-zA-Z0-9][a-zA-Z0-9_-]*$
       minLength: 1
       maxLength: 100
+    PluginState:
+      type: string
+      enum:
+      - ENABLED
+      - DISABLED
+    PluginType:
+      type: string
+      enum:
+      - SERVICE_NOW
+      - SALESFORCE
+      - JIRA
+      - ZENDESK
+      - CUSTOM
+      - QUICKSIGHT
+      - SERVICENOW_NOW_PLATFORM
+      - JIRA_CLOUD
+      - SALESFORCE_CRM
+      - ZENDESK_SUITE
+      - ATLASSIAN_CONFLUENCE
+      - GOOGLE_CALENDAR
+      - MICROSOFT_TEAMS
+      - MICROSOFT_EXCHANGE
+      - PAGERDUTY_ADVANCE
+      - SMARTSHEET
+      - ASANA
+    PluginTypeCategory:
+      type: string
+      enum:
+      - Customer relationship management (CRM)
+      - Project management
+      - Communication
+      - Productivity
+      - Ticketing and incident management
+    Plugins:
+      type: array
+      items:
+        $ref: '#/components/schemas/Plugin'
+    Principal:
+      allOf:
+      - allOf:
+        - $ref: '#/components/schemas/PrincipalUser'
+        description: |-
+          The user associated with the principal.
+      - allOf:
+        - $ref: '#/components/schemas/PrincipalGroup'
+        description: |-
+          The group associated with the principal.
+      description: |-
+        Provides user and group information used for filtering documents to use for generating Amazon Q Business conversation responses.
     PrincipalRoleArn:
       type: string
       pattern: ^arn:aws:iam::[0-9]{12}:role/[a-zA-Z0-9_/+=,.@-]+$
       minLength: 1
       maxLength: 1284
+    Principals:
+      type: array
+      items:
+        $ref: '#/components/schemas/Principal'
+    QAppsControlMode:
+      type: string
+      enum:
+      - ENABLED
+      - DISABLED
     QIamAction:
       type: string
       pattern: ^qbusiness:[a-zA-Z]+$
+    QIamActions:
+      type: array
+      items:
+        $ref: '#/components/schemas/QIamAction'
     QueryText:
       type: string
+    ReadAccessType:
+      type: string
+      enum:
+      - ALLOW
+      - DENY
+    RelevantContentList:
+      type: array
+      items:
+        $ref: '#/components/schemas/RelevantContent'
+    ResponseScope:
+      type: string
+      enum:
+      - ENTERPRISE_CONTENT_ONLY
+      - EXTENDED_KNOWLEDGE_ENABLED
     RetrieverArn:
       type: string
       pattern: ^arn:[a-z0-9-\.]{1,63}:[a-z0-9-\.]{0,63}:[a-z0-9-\.]{0,63}:[a-z0-9-\.]{0,63}:[^/].{0,1023}$
       minLength: 0
       maxLength: 1284
+    RetrieverConfiguration:
+      allOf:
+      - allOf:
+        - $ref: '#/components/schemas/NativeIndexConfiguration'
+        description: |-
+          Provides information on how a Amazon Q Business index used as a retriever for your Amazon Q Business application is configured.
+      - allOf:
+        - $ref: '#/components/schemas/KendraIndexConfiguration'
+        description: |-
+          Provides information on how the Amazon Kendra index used as a retriever for your Amazon Q Business application is configured.
+      description: |-
+        Provides information on how the retriever used for your Amazon Q Business application is configured.
     RetrieverId:
       type: string
       pattern: ^[a-zA-Z0-9][a-zA-Z0-9-]{35}$
@@ -445,11 +1150,45 @@ components:
       pattern: ^[a-zA-Z0-9][a-zA-Z0-9_-]*$
       minLength: 1
       maxLength: 1000
+    RetrieverStatus:
+      type: string
+      enum:
+      - CREATING
+      - ACTIVE
+      - FAILED
+    RetrieverType:
+      type: string
+      enum:
+      - NATIVE_INDEX
+      - KENDRA_INDEX
+    Retrievers:
+      type: array
+      items:
+        $ref: '#/components/schemas/Retriever'
     RoleArn:
       type: string
       pattern: ^arn:[a-z0-9-\.]{1,63}:[a-z0-9-\.]{0,63}:[a-z0-9-\.]{0,63}:[a-z0-9-\.]{0,63}:[^/].{0,1023}$
       minLength: 0
       maxLength: 1284
+    RuleConfiguration:
+      allOf:
+      - allOf:
+        - $ref: '#/components/schemas/ContentBlockerRule'
+        description: |-
+          A rule for configuring how Amazon Q Business responds when it encounters a a blocked topic.
+      - allOf:
+        - $ref: '#/components/schemas/ContentRetrievalRule'
+      description: |-
+        Provides configuration information about a rule.
+    RuleType:
+      type: string
+      enum:
+      - CONTENT_BLOCKER_RULE
+      - CONTENT_RETRIEVAL_RULE
+    Rules:
+      type: array
+      items:
+        $ref: '#/components/schemas/Rule'
     S3BucketName:
       type: string
       pattern: ^[a-z0-9][\.\-a-z0-9]{1,61}[a-z0-9]$
@@ -473,6 +1212,14 @@ components:
       pattern: ^.*$
       minLength: 1000
       maxLength: 10000000
+    ScoreConfidence:
+      type: string
+      enum:
+      - VERY_HIGH
+      - HIGH
+      - MEDIUM
+      - LOW
+      - NOT_AVAILABLE
     SecretArn:
       type: string
       pattern: ^arn:[a-z0-9-\.]{1,63}:[a-z0-9-\.]{0,63}:[a-z0-9-\.]{0,63}:[a-z0-9-\.]{0,63}:[^/].{0,1023}$
@@ -483,6 +1230,10 @@ components:
       pattern: ^[-0-9a-zA-Z]+$
       minLength: 1
       maxLength: 200
+    SecurityGroupIds:
+      type: array
+      items:
+        $ref: '#/components/schemas/SecurityGroupId'
     SessionDurationInMinutes:
       type: integer
       minimum: 15
@@ -494,20 +1245,60 @@ components:
       pattern: ^[a-zA-Z0-9][a-zA-Z0-9-]{35}$
       minLength: 36
       maxLength: 36
+    SourceAttributions:
+      type: array
+      items:
+        $ref: '#/components/schemas/SourceAttribution'
+    SourceDetails:
+      allOf:
+      - allOf:
+        - $ref: '#/components/schemas/ImageSourceDetails'
+        description: |-
+          Details specific to image content within the source.
+      - allOf:
+        - $ref: '#/components/schemas/AudioSourceDetails'
+        description: |-
+          Details specific to audio content within the source.
+      - allOf:
+        - $ref: '#/components/schemas/VideoSourceDetails'
+        description: |-
+          Details specific to video content within the source.
+      description: |-
+        Container for details about different types of media sources (image, audio, or video).
     StatementId:
       type: string
       pattern: ^[a-zA-Z0-9_-]+$
       minLength: 1
       maxLength: 100
+    Status:
+      type: string
+      enum:
+      - ENABLED
+      - DISABLED
     String:
       type: string
       minLength: 1
       maxLength: 2048
+    StringAttributeValueBoosting:
+      type: object
+      additionalProperties:
+        $ref: '#/components/schemas/StringAttributeValueBoostingLevel'
+    StringAttributeValueBoostingLevel:
+      type: string
+      enum:
+      - LOW
+      - MEDIUM
+      - HIGH
+      - VERY_HIGH
     SubnetId:
       type: string
       pattern: ^[-0-9a-zA-Z]+$
       minLength: 1
       maxLength: 200
+    SubnetIds:
+      type: array
+      items:
+        $ref: '#/components/schemas/SubnetId'
     SubscriptionArn:
       type: string
       pattern: ^arn:[a-z0-9-\.]{1,63}:[a-z0-9-\.]{0,63}:[a-z0-9-\.]{0,63}:[a-z0-9-\.]{0,63}:[^/].{0,1023}$
@@ -517,6 +1308,27 @@ components:
       type: string
       minLength: 0
       maxLength: 1224
+    SubscriptionPrincipal:
+      allOf:
+      - allOf:
+        - $ref: '#/components/schemas/UserIdentifier'
+        description: |-
+          The identifier of a user in the IAM Identity Center instance connected to the Amazon Q Business application.
+      - allOf:
+        - $ref: '#/components/schemas/GroupIdentifier'
+        description: |-
+          The identifier of a group in the IAM Identity Center instance connected to the Amazon Q Business application.
+      description: |-
+        A user or group in the IAM Identity Center instance connected to the Amazon Q Business application.
+    SubscriptionType:
+      type: string
+      enum:
+      - Q_LITE
+      - Q_BUSINESS
+    Subscriptions:
+      type: array
+      items:
+        $ref: '#/components/schemas/Subscription'
     SyncSchedule:
       type: string
       pattern: ^[\s\S]*$
@@ -530,14 +1342,34 @@ components:
       type: string
       pattern: ^\P{C}*$
       maxLength: 350
+    SystemMessageType:
+      type: string
+      enum:
+      - RESPONSE
+      - GROUNDED_RESPONSE
     TagKey:
       type: string
       minLength: 1
       maxLength: 128
+    TagKeys:
+      type: array
+      items:
+        $ref: '#/components/schemas/TagKey'
     TagValue:
       type: string
       minLength: 0
       maxLength: 256
+    Tags:
+      type: array
+      items:
+        $ref: '#/components/schemas/Tag'
+    TextSegmentList:
+      type: array
+      items:
+        $ref: '#/components/schemas/TextSegment'
+    Timestamp:
+      type: string
+      format: date-time
     Title:
       type: string
       minLength: 1
@@ -547,6 +1379,10 @@ components:
       pattern: ^[a-zA-Z0-9][a-zA-Z0-9-]{0,35}$
       minLength: 1
       maxLength: 36
+    TopicConfigurations:
+      type: array
+      items:
+        $ref: '#/components/schemas/TopicConfiguration'
     TopicDescription:
       type: string
       pattern: ^\P{C}*$
@@ -557,6 +1393,14 @@ components:
       pattern: ^(https?|ftp|file)://([^\s]*)$
       minLength: 1
       maxLength: 2048
+    UserAliases:
+      type: array
+      items:
+        $ref: '#/components/schemas/UserAlias'
+    UserGroups:
+      type: array
+      items:
+        $ref: '#/components/schemas/String'
     UserId:
       type: string
       pattern: ^\P{C}*$
@@ -567,18 +1411,65 @@ components:
       pattern: ^([0-9a-f]{10}-|)[A-Fa-f0-9]{8}-[A-Fa-f0-9]{4}-[A-Fa-f0-9]{4}-[A-Fa-f0-9]{4}-[A-Fa-f0-9]{12}$
       minLength: 1
       maxLength: 47
+    UserIds:
+      type: array
+      items:
+        $ref: '#/components/schemas/String'
     UserMessage:
       type: string
+    ValidationExceptionFields:
+      type: array
+      items:
+        $ref: '#/components/schemas/ValidationExceptionField'
+    ValidationExceptionReason:
+      type: string
+      enum:
+      - CANNOT_PARSE
+      - FIELD_VALIDATION_FAILED
+      - UNKNOWN_OPERATION
+    VideoExtractionStatus:
+      type: string
+      enum:
+      - ENABLED
+      - DISABLED
+    VideoExtractionType:
+      type: string
+      enum:
+      - TRANSCRIPT
+      - SUMMARY
     WebExperienceArn:
       type: string
       pattern: ^arn:[a-z0-9-\.]{1,63}:[a-z0-9-\.]{0,63}:[a-z0-9-\.]{0,63}:[a-z0-9-\.]{0,63}:[^/].{0,1023}$
       minLength: 0
       maxLength: 1284
+    WebExperienceAuthConfiguration:
+      allOf:
+      - allOf:
+        - $ref: '#/components/schemas/SamlConfiguration'
+      description: |-
+        Provides the authorization configuration information needed to deploy a Amazon Q Business web experience to end users.
     WebExperienceId:
       type: string
       pattern: ^[a-zA-Z0-9][a-zA-Z0-9-]*$
       minLength: 36
       maxLength: 36
+    WebExperienceOrigins:
+      type: array
+      items:
+        $ref: '#/components/schemas/Origin'
+    WebExperienceSamplePromptsControlMode:
+      type: string
+      enum:
+      - ENABLED
+      - DISABLED
+    WebExperienceStatus:
+      type: string
+      enum:
+      - CREATING
+      - ACTIVE
+      - DELETING
+      - FAILED
+      - PENDING_AUTH_CONFIG
     WebExperienceSubtitle:
       type: string
       pattern: ^[\s\S]*$
@@ -593,3 +1484,7 @@ components:
       type: string
       minLength: 0
       maxLength: 300
+    WebExperiences:
+      type: array
+      items:
+        $ref: '#/components/schemas/WebExperience'

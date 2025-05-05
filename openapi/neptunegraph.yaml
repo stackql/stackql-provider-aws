@@ -51,6 +51,35 @@ components:
       pattern: ^arn:.+$
       minLength: 1
       maxLength: 1011
+    BlankNodeHandling:
+      type: string
+      enum:
+      - convertToIri
+    ConflictExceptionReason:
+      type: string
+      enum:
+      - CONCURRENT_MODIFICATION
+    DocumentValuedMap:
+      type: object
+      additionalProperties:
+        $ref: '#/components/schemas/Document'
+    EdgeLabels:
+      type: array
+      items:
+        type: string
+    EdgeProperties:
+      type: array
+      items:
+        type: string
+    EdgeStructures:
+      type: array
+      items:
+        $ref: '#/components/schemas/EdgeStructure'
+    ExplainMode:
+      type: string
+      enum:
+      - STATIC
+      - DETAILS
     ExportFilterLabel:
       type: string
       minLength: 1
@@ -63,13 +92,47 @@ components:
       pattern: ^[a-zA-Z0-9_]+$
       minLength: 1
       maxLength: 128
+    ExportFilterPerLabelMap:
+      type: object
+      additionalProperties:
+        $ref: '#/components/schemas/ExportFilterElement'
+    ExportFilterPropertyMap:
+      type: object
+      additionalProperties:
+        $ref: '#/components/schemas/ExportFilterPropertyAttributes'
     ExportFilterSourcePropertyName:
       type: string
       minLength: 1
       maxLength: 128
+    ExportFormat:
+      type: string
+      enum:
+      - PARQUET
+      - CSV
     ExportTaskId:
       type: string
       pattern: ^t-[a-z0-9]{10}$
+    ExportTaskStatus:
+      type: string
+      enum:
+      - INITIALIZING
+      - EXPORTING
+      - SUCCEEDED
+      - FAILED
+      - CANCELLING
+      - CANCELLED
+      - DELETED
+    ExportTaskSummaryList:
+      type: array
+      items:
+        $ref: '#/components/schemas/ExportTaskSummary'
+    Format:
+      type: string
+      enum:
+      - CSV
+      - OPEN_CYPHER
+      - PARQUET
+      - NTRIPLES
     GraphId:
       type: string
       pattern: ^g-[a-z0-9]{10}$
@@ -81,23 +144,147 @@ components:
       pattern: ^(?!g-)[a-z][a-z0-9]*(-[a-z0-9]+)*$
       minLength: 1
       maxLength: 63
+    GraphSnapshotSummaryList:
+      type: array
+      items:
+        $ref: '#/components/schemas/GraphSnapshotSummary'
+    GraphStatus:
+      type: string
+      enum:
+      - CREATING
+      - AVAILABLE
+      - DELETING
+      - RESETTING
+      - UPDATING
+      - SNAPSHOTTING
+      - FAILED
+      - IMPORTING
+    GraphSummaryList:
+      type: array
+      items:
+        $ref: '#/components/schemas/GraphSummary'
+    GraphSummaryMode:
+      type: string
+      enum:
+      - BASIC
+      - DETAILED
+    ImportOptions:
+      allOf:
+      - allOf:
+        - $ref: '#/components/schemas/NeptuneImportOptions'
+        description: |-
+          Options for importing data from a Neptune database.
+      description: |-
+        Options for how to perform an import.
+    ImportTaskStatus:
+      type: string
+      enum:
+      - INITIALIZING
+      - EXPORTING
+      - ANALYZING_DATA
+      - IMPORTING
+      - REPROVISIONING
+      - ROLLING_BACK
+      - SUCCEEDED
+      - FAILED
+      - CANCELLING
+      - CANCELLED
+      - DELETED
+    ImportTaskSummaryList:
+      type: array
+      items:
+        $ref: '#/components/schemas/ImportTaskSummary'
     KmsKeyArn:
       type: string
       pattern: ^arn:aws(|-cn|-us-gov):kms:[a-zA-Z0-9-]*:[0-9]{12}:key/[a-zA-Z0-9-]{36}$
       minLength: 1
       maxLength: 1024
+    LongValuedMap:
+      type: object
+      additionalProperties:
+        $ref: '#/components/schemas/Long'
+    LongValuedMapList:
+      type: array
+      items:
+        $ref: '#/components/schemas/LongValuedMap'
     MaxResults:
       type: integer
       minimum: 1
       maximum: 100
+    MultiValueHandlingType:
+      type: string
+      enum:
+      - TO_LIST
+      - PICK_FIRST
+    NodeLabels:
+      type: array
+      items:
+        type: string
+    NodeProperties:
+      type: array
+      items:
+        type: string
+    NodeStructures:
+      type: array
+      items:
+        $ref: '#/components/schemas/NodeStructure'
+    OutgoingEdgeLabels:
+      type: array
+      items:
+        type: string
     PaginationToken:
       type: string
       minLength: 1
       maxLength: 8192
+    ParquetType:
+      type: string
+      enum:
+      - COLUMNAR
+    PlanCacheType:
+      type: string
+      enum:
+      - ENABLED
+      - DISABLED
+      - AUTO
+    PrivateGraphEndpointStatus:
+      type: string
+      enum:
+      - CREATING
+      - AVAILABLE
+      - DELETING
+      - FAILED
+    PrivateGraphEndpointSummaryList:
+      type: array
+      items:
+        $ref: '#/components/schemas/PrivateGraphEndpointSummary'
     ProvisionedMemory:
       type: integer
       minimum: 16
       maximum: 24576
+    QueryLanguage:
+      type: string
+      enum:
+      - OPEN_CYPHER
+    QueryResponseBlob:
+      type: string
+      format: byte
+    QueryState:
+      type: string
+      enum:
+      - RUNNING
+      - WAITING
+      - CANCELLING
+    QueryStateInput:
+      type: string
+      enum:
+      - ALL
+      - RUNNING
+      - WAITING
+      - CANCELLING
+    QuerySummaryList:
+      type: array
+      items:
+        $ref: '#/components/schemas/QuerySummary'
     ReplicaCount:
       type: integer
       minimum: 0
@@ -108,6 +295,10 @@ components:
     SecurityGroupId:
       type: string
       pattern: ^sg-[a-z0-9]+$
+    SecurityGroupIds:
+      type: array
+      items:
+        $ref: '#/components/schemas/SecurityGroupId'
     SnapshotId:
       type: string
       pattern: ^gs-[a-z0-9]{10}$
@@ -119,14 +310,33 @@ components:
       pattern: ^(?!gs-)[a-z][a-z0-9]*(-[a-z0-9]+)*$
       minLength: 1
       maxLength: 63
+    SnapshotStatus:
+      type: string
+      enum:
+      - CREATING
+      - AVAILABLE
+      - DELETING
+      - FAILED
     SubnetId:
       type: string
       pattern: ^subnet-[a-z0-9]+$
+    SubnetIds:
+      type: array
+      items:
+        $ref: '#/components/schemas/SubnetId'
     TagKey:
       type: string
       pattern: ^(?!aws:)[a-zA-Z+-=._:/]+$
       minLength: 1
       maxLength: 128
+    TagKeyList:
+      type: array
+      items:
+        $ref: '#/components/schemas/TagKey'
+    TagMap:
+      type: object
+      additionalProperties:
+        $ref: '#/components/schemas/TagValue'
     TagValue:
       type: string
       minLength: 0
@@ -134,6 +344,24 @@ components:
     TaskId:
       type: string
       pattern: ^t-[a-z0-9]{10}$
+    UnprocessableExceptionReason:
+      type: string
+      enum:
+      - QUERY_TIMEOUT
+      - INTERNAL_LIMIT_EXCEEDED
+      - MEMORY_LIMIT_EXCEEDED
+      - STORAGE_LIMIT_EXCEEDED
+      - PARTITION_FULL
+    ValidationExceptionReason:
+      type: string
+      enum:
+      - CONSTRAINT_VIOLATION
+      - ILLEGAL_ARGUMENT
+      - MALFORMED_QUERY
+      - QUERY_CANCELLED
+      - QUERY_TOO_LARGE
+      - UNSUPPORTED_OPERATION
+      - BAD_REQUEST
     VectorSearchDimension:
       type: integer
       minimum: 1

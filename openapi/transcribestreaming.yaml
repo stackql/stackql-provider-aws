@@ -54,6 +54,29 @@ servers:
 paths: {}
 components:
   schemas:
+    AlternativeList:
+      type: array
+      items:
+        $ref: '#/components/schemas/Alternative'
+    AudioChunk:
+      type: string
+      format: byte
+    AudioStream:
+      allOf:
+      - allOf:
+        - $ref: '#/components/schemas/AudioEvent'
+        description: |-
+          A blob of audio from your application. Your audio stream consists of one or more audio events.
+
+          For more information, see [Event stream encoding](https://docs.aws.amazon.com/transcribe/latest/dg/event-stream.html).
+      - allOf:
+        - $ref: '#/components/schemas/ConfigurationEvent'
+        description: |-
+          Contains audio channel definitions and post-call analytics settings.
+      description: |-
+        An encoded stream of audio blobs. Audio streams are encoded as either HTTP/2 or WebSocket data frames.
+
+        For more information, see [Transcribing streaming audio](https://docs.aws.amazon.com/transcribe/latest/dg/streaming.html).
     Boolean:
       type: boolean
       default: false
@@ -62,11 +85,90 @@ components:
       pattern: ^[a-z0-9][\.\-a-z0-9]{1,61}[a-z0-9]$
       minLength: 0
       maxLength: 64
+    CallAnalyticsEntityList:
+      type: array
+      items:
+        $ref: '#/components/schemas/CallAnalyticsEntity'
+    CallAnalyticsItemList:
+      type: array
+      items:
+        $ref: '#/components/schemas/CallAnalyticsItem'
+    CallAnalyticsLanguageCode:
+      type: string
+      enum:
+      - en-US
+      - en-GB
+      - es-US
+      - fr-CA
+      - fr-FR
+      - en-AU
+      - it-IT
+      - de-DE
+      - pt-BR
+    CallAnalyticsTranscriptResultStream:
+      allOf:
+      - allOf:
+        - $ref: '#/components/schemas/UtteranceEvent'
+        description: |-
+          Contains set of transcription results from one or more audio segments, along with additional information per your request parameters. This can include information relating to channel definitions, partial result stabilization, sentiment, issue detection, and other transcription-related data.
+      - allOf:
+        - $ref: '#/components/schemas/CategoryEvent'
+        description: |-
+          Provides information on matched categories that were used to generate real-time supervisor alerts.
+      - allOf:
+        - $ref: '#/components/schemas/BadRequestException'
+      - allOf:
+        - $ref: '#/components/schemas/LimitExceededException'
+      - allOf:
+        - $ref: '#/components/schemas/InternalFailureException'
+      - allOf:
+        - $ref: '#/components/schemas/ConflictException'
+      - allOf:
+        - $ref: '#/components/schemas/ServiceUnavailableException'
+      description: |-
+        Contains detailed information about your real-time Call Analytics session. These details are provided in the `UtteranceEvent` and `CategoryEvent` objects.
+    ChannelDefinitions:
+      type: array
+      items:
+        $ref: '#/components/schemas/ChannelDefinition'
     ChannelId:
       type: integer
       default: 0
       minimum: 0
       maximum: 1
+    ClinicalNoteGenerationStatus:
+      type: string
+      enum:
+      - IN_PROGRESS
+      - FAILED
+      - COMPLETED
+    Confidence:
+      type: number
+      format: double
+    ContentIdentificationType:
+      type: string
+      enum:
+      - PII
+    ContentRedactionOutput:
+      type: string
+      enum:
+      - redacted
+      - redacted_and_unredacted
+    ContentRedactionType:
+      type: string
+      enum:
+      - PII
+    DateTime:
+      type: string
+      format: date-time
+    Double:
+      type: number
+      format: double
+      default: 0
+    EntityList:
+      type: array
+      items:
+        $ref: '#/components/schemas/Entity'
     IamRoleArn:
       type: string
       pattern: ^arn:(aws|aws-cn|aws-us-gov|aws-iso-{0,1}[a-z]{0,1}):iam::[0-9]{0,63}:role/[A-Za-z0-9:_/+=,@.-]{0,1024}$
@@ -74,29 +176,252 @@ components:
       maxLength: 2048
     Integer:
       type: integer
+    IssuesDetected:
+      type: array
+      items:
+        $ref: '#/components/schemas/IssueDetected'
+    ItemList:
+      type: array
+      items:
+        $ref: '#/components/schemas/Item'
+    ItemType:
+      type: string
+      enum:
+      - pronunciation
+      - punctuation
+    KMSEncryptionContextMap:
+      type: object
+      additionalProperties:
+        $ref: '#/components/schemas/NonEmptyString'
     KMSKeyId:
       type: string
       pattern: ^[A-Za-z0-9][A-Za-z0-9:_/+=,@.-]{0,2048}$
       minLength: 1
       maxLength: 2048
+    LanguageCode:
+      type: string
+      enum:
+      - en-US
+      - en-GB
+      - es-US
+      - fr-CA
+      - fr-FR
+      - en-AU
+      - it-IT
+      - de-DE
+      - pt-BR
+      - ja-JP
+      - ko-KR
+      - zh-CN
+      - th-TH
+      - es-ES
+      - ar-SA
+      - pt-PT
+      - ca-ES
+      - ar-AE
+      - hi-IN
+      - zh-HK
+      - nl-NL
+      - no-NO
+      - sv-SE
+      - pl-PL
+      - fi-FI
+      - zh-TW
+      - en-IN
+      - en-IE
+      - en-NZ
+      - en-AB
+      - en-ZA
+      - en-WL
+      - de-CH
+      - af-ZA
+      - eu-ES
+      - hr-HR
+      - cs-CZ
+      - da-DK
+      - fa-IR
+      - gl-ES
+      - el-GR
+      - he-IL
+      - id-ID
+      - lv-LV
+      - ms-MY
+      - ro-RO
+      - ru-RU
+      - sr-RS
+      - sk-SK
+      - so-SO
+      - tl-PH
+      - uk-UA
+      - vi-VN
+      - zu-ZA
+    LanguageIdentification:
+      type: array
+      items:
+        $ref: '#/components/schemas/LanguageWithScore'
     LanguageOptions:
       type: string
       pattern: ^[a-zA-Z-,]+$
       minLength: 1
       maxLength: 200
+    Long:
+      type: integer
+      format: int64
+    MatchedCategoryDetails:
+      type: object
+      additionalProperties:
+        $ref: '#/components/schemas/PointsOfInterest'
+    MediaEncoding:
+      type: string
+      enum:
+      - pcm
+      - ogg-opus
+      - flac
     MediaSampleRateHertz:
       type: integer
       minimum: 8000
       maximum: 48000
+    MedicalAlternativeList:
+      type: array
+      items:
+        $ref: '#/components/schemas/MedicalAlternative'
+    MedicalContentIdentificationType:
+      type: string
+      enum:
+      - PHI
+    MedicalEntityList:
+      type: array
+      items:
+        $ref: '#/components/schemas/MedicalEntity'
+    MedicalItemList:
+      type: array
+      items:
+        $ref: '#/components/schemas/MedicalItem'
+    MedicalResultList:
+      type: array
+      items:
+        $ref: '#/components/schemas/MedicalResult'
+    MedicalScribeChannelDefinitions:
+      type: array
+      items:
+        $ref: '#/components/schemas/MedicalScribeChannelDefinition'
     MedicalScribeChannelId:
       type: integer
       default: 0
       minimum: 0
       maximum: 1
+    MedicalScribeInputStream:
+      allOf:
+      - allOf:
+        - $ref: '#/components/schemas/MedicalScribeAudioEvent'
+      - allOf:
+        - $ref: '#/components/schemas/MedicalScribeSessionControlEvent'
+        description: |-
+          Specify the lifecycle of your streaming session, such as ending the session.
+      - allOf:
+        - $ref: '#/components/schemas/MedicalScribeConfigurationEvent'
+        description: |-
+          Specify additional streaming session configurations beyond those provided in your initial start request headers. For example, specify channel definitions, encryption settings, and post-stream analytics settings.
+
+          Whether you are starting a new session or resuming an existing session, your first event must be a `MedicalScribeConfigurationEvent`.
+      description: |-
+        An encoded stream of events. The stream is encoded as HTTP/2 data frames.
+
+        An input stream consists of the following types of events. The first element of the input stream must be the `MedicalScribeConfigurationEvent` event type.
+
+          * `MedicalScribeConfigurationEvent`
+
+          * `MedicalScribeAudioEvent`
+
+          * `MedicalScribeSessionControlEvent`
+    MedicalScribeLanguageCode:
+      type: string
+      enum:
+      - en-US
+    MedicalScribeMediaEncoding:
+      type: string
+      enum:
+      - pcm
+      - ogg-opus
+      - flac
     MedicalScribeMediaSampleRateHertz:
       type: integer
       minimum: 16000
       maximum: 48000
+    MedicalScribeNoteTemplate:
+      type: string
+      enum:
+      - HISTORY_AND_PHYSICAL
+      - GIRPP
+    MedicalScribeParticipantRole:
+      type: string
+      enum:
+      - PATIENT
+      - CLINICIAN
+    MedicalScribeResultStream:
+      allOf:
+      - allOf:
+        - $ref: '#/components/schemas/MedicalScribeTranscriptEvent'
+        description: |-
+          The transcript event that contains real-time transcription results.
+      - allOf:
+        - $ref: '#/components/schemas/BadRequestException'
+      - allOf:
+        - $ref: '#/components/schemas/LimitExceededException'
+      - allOf:
+        - $ref: '#/components/schemas/InternalFailureException'
+      - allOf:
+        - $ref: '#/components/schemas/ConflictException'
+      - allOf:
+        - $ref: '#/components/schemas/ServiceUnavailableException'
+      description: |-
+        Result stream where you will receive the output events. The details are provided in the `MedicalScribeTranscriptEvent` object.
+    MedicalScribeSessionControlEventType:
+      type: string
+      enum:
+      - END_OF_SESSION
+    MedicalScribeStreamStatus:
+      type: string
+      enum:
+      - IN_PROGRESS
+      - PAUSED
+      - FAILED
+      - COMPLETED
+    MedicalScribeTranscriptItemList:
+      type: array
+      items:
+        $ref: '#/components/schemas/MedicalScribeTranscriptItem'
+    MedicalScribeTranscriptItemType:
+      type: string
+      enum:
+      - pronunciation
+      - punctuation
+    MedicalScribeVocabularyFilterMethod:
+      type: string
+      enum:
+      - remove
+      - mask
+      - tag
+    MedicalTranscriptResultStream:
+      allOf:
+      - allOf:
+        - $ref: '#/components/schemas/MedicalTranscriptEvent'
+        description: |-
+          The `MedicalTranscriptEvent` associated with a `MedicalTranscriptResultStream`.
+
+          Contains a set of transcription results from one or more audio segments, along with additional information per your request parameters. This can include information relating to alternative transcriptions, channel identification, partial result stabilization, language identification, and other transcription-related data.
+      - allOf:
+        - $ref: '#/components/schemas/BadRequestException'
+      - allOf:
+        - $ref: '#/components/schemas/LimitExceededException'
+      - allOf:
+        - $ref: '#/components/schemas/InternalFailureException'
+      - allOf:
+        - $ref: '#/components/schemas/ConflictException'
+      - allOf:
+        - $ref: '#/components/schemas/ServiceUnavailableException'
+      description: |-
+        Contains detailed information about your streaming session.
     ModelName:
       type: string
       pattern: ^[0-9a-zA-Z._-]+$
@@ -112,6 +437,17 @@ components:
     NumberOfChannels:
       type: integer
       minimum: 2
+    PartialResultsStability:
+      type: string
+      enum:
+      - high
+      - medium
+      - low
+    ParticipantRole:
+      type: string
+      enum:
+      - AGENT
+      - CUSTOMER
     PiiEntityTypes:
       type: string
       pattern: ^[A-Z_, ]+$
@@ -119,20 +455,87 @@ components:
       maxLength: 300
     RequestId:
       type: string
+    ResultList:
+      type: array
+      items:
+        $ref: '#/components/schemas/Result'
+    Sentiment:
+      type: string
+      enum:
+      - POSITIVE
+      - NEGATIVE
+      - MIXED
+      - NEUTRAL
     SessionId:
       type: string
       pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
       minLength: 36
       maxLength: 36
+    Specialty:
+      type: string
+      enum:
+      - PRIMARYCARE
+      - CARDIOLOGY
+      - NEUROLOGY
+      - ONCOLOGY
+      - RADIOLOGY
+      - UROLOGY
     Stable:
       type: boolean
     String:
       type: string
+    StringList:
+      type: array
+      items:
+        $ref: '#/components/schemas/String'
+    TimestampRanges:
+      type: array
+      items:
+        $ref: '#/components/schemas/TimestampRange'
+    TranscriptResultStream:
+      allOf:
+      - allOf:
+        - $ref: '#/components/schemas/TranscriptEvent'
+        description: |-
+          Contains `Transcript`, which contains `Results`. The `` object contains a set of transcription results from one or more audio segments, along with additional information per your request parameters.
+      - allOf:
+        - $ref: '#/components/schemas/BadRequestException'
+        description: |-
+          A client error occurred when the stream was created. Check the parameters of the request and try your request again.
+      - allOf:
+        - $ref: '#/components/schemas/LimitExceededException'
+        description: |-
+          Your client has exceeded one of the Amazon Transcribe limits. This is typically the audio length limit. Break your audio stream into smaller chunks and try your request again.
+      - allOf:
+        - $ref: '#/components/schemas/InternalFailureException'
+        description: |-
+          A problem occurred while processing the audio. Amazon Transcribe terminated processing.
+      - allOf:
+        - $ref: '#/components/schemas/ConflictException'
+        description: |-
+          A new stream started with the same session ID. The current stream has been terminated.
+      - allOf:
+        - $ref: '#/components/schemas/ServiceUnavailableException'
+        description: |-
+          The service is currently unavailable. Try your request later.
+      description: |-
+        Contains detailed information about your streaming session.
+    Type:
+      type: string
+      enum:
+      - CONVERSATION
+      - DICTATION
     Uri:
       type: string
       pattern: ^(s3://|http(s*)://).+$
       minLength: 1
       maxLength: 2000
+    VocabularyFilterMethod:
+      type: string
+      enum:
+      - remove
+      - mask
+      - tag
     VocabularyFilterName:
       type: string
       pattern: ^[0-9a-zA-Z._-]+$

@@ -53,16 +53,42 @@ components:
       pattern: ^[a-zA-Z0-9:*/-]+$
       minLength: 1
       maxLength: 2048
+    AmiProductEntityIdFilterValueList:
+      type: array
+      items:
+        $ref: '#/components/schemas/AmiProductEntityIdString'
     AmiProductEntityIdString:
       type: string
       pattern: ^[a-zA-Z0-9][.a-zA-Z0-9/-]+[a-zA-Z0-9]$
       minLength: 1
       maxLength: 255
+    AmiProductSortBy:
+      type: string
+      enum:
+      - EntityId
+      - LastModifiedDate
+      - ProductTitle
+      - Visibility
+    AmiProductTitleFilterValueList:
+      type: array
+      items:
+        $ref: '#/components/schemas/AmiProductTitleString'
     AmiProductTitleString:
       type: string
       pattern: ^(.)+$
       minLength: 1
       maxLength: 255
+    AmiProductVisibilityFilterValueList:
+      type: array
+      items:
+        $ref: '#/components/schemas/AmiProductVisibilityString'
+    AmiProductVisibilityString:
+      type: string
+      enum:
+      - Limited
+      - Public
+      - Restricted
+      - Draft
     BatchDescribeErrorCodeString:
       type: string
       pattern: ^[a-zA-Z_]+$
@@ -83,11 +109,27 @@ components:
       pattern: ^[a-zA-Z]$
       minLength: 1
       maxLength: 72
+    ChangeSetDescription:
+      type: array
+      items:
+        $ref: '#/components/schemas/ChangeSummary'
     ChangeSetName:
       type: string
       pattern: ^[\w\s+=.:@-]+$
       minLength: 1
       maxLength: 100
+    ChangeSetSummaryList:
+      type: array
+      items:
+        $ref: '#/components/schemas/ChangeSetSummaryListItem'
+    ChangeStatus:
+      type: string
+      enum:
+      - PREPARING
+      - APPLYING
+      - SUCCEEDED
+      - CANCELLED
+      - FAILED
     ChangeType:
       type: string
       pattern: ^[A-Z][\w]*$
@@ -98,31 +140,88 @@ components:
       pattern: ^[!-~]+$
       minLength: 1
       maxLength: 64
+    ContainerProductEntityIdFilterValueList:
+      type: array
+      items:
+        $ref: '#/components/schemas/ContainerProductEntityIdString'
     ContainerProductEntityIdString:
       type: string
       pattern: ^[a-zA-Z0-9][.a-zA-Z0-9/-]+[a-zA-Z0-9]$
       minLength: 1
       maxLength: 255
+    ContainerProductSortBy:
+      type: string
+      enum:
+      - EntityId
+      - LastModifiedDate
+      - ProductTitle
+      - Visibility
+    ContainerProductTitleFilterValueList:
+      type: array
+      items:
+        $ref: '#/components/schemas/ContainerProductTitleString'
     ContainerProductTitleString:
       type: string
       pattern: ^(.)+$
       minLength: 1
       maxLength: 255
+    ContainerProductVisibilityFilterValueList:
+      type: array
+      items:
+        $ref: '#/components/schemas/ContainerProductVisibilityString'
+    ContainerProductVisibilityString:
+      type: string
+      enum:
+      - Limited
+      - Public
+      - Restricted
+      - Draft
+    DataProductEntityIdFilterValueList:
+      type: array
+      items:
+        $ref: '#/components/schemas/DataProductEntityIdString'
     DataProductEntityIdString:
       type: string
       pattern: ^[a-zA-Z0-9][.a-zA-Z0-9/-]+[a-zA-Z0-9]$
       minLength: 1
       maxLength: 255
+    DataProductSortBy:
+      type: string
+      enum:
+      - EntityId
+      - ProductTitle
+      - Visibility
+      - LastModifiedDate
+    DataProductTitleFilterValueList:
+      type: array
+      items:
+        $ref: '#/components/schemas/DataProductTitleString'
     DataProductTitleString:
       type: string
       pattern: ^(.)+$
       minLength: 1
       maxLength: 255
+    DataProductVisibilityFilterValueList:
+      type: array
+      items:
+        $ref: '#/components/schemas/DataProductVisibilityString'
+    DataProductVisibilityString:
+      type: string
+      enum:
+      - Limited
+      - Public
+      - Restricted
+      - Unavailable
+      - Draft
     DateTimeISO8601:
       type: string
       pattern: ^([\d]{4})\-(1[0-2]|0[1-9])\-(3[01]|0[1-9]|[12][\d])T(2[0-3]|[01][\d]):([0-5][\d]):([0-5][\d])Z$
       minLength: 20
       maxLength: 20
+    EntityDetails:
+      type: object
+      additionalProperties:
+        $ref: '#/components/schemas/EntityDetail'
     EntityId:
       type: string
       pattern: ^[a-zA-Z0-9][.a-zA-Z0-9/-]+[a-zA-Z0-9]$
@@ -133,21 +232,102 @@ components:
       pattern: ^\\S+[\\S\\s]*$
       minLength: 1
       maxLength: 255
+    EntityRequestList:
+      type: array
+      items:
+        $ref: '#/components/schemas/EntityRequest'
+    EntitySummaryList:
+      type: array
+      items:
+        $ref: '#/components/schemas/EntitySummary'
     EntityType:
       type: string
       pattern: ^[a-zA-Z]+$
       minLength: 1
       maxLength: 255
+    EntityTypeFilters:
+      allOf:
+      - allOf:
+        - $ref: '#/components/schemas/DataProductFilters'
+        description: |-
+          A filter for data products.
+      - allOf:
+        - $ref: '#/components/schemas/SaaSProductFilters'
+        description: |-
+          A filter for SaaS products.
+      - allOf:
+        - $ref: '#/components/schemas/AmiProductFilters'
+        description: |-
+          A filter for AMI products.
+      - allOf:
+        - $ref: '#/components/schemas/OfferFilters'
+        description: |-
+          A filter for offers.
+      - allOf:
+        - $ref: '#/components/schemas/ContainerProductFilters'
+        description: |-
+          A filter for container products.
+      - allOf:
+        - $ref: '#/components/schemas/ResaleAuthorizationFilters'
+        description: |-
+          A filter for Resale Authorizations.
+      description: |-
+        Object containing all the filter fields per entity type.
+    EntityTypeSort:
+      allOf:
+      - allOf:
+        - $ref: '#/components/schemas/DataProductSort'
+        description: |-
+          A sort for data products.
+      - allOf:
+        - $ref: '#/components/schemas/SaaSProductSort'
+        description: |-
+          A sort for SaaS products.
+      - allOf:
+        - $ref: '#/components/schemas/AmiProductSort'
+        description: |-
+          A sort for AMI products.
+      - allOf:
+        - $ref: '#/components/schemas/OfferSort'
+        description: |-
+          A sort for offers.
+      - allOf:
+        - $ref: '#/components/schemas/ContainerProductSort'
+        description: |-
+          A sort for container products.
+      - allOf:
+        - $ref: '#/components/schemas/ResaleAuthorizationSort'
+        description: |-
+          A sort for Resale Authorizations.
+      description: |-
+        Object containing all the sort fields per entity type.
     ErrorCodeString:
       type: string
       pattern: ^[a-zA-Z_]+$
       minLength: 1
       maxLength: 72
+    ErrorDetailList:
+      type: array
+      items:
+        $ref: '#/components/schemas/ErrorDetail'
+    Errors:
+      type: object
+      additionalProperties:
+        $ref: '#/components/schemas/BatchDescribeErrorDetail'
     ExceptionMessageContent:
       type: string
       pattern: ^(.)+$
       minLength: 1
       maxLength: 2048
+    FailureCode:
+      type: string
+      enum:
+      - CLIENT_ERROR
+      - SERVER_FAULT
+    FilterList:
+      type: array
+      items:
+        $ref: '#/components/schemas/Filter'
     FilterName:
       type: string
       pattern: ^[a-zA-Z]+$
@@ -163,11 +343,19 @@ components:
       pattern: ^[\w\-@]+$
       minLength: 1
       maxLength: 255
+    Intent:
+      type: string
+      enum:
+      - VALIDATE
+      - APPLY
     Json:
       type: string
       pattern: ^[\s]*\{[\s\S]*\}[\s]*$
       minLength: 2
       maxLength: 16384
+    JsonDocumentType:
+      type: object
+      additionalProperties: true
     ListChangeSetsMaxResultInteger:
       type: integer
       minimum: 1
@@ -186,36 +374,118 @@ components:
       pattern: ^(.)+$
       minLength: 1
       maxLength: 255
+    OfferBuyerAccountsList:
+      type: array
+      items:
+        $ref: '#/components/schemas/OfferBuyerAccountsString'
     OfferBuyerAccountsString:
       type: string
       pattern: ^\d{12}$
       minLength: 12
       maxLength: 12
+    OfferEntityIdFilterValueList:
+      type: array
+      items:
+        $ref: '#/components/schemas/OfferEntityIdString'
     OfferEntityIdString:
       type: string
       pattern: ^[a-zA-Z0-9][.a-zA-Z0-9/-]+[a-zA-Z0-9]$
       minLength: 1
       maxLength: 255
+    OfferNameFilterValueList:
+      type: array
+      items:
+        $ref: '#/components/schemas/OfferNameString'
     OfferNameString:
       type: string
       pattern: ^(.)+$
       minLength: 1
       maxLength: 150
+    OfferProductIdFilterValueList:
+      type: array
+      items:
+        $ref: '#/components/schemas/OfferProductIdString'
     OfferProductIdString:
       type: string
       pattern: ^(.)+$
       minLength: 1
       maxLength: 255
+    OfferResaleAuthorizationIdFilterValueList:
+      type: array
+      items:
+        $ref: '#/components/schemas/OfferResaleAuthorizationIdString'
     OfferResaleAuthorizationIdString:
       type: string
       pattern: ^[a-zA-Z0-9][.a-zA-Z0-9/-]+[a-zA-Z0-9]$
       minLength: 1
       maxLength: 255
+    OfferSortBy:
+      type: string
+      enum:
+      - EntityId
+      - Name
+      - ProductId
+      - ResaleAuthorizationId
+      - ReleaseDate
+      - AvailabilityEndDate
+      - BuyerAccounts
+      - State
+      - Targeting
+      - LastModifiedDate
+    OfferStateFilterValueList:
+      type: array
+      items:
+        $ref: '#/components/schemas/OfferStateString'
+    OfferStateString:
+      type: string
+      enum:
+      - Draft
+      - Released
+    OfferTargetingFilterValueList:
+      type: array
+      items:
+        $ref: '#/components/schemas/OfferTargetingString'
+    OfferTargetingList:
+      type: array
+      items:
+        $ref: '#/components/schemas/OfferTargetingString'
+    OfferTargetingString:
+      type: string
+      enum:
+      - BuyerAccounts
+      - ParticipatingPrograms
+      - CountryCodes
+      - None
+    OwnershipType:
+      type: string
+      enum:
+      - SELF
+      - SHARED
+    RequestedChangeList:
+      type: array
+      items:
+        $ref: '#/components/schemas/Change'
+    ResaleAuthorizationAvailabilityEndDateFilterValueList:
+      type: array
+      items:
+        $ref: '#/components/schemas/DateTimeISO8601'
+    ResaleAuthorizationCreatedDateFilterValueList:
+      type: array
+      items:
+        $ref: '#/components/schemas/DateTimeISO8601'
+    ResaleAuthorizationEntityIdFilterValueList:
+      type: array
+      items:
+        $ref: '#/components/schemas/ResaleAuthorizationEntityIdString'
     ResaleAuthorizationEntityIdString:
       type: string
       pattern: ^[a-zA-Z0-9][.a-zA-Z0-9/-]+[a-zA-Z0-9]$
       minLength: 1
       maxLength: 255
+    ResaleAuthorizationManufacturerAccountIdFilterValueList:
+      type: array
+      items:
+        $ref: '#/components/schemas/ResaleAuthorizationManufacturerAccountIdString'
     ResaleAuthorizationManufacturerAccountIdFilterWildcard:
       type: string
       pattern: ^\d{12}$
@@ -226,6 +496,10 @@ components:
       pattern: ^\d{12}$
       minLength: 12
       maxLength: 12
+    ResaleAuthorizationManufacturerLegalNameFilterValueList:
+      type: array
+      items:
+        $ref: '#/components/schemas/ResaleAuthorizationManufacturerLegalNameString'
     ResaleAuthorizationManufacturerLegalNameFilterWildcard:
       type: string
       pattern: ^(.)+$
@@ -236,6 +510,10 @@ components:
       pattern: ^(.)+$
       minLength: 1
       maxLength: 255
+    ResaleAuthorizationNameFilterValueList:
+      type: array
+      items:
+        $ref: '#/components/schemas/ResaleAuthorizationNameString'
     ResaleAuthorizationNameFilterWildcard:
       type: string
       pattern: ^(.)+$
@@ -246,11 +524,19 @@ components:
       pattern: ^(.)+$
       minLength: 1
       maxLength: 255
+    ResaleAuthorizationOfferExtendedStatusFilterValueList:
+      type: array
+      items:
+        $ref: '#/components/schemas/ResaleAuthorizationOfferExtendedStatusString'
     ResaleAuthorizationOfferExtendedStatusString:
       type: string
       pattern: ^(.)+$
       minLength: 1
       maxLength: 255
+    ResaleAuthorizationProductIdFilterValueList:
+      type: array
+      items:
+        $ref: '#/components/schemas/ResaleAuthorizationProductIdString'
     ResaleAuthorizationProductIdFilterWildcard:
       type: string
       pattern: ^(.)+$
@@ -261,6 +547,10 @@ components:
       pattern: ^(.)+$
       minLength: 1
       maxLength: 255
+    ResaleAuthorizationProductNameFilterValueList:
+      type: array
+      items:
+        $ref: '#/components/schemas/ResaleAuthorizationProductNameString'
     ResaleAuthorizationProductNameFilterWildcard:
       type: string
       pattern: ^(.)+$
@@ -271,6 +561,10 @@ components:
       pattern: ^(.)+$
       minLength: 1
       maxLength: 255
+    ResaleAuthorizationResellerAccountIDFilterValueList:
+      type: array
+      items:
+        $ref: '#/components/schemas/ResaleAuthorizationResellerAccountIDString'
     ResaleAuthorizationResellerAccountIDFilterWildcard:
       type: string
       pattern: ^\d{12}$
@@ -281,6 +575,10 @@ components:
       pattern: ^\d{12}$
       minLength: 12
       maxLength: 12
+    ResaleAuthorizationResellerLegalNameFilterValueList:
+      type: array
+      items:
+        $ref: '#/components/schemas/ResaleAuthorizationResellerLegalNameString'
     ResaleAuthorizationResellerLegalNameFilterWildcard:
       type: string
       pattern: ^(.)+$
@@ -291,6 +589,32 @@ components:
       pattern: ^(.)+$
       minLength: 1
       maxLength: 255
+    ResaleAuthorizationSortBy:
+      type: string
+      enum:
+      - EntityId
+      - Name
+      - ProductId
+      - ProductName
+      - ManufacturerAccountId
+      - ManufacturerLegalName
+      - ResellerAccountID
+      - ResellerLegalName
+      - Status
+      - OfferExtendedStatus
+      - CreatedDate
+      - AvailabilityEndDate
+      - LastModifiedDate
+    ResaleAuthorizationStatusFilterValueList:
+      type: array
+      items:
+        $ref: '#/components/schemas/ResaleAuthorizationStatusString'
+    ResaleAuthorizationStatusString:
+      type: string
+      enum:
+      - Draft
+      - Active
+      - Restricted
     ResourceARN:
       type: string
       pattern: ^arn:[\w+=/,.@-]+:aws-marketplace:[\w+=/,.@-]*:[0-9]+:[\w+=,.@-]+(/[\w+=,.@-]+)*$
@@ -301,36 +625,83 @@ components:
       pattern: ^[\w\-]+$
       minLength: 1
       maxLength: 255
+    ResourceIdList:
+      type: array
+      items:
+        $ref: '#/components/schemas/ResourceId'
     ResourcePolicyJson:
       type: string
       pattern: ^[\u0009\u000A\u000D\u0020-\u00FF]+$
       minLength: 1
       maxLength: 10240
+    SaaSProductEntityIdFilterValueList:
+      type: array
+      items:
+        $ref: '#/components/schemas/SaaSProductEntityIdString'
     SaaSProductEntityIdString:
       type: string
       pattern: ^[a-zA-Z0-9][.a-zA-Z0-9/-]+[a-zA-Z0-9]$
       minLength: 1
       maxLength: 255
+    SaaSProductSortBy:
+      type: string
+      enum:
+      - EntityId
+      - ProductTitle
+      - Visibility
+      - LastModifiedDate
+    SaaSProductTitleFilterValueList:
+      type: array
+      items:
+        $ref: '#/components/schemas/SaaSProductTitleString'
     SaaSProductTitleString:
       type: string
       pattern: ^(.)+$
       minLength: 1
       maxLength: 255
+    SaaSProductVisibilityFilterValueList:
+      type: array
+      items:
+        $ref: '#/components/schemas/SaaSProductVisibilityString'
+    SaaSProductVisibilityString:
+      type: string
+      enum:
+      - Limited
+      - Public
+      - Restricted
+      - Draft
     SortBy:
       type: string
       pattern: ^[a-zA-Z]+$
       minLength: 1
       maxLength: 255
+    SortOrder:
+      type: string
+      enum:
+      - ASCENDING
+      - DESCENDING
     TagKey:
       type: string
       pattern: ^([\p{L}\p{Z}\p{N}_.:/=+\-@]*)$
       minLength: 1
       maxLength: 128
+    TagKeyList:
+      type: array
+      items:
+        $ref: '#/components/schemas/TagKey'
+    TagList:
+      type: array
+      items:
+        $ref: '#/components/schemas/Tag'
     TagValue:
       type: string
       pattern: ^([\p{L}\p{Z}\p{N}_.:/=+\-@]*)$
       minLength: 0
       maxLength: 256
+    ValueList:
+      type: array
+      items:
+        $ref: '#/components/schemas/FilterValueContent'
     VisibilityValue:
       type: string
       pattern: ^[a-zA-Z]+$

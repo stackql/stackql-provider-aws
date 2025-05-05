@@ -46,6 +46,12 @@ servers:
 paths: {}
 components:
   schemas:
+    BodyBlob:
+      type: string
+      format: byte
+      minLength: 0
+      maxLength: 6291456
+      x-sensitive: true
     CustomAttributesHeader:
       type: string
       pattern: ^\p{ASCII}*$
@@ -98,10 +104,34 @@ components:
       pattern: ^[a-zA-Z0-9](-*[a-zA-Z0-9])*;\sExpires=[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}Z$
       minLength: 0
       maxLength: 256
+    PartBlob:
+      type: string
+      format: byte
+      x-sensitive: true
     RequestTTLSecondsHeader:
       type: integer
       minimum: 60
       maximum: 21600
+    ResponseStream:
+      allOf:
+      - allOf:
+        - $ref: '#/components/schemas/PayloadPart'
+        description: |-
+          A wrapper for pieces of the payload that's returned in response to a streaming inference request. A streaming inference response consists of one or more payload parts.
+      - allOf:
+        - $ref: '#/components/schemas/ModelStreamError'
+        description: "An error occurred while streaming the response body. This error\
+          \ can have the following error codes:\n\nModelInvocationTimeExceeded\n\n\
+          \    \n\nThe model failed to finish sending the response within the timeout\
+          \ period allowed by Amazon SageMaker.\n\nStreamBroken\n\n    \n\nThe Transmission\
+          \ Control Protocol (TCP) connection between the client and the model was\
+          \ reset or closed."
+      - allOf:
+        - $ref: '#/components/schemas/InternalStreamFailure'
+        description: |-
+          The stream processing failed because of an unknown error, exception or failure. Try your request again.
+      description: |-
+        A stream of payload parts. Each part contains a portion of the response for a streaming inference request.
     SessionIdHeader:
       type: string
       pattern: ^[a-zA-Z0-9](-*[a-zA-Z0-9])*$

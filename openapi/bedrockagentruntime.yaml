@@ -46,18 +46,71 @@ servers:
 paths: {}
 components:
   schemas:
+    APISchema:
+      allOf:
+      - allOf:
+        - $ref: '#/components/schemas/S3Identifier'
+        description: |-
+          Contains details about the S3 object containing the OpenAPI schema for the action group.
+      - allOf:
+        - $ref: '#/components/schemas/Payload'
+        description: |-
+          The JSON or YAML-formatted payload defining the OpenAPI schema for the action group.
+      description: |-
+        Contains details about the OpenAPI schema for the action group. For more information, see [Action group OpenAPI schemas](https://docs.aws.amazon.com/bedrock/latest/userguide/agents-api-schema.html). You can either include the schema directly in the payload field or you can upload it to an S3 bucket and specify the S3 bucket location in the s3 field.
     AWSResourceARN:
       type: string
       pattern: ^arn:aws(-[^:]+)?:bedrock:[a-z0-9-]{1,20}:[0-9]{12}:agent/[0-9a-zA-Z]{10}$
       maxLength: 2048
+    ActionGroupExecutor:
+      allOf:
+      - allOf:
+        - $ref: '#/components/schemas/LambdaResourceArn'
+        description: |-
+          The Amazon Resource Name (ARN) of the Lambda function containing the business logic that is carried out upon invoking the action.
+      - allOf:
+        - $ref: '#/components/schemas/CustomControlMethod'
+        description: |-
+          To return the action group invocation results directly in the `InvokeInlineAgent` response, specify `RETURN_CONTROL`.
+      description: |-
+        Contains details about the Lambda function containing the business logic that is carried out upon invoking the action or the custom control method for handling the information elicited from the user.
     ActionGroupName:
       type: string
     ActionGroupOutputString:
       type: string
+    ActionGroupSignature:
+      type: string
+      enum:
+      - AMAZON.UserInput
+      - AMAZON.CodeInterpreter
+      - ANTHROPIC.Computer
+      - ANTHROPIC.Bash
+      - ANTHROPIC.TextEditor
+    ActionGroupSignatureParams:
+      type: object
+      additionalProperties:
+        $ref: '#/components/schemas/String'
+    ActionInvocationType:
+      type: string
+      enum:
+      - RESULT
+      - USER_CONFIRMATION
+      - USER_CONFIRMATION_AND_RESULT
+    AdditionalModelRequestFields:
+      type: object
+      additionalProperties:
+        $ref: '#/components/schemas/AdditionalModelRequestFieldsValue'
     AdditionalModelRequestFieldsKey:
       type: string
       minLength: 1
       maxLength: 100
+    AdditionalModelRequestFieldsValue:
+      type: object
+      additionalProperties: true
+    AgentActionGroups:
+      type: array
+      items:
+        $ref: '#/components/schemas/AgentActionGroup'
     AgentAliasArn:
       type: string
       pattern: ^arn:aws(-[^:]+)?:bedrock:[a-z0-9-]{1,20}:[0-9]{12}:agent-alias/[0-9a-zA-Z]{10}/[0-9a-zA-Z]{10}$
@@ -66,6 +119,12 @@ components:
       type: string
       pattern: ^[0-9a-zA-Z]+$
       maxLength: 10
+    AgentCollaboration:
+      type: string
+      enum:
+      - SUPERVISOR
+      - SUPERVISOR_ROUTER
+      - DISABLED
     AgentCollaboratorPayloadString:
       type: string
     AgentId:
@@ -77,8 +136,23 @@ components:
       pattern: ^(DRAFT|[0-9]{0,4}[1-9][0-9]{0,4})$
       minLength: 1
       maxLength: 5
+    ApiContentMap:
+      type: object
+      additionalProperties:
+        $ref: '#/components/schemas/PropertyParameters'
+    ApiParameters:
+      type: array
+      items:
+        $ref: '#/components/schemas/ApiParameter'
     ApiPath:
       type: string
+    AttributeType:
+      type: string
+      enum:
+      - STRING
+      - NUMBER
+      - BOOLEAN
+      - STRING_LIST
     BasePromptTemplate:
       type: string
       minLength: 1
@@ -93,25 +167,160 @@ components:
       pattern: ^(arn:aws(-[^:]+)?:bedrock:[a-z0-9-]{1,20}::foundation-model/(.*))?$
       minLength: 1
       maxLength: 2048
+    BedrockSessionContentBlock:
+      allOf:
+      - allOf:
+        - $ref: '#/components/schemas/String'
+        description: |-
+          The text in the invocation step.
+      - allOf:
+        - $ref: '#/components/schemas/ImageBlock'
+        description: |-
+          The image in the invocation step.
+      description: |-
+        A block of content that you pass to, or receive from, a Amazon Bedrock session in an invocation step. You pass the content to a session in the `payLoad` of the [PutInvocationStep](https://docs.aws.amazon.com/bedrock/latest/APIReference/API_agent-runtime_PutInvocationStep.html) API operation. You retrieve the content with the [GetInvocationStep](https://docs.aws.amazon.com/bedrock/latest/APIReference/API_agent-runtime_GetInvocationStep.html) API operation.
+
+        For more information about sessions, see [Store and retrieve conversation history and context with Amazon Bedrock sessions](https://docs.aws.amazon.com/bedrock/latest/userguide/sessions.html).
+      x-sensitive: true
+    BedrockSessionContentBlocks:
+      type: array
+      items:
+        $ref: '#/components/schemas/BedrockSessionContentBlock'
+    ByteContentBlob:
+      type: string
+      format: byte
+      minLength: 1
+      maxLength: 10485760
+      x-sensitive: true
+    Caller:
+      allOf:
+      - allOf:
+        - $ref: '#/components/schemas/AgentAliasArn'
+        description: |-
+          The caller's agent alias ARN.
+      description: |-
+        Details about a caller.
+    CallerChain:
+      type: array
+      items:
+        $ref: '#/components/schemas/Caller'
+    Citations:
+      type: array
+      items:
+        $ref: '#/components/schemas/Citation'
     CollaborationInstruction:
       type: string
       minLength: 1
       maxLength: 4000
+    CollaboratorConfigurations:
+      type: array
+      items:
+        $ref: '#/components/schemas/CollaboratorConfiguration'
+    Collaborators:
+      type: array
+      items:
+        $ref: '#/components/schemas/Collaborator'
+    ConfirmationState:
+      type: string
+      enum:
+      - CONFIRM
+      - DENY
+    ContentBlock:
+      allOf:
+      - allOf:
+        - $ref: '#/components/schemas/String'
+        description: |-
+          The block's text.
+      description: |-
+        A content block.
+      x-sensitive: true
+    ContentBlocks:
+      type: array
+      items:
+        $ref: '#/components/schemas/ContentBlock'
+    ContentMap:
+      type: object
+      additionalProperties:
+        $ref: '#/components/schemas/Parameters'
     ContentType:
       type: string
       pattern: '[a-z]{1,20}/.{1,20}'
+    ConversationRole:
+      type: string
+      enum:
+      - user
+      - assistant
+    CreationMode:
+      type: string
+      enum:
+      - DEFAULT
+      - OVERRIDDEN
+    CustomControlMethod:
+      type: string
+      enum:
+      - RETURN_CONTROL
+    DateTimestamp:
+      type: string
+      format: date-time
+      description: Time Stamp.
+    ExecutionType:
+      type: string
+      enum:
+      - LAMBDA
+      - RETURN_CONTROL
+    ExternalSourceType:
+      type: string
+      enum:
+      - S3
+      - BYTE_CONTENT
+    ExternalSources:
+      type: array
+      items:
+        $ref: '#/components/schemas/ExternalSource'
     FailureReasonString:
       type: string
+    FieldsForReranking:
+      type: array
+      items:
+        $ref: '#/components/schemas/FieldForReranking'
+      x-sensitive: true
+    FileBody:
+      type: string
+      format: byte
+      maxLength: 1000000
+      x-sensitive: true
+    FileSourceType:
+      type: string
+      enum:
+      - S3
+      - BYTE_CONTENT
+    FileUseCase:
+      type: string
+      enum:
+      - CODE_INTERPRETER
+      - CHAT
+    Files:
+      type: array
+      items:
+        type: string
     FilterKey:
       type: string
       minLength: 1
       maxLength: 100
+    FilterValue:
+      type: object
+      additionalProperties: true
     FinalResponseString:
       type: string
     FlowAliasIdentifier:
       type: string
       pattern: ^(arn:aws:bedrock:[a-z0-9-]{1,20}:[0-9]{12}:flow/[0-9a-zA-Z]{10}/alias/[0-9a-zA-Z]{10})|(\bTSTALIASID\b|[0-9a-zA-Z]+)$
       maxLength: 2048
+    FlowCompletionReason:
+      type: string
+      enum:
+      - SUCCESS
+      - INPUT_REQUIRED
     FlowExecutionId:
       type: string
       pattern: ^[0-9a-zA-Z._:-]+$
@@ -121,25 +330,413 @@ components:
       type: string
       pattern: ^(arn:aws:bedrock:[a-z0-9-]{1,20}:[0-9]{12}:flow/[0-9a-zA-Z]{10})|([0-9a-zA-Z]{10})$
       maxLength: 2048
+    FlowInputContent:
+      allOf:
+      - allOf:
+        - $ref: '#/components/schemas/Document'
+        description: |-
+          The input to send to the prompt flow input node.
+      description: |-
+        Contains information about an input into the flow.
+      x-sensitive: true
+    FlowInputs:
+      type: array
+      items:
+        $ref: '#/components/schemas/FlowInput'
+    FlowMultiTurnInputContent:
+      allOf:
+      - allOf:
+        - $ref: '#/components/schemas/Document'
+        description: |-
+          The requested additional input to send back to the multi-turn flow node.
+      description: |-
+        The content structure containing input information for multi-turn flow interactions.
+    FlowOutputContent:
+      allOf:
+      - allOf:
+        - $ref: '#/components/schemas/Document'
+        description: |-
+          The content in the output.
+      description: |-
+        Contains information about the content in an output from prompt flow invocation.
+    FlowResponseStream:
+      allOf:
+      - allOf:
+        - $ref: '#/components/schemas/FlowOutputEvent'
+        description: |-
+          Contains information about an output from flow invocation.
+      - allOf:
+        - $ref: '#/components/schemas/FlowCompletionEvent'
+        description: |-
+          Contains information about why the flow completed.
+      - allOf:
+        - $ref: '#/components/schemas/FlowTraceEvent'
+        description: |-
+          Contains information about a trace, which tracks an input or output for a node in the flow.
+      - allOf:
+        - $ref: '#/components/schemas/InternalServerException'
+        description: |-
+          An internal server error occurred. Retry your request.
+      - allOf:
+        - $ref: '#/components/schemas/ValidationException'
+        description: |-
+          Input validation failed. Check your request parameters and retry the request.
+      - allOf:
+        - $ref: '#/components/schemas/ResourceNotFoundException'
+        description: |-
+          The specified resource Amazon Resource Name (ARN) was not found. Check the Amazon Resource Name (ARN) and try your request again.
+      - allOf:
+        - $ref: '#/components/schemas/ServiceQuotaExceededException'
+        description: |-
+          The number of requests exceeds the service quota. Resubmit your request later.
+      - allOf:
+        - $ref: '#/components/schemas/ThrottlingException'
+        description: |-
+          The number of requests exceeds the limit. Resubmit your request later.
+      - allOf:
+        - $ref: '#/components/schemas/AccessDeniedException'
+        description: |-
+          The request is denied because of missing access permissions. Check your permissions and retry your request.
+      - allOf:
+        - $ref: '#/components/schemas/ConflictException'
+        description: |-
+          There was a conflict performing an operation. Resolve the conflict and retry your request.
+      - allOf:
+        - $ref: '#/components/schemas/DependencyFailedException'
+        description: |-
+          There was an issue with a dependency. Check the resource configurations and retry the request.
+      - allOf:
+        - $ref: '#/components/schemas/BadGatewayException'
+        description: |-
+          There was an issue with a dependency due to a server issue. Retry your request.
+      - allOf:
+        - $ref: '#/components/schemas/FlowMultiTurnInputRequestEvent'
+        description: |-
+          The event stream containing the multi-turn input request information from the flow.
+      description: |-
+        The output of the flow.
+    FlowTrace:
+      allOf:
+      - allOf:
+        - $ref: '#/components/schemas/FlowTraceNodeInputEvent'
+        description: |-
+          Contains information about the input into a node.
+      - allOf:
+        - $ref: '#/components/schemas/FlowTraceNodeOutputEvent'
+        description: |-
+          Contains information about the output from a node.
+      - allOf:
+        - $ref: '#/components/schemas/FlowTraceConditionNodeResultEvent'
+        description: |-
+          Contains information about an output from a condition node.
+      - allOf:
+        - $ref: '#/components/schemas/FlowTraceNodeActionEvent'
+        description: |-
+          Contains information about an action (operation) called by a node. For more information, see [Track each step in your prompt flow by viewing its trace in Amazon Bedrock](https://docs.aws.amazon.com/bedrock/latest/userguide/flows-trace.html).
+      description: |-
+        Contains information about an input or output for a node in the flow. For more information, see [Track each step in your prompt flow by viewing its trace in Amazon Bedrock](https://docs.aws.amazon.com/bedrock/latest/userguide/flows-trace.html).
+      x-sensitive: true
+    FlowTraceConditions:
+      type: array
+      items:
+        $ref: '#/components/schemas/FlowTraceCondition'
+    FlowTraceNodeInputContent:
+      allOf:
+      - allOf:
+        - $ref: '#/components/schemas/Document'
+        description: |-
+          The content of the node input.
+      description: |-
+        Contains the content of the node input. For more information, see [Track each step in your prompt flow by viewing its trace in Amazon Bedrock](https://docs.aws.amazon.com/bedrock/latest/userguide/flows-trace.html).
+      x-sensitive: true
+    FlowTraceNodeInputFields:
+      type: array
+      items:
+        $ref: '#/components/schemas/FlowTraceNodeInputField'
+    FlowTraceNodeOutputContent:
+      allOf:
+      - allOf:
+        - $ref: '#/components/schemas/Document'
+        description: |-
+          The content of the node output.
+      description: |-
+        Contains the content of the node output. For more information, see [Track each step in your prompt flow by viewing its trace in Amazon Bedrock](https://docs.aws.amazon.com/bedrock/latest/userguide/flows-trace.html).
+    FlowTraceNodeOutputFields:
+      type: array
+      items:
+        $ref: '#/components/schemas/FlowTraceNodeOutputField'
     Function:
       type: string
     FunctionDescription:
       type: string
       minLength: 1
       maxLength: 1200
+    FunctionParameters:
+      type: array
+      items:
+        $ref: '#/components/schemas/FunctionParameter'
+    FunctionSchema:
+      allOf:
+      - allOf:
+        - $ref: '#/components/schemas/Functions'
+        description: |-
+          A list of functions that each define an action in the action group.
+      description: |-
+        Contains details about the function schema for the action group or the JSON or YAML-formatted payload defining the schema.
+    Functions:
+      type: array
+      items:
+        $ref: '#/components/schemas/FunctionDefinition'
+    GeneratedQueries:
+      type: array
+      items:
+        $ref: '#/components/schemas/GeneratedQuery'
+    GeneratedQueryType:
+      type: string
+      enum:
+      - REDSHIFT_SQL
+    GuadrailAction:
+      type: string
+      enum:
+      - INTERVENED
+      - NONE
+    GuardrailAction:
+      type: string
+      enum:
+      - INTERVENED
+      - NONE
+    GuardrailAssessmentList:
+      type: array
+      items:
+        $ref: '#/components/schemas/GuardrailAssessment'
+    GuardrailContentFilterConfidence:
+      type: string
+      enum:
+      - NONE
+      - LOW
+      - MEDIUM
+      - HIGH
+    GuardrailContentFilterList:
+      type: array
+      items:
+        $ref: '#/components/schemas/GuardrailContentFilter'
+      x-sensitive: true
+    GuardrailContentFilterType:
+      type: string
+      enum:
+      - INSULTS
+      - HATE
+      - SEXUAL
+      - VIOLENCE
+      - MISCONDUCT
+      - PROMPT_ATTACK
+    GuardrailContentPolicyAction:
+      type: string
+      enum:
+      - BLOCKED
+    GuardrailCustomWordList:
+      type: array
+      items:
+        $ref: '#/components/schemas/GuardrailCustomWord'
+      x-sensitive: true
     GuardrailIdentifierWithArn:
       type: string
       pattern: ^(([a-z0-9]+)|(arn:aws(-[^:]+)?:bedrock:[a-z0-9-]{1,20}:[0-9]{12}:guardrail/[a-z0-9]+))$
       maxLength: 2048
+    GuardrailManagedWordList:
+      type: array
+      items:
+        $ref: '#/components/schemas/GuardrailManagedWord'
+      x-sensitive: true
+    GuardrailManagedWordType:
+      type: string
+      enum:
+      - PROFANITY
+    GuardrailPiiEntityFilterList:
+      type: array
+      items:
+        $ref: '#/components/schemas/GuardrailPiiEntityFilter'
+      x-sensitive: true
+    GuardrailPiiEntityType:
+      type: string
+      enum:
+      - ADDRESS
+      - AGE
+      - AWS_ACCESS_KEY
+      - AWS_SECRET_KEY
+      - CA_HEALTH_NUMBER
+      - CA_SOCIAL_INSURANCE_NUMBER
+      - CREDIT_DEBIT_CARD_CVV
+      - CREDIT_DEBIT_CARD_EXPIRY
+      - CREDIT_DEBIT_CARD_NUMBER
+      - DRIVER_ID
+      - EMAIL
+      - INTERNATIONAL_BANK_ACCOUNT_NUMBER
+      - IP_ADDRESS
+      - LICENSE_PLATE
+      - MAC_ADDRESS
+      - NAME
+      - PASSWORD
+      - PHONE
+      - PIN
+      - SWIFT_CODE
+      - UK_NATIONAL_HEALTH_SERVICE_NUMBER
+      - UK_NATIONAL_INSURANCE_NUMBER
+      - UK_UNIQUE_TAXPAYER_REFERENCE_NUMBER
+      - URL
+      - USERNAME
+      - US_BANK_ACCOUNT_NUMBER
+      - US_BANK_ROUTING_NUMBER
+      - US_INDIVIDUAL_TAX_IDENTIFICATION_NUMBER
+      - US_PASSPORT_NUMBER
+      - US_SOCIAL_SECURITY_NUMBER
+      - VEHICLE_IDENTIFICATION_NUMBER
+    GuardrailRegexFilterList:
+      type: array
+      items:
+        $ref: '#/components/schemas/GuardrailRegexFilter'
+      x-sensitive: true
+    GuardrailSensitiveInformationPolicyAction:
+      type: string
+      enum:
+      - BLOCKED
+      - ANONYMIZED
+    GuardrailTopicList:
+      type: array
+      items:
+        $ref: '#/components/schemas/GuardrailTopic'
+      x-sensitive: true
+    GuardrailTopicPolicyAction:
+      type: string
+      enum:
+      - BLOCKED
+    GuardrailTopicType:
+      type: string
+      enum:
+      - DENY
     GuardrailVersion:
       type: string
       pattern: ^(([1-9][0-9]{0,7})|(DRAFT))$
       minLength: 1
       maxLength: 5
+    GuardrailWordPolicyAction:
+      type: string
+      enum:
+      - BLOCKED
     Identifier:
       type: string
       minLength: 1
       maxLength: 1024
+    ImageFormat:
+      type: string
+      enum:
+      - png
+      - jpeg
+      - gif
+      - webp
+    ImageInputFormat:
+      type: string
+      enum:
+      - png
+      - jpeg
+      - gif
+      - webp
+    ImageInputSource:
+      allOf:
+      - allOf:
+        - $ref: '#/components/schemas/Blob'
+        description: |-
+          The raw image bytes for the image. If you use an Amazon Web Services SDK, you don't need to encode the image bytes in base64.
+      description: |-
+        Details about the source of an input image in the result from a function in the action group invocation.
+    ImageInputs:
+      type: array
+      items:
+        $ref: '#/components/schemas/ImageInput'
+    ImageSource:
+      allOf:
+      - allOf:
+        - $ref: '#/components/schemas/Blob'
+        description: |-
+          The raw image bytes for the image. If you use an Amazon Web Services SDK, you don't need to encode the image bytes in base64.
+      - allOf:
+        - $ref: '#/components/schemas/S3Location'
+        description: |-
+          The path to the Amazon S3 bucket where the image is stored.
+      description: |-
+        The source for an image.
+    InlineAgentResponseStream:
+      allOf:
+      - allOf:
+        - $ref: '#/components/schemas/InlineAgentPayloadPart'
+        description: |-
+          Contains a part of an agent response and citations for it.
+      - allOf:
+        - $ref: '#/components/schemas/InlineAgentTracePart'
+        description: |-
+          Contains information about the agent and session, alongside the agent's reasoning process and results from calling actions and querying knowledge bases and metadata about the trace. You can use the trace to understand how the agent arrived at the response it provided the customer. For more information, see [Trace events](https://docs.aws.amazon.com/bedrock/latest/userguide/trace-events.html).
+      - allOf:
+        - $ref: '#/components/schemas/InlineAgentReturnControlPayload'
+        description: |-
+          Contains the parameters and information that the agent elicited from the customer to carry out an action. This information is returned to the system and can be used in your own setup for fulfilling the action.
+      - allOf:
+        - $ref: '#/components/schemas/InternalServerException'
+        description: |-
+          An internal server error occurred. Retry your request.
+      - allOf:
+        - $ref: '#/components/schemas/ValidationException'
+        description: |-
+          Input validation failed. Check your request parameters and retry the request.
+      - allOf:
+        - $ref: '#/components/schemas/ResourceNotFoundException'
+        description: |-
+          The specified resource Amazon Resource Name (ARN) was not found. Check the Amazon Resource Name (ARN) and try your request again.
+      - allOf:
+        - $ref: '#/components/schemas/ServiceQuotaExceededException'
+        description: |-
+          The number of requests exceeds the service quota. Resubmit your request later.
+      - allOf:
+        - $ref: '#/components/schemas/ThrottlingException'
+        description: |-
+          The number of requests exceeds the limit. Resubmit your request later.
+      - allOf:
+        - $ref: '#/components/schemas/AccessDeniedException'
+        description: |-
+          The request is denied because of missing access permissions. Check your permissions and retry your request.
+      - allOf:
+        - $ref: '#/components/schemas/ConflictException'
+        description: |-
+          There was a conflict performing an operation. Resolve the conflict and retry your request.
+      - allOf:
+        - $ref: '#/components/schemas/DependencyFailedException'
+        description: |-
+          There was an issue with a dependency. Check the resource configurations and retry the request.
+      - allOf:
+        - $ref: '#/components/schemas/BadGatewayException'
+        description: |-
+          There was an issue with a dependency due to a server issue. Retry your request.
+      - allOf:
+        - $ref: '#/components/schemas/InlineAgentFilePart'
+        description: |-
+          Contains intermediate response for code interpreter if any files have been generated.
+      description: |-
+        The response from invoking the agent and associated citations and trace information.
+    InputFiles:
+      type: array
+      items:
+        $ref: '#/components/schemas/InputFile'
+    InputPrompt:
+      allOf:
+      - allOf:
+        - $ref: '#/components/schemas/TextPrompt'
+        description: |-
+          Contains information about the text prompt to optimize.
+      description: |-
+        Contains information about the prompt to optimize.
+    InputQueryType:
+      type: string
+      enum:
+      - TEXT
     InputText:
       type: string
       maxLength: 25000000
@@ -153,6 +750,66 @@ components:
     InvocationIdentifier:
       type: string
       pattern: ^[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$
+    InvocationInputMember:
+      allOf:
+      - allOf:
+        - $ref: '#/components/schemas/ApiInvocationInput'
+        description: |-
+          Contains information about the API operation that the agent predicts should be called.
+      - allOf:
+        - $ref: '#/components/schemas/FunctionInvocationInput'
+        description: |-
+          Contains information about the function that the agent predicts should be called.
+      description: |-
+        Contains details about the API operation or function that the agent predicts should be called.
+
+        This data type is used in the following API operations:
+
+          * In the `returnControl` field of the [InvokeAgent response](https://docs.aws.amazon.com/bedrock/latest/APIReference/API_agent-runtime_InvokeAgent.html#API_agent-runtime_InvokeAgent_ResponseSyntax)
+    InvocationInputs:
+      type: array
+      items:
+        $ref: '#/components/schemas/InvocationInputMember'
+    InvocationResultMember:
+      allOf:
+      - allOf:
+        - $ref: '#/components/schemas/ApiResult'
+        description: |-
+          The result from the API response from the action group invocation.
+      - allOf:
+        - $ref: '#/components/schemas/FunctionResult'
+        description: |-
+          The result from the function from the action group invocation.
+      description: |-
+        A result from the invocation of an action. For more information, see [Return control to the agent developer](https://docs.aws.amazon.com/bedrock/latest/userguide/agents-returncontrol.html) and [Control session context](https://docs.aws.amazon.com/bedrock/latest/userguide/agents-session-state.html).
+
+        This data type is used in the following API operations:
+
+          * [InvokeAgent request](https://docs.aws.amazon.com/bedrock/latest/APIReference/API_agent-runtime_InvokeAgent.html#API_agent-runtime_InvokeAgent_RequestSyntax)
+    InvocationStepPayload:
+      allOf:
+      - allOf:
+        - $ref: '#/components/schemas/BedrockSessionContentBlocks'
+        description: |-
+          The content for the invocation step.
+      description: |-
+        Payload content, such as text and images, for the invocation step.
+    InvocationStepSummaries:
+      type: array
+      items:
+        $ref: '#/components/schemas/InvocationStepSummary'
+    InvocationSummaries:
+      type: array
+      items:
+        $ref: '#/components/schemas/InvocationSummary'
+    InvocationType:
+      type: string
+      enum:
+      - ACTION_GROUP
+      - KNOWLEDGE_BASE
+      - FINISH
+      - ACTION_GROUP_CODE_INTERPRETER
+      - AGENT_COLLABORATOR
     KmsKeyArn:
       type: string
       pattern: ^arn:aws(|-cn|-us-gov):kms:[a-zA-Z0-9-]*:[0-9]{12}:key/[a-zA-Z0-9-]{36}$
@@ -162,12 +819,25 @@ components:
       type: string
       pattern: ^arn:aws(|-cn|-us-gov):bedrock:[a-zA-Z0-9-]*:[0-9]{12}:knowledge-base/[0-9a-zA-Z]+$
       maxLength: 128
+    KnowledgeBaseConfigurations:
+      type: array
+      items:
+        $ref: '#/components/schemas/KnowledgeBaseConfiguration'
     KnowledgeBaseId:
       type: string
       pattern: ^[0-9a-zA-Z]+$
       maxLength: 10
     KnowledgeBaseLookupInputString:
       type: string
+    KnowledgeBaseRetrievalResults:
+      type: array
+      items:
+        $ref: '#/components/schemas/KnowledgeBaseRetrievalResult'
+      x-sensitive: true
+    KnowledgeBases:
+      type: array
+      items:
+        $ref: '#/components/schemas/KnowledgeBase'
     LambdaArn:
       type: string
     LambdaResourceArn:
@@ -187,11 +857,35 @@ components:
       type: integer
       minimum: 0
       maximum: 8192
+    Memories:
+      type: array
+      items:
+        $ref: '#/components/schemas/Memory'
+    Memory:
+      allOf:
+      - allOf:
+        - $ref: '#/components/schemas/MemorySessionSummary'
+        description: |-
+          Contains summary of a session.
+      description: |-
+        Contains sessions summaries.
     MemoryId:
       type: string
       pattern: ^[0-9a-zA-Z._:-]+$
       minLength: 2
       maxLength: 100
+    MemoryType:
+      type: string
+      enum:
+      - SESSION_SUMMARY
+    Messages:
+      type: array
+      items:
+        $ref: '#/components/schemas/Message'
+    MetadataAttributeSchemaList:
+      type: array
+      items:
+        $ref: '#/components/schemas/MetadataAttributeSchema'
     MimeType:
       type: string
     ModelIdentifier:
@@ -216,24 +910,290 @@ components:
     NodeOutputName:
       type: string
       pattern: ^[a-zA-Z]([_]?[0-9a-zA-Z]){0,99}$
+    NodeType:
+      type: string
+      enum:
+      - FlowInputNode
+      - FlowOutputNode
+      - LambdaFunctionNode
+      - KnowledgeBaseNode
+      - PromptNode
+      - ConditionNode
+      - LexNode
     NonBlankString:
       type: string
       pattern: ^[\s\S]*$
+    OptimizedPrompt:
+      allOf:
+      - allOf:
+        - $ref: '#/components/schemas/TextPrompt'
+        description: |-
+          Contains information about the text in the prompt that was optimized.
+      description: |-
+        Contains information about the optimized prompt.
+    OptimizedPromptStream:
+      allOf:
+      - allOf:
+        - $ref: '#/components/schemas/OptimizedPromptEvent'
+        description: |-
+          An event in which the prompt was optimized.
+      - allOf:
+        - $ref: '#/components/schemas/AnalyzePromptEvent'
+        description: |-
+          An event in which the prompt was analyzed in preparation for optimization.
+      - allOf:
+        - $ref: '#/components/schemas/InternalServerException'
+        description: |-
+          An internal server error occurred. Retry your request.
+      - allOf:
+        - $ref: '#/components/schemas/ThrottlingException'
+        description: |-
+          Your request was throttled because of service-wide limitations. Resubmit your request later or in a different region. You can also purchase [Provisioned Throughput](https://docs.aws.amazon.com/bedrock/latest/userguide/prov-throughput.html) to increase the rate or number of tokens you can process.
+      - allOf:
+        - $ref: '#/components/schemas/ValidationException'
+        description: |-
+          Input validation failed. Check your request parameters and retry the request.
+      - allOf:
+        - $ref: '#/components/schemas/DependencyFailedException'
+        description: |-
+          There was an issue with a dependency. Check the resource configurations and retry the request.
+      - allOf:
+        - $ref: '#/components/schemas/AccessDeniedException'
+        description: |-
+          The request is denied because of missing access permissions. Check your permissions and retry your request.
+      - allOf:
+        - $ref: '#/components/schemas/BadGatewayException'
+        description: |-
+          There was an issue with a dependency due to a server issue. Retry your request.
+      description: |-
+        The stream containing events in the prompt optimization process.
+    OrchestrationTrace:
+      allOf:
+      - allOf:
+        - $ref: '#/components/schemas/Rationale'
+        description: |-
+          Details about the reasoning, based on the input, that the agent uses to justify carrying out an action group or getting information from a knowledge base.
+      - allOf:
+        - $ref: '#/components/schemas/InvocationInput'
+        description: |-
+          Contains information pertaining to the action group or knowledge base that is being invoked.
+      - allOf:
+        - $ref: '#/components/schemas/Observation'
+        description: |-
+          Details about the observation (the output of the action group Lambda or knowledge base) made by the agent.
+      - allOf:
+        - $ref: '#/components/schemas/ModelInvocationInput'
+        description: |-
+          The input for the orchestration step.
+
+            * The `type` is `ORCHESTRATION`.
+
+            * The `text` contains the prompt.
+
+            * The `inferenceConfiguration`, `parserMode`, and `overrideLambda` values are set in the [PromptOverrideConfiguration](https://docs.aws.amazon.com/bedrock/latest/APIReference/API_agent_PromptOverrideConfiguration.html) object that was set when the agent was created or updated.
+      - allOf:
+        - $ref: '#/components/schemas/OrchestrationModelInvocationOutput'
+        description: |-
+          Contains information pertaining to the output from the foundation model that is being invoked.
+      description: |-
+        Details about the orchestration step, in which the agent determines the order in which actions are executed and which knowledge bases are retrieved.
+      x-sensitive: true
+    OutputFiles:
+      type: array
+      items:
+        $ref: '#/components/schemas/OutputFile'
     OutputString:
       type: string
     ParameterDescription:
       type: string
       minLength: 1
       maxLength: 500
+    ParameterList:
+      type: array
+      items:
+        $ref: '#/components/schemas/Parameter'
+    ParameterMap:
+      type: object
+      additionalProperties:
+        $ref: '#/components/schemas/ParameterDetail'
     ParameterName:
       type: string
       pattern: ^([0-9a-zA-Z][_-]?){1,100}$
+    ParameterType:
+      type: string
+      enum:
+      - string
+      - number
+      - integer
+      - boolean
+      - array
+    Parameters:
+      type: array
+      items:
+        $ref: '#/components/schemas/Parameter'
+    PartBody:
+      type: string
+      format: byte
+      maxLength: 1000000
+      x-sensitive: true
     Payload:
       type: string
+    PayloadType:
+      type: string
+      enum:
+      - TEXT
+      - RETURN_CONTROL
+    PerformanceConfigLatency:
+      type: string
+      enum:
+      - standard
+      - optimized
+    PostProcessingTrace:
+      allOf:
+      - allOf:
+        - $ref: '#/components/schemas/ModelInvocationInput'
+        description: |-
+          The input for the post-processing step.
+
+            * The `type` is `POST_PROCESSING`.
+
+            * The `text` contains the prompt.
+
+            * The `inferenceConfiguration`, `parserMode`, and `overrideLambda` values are set in the [PromptOverrideConfiguration](https://docs.aws.amazon.com/bedrock/latest/APIReference/API_agent_PromptOverrideConfiguration.html) object that was set when the agent was created or updated.
+      - allOf:
+        - $ref: '#/components/schemas/PostProcessingModelInvocationOutput'
+        description: |-
+          The foundation model output from the post-processing step.
+      description: |-
+        Details about the post-processing step, in which the agent shapes the response.
+      x-sensitive: true
+    PreProcessingTrace:
+      allOf:
+      - allOf:
+        - $ref: '#/components/schemas/ModelInvocationInput'
+        description: |-
+          The input for the pre-processing step.
+
+            * The `type` is `PRE_PROCESSING`.
+
+            * The `text` contains the prompt.
+
+            * The `inferenceConfiguration`, `parserMode`, and `overrideLambda` values are set in the [PromptOverrideConfiguration](https://docs.aws.amazon.com/bedrock/latest/APIReference/API_agent_PromptOverrideConfiguration.html) object that was set when the agent was created or updated.
+      - allOf:
+        - $ref: '#/components/schemas/PreProcessingModelInvocationOutput'
+        description: |-
+          The foundation model output from the pre-processing step.
+      description: |-
+        Details about the pre-processing step, in which the agent contextualizes and categorizes user inputs.
+      x-sensitive: true
+    PromptConfigurations:
+      type: array
+      items:
+        $ref: '#/components/schemas/PromptConfiguration'
+    PromptSessionAttributesMap:
+      type: object
+      additionalProperties:
+        $ref: '#/components/schemas/String'
+    PromptState:
+      type: string
+      enum:
+      - ENABLED
+      - DISABLED
     PromptText:
       type: string
+    PromptType:
+      type: string
+      enum:
+      - PRE_PROCESSING
+      - ORCHESTRATION
+      - KNOWLEDGE_BASE_RESPONSE_GENERATION
+      - POST_PROCESSING
+      - ROUTING_CLASSIFIER
+    QueryTransformationMode:
+      type: string
+      enum:
+      - TEXT_TO_SQL
+    QueryTransformationType:
+      type: string
+      enum:
+      - QUERY_DECOMPOSITION
+    RAGStopSequences:
+      type: array
+      items:
+        type: string
     RationaleString:
       type: string
+    ReasoningContentBlock:
+      allOf:
+      - allOf:
+        - $ref: '#/components/schemas/ReasoningTextBlock'
+        description: |-
+          Contains information about the reasoning that the model used to return the content in the content block.
+      - allOf:
+        - $ref: '#/components/schemas/Blob'
+        description: |-
+          The content in the reasoning that was encrypted by the model provider for trust and safety reasons.
+      description: |-
+        Contains content regarding the reasoning that the foundation model made with respect to the content in the content block. Reasoning refers to a Chain of Thought (CoT) that the model generates to enhance the accuracy of its final response.
+      x-sensitive: true
+    RelayConversationHistory:
+      type: string
+      enum:
+      - TO_COLLABORATOR
+      - DISABLED
+    RequireConfirmation:
+      type: string
+      enum:
+      - ENABLED
+      - DISABLED
+    RerankDocumentType:
+      type: string
+      enum:
+      - TEXT
+      - JSON
+    RerankQueriesList:
+      type: array
+      items:
+        $ref: '#/components/schemas/RerankQuery'
+      x-sensitive: true
+    RerankQueryContentType:
+      type: string
+      enum:
+      - TEXT
+    RerankResultsList:
+      type: array
+      items:
+        $ref: '#/components/schemas/RerankResult'
+    RerankSourceType:
+      type: string
+      enum:
+      - INLINE
+    RerankSourcesList:
+      type: array
+      items:
+        $ref: '#/components/schemas/RerankSource'
+      x-sensitive: true
+    RerankingConfigurationType:
+      type: string
+      enum:
+      - BEDROCK_RERANKING_MODEL
+    RerankingMetadataSelectionMode:
+      type: string
+      enum:
+      - SELECTIVE
+      - ALL
+    RerankingMetadataSelectiveModeConfiguration:
+      allOf:
+      - allOf:
+        - $ref: '#/components/schemas/FieldsForReranking'
+        description: |-
+          An array of objects, each of which specifies a metadata field to include in consideration when reranking. The remaining metadata fields are ignored.
+      - allOf:
+        - $ref: '#/components/schemas/FieldsForReranking'
+        description: |-
+          An array of objects, each of which specifies a metadata field to exclude from consideration when reranking.
+      description: |-
+        Contains configurations for the metadata fields to include or exclude when considering reranking. If you include the `fieldsToExclude` field, the reranker ignores all the metadata fields that you specify. If you include the `fieldsToInclude` field, the reranker uses only the metadata fields that you specify and ignores all others. You can include only one of these fields.
     ResourceDescription:
       type: string
       minLength: 1
@@ -241,10 +1201,322 @@ components:
     ResourceName:
       type: string
       pattern: ^([0-9a-zA-Z][_-]?){1,100}$
+    ResponseBody:
+      type: object
+      additionalProperties:
+        $ref: '#/components/schemas/ContentBody'
+    ResponseState:
+      type: string
+      enum:
+      - FAILURE
+      - REPROMPT
+    ResponseStream:
+      allOf:
+      - allOf:
+        - $ref: '#/components/schemas/PayloadPart'
+        description: |-
+          Contains a part of an agent response and citations for it.
+      - allOf:
+        - $ref: '#/components/schemas/TracePart'
+        description: |-
+          Contains information about the agent and session, alongside the agent's reasoning process and results from calling actions and querying knowledge bases and metadata about the trace. You can use the trace to understand how the agent arrived at the response it provided the customer. For more information, see [Trace events](https://docs.aws.amazon.com/bedrock/latest/userguide/trace-events.html).
+      - allOf:
+        - $ref: '#/components/schemas/ReturnControlPayload'
+        description: |-
+          Contains the parameters and information that the agent elicited from the customer to carry out an action. This information is returned to the system and can be used in your own setup for fulfilling the action.
+      - allOf:
+        - $ref: '#/components/schemas/InternalServerException'
+        description: |-
+          An internal server error occurred. Retry your request.
+      - allOf:
+        - $ref: '#/components/schemas/ValidationException'
+        description: |-
+          Input validation failed. Check your request parameters and retry the request.
+      - allOf:
+        - $ref: '#/components/schemas/ResourceNotFoundException'
+        description: |-
+          The specified resource Amazon Resource Name (ARN) was not found. Check the Amazon Resource Name (ARN) and try your request again.
+      - allOf:
+        - $ref: '#/components/schemas/ServiceQuotaExceededException'
+        description: |-
+          The number of requests exceeds the service quota. Resubmit your request later.
+      - allOf:
+        - $ref: '#/components/schemas/ThrottlingException'
+        description: |-
+          The number of requests exceeds the limit. Resubmit your request later.
+      - allOf:
+        - $ref: '#/components/schemas/AccessDeniedException'
+        description: |-
+          The request is denied because of missing access permissions. Check your permissions and retry your request.
+      - allOf:
+        - $ref: '#/components/schemas/ConflictException'
+        description: |-
+          There was a conflict performing an operation. Resolve the conflict and retry your request.
+      - allOf:
+        - $ref: '#/components/schemas/DependencyFailedException'
+        description: |-
+          There was an issue with a dependency. Check the resource configurations and retry the request.
+      - allOf:
+        - $ref: '#/components/schemas/BadGatewayException'
+        description: |-
+          There was an issue with a dependency due to a server issue. Retry your request.
+      - allOf:
+        - $ref: '#/components/schemas/ModelNotReadyException'
+        description: |-
+          The model specified in the request is not ready to serve Inference requests. The AWS SDK will automatically retry the operation up to 5 times. For information about configuring automatic retries, see [Retry behavior](https://docs.aws.amazon.com/sdkref/latest/guide/feature-retry-behavior.html) in the _AWS SDKs and Tools_ reference guide.
+      - allOf:
+        - $ref: '#/components/schemas/FilePart'
+        description: |-
+          Contains intermediate response for code interpreter if any files have been generated.
+      description: |-
+        The response from invoking the agent and associated citations and trace information.
+    RetrievalFilter:
+      allOf:
+      - allOf:
+        - $ref: '#/components/schemas/FilterAttribute'
+        description: |-
+          Knowledge base data sources are returned if they contain a metadata attribute whose name matches the `key` and whose value matches the `value` in this object.
+
+          The following example would return data sources with an `animal` attribute whose value is `cat`:
+
+          `"equals": { "key": "animal", "value": "cat" }`
+      - allOf:
+        - $ref: '#/components/schemas/FilterAttribute'
+        description: |-
+          Knowledge base data sources are returned when:
+
+            * It contains a metadata attribute whose name matches the `key` and whose value doesn't match the `value` in this object.
+
+            * The key is not present in the document.
+
+          The following example would return data sources that don't contain an `animal` attribute whose value is `cat`.
+
+          `"notEquals": { "key": "animal", "value": "cat" }`
+      - allOf:
+        - $ref: '#/components/schemas/FilterAttribute'
+        description: |-
+          Knowledge base data sources are returned if they contain a metadata attribute whose name matches the `key` and whose value is greater than the `value` in this object.
+
+          The following example would return data sources with an `year` attribute whose value is greater than `1989`:
+
+          `"greaterThan": { "key": "year", "value": 1989 }`
+      - allOf:
+        - $ref: '#/components/schemas/FilterAttribute'
+        description: |-
+          Knowledge base data sources are returned if they contain a metadata attribute whose name matches the `key` and whose value is greater than or equal to the `value` in this object.
+
+          The following example would return data sources with an `year` attribute whose value is greater than or equal to `1989`:
+
+          `"greaterThanOrEquals": { "key": "year", "value": 1989 }`
+      - allOf:
+        - $ref: '#/components/schemas/FilterAttribute'
+        description: |-
+          Knowledge base data sources are returned if they contain a metadata attribute whose name matches the `key` and whose value is less than the `value` in this object.
+
+          The following example would return data sources with an `year` attribute whose value is less than to `1989`.
+
+          `"lessThan": { "key": "year", "value": 1989 }`
+      - allOf:
+        - $ref: '#/components/schemas/FilterAttribute'
+        description: |-
+          Knowledge base data sources are returned if they contain a metadata attribute whose name matches the `key` and whose value is less than or equal to the `value` in this object.
+
+          The following example would return data sources with an `year` attribute whose value is less than or equal to `1989`.
+
+          `"lessThanOrEquals": { "key": "year", "value": 1989 }`
+      - allOf:
+        - $ref: '#/components/schemas/FilterAttribute'
+        description: |-
+          Knowledge base data sources are returned if they contain a metadata attribute whose name matches the `key` and whose value is in the list specified in the `value` in this object.
+
+          The following example would return data sources with an `animal` attribute that is either `cat` or `dog`:
+
+          `"in": { "key": "animal", "value": ["cat", "dog"] }`
+      - allOf:
+        - $ref: '#/components/schemas/FilterAttribute'
+        description: |-
+          Knowledge base data sources are returned if they contain a metadata attribute whose name matches the `key` and whose value isn't in the list specified in the `value` in this object.
+
+          The following example would return data sources whose `animal` attribute is neither `cat` nor `dog`.
+
+          `"notIn": { "key": "animal", "value": ["cat", "dog"] }`
+      - allOf:
+        - $ref: '#/components/schemas/FilterAttribute'
+        description: |-
+          Knowledge base data sources are returned if they contain a metadata attribute whose name matches the `key` and whose value starts with the `value` in this object. This filter is currently only supported for Amazon OpenSearch Serverless vector stores.
+
+          The following example would return data sources with an `animal` attribute starts with `ca` (for example, `cat` or `camel`).
+
+          `"startsWith": { "key": "animal", "value": "ca" }`
+      - allOf:
+        - $ref: '#/components/schemas/FilterAttribute'
+        description: |-
+          Knowledge base data sources are returned if they contain a metadata attribute whose name matches the `key` and whose value is a list that contains the `value` as one of its members.
+
+          The following example would return data sources with an `animals` attribute that is a list containing a `cat` member (for example `["dog", "cat"]`).
+
+          `"listContains": { "key": "animals", "value": "cat" }`
+      - allOf:
+        - $ref: '#/components/schemas/FilterAttribute'
+        description: |-
+          Knowledge base data sources are returned if they contain a metadata attribute whose name matches the `key` and whose value is one of the following:
+
+            * A string that contains the `value` as a substring. The following example would return data sources with an `animal` attribute that contains the substring `at` (for example `cat`).
+
+          `"stringContains": { "key": "animal", "value": "at" }`
+
+            * A list with a member that contains the `value` as a substring. The following example would return data sources with an `animals` attribute that is a list containing a member that contains the substring `at` (for example `["dog", "cat"]`).
+
+          `"stringContains": { "key": "animals", "value": "at" }`
+      - allOf:
+        - $ref: '#/components/schemas/RetrievalFilterList'
+        description: |-
+          Knowledge base data sources are returned if their metadata attributes fulfill all the filter conditions inside this list.
+      - allOf:
+        - $ref: '#/components/schemas/RetrievalFilterList'
+        description: |-
+          Knowledge base data sources are returned if their metadata attributes fulfill at least one of the filter conditions inside this list.
+      description: |-
+        Specifies the filters to use on the metadata attributes in the knowledge base data sources before returning results. For more information, see [Query configurations](https://docs.aws.amazon.com/bedrock/latest/userguide/kb-test-config.html). See the examples below to see how to use these filters.
+
+        This data type is used in the following API operations:
+
+          * [Retrieve request](https://docs.aws.amazon.com/bedrock/latest/APIReference/API_agent-runtime_Retrieve.html#API_agent-runtime_Retrieve_RequestSyntax) – in the `filter` field
+
+          * [RetrieveAndGenerate request](https://docs.aws.amazon.com/bedrock/latest/APIReference/API_agent-runtime_RetrieveAndGenerate.html#API_agent-runtime_RetrieveAndGenerate_RequestSyntax) – in the `filter` field
+      x-sensitive: true
+    RetrievalFilterList:
+      type: array
+      items:
+        $ref: '#/components/schemas/RetrievalFilter'
+    RetrievalResultContentColumnType:
+      type: string
+      enum:
+      - BLOB
+      - BOOLEAN
+      - DOUBLE
+      - 'NULL'
+      - LONG
+      - STRING
+    RetrievalResultContentRow:
+      type: array
+      items:
+        $ref: '#/components/schemas/RetrievalResultContentColumn'
+      x-sensitive: true
+    RetrievalResultContentType:
+      type: string
+      enum:
+      - TEXT
+      - IMAGE
+      - ROW
+    RetrievalResultLocationType:
+      type: string
+      enum:
+      - S3
+      - WEB
+      - CONFLUENCE
+      - SALESFORCE
+      - SHAREPOINT
+      - CUSTOM
+      - KENDRA
+      - SQL
+    RetrievalResultMetadata:
+      type: object
+      additionalProperties:
+        $ref: '#/components/schemas/RetrievalResultMetadataValue'
     RetrievalResultMetadataKey:
       type: string
       minLength: 1
       maxLength: 100
+    RetrievalResultMetadataValue:
+      type: object
+      additionalProperties: true
+    RetrieveAndGenerateStreamResponseOutput:
+      allOf:
+      - allOf:
+        - $ref: '#/components/schemas/RetrieveAndGenerateOutputEvent'
+        description: |-
+          An output event.
+      - allOf:
+        - $ref: '#/components/schemas/CitationEvent'
+        description: |-
+          A citation event.
+      - allOf:
+        - $ref: '#/components/schemas/GuardrailEvent'
+        description: |-
+          A guardrail event.
+      - allOf:
+        - $ref: '#/components/schemas/InternalServerException'
+        description: |-
+          An internal server error occurred. Retry your request.
+      - allOf:
+        - $ref: '#/components/schemas/ValidationException'
+        description: |-
+          The input fails to satisfy the constraints specified by _Amazon Bedrock_. For troubleshooting this error, see [ValidationError](https://docs.aws.amazon.com/bedrock/latest/userguide/troubleshooting-api-error-codes.html#ts-validation-error) in the Amazon Bedrock User Guide.
+      - allOf:
+        - $ref: '#/components/schemas/ResourceNotFoundException'
+        description: |-
+          The specified resource ARN was not found. For troubleshooting this error, see [ResourceNotFound](https://docs.aws.amazon.com/bedrock/latest/userguide/troubleshooting-api-error-codes.html#ts-resource-not-found) in the Amazon Bedrock User Guide.
+      - allOf:
+        - $ref: '#/components/schemas/ServiceQuotaExceededException'
+        description: |-
+          Your request exceeds the service quota for your account. You can view your quotas at [Viewing service quotas](https://docs.aws.amazon.com/servicequotas/latest/userguide/gs-request-quota.html). You can resubmit your request later.
+      - allOf:
+        - $ref: '#/components/schemas/ThrottlingException'
+        description: |-
+          Your request was denied due to exceeding the account quotas for _Amazon Bedrock_. For troubleshooting this error, see [ThrottlingException](https://docs.aws.amazon.com/bedrock/latest/userguide/troubleshooting-api-error-codes.html#ts-throttling-exception) in the Amazon Bedrock User Guide.
+      - allOf:
+        - $ref: '#/components/schemas/AccessDeniedException'
+        description: |-
+          The request is denied because you do not have sufficient permissions to perform the requested action. For troubleshooting this error, see [AccessDeniedException](https://docs.aws.amazon.com/bedrock/latest/userguide/troubleshooting-api-error-codes.html#ts-access-denied) in the Amazon Bedrock User Guide.
+      - allOf:
+        - $ref: '#/components/schemas/ConflictException'
+        description: |-
+          Error occurred because of a conflict while performing an operation.
+      - allOf:
+        - $ref: '#/components/schemas/DependencyFailedException'
+        description: |-
+          The request failed due to a dependency error.
+      - allOf:
+        - $ref: '#/components/schemas/BadGatewayException'
+        description: |-
+          The request failed due to a bad gateway error.
+      description: |-
+        A retrieve and generate stream response output.
+    RetrieveAndGenerateType:
+      type: string
+      enum:
+      - KNOWLEDGE_BASE
+      - EXTERNAL_SOURCES
+    RetrievedReferences:
+      type: array
+      items:
+        $ref: '#/components/schemas/RetrievedReference'
+    ReturnControlInvocationResults:
+      type: array
+      items:
+        $ref: '#/components/schemas/InvocationResultMember'
+    RoutingClassifierTrace:
+      allOf:
+      - allOf:
+        - $ref: '#/components/schemas/InvocationInput'
+        description: |-
+          The classifier's invocation input.
+      - allOf:
+        - $ref: '#/components/schemas/Observation'
+        description: |-
+          The classifier's observation.
+      - allOf:
+        - $ref: '#/components/schemas/ModelInvocationInput'
+        description: |-
+          The classifier's model invocation input.
+      - allOf:
+        - $ref: '#/components/schemas/RoutingClassifierModelInvocationOutput'
+        description: |-
+          The classifier's model invocation output.
+      description: |-
+        A trace for a routing classifier.
+      x-sensitive: true
     S3BucketName:
       type: string
       pattern: ^[a-z0-9][\.\-a-z0-9]{1,61}[a-z0-9]$
@@ -260,9 +1532,18 @@ components:
       pattern: ^s3://[a-z0-9][a-z0-9.-]{1,61}[a-z0-9]/.{1,1024}$
       minLength: 1
       maxLength: 1024
+    SearchType:
+      type: string
+      enum:
+      - HYBRID
+      - SEMANTIC
     SessionArn:
       type: string
       pattern: ^arn:aws(-[^:]+)?:bedrock:[a-z0-9-]+:[0-9]{12}:session/[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$
+    SessionAttributesMap:
+      type: object
+      additionalProperties:
+        $ref: '#/components/schemas/String'
     SessionId:
       type: string
       pattern: ^[0-9a-zA-Z._:-]+$
@@ -275,14 +1556,38 @@ components:
       type: string
       minLength: 1
       maxLength: 100
+    SessionMetadataMap:
+      type: object
+      additionalProperties:
+        $ref: '#/components/schemas/SessionMetadataValue'
     SessionMetadataValue:
       type: string
       minLength: 0
       maxLength: 5000
+    SessionStatus:
+      type: string
+      enum:
+      - ACTIVE
+      - EXPIRED
+      - ENDED
+    SessionSummaries:
+      type: array
+      items:
+        $ref: '#/components/schemas/SessionSummary'
     SessionTTL:
       type: integer
       minimum: 60
       maximum: 3600
+    Source:
+      type: string
+      enum:
+      - ACTION_GROUP
+      - KNOWLEDGE_BASE
+      - PARSER
+    StopSequences:
+      type: array
+      items:
+        type: string
     SummaryText:
       type: string
       minLength: 0
@@ -292,6 +1597,11 @@ components:
       pattern: ^[a-zA-Z0-9\s._:/=+@-]*$
       minLength: 1
       maxLength: 128
+    TagKeyList:
+      type: array
+      items:
+        $ref: '#/components/schemas/TagKey'
+      description: List of Tag Keys
     TagValue:
       type: string
       pattern: ^[a-zA-Z0-9\s._:/=+@-]*$
@@ -302,22 +1612,87 @@ components:
       pattern: (^arn:aws(-[^:]+)?:bedrock:[a-zA-Z0-9-]+:[0-9]{12}:(session)/[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$)
       minLength: 20
       maxLength: 1011
+    TagsMap:
+      type: object
+      additionalProperties:
+        $ref: '#/components/schemas/TagValue'
+      description: A map of tag keys and values
+    Temperature:
+      type: number
+      format: float
+      minimum: 0
+      maximum: 1
     TextPromptTemplate:
       type: string
       minLength: 1
       maxLength: 4000
+    TextToSqlConfigurationType:
+      type: string
+      enum:
+      - KNOWLEDGE_BASE
     TopK:
       type: integer
       minimum: 0
       maximum: 500
+    TopP:
+      type: number
+      format: float
+      minimum: 0
+      maximum: 1
+    Trace:
+      allOf:
+      - allOf:
+        - $ref: '#/components/schemas/GuardrailTrace'
+        description: |-
+          The trace details for a trace defined in the Guardrail filter.
+      - allOf:
+        - $ref: '#/components/schemas/PreProcessingTrace'
+        description: |-
+          Details about the pre-processing step, in which the agent contextualizes and categorizes user inputs.
+      - allOf:
+        - $ref: '#/components/schemas/OrchestrationTrace'
+        description: |-
+          Details about the orchestration step, in which the agent determines the order in which actions are executed and which knowledge bases are retrieved.
+      - allOf:
+        - $ref: '#/components/schemas/PostProcessingTrace'
+        description: |-
+          Details about the post-processing step, in which the agent shapes the response..
+      - allOf:
+        - $ref: '#/components/schemas/RoutingClassifierTrace'
+        description: |-
+          A routing classifier's trace.
+      - allOf:
+        - $ref: '#/components/schemas/FailureTrace'
+        description: |-
+          Contains information about the failure of the interaction.
+      - allOf:
+        - $ref: '#/components/schemas/CustomOrchestrationTrace'
+        description: |-
+          Details about the custom orchestration step in which the agent determines the order in which actions are executed.
+      description: |-
+        Contains one part of the agent's reasoning process and results from calling API actions and querying knowledge bases. You can use the trace to understand how the agent arrived at the response it provided the customer. For more information, see [Trace enablement](https://docs.aws.amazon.com/bedrock/latest/userguide/agents-test.html#trace-enablement).
+      x-sensitive: true
     TraceId:
       type: string
       minLength: 2
       maxLength: 16
     TraceKnowledgeBaseId:
       type: string
+    Type:
+      type: string
+      enum:
+      - ACTION_GROUP
+      - AGENT_COLLABORATOR
+      - KNOWLEDGE_BASE
+      - FINISH
+      - ASK_USER
+      - REPROMPT
     Uuid:
       type: string
       pattern: ^[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$
+    VectorSearchRerankingConfigurationType:
+      type: string
+      enum:
+      - BEDROCK_RERANKING_MODEL
     Verb:
       type: string

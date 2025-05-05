@@ -67,13 +67,39 @@ components:
       type: string
       minLength: 1
       maxLength: 1024
+    Attainment:
+      type: number
+      format: double
+    AttainmentGoal:
+      type: number
+      format: double
+    AttributeMap:
+      type: object
+      additionalProperties:
+        $ref: '#/components/schemas/String'
+    AttributeMaps:
+      type: array
+      items:
+        $ref: '#/components/schemas/AttributeMap'
+    Attributes:
+      type: object
+      additionalProperties:
+        $ref: '#/components/schemas/KeyAttributeValue'
     AwsAccountId:
       type: string
       pattern: ^[0-9]{12}$
+    BatchUpdateExclusionWindowsErrors:
+      type: array
+      items:
+        $ref: '#/components/schemas/BatchUpdateExclusionWindowsError'
     BudgetRequestsRemaining:
       type: integer
     BudgetSecondsRemaining:
       type: integer
+    BurnRateConfigurations:
+      type: array
+      items:
+        $ref: '#/components/schemas/BurnRateConfiguration'
     BurnRateLookBackWindowMinutes:
       type: integer
       minimum: 1
@@ -89,6 +115,22 @@ components:
       type: string
       minLength: 1
       maxLength: 1024
+    Dimensions:
+      type: array
+      items:
+        $ref: '#/components/schemas/Dimension'
+    DurationUnit:
+      type: string
+      enum:
+      - MINUTE
+      - HOUR
+      - DAY
+      - MONTH
+    EvaluationType:
+      type: string
+      enum:
+      - PeriodBased
+      - RequestBased
     ExclusionDuration:
       type: integer
       minimum: 1
@@ -100,12 +142,28 @@ components:
       type: string
     ExclusionWindowErrorMessage:
       type: string
+    ExclusionWindows:
+      type: array
+      items:
+        $ref: '#/components/schemas/ExclusionWindow'
     Expression:
       type: string
       minLength: 1
       maxLength: 1024
     FaultDescription:
       type: string
+    Interval:
+      allOf:
+      - allOf:
+        - $ref: '#/components/schemas/RollingInterval'
+        description: |-
+          If the interval is a rolling interval, this structure contains the interval specifications.
+      - allOf:
+        - $ref: '#/components/schemas/CalendarInterval'
+        description: |-
+          If the interval is a calendar interval, this structure contains the interval specifications.
+      description: |-
+        The time period used to evaluate the SLO. It can be either a calendar interval or rolling interval.
     KeyAttributeName:
       type: string
       pattern: ^[a-zA-Z]{1,50}$
@@ -138,6 +196,14 @@ components:
       type: integer
       minimum: 1
       maximum: 100
+    LogGroupReferences:
+      type: array
+      items:
+        $ref: '#/components/schemas/Attributes'
+    MetricDataQueries:
+      type: array
+      items:
+        $ref: '#/components/schemas/MetricDataQuery'
     MetricExpression:
       type: string
       minLength: 1
@@ -152,9 +218,35 @@ components:
       type: string
       minLength: 1
       maxLength: 255
+    MetricReferences:
+      type: array
+      items:
+        $ref: '#/components/schemas/MetricReference'
+    MetricSourceType:
+      type: string
+      enum:
+      - ServiceOperation
+      - CloudWatchMetric
+      - ServiceDependency
+    MetricSourceTypes:
+      type: array
+      items:
+        $ref: '#/components/schemas/MetricSourceType'
     MetricType:
       type: string
       pattern: ^[A-Za-z0-9 -]+$
+    MonitoredRequestCountMetricDataQueries:
+      allOf:
+      - allOf:
+        - $ref: '#/components/schemas/MetricDataQueries'
+        description: |-
+          If you want to count "good requests" to determine the percentage of successful requests for this request-based SLO, specify the metric to use as "good requests" in this structure.
+      - allOf:
+        - $ref: '#/components/schemas/MetricDataQueries'
+        description: |-
+          If you want to count "bad requests" to determine the percentage of successful requests for this request-based SLO, specify the metric to use as "bad requests" in this structure.
+      description: |-
+        This structure defines the metric that is used as the "good request" or "bad request" value for a request-based SLO. This value observed for the metric defined in `TotalRequestCountMetric` is divided by the number found for `MonitoredRequestCountMetric` to determine the percentage of successful requests that this SLO tracks.
     Namespace:
       type: string
       pattern: '[^:].*'
@@ -182,8 +274,31 @@ components:
       type: integer
       minimum: 60
       maximum: 900
+    ServiceDependencies:
+      type: array
+      items:
+        $ref: '#/components/schemas/ServiceDependency'
+    ServiceDependents:
+      type: array
+      items:
+        $ref: '#/components/schemas/ServiceDependent'
     ServiceErrorMessage:
       type: string
+    ServiceLevelIndicatorComparisonOperator:
+      type: string
+      enum:
+      - GreaterThanOrEqualTo
+      - GreaterThan
+      - LessThan
+      - LessThanOrEqualTo
+    ServiceLevelIndicatorMetricThreshold:
+      type: number
+      format: double
+    ServiceLevelIndicatorMetricType:
+      type: string
+      enum:
+      - LATENCY
+      - AVAILABILITY
     ServiceLevelIndicatorStatistic:
       type: string
       pattern: ^[a-zA-Z0-9.]+$
@@ -199,6 +314,21 @@ components:
       type: string
     ServiceLevelObjectiveBudgetReportErrorMessage:
       type: string
+    ServiceLevelObjectiveBudgetReportErrors:
+      type: array
+      items:
+        $ref: '#/components/schemas/ServiceLevelObjectiveBudgetReportError'
+    ServiceLevelObjectiveBudgetReports:
+      type: array
+      items:
+        $ref: '#/components/schemas/ServiceLevelObjectiveBudgetReport'
+    ServiceLevelObjectiveBudgetStatus:
+      type: string
+      enum:
+      - OK
+      - WARNING
+      - BREACHED
+      - INSUFFICIENT_DATA
     ServiceLevelObjectiveDescription:
       type: string
       minLength: 1
@@ -207,15 +337,69 @@ components:
       type: string
       pattern: ^[0-9A-Za-z][-._0-9A-Za-z ]{0,126}[0-9A-Za-z]$|^arn:aws:application-signals:[^:]*:[^:]*:slo/[0-9A-Za-z][-._0-9A-Za-z
         ]{0,126}[0-9A-Za-z]$
+    ServiceLevelObjectiveIds:
+      type: array
+      items:
+        type: string
     ServiceLevelObjectiveName:
       type: string
       pattern: ^[0-9A-Za-z][-._0-9A-Za-z ]{0,126}[0-9A-Za-z]$
+    ServiceLevelObjectiveSummaries:
+      type: array
+      items:
+        $ref: '#/components/schemas/ServiceLevelObjectiveSummary'
+    ServiceOperations:
+      type: array
+      items:
+        $ref: '#/components/schemas/ServiceOperation'
+    ServiceSummaries:
+      type: array
+      items:
+        $ref: '#/components/schemas/ServiceSummary'
+    StandardUnit:
+      type: string
+      enum:
+      - Microseconds
+      - Milliseconds
+      - Seconds
+      - Bytes
+      - Kilobytes
+      - Megabytes
+      - Gigabytes
+      - Terabytes
+      - Bits
+      - Kilobits
+      - Megabits
+      - Gigabits
+      - Terabits
+      - Percent
+      - Count
+      - Bytes/Second
+      - Kilobytes/Second
+      - Megabytes/Second
+      - Gigabytes/Second
+      - Terabytes/Second
+      - Bits/Second
+      - Kilobits/Second
+      - Megabits/Second
+      - Gigabits/Second
+      - Terabits/Second
+      - Count/Second
+      - None
     Stat:
       type: string
     TagKey:
       type: string
       minLength: 1
       maxLength: 128
+    TagKeyList:
+      type: array
+      items:
+        $ref: '#/components/schemas/TagKey'
+    TagList:
+      type: array
+      items:
+        $ref: '#/components/schemas/Tag'
     TagValue:
       type: string
       minLength: 0
@@ -226,3 +410,6 @@ components:
       type: integer
     ValidationExceptionMessage:
       type: string
+    WarningThreshold:
+      type: number
+      format: double

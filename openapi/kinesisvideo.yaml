@@ -45,11 +45,51 @@ servers:
 paths: {}
 components:
   schemas:
+    APIName:
+      type: string
+      enum:
+      - PUT_MEDIA
+      - GET_MEDIA
+      - LIST_FRAGMENTS
+      - GET_MEDIA_FOR_FRAGMENT_LIST
+      - GET_HLS_STREAMING_SESSION_URL
+      - GET_DASH_STREAMING_SESSION_URL
+      - GET_CLIP
+      - GET_IMAGES
+    ChannelInfoList:
+      type: array
+      items:
+        $ref: '#/components/schemas/ChannelInfo'
     ChannelName:
       type: string
       pattern: ^[a-zA-Z0-9_.-]+$
       minLength: 1
       maxLength: 256
+    ChannelProtocol:
+      type: string
+      enum:
+      - WSS
+      - HTTPS
+      - WEBRTC
+    ChannelRole:
+      type: string
+      enum:
+      - MASTER
+      - VIEWER
+    ChannelType:
+      type: string
+      enum:
+      - SINGLE_MASTER
+      - FULL_MESH
+    ComparisonOperator:
+      type: string
+      enum:
+      - BEGINS_WITH
+    ConfigurationStatus:
+      type: string
+      enum:
+      - ENABLED
+      - DISABLED
     DataEndpoint:
       type: string
     DataRetentionChangeInHours:
@@ -87,6 +127,19 @@ components:
       type: string
     FailedStatusDetails:
       type: string
+    Format:
+      type: string
+      enum:
+      - JPEG
+      - PNG
+    FormatConfig:
+      type: object
+      additionalProperties:
+        $ref: '#/components/schemas/FormatConfigValue'
+    FormatConfigKey:
+      type: string
+      enum:
+      - JPEGQuality
     FormatConfigValue:
       type: string
       pattern: ^[a-zA-Z_0-9]+$
@@ -101,6 +154,11 @@ components:
       pattern: ^arn:[a-z\d-]+:iot:[a-z0-9-]+:[0-9]+:thing/[a-zA-Z0-9_.-]+$
       minLength: 1
       maxLength: 1024
+    ImageSelectorType:
+      type: string
+      enum:
+      - SERVER_TIMESTAMP
+      - PRODUCER_TIMESTAMP
     JobStatusDetails:
       type: string
     KmsKeyId:
@@ -108,14 +166,26 @@ components:
       pattern: ^.+$
       minLength: 1
       maxLength: 2048
+    ListEdgeAgentConfigurationsEdgeConfigList:
+      type: array
+      items:
+        $ref: '#/components/schemas/ListEdgeAgentConfigurationsEdgeConfig'
     ListEdgeAgentConfigurationsInputLimit:
       type: integer
       minimum: 1
       maximum: 10
+    ListOfProtocols:
+      type: array
+      items:
+        $ref: '#/components/schemas/ChannelProtocol'
     ListStreamsInputLimit:
       type: integer
       minimum: 1
       maximum: 10000
+    MappedResourceConfigurationList:
+      type: array
+      items:
+        $ref: '#/components/schemas/MappedResourceConfigurationListItem'
     MappedResourceConfigurationListLimit:
       type: integer
       minimum: 1
@@ -124,6 +194,11 @@ components:
       type: integer
       minimum: 64
       maximum: 2000000
+    MediaStorageConfigurationStatus:
+      type: string
+      enum:
+      - ENABLED
+      - DISABLED
     MediaType:
       type: string
       pattern: ^[\w\-\.\+]+/[\w\-\.\+]+(,[\w\-\.\+]+/[\w\-\.\+]+)*$
@@ -134,6 +209,11 @@ components:
       pattern: ^arn:[a-z\d-]+:secretsmanager:[a-z0-9-]+:[0-9]+:secret:[a-zA-Z0-9_.-]+$
       minLength: 20
       maxLength: 2048
+    MediaUriType:
+      type: string
+      enum:
+      - RTSP_URI
+      - FILE_URI
     MessageTtlSeconds:
       type: integer
       minimum: 5
@@ -143,6 +223,12 @@ components:
       pattern: ^[a-zA-Z0-9+/=]*$
       minLength: 0
       maxLength: 1024
+    RecorderStatus:
+      type: string
+      enum:
+      - SUCCESS
+      - USER_ERROR
+      - SYSTEM_ERROR
     ResourceARN:
       type: string
       pattern: ^arn:[a-z\d-]+:kinesisvideo:[a-z0-9-]+:[0-9]+:[a-z]+/[a-zA-Z0-9_.-]+/[0-9]+$
@@ -150,6 +236,14 @@ components:
       maxLength: 1024
     ResourceEndpoint:
       type: string
+    ResourceEndpointList:
+      type: array
+      items:
+        $ref: '#/components/schemas/ResourceEndpointListItem'
+    ResourceTags:
+      type: object
+      additionalProperties:
+        $ref: '#/components/schemas/TagValue'
     SamplingInterval:
       type: integer
     ScheduleExpression:
@@ -157,23 +251,75 @@ components:
       pattern: ^[^\n]{11,100}$
       minLength: 11
       maxLength: 100
+    Status:
+      type: string
+      enum:
+      - CREATING
+      - ACTIVE
+      - UPDATING
+      - DELETING
+    StrategyOnFullSize:
+      type: string
+      enum:
+      - DELETE_OLDEST_MEDIA
+      - DENY_NEW_MEDIA
+    StreamInfoList:
+      type: array
+      items:
+        $ref: '#/components/schemas/StreamInfo'
     StreamName:
       type: string
       pattern: ^[a-zA-Z0-9_.-]+$
       minLength: 1
       maxLength: 256
+    SyncStatus:
+      type: string
+      enum:
+      - SYNCING
+      - ACKNOWLEDGED
+      - IN_SYNC
+      - SYNC_FAILED
+      - DELETING
+      - DELETE_FAILED
+      - DELETING_ACKNOWLEDGED
     TagKey:
       type: string
       pattern: ^([\p{L}\p{Z}\p{N}_.:/=+\-@]*)$
       minLength: 1
       maxLength: 128
+    TagKeyList:
+      type: array
+      items:
+        $ref: '#/components/schemas/TagKey'
+    TagList:
+      type: array
+      items:
+        $ref: '#/components/schemas/Tag'
+    TagOnCreateList:
+      type: array
+      items:
+        $ref: '#/components/schemas/Tag'
     TagValue:
       type: string
       pattern: ^[\p{L}\p{Z}\p{N}_.:/=+\-@]*$
       minLength: 0
       maxLength: 256
+    Timestamp:
+      type: string
+      format: date-time
     Type:
       type: string
+    UpdateDataRetentionOperation:
+      type: string
+      enum:
+      - INCREASE_DATA_RETENTION
+      - DECREASE_DATA_RETENTION
+    UploaderStatus:
+      type: string
+      enum:
+      - SUCCESS
+      - USER_ERROR
+      - SYSTEM_ERROR
     Version:
       type: string
       pattern: ^[a-zA-Z0-9]+$

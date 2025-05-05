@@ -54,6 +54,13 @@ servers:
 paths: {}
 components:
   schemas:
+    AlertManagerDefinitionData:
+      type: string
+      format: byte
+      description: "<p>The base-64 encoded blob that is alert manager definition.</p>\n\
+        \         <p>For details about the alert manager definition, see <a href=\"\
+        https://docs.aws.amazon.com/prometheus/latest/APIReference/yaml-AlertManagerDefinitionData.html\"\
+        >AlertManagedDefinitionData</a>.</p>"
     AlertManagerDefinitionStatusCode:
       type: string
       enum:
@@ -66,6 +73,14 @@ components:
     ClusterArn:
       type: string
       pattern: ^arn:aws[-a-z]*:eks:[-a-z0-9]+:[0-9]{12}:cluster/.+$
+    Destination:
+      allOf:
+      - allOf:
+        - $ref: '#/components/schemas/AmpConfiguration'
+        description: |-
+          The Amazon Managed Service for Prometheus workspace to send metrics to.
+      description: |-
+        Where to send the metrics from a scraper.
     FilterKey:
       type: string
       minLength: 1
@@ -74,6 +89,11 @@ components:
       type: string
       minLength: 1
       maxLength: 256
+    FilterValues:
+      type: array
+      items:
+        $ref: '#/components/schemas/FilterValue'
+      description: <p>A list of scraper filter values.</p>
     IamRoleArn:
       type: string
       pattern: ^arn:aws[-a-z]*:iam::[0-9]{12}:role/.+$
@@ -91,9 +111,17 @@ components:
       type: string
       pattern: ^[a-zA-Z_][a-zA-Z0-9_]*$
       minLength: 1
+    LabelSet:
+      type: object
+      additionalProperties:
+        $ref: '#/components/schemas/LabelValue'
     LabelValue:
       type: string
       minLength: 1
+    LimitsPerLabelSetList:
+      type: array
+      items:
+        $ref: '#/components/schemas/LimitsPerLabelSet'
     LogGroupArn:
       type: string
       pattern: ^arn:aws[-a-z]*:logs:[-a-z0-9]+:[0-9]{12}:log-group:[A-Za-z0-9\.\-\_\#/]{1,512}\:\*$
@@ -111,6 +139,10 @@ components:
       maxLength: 1000
     RuleGroupsNamespaceArn:
       type: string
+    RuleGroupsNamespaceData:
+      type: string
+      format: byte
+      description: <p>The rule groups namespace data.</p>
     RuleGroupsNamespaceName:
       type: string
       pattern: '[0-9A-Za-z][-.0-9A-Z_a-z]*'
@@ -125,6 +157,19 @@ components:
       - DELETING
       - CREATION_FAILED
       - UPDATE_FAILED
+    RuleGroupsNamespaceSummaryList:
+      type: array
+      items:
+        $ref: '#/components/schemas/RuleGroupsNamespaceSummary'
+      description: <p>A list of rule groups namespace summary.</p>
+    ScrapeConfiguration:
+      allOf:
+      - allOf:
+        - $ref: '#/components/schemas/Blob'
+        description: |-
+          The base 64 encoded scrape configuration file.
+      description: |-
+        A scrape configuration for a scraper, base 64 encoded. For more information, see [Scraper configuration](https://docs.aws.amazon.com/prometheus/latest/userguide/AMP-collector-how-to.html#AMP-collector-configuration) in the _Amazon Managed Service for Prometheus User Guide_.
     ScraperAlias:
       type: string
       pattern: ^[0-9A-Za-z][-.0-9A-Z_a-z]*$
@@ -132,6 +177,11 @@ components:
       maxLength: 100
     ScraperArn:
       type: string
+    ScraperFilters:
+      type: object
+      additionalProperties:
+        $ref: '#/components/schemas/FilterValues'
+      description: <p>A list of scraper filters.</p>
     ScraperId:
       type: string
       pattern: ^[0-9A-Za-z][-.0-9A-Z_a-z]*$
@@ -147,11 +197,29 @@ components:
       - CREATION_FAILED
       - UPDATE_FAILED
       - DELETION_FAILED
+    ScraperSummaryList:
+      type: array
+      items:
+        $ref: '#/components/schemas/ScraperSummary'
+      description: <p>A list of scraper summaries.</p>
     SecurityGroupId:
       type: string
       pattern: ^sg-[0-9a-z]+$
       minLength: 0
       maxLength: 255
+    SecurityGroupIds:
+      type: array
+      items:
+        $ref: '#/components/schemas/SecurityGroupId'
+      description: <p>A list of security group IDs specified for VPC configuration.</p>
+    Source:
+      allOf:
+      - allOf:
+        - $ref: '#/components/schemas/EksConfiguration'
+        description: |-
+          The Amazon EKS cluster from which a scraper collects metrics.
+      description: |-
+        The source of collected metrics for a scraper.
     StatusReason:
       type: string
       minLength: 1
@@ -161,11 +229,25 @@ components:
       pattern: ^subnet-[0-9a-z]+$
       minLength: 0
       maxLength: 255
+    SubnetIds:
+      type: array
+      items:
+        $ref: '#/components/schemas/SubnetId'
+      description: <p>A list of subnet IDs specified for VPC configuration.</p>
     TagKey:
       type: string
       pattern: ^([\p{L}\p{Z}\p{N}_.:/=+\-@]*)$
       minLength: 1
       maxLength: 128
+    TagKeys:
+      type: array
+      items:
+        $ref: '#/components/schemas/TagKey'
+    TagMap:
+      type: object
+      additionalProperties:
+        $ref: '#/components/schemas/TagValue'
+      description: <p>A tag associated with a resource.</p>
     TagValue:
       type: string
       pattern: ^([\p{L}\p{Z}\p{N}_.:/=+\-@]*)$
@@ -175,6 +257,11 @@ components:
       type: string
       minLength: 1
       maxLength: 1024
+    ValidationExceptionFieldList:
+      type: array
+      items:
+        $ref: '#/components/schemas/ValidationExceptionField'
+      description: <p>A list of fields.</p>
     ValidationExceptionReason:
       type: string
       enum:
@@ -208,3 +295,8 @@ components:
       - UPDATING
       - DELETING
       - CREATION_FAILED
+    WorkspaceSummaryList:
+      type: array
+      items:
+        $ref: '#/components/schemas/WorkspaceSummary'
+      description: <p>A list of workspace summaries.</p>

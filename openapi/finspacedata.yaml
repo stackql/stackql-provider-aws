@@ -56,31 +56,88 @@ components:
       pattern: ^alias\/\S+$
       minLength: 1
       maxLength: 255
+    ApiAccess:
+      type: string
+      enum:
+      - ENABLED
+      - DISABLED
+    ApplicationPermission:
+      type: string
+      enum:
+      - CreateDataset
+      - ManageClusters
+      - ManageUsersAndGroups
+      - ManageAttributeSets
+      - ViewAuditData
+      - AccessNotebooks
+      - GetTemporaryCredentials
+    ApplicationPermissionList:
+      type: array
+      items:
+        $ref: '#/components/schemas/ApplicationPermission'
     Boolean:
       type: boolean
       default: false
       description: Common Boolean data type
+    ChangeType:
+      type: string
+      enum:
+      - REPLACE
+      - APPEND
+      - MODIFY
+      description: Indicates how the given change will be applied to the dataset.
     ChangesetArn:
       type: string
     ChangesetId:
       type: string
       minLength: 1
       maxLength: 26
+    ChangesetList:
+      type: array
+      items:
+        $ref: '#/components/schemas/ChangesetSummary'
+      description: List of Changeset Summaries
     ClientToken:
       type: string
       pattern: \S
       minLength: 1
       maxLength: 128
+    ColumnDataType:
+      type: string
+      enum:
+      - STRING
+      - CHAR
+      - INTEGER
+      - TINYINT
+      - SMALLINT
+      - BIGINT
+      - FLOAT
+      - DOUBLE
+      - DATE
+      - DATETIME
+      - BOOLEAN
+      - BINARY
+      description: Data type of a column.
     ColumnDescription:
       type: string
       pattern: ^[\s\S]*$
       minLength: 0
       maxLength: 512
+    ColumnList:
+      type: array
+      items:
+        $ref: '#/components/schemas/ColumnDefinition'
+      description: List of Column Definitions
     ColumnName:
       type: string
       pattern: \S
       minLength: 0
       maxLength: 126
+    ColumnNameList:
+      type: array
+      items:
+        $ref: '#/components/schemas/ColumnName'
+      description: List of Column Names
     DataViewArn:
       type: string
     DataViewDestinationType:
@@ -89,6 +146,23 @@ components:
       type: string
       minLength: 1
       maxLength: 26
+    DataViewList:
+      type: array
+      items:
+        $ref: '#/components/schemas/DataViewSummary'
+      description: List of Data Views
+    DataViewStatus:
+      type: string
+      enum:
+      - RUNNING
+      - STARTING
+      - FAILED
+      - CANCELLED
+      - TIMEOUT
+      - SUCCESS
+      - PENDING
+      - FAILED_CLEANUP_FAILED
+      description: Status of a DataView
     DatasetArn:
       type: string
     DatasetDescription:
@@ -100,6 +174,25 @@ components:
       type: string
       minLength: 1
       maxLength: 26
+    DatasetKind:
+      type: string
+      enum:
+      - TABULAR
+      - NON_TABULAR
+      description: Dataset Kind
+    DatasetList:
+      type: array
+      items:
+        $ref: '#/components/schemas/Dataset'
+      description: List of Dataset structures
+    DatasetStatus:
+      type: string
+      enum:
+      - PENDING
+      - FAILED
+      - SUCCESS
+      - RUNNING
+      description: Status of the dataset process returned from scheduler service.
     DatasetTitle:
       type: string
       pattern: \S
@@ -110,21 +203,53 @@ components:
       pattern: ^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,4}$
       minLength: 4
       maxLength: 320
+    ErrorCategory:
+      type: string
+      enum:
+      - VALIDATION
+      - SERVICE_QUOTA_EXCEEDED
+      - ACCESS_DENIED
+      - RESOURCE_NOT_FOUND
+      - THROTTLING
+      - INTERNAL_SERVICE_EXCEPTION
+      - CANCELLED
+      - USER_RECOVERABLE
+      description: Changeset Error Category
     ErrorMessage:
       type: string
       minLength: 0
       maxLength: 1000
     ErrorMessage2:
       type: string
+    ExportFileFormat:
+      type: string
+      enum:
+      - PARQUET
+      - DELIMITED_TEXT
+      description: Data View Export File Format
     FirstName:
       type: string
       pattern: \S
       minLength: 1
       maxLength: 50
+    FormatParams:
+      type: object
+      additionalProperties:
+        $ref: '#/components/schemas/StringMapValue'
+      description: Format Parameters of a Changeset
     IdType:
       type: string
       minLength: 1
       maxLength: 26
+    IngestionStatus:
+      type: string
+      enum:
+      - PENDING
+      - FAILED
+      - SUCCESS
+      - RUNNING
+      - STOP_REQUESTED
+      description: Status of the ingestion process returned from scheduler service.
     LastName:
       type: string
       pattern: \S
@@ -137,11 +262,20 @@ components:
       maxLength: 250
     PaginationToken:
       type: string
+    PartitionColumnList:
+      type: array
+      items:
+        $ref: '#/components/schemas/StringValueLength1to255'
+      description: DataView Partition Column List
     Password:
       type: string
       pattern: \S
       minLength: 8
       maxLength: 20
+    PermissionGroupByUserList:
+      type: array
+      items:
+        $ref: '#/components/schemas/PermissionGroupByUser'
     PermissionGroupDescription:
       type: string
       pattern: ^[\s\S]*$
@@ -152,6 +286,16 @@ components:
       pattern: \S
       minLength: 1
       maxLength: 26
+    PermissionGroupList:
+      type: array
+      items:
+        $ref: '#/components/schemas/PermissionGroup'
+    PermissionGroupMembershipStatus:
+      type: string
+      enum:
+      - ADDITION_IN_PROGRESS
+      - ADDITION_SUCCESS
+      - REMOVAL_IN_PROGRESS
     PermissionGroupName:
       type: string
       pattern: \S
@@ -162,6 +306,11 @@ components:
       pattern: ^[\+0-9\#\,\(][\+0-9\-\.\/\(\)\,\#\s]+$
       minLength: 10
       maxLength: 20
+    ResourcePermissionsList:
+      type: array
+      items:
+        $ref: '#/components/schemas/ResourcePermission'
+      description: List of Resource Permissions
     ResultLimit:
       type: integer
       minimum: 1
@@ -176,6 +325,10 @@ components:
       pattern: ^.*\S.*$
       minLength: 1
       maxLength: 63
+    S3DestinationFormatOptions:
+      type: object
+      additionalProperties:
+        $ref: '#/components/schemas/StringMapValue'
     S3Key:
       type: string
       pattern: ^.*\S.*$
@@ -186,11 +339,26 @@ components:
       pattern: ^[\s\S]*\S[\s\S]*$
       minLength: 1
       maxLength: 1000
+    SessionDuration:
+      type: integer
+      format: int64
+      minimum: 1
+      maximum: 60
     SessionToken:
       type: string
       pattern: ^[\s\S]*\S[\s\S]*$
       minLength: 1
       maxLength: 1000
+    SortColumnList:
+      type: array
+      items:
+        $ref: '#/components/schemas/StringValueLength1to255'
+      description: DataView Sort Column List
+    SourceParams:
+      type: object
+      additionalProperties:
+        $ref: '#/components/schemas/StringMapValue'
+      description: Source Parameters of a Changeset
     StatusCode:
       type: integer
       default: 0
@@ -218,11 +386,40 @@ components:
       type: string
       minLength: 1
       maxLength: 255
+    TimestampEpoch:
+      type: integer
+      format: int64
+      description: Milliseconds since UTC epoch
+      default: 0
+    UserByPermissionGroupList:
+      type: array
+      items:
+        $ref: '#/components/schemas/UserByPermissionGroup'
     UserId:
       type: string
       pattern: \S
       minLength: 1
       maxLength: 26
+    UserList:
+      type: array
+      items:
+        $ref: '#/components/schemas/User'
+    UserStatus:
+      type: string
+      enum:
+      - CREATING
+      - ENABLED
+      - DISABLED
+    UserType:
+      type: string
+      enum:
+      - SUPER_USER
+      - APP_USER
+    locationType:
+      type: string
+      enum:
+      - INGESTION
+      - SAGEMAKER
     stringValueLength1to1024:
       type: string
       pattern: \S

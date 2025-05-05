@@ -46,30 +46,137 @@ servers:
 paths: {}
 components:
   schemas:
+    AppAuthorizationStatus:
+      type: string
+      enum:
+      - PendingConnect
+      - Connected
+      - ConnectionValidationFailed
+      - TokenAutoRotationFailed
+    AppAuthorizationSummaryList:
+      type: array
+      items:
+        $ref: '#/components/schemas/AppAuthorizationSummary'
+    AppBundleSummaryList:
+      type: array
+      items:
+        $ref: '#/components/schemas/AppBundleSummary'
     Arn:
       type: string
       pattern: ^arn:.+$
       minLength: 1
       maxLength: 1011
+    AuthType:
+      type: string
+      enum:
+      - oauth2
+      - apiKey
+    Credential:
+      allOf:
+      - allOf:
+        - $ref: '#/components/schemas/Oauth2Credential'
+        description: |-
+          Contains OAuth2 client credential information.
+      - allOf:
+        - $ref: '#/components/schemas/ApiKeyCredential'
+        description: |-
+          Contains API key credential information.
+      description: |-
+        Contains credential information for an application.
+    DateTime:
+      type: string
+      format: date-time
+    Destination:
+      allOf:
+      - allOf:
+        - $ref: '#/components/schemas/S3Bucket'
+        description: |-
+          Contains information about an Amazon S3 bucket.
+      - allOf:
+        - $ref: '#/components/schemas/FirehoseStream'
+        description: |-
+          Contains information about an Amazon Kinesis Data Firehose delivery stream.
+      description: |-
+        Contains information about an audit log destination.
+    DestinationConfiguration:
+      allOf:
+      - allOf:
+        - $ref: '#/components/schemas/AuditLogDestinationConfiguration'
+        description: |-
+          Contains information about an audit log destination configuration.
+      description: |-
+        Contains information about the destination of ingested data.
     Email:
       type: string
       pattern: ^[a-zA-Z0-9.!#$%&’*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$
       maxLength: 320
+    Format:
+      type: string
+      enum:
+      - json
+      - parquet
     Identifier:
       type: string
       pattern: ^arn:.+$|^[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$
       minLength: 1
       maxLength: 1011
+    IngestionDestinationList:
+      type: array
+      items:
+        $ref: '#/components/schemas/IngestionDestinationSummary'
+    IngestionDestinationStatus:
+      type: string
+      enum:
+      - Active
+      - Failed
+    IngestionList:
+      type: array
+      items:
+        $ref: '#/components/schemas/IngestionSummary'
+    IngestionState:
+      type: string
+      enum:
+      - enabled
+      - disabled
+    IngestionType:
+      type: string
+      enum:
+      - auditLog
     Integer:
       type: integer
     MaxResults:
       type: integer
       minimum: 1
       maximum: 100
+    Persona:
+      type: string
+      enum:
+      - admin
+      - endUser
+    ProcessingConfiguration:
+      allOf:
+      - allOf:
+        - $ref: '#/components/schemas/AuditLogProcessingConfiguration'
+        description: |-
+          Contains information about an audit log processing configuration.
+      description: |-
+        Contains information about how ingested data is processed.
     RedirectUri:
       type: string
       pattern: ^https://[-a-zA-Z0-9-._~:/?#@!$&'()*+,;=]+$
       maxLength: 1024
+    ResultStatus:
+      type: string
+      enum:
+      - IN_PROGRESS
+      - COMPLETED
+      - FAILED
+      - EXPIRED
+    Schema:
+      type: string
+      enum:
+      - ocsf
+      - raw
     SensitiveString2048:
       type: string
       minLength: 1
@@ -98,10 +205,22 @@ components:
       type: string
       minLength: 1
       maxLength: 128
+    TagKeyList:
+      type: array
+      items:
+        $ref: '#/components/schemas/TagKey'
+    TagList:
+      type: array
+      items:
+        $ref: '#/components/schemas/Tag'
     TagValue:
       type: string
       minLength: 0
       maxLength: 256
+    TaskIdList:
+      type: array
+      items:
+        $ref: '#/components/schemas/UUID'
     TenantIdentifier:
       type: string
       minLength: 1
@@ -109,3 +228,22 @@ components:
     UUID:
       type: string
       pattern: ^[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$
+    UserAccessResultsList:
+      type: array
+      items:
+        $ref: '#/components/schemas/UserAccessResultItem'
+    UserAccessTasksList:
+      type: array
+      items:
+        $ref: '#/components/schemas/UserAccessTaskItem'
+    ValidationExceptionFieldList:
+      type: array
+      items:
+        $ref: '#/components/schemas/ValidationExceptionField'
+    ValidationExceptionReason:
+      type: string
+      enum:
+      - unknownOperation
+      - cannotParse
+      - fieldValidationFailed
+      - other

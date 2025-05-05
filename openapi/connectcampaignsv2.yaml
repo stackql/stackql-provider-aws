@@ -61,6 +61,19 @@ components:
       pattern: ^.*$
       minLength: 0
       maxLength: 32767
+    Attributes:
+      type: object
+      additionalProperties:
+        $ref: '#/components/schemas/AttributeValue'
+      description: A custom key-value pair using an attribute map. The attributes
+        are standard Amazon Connect attributes, and can be accessed in contact flows
+        just like any other contact attributes.
+    BandwidthAllocation:
+      type: number
+      format: double
+      description: The bandwidth allocation of a queue resource.
+      minimum: 0
+      maximum: 1
     CampaignArn:
       type: string
       minLength: 20
@@ -75,6 +88,11 @@ components:
       pattern: ^[a-zA-Z0-9\-:/]*$
       minLength: 0
       maxLength: 256
+    CampaignIdList:
+      type: array
+      items:
+        $ref: '#/components/schemas/CampaignId'
+      description: List of CampaignId
     CampaignName:
       type: string
       minLength: 1
@@ -88,21 +106,59 @@ components:
       - Stopped
       - Failed
       - Completed
+    CampaignSummaryList:
+      type: array
+      items:
+        $ref: '#/components/schemas/CampaignSummary'
+      description: A list of Amazon Connect campaigns.
+    Capacity:
+      type: number
+      format: double
+      description: Allocates outbound capacity for the specific channel subtype of
+        this campaign between multiple active campaigns
+      minimum: 0.01
+      maximum: 1
     ChannelSubtype:
       type: string
       enum:
       - TELEPHONY
       - SMS
       - EMAIL
+    ChannelSubtypeList:
+      type: array
+      items:
+        $ref: '#/components/schemas/ChannelSubtype'
+      description: Channel subtype list
+    ChannelSubtypeParameters:
+      allOf:
+      - allOf:
+        - $ref: '#/components/schemas/TelephonyChannelSubtypeParameters'
+      - allOf:
+        - $ref: '#/components/schemas/SmsChannelSubtypeParameters'
+      - allOf:
+        - $ref: '#/components/schemas/EmailChannelSubtypeParameters'
+      description: |-
+        ChannelSubtypeParameters for an outbound request
     ClientToken:
       type: string
       pattern: ^[a-zA-Z0-9_\-.]*$
       minLength: 0
       maxLength: 200
+    CommunicationLimitList:
+      type: array
+      items:
+        $ref: '#/components/schemas/CommunicationLimit'
+      description: List of communication limit
     CommunicationLimitTimeUnit:
       type: string
       enum:
       - DAY
+    CommunicationLimits:
+      allOf:
+      - allOf:
+        - $ref: '#/components/schemas/CommunicationLimitList'
+      description: |-
+        Communication limits
     CommunicationLimitsConfigType:
       type: string
       enum:
@@ -116,6 +172,11 @@ components:
     ContactFlowId:
       type: string
       maxLength: 500
+    DailyHours:
+      type: object
+      additionalProperties:
+        $ref: '#/components/schemas/TimeRangeList'
+      description: Daily Hours map
     DayOfWeek:
       type: string
       enum:
@@ -145,6 +206,12 @@ components:
       type: string
       minLength: 0
       maxLength: 256
+    EmailOutboundMode:
+      allOf:
+      - allOf:
+        - $ref: '#/components/schemas/AgentlessConfig'
+      description: |-
+        Email Outbound Mode
     Enabled:
       type: boolean
       default: false
@@ -163,6 +230,21 @@ components:
       - Campaign-SMS
       - Campaign-Telephony
       - Campaign-Orchestration
+    FailedCampaignStateResponseList:
+      type: array
+      items:
+        $ref: '#/components/schemas/FailedCampaignStateResponse'
+      description: List of failed requests of campaign state
+    FailedProfileOutboundRequestList:
+      type: array
+      items:
+        $ref: '#/components/schemas/FailedProfileOutboundRequest'
+      description: List of failed profile outbound requests
+    FailedRequestList:
+      type: array
+      items:
+        $ref: '#/components/schemas/FailedRequest'
+      description: A list of failed requests.
     FailureCode:
       type: string
       enum:
@@ -199,6 +281,35 @@ components:
       - IN_PROGRESS
       - SUCCEEDED
       - FAILED
+    IntegrationConfig:
+      allOf:
+      - allOf:
+        - $ref: '#/components/schemas/CustomerProfilesIntegrationConfig'
+      - allOf:
+        - $ref: '#/components/schemas/QConnectIntegrationConfig'
+      description: |-
+        Integration config for Connect Instance
+    IntegrationIdentifier:
+      allOf:
+      - allOf:
+        - $ref: '#/components/schemas/CustomerProfilesIntegrationIdentifier'
+      - allOf:
+        - $ref: '#/components/schemas/QConnectIntegrationIdentifier'
+      description: |-
+        Integration identifier for Connect instance
+    IntegrationSummary:
+      allOf:
+      - allOf:
+        - $ref: '#/components/schemas/CustomerProfilesIntegrationSummary'
+      - allOf:
+        - $ref: '#/components/schemas/QConnectIntegrationSummary'
+      description: |-
+        Integration summary for Connect instance.
+    IntegrationSummaryList:
+      type: array
+      items:
+        $ref: '#/components/schemas/IntegrationSummary'
+      description: A list of Amazon Connect Instance Integrations.
     Iso8601Date:
       type: string
       pattern: ^\d{4}-\d{2}-\d{2}$
@@ -210,6 +321,11 @@ components:
     Iso8601Time:
       type: string
       pattern: ^T\d{2}:\d{2}$
+    LocalTimeZoneDetection:
+      type: array
+      items:
+        $ref: '#/components/schemas/LocalTimeZoneDetectionType'
+      description: Local TimeZone Detection method list
     LocalTimeZoneDetectionType:
       type: string
       enum:
@@ -227,6 +343,22 @@ components:
       type: string
       minLength: 1
       maxLength: 255
+    ObjectTypeNamesMap:
+      type: object
+      additionalProperties:
+        $ref: '#/components/schemas/ObjectTypeName'
+      description: Object type names map.
+    OpenHours:
+      allOf:
+      - allOf:
+        - $ref: '#/components/schemas/DailyHours'
+      description: |-
+        Open Hours config
+    OutboundRequestList:
+      type: array
+      items:
+        $ref: '#/components/schemas/OutboundRequest'
+      description: A list of outbound requests.
     ProfileId:
       type: string
       pattern: ^[a-f0-9]{32}$
@@ -243,28 +375,102 @@ components:
       pattern: ^[a-zA-Z0-9_\-.]*$
       minLength: 0
       maxLength: 256
+    ProfileOutboundRequestList:
+      type: array
+      items:
+        $ref: '#/components/schemas/ProfileOutboundRequest'
+      description: List of profile outbound requests
     QueueId:
       type: string
       maxLength: 500
+    RestrictedPeriodList:
+      type: array
+      items:
+        $ref: '#/components/schemas/RestrictedPeriod'
+      description: List of restricted period
     RestrictedPeriodName:
       type: string
       minLength: 1
       maxLength: 127
+    RestrictedPeriods:
+      allOf:
+      - allOf:
+        - $ref: '#/components/schemas/RestrictedPeriodList'
+      description: |-
+        Restricted period config
     ServiceLinkedRoleArn:
       type: string
       maxLength: 256
+    SmsOutboundMode:
+      allOf:
+      - allOf:
+        - $ref: '#/components/schemas/AgentlessConfig'
+      description: |-
+        SMS Outbound Mode
+    Source:
+      allOf:
+      - allOf:
+        - $ref: '#/components/schemas/Arn'
+      - allOf:
+        - $ref: '#/components/schemas/EventTrigger'
+      description: |-
+        Source of the campaign
     SourcePhoneNumber:
       type: string
       maxLength: 100
+    SuccessfulCampaignStateResponseList:
+      type: array
+      items:
+        $ref: '#/components/schemas/SuccessfulCampaignStateResponse'
+      description: List of successful response of campaign state
+    SuccessfulProfileOutboundRequestList:
+      type: array
+      items:
+        $ref: '#/components/schemas/SuccessfulProfileOutboundRequest'
+      description: List of successful profile outbound requests
+    SuccessfulRequestList:
+      type: array
+      items:
+        $ref: '#/components/schemas/SuccessfulRequest'
+      description: A list of successful requests identified by the unique client token.
     TagKey:
       type: string
       pattern: ^(?!aws:)[a-zA-Z+-=._:/]+$
       minLength: 1
       maxLength: 128
+    TagKeyList:
+      type: array
+      items:
+        $ref: '#/components/schemas/TagKey'
+      description: List of tag keys.
+    TagMap:
+      type: object
+      additionalProperties:
+        $ref: '#/components/schemas/TagValue'
+      description: Tag map with key and value.
     TagValue:
       type: string
       minLength: 0
       maxLength: 256
+    TelephonyOutboundMode:
+      allOf:
+      - allOf:
+        - $ref: '#/components/schemas/ProgressiveConfig'
+      - allOf:
+        - $ref: '#/components/schemas/PredictiveConfig'
+      - allOf:
+        - $ref: '#/components/schemas/AgentlessConfig'
+      description: |-
+        Telephony Outbound Mode
+    TimeRangeList:
+      type: array
+      items:
+        $ref: '#/components/schemas/TimeRange'
+      description: List of time range
+    TimeStamp:
+      type: string
+      format: date-time
+      description: Timestamp with no UTC offset or timezone
     TimeZone:
       type: string
       pattern: ^[a-zA-Z0-9_\-/]*$

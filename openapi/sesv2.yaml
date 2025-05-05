@@ -55,6 +55,11 @@ components:
       pattern: ^(.+)@(.+)$
       minLength: 6
       maxLength: 254
+    AdditionalContactEmailAddresses:
+      type: array
+      items:
+        $ref: '#/components/schemas/AdditionalContactEmailAddress'
+      x-sensitive: true
     AdminEmail:
       type: string
     AmazonResourceName:
@@ -68,10 +73,21 @@ components:
       type: string
       minLength: 0
       maxLength: 1000
+    AttachmentContentDisposition:
+      type: string
+      enum:
+      - ATTACHMENT
+      - INLINE
     AttachmentContentId:
       type: string
       minLength: 1
       maxLength: 78
+    AttachmentContentTransferEncoding:
+      type: string
+      enum:
+      - BASE64
+      - QUOTED_PRINTABLE
+      - SEVEN_BIT
     AttachmentContentType:
       type: string
       minLength: 1
@@ -80,58 +96,355 @@ components:
       type: string
       minLength: 0
       maxLength: 255
+    AttachmentList:
+      type: array
+      items:
+        $ref: '#/components/schemas/Attachment'
     AttributesData:
       type: string
+    BatchGetMetricDataQueries:
+      type: array
+      items:
+        $ref: '#/components/schemas/BatchGetMetricDataQuery'
+    BehaviorOnMxFailure:
+      type: string
+      enum:
+      - USE_DEFAULT_VALUE
+      - REJECT_MESSAGE
+      description: "<p>The action to take if the required MX record can't be found\
+        \ when you send an email.\n            When you set this value to <code>UseDefaultValue</code>,\
+        \ the mail is sent using\n                <i>amazonses.com</i> as the MAIL\
+        \ FROM domain. When you set this value\n            to <code>RejectMessage</code>,\
+        \ the Amazon SES API v2 returns a\n                <code>MailFromDomainNotVerified</code>\
+        \ error, and doesn't attempt to deliver the\n            email.</p>\n    \
+        \     <p>These behaviors are taken when the custom MAIL FROM domain configuration\
+        \ is in the\n                <code>Pending</code>, <code>Failed</code>, and\
+        \ <code>TemporaryFailure</code>\n            states.</p>"
+    BlacklistEntries:
+      type: array
+      items:
+        $ref: '#/components/schemas/BlacklistEntry'
     BlacklistItemName:
       type: string
+    BlacklistItemNames:
+      type: array
+      items:
+        $ref: '#/components/schemas/BlacklistItemName'
+    BlacklistReport:
+      type: object
+      additionalProperties:
+        $ref: '#/components/schemas/BlacklistEntries'
     BlacklistingDescription:
       type: string
     BounceSubType:
       type: string
+    BounceType:
+      type: string
+      enum:
+      - UNDETERMINED
+      - TRANSIENT
+      - PERMANENT
+    BulkEmailEntryList:
+      type: array
+      items:
+        $ref: '#/components/schemas/BulkEmailEntry'
+      description: <p>A list of <code>BulkEmailEntry</code> objects.</p>
+    BulkEmailEntryResultList:
+      type: array
+      items:
+        $ref: '#/components/schemas/BulkEmailEntryResult'
+      description: <p>A list of <code>BulkMailEntry</code> objects.</p>
+    BulkEmailStatus:
+      type: string
+      enum:
+      - SUCCESS
+      - MESSAGE_REJECTED
+      - MAIL_FROM_DOMAIN_NOT_VERIFIED
+      - CONFIGURATION_SET_NOT_FOUND
+      - TEMPLATE_NOT_FOUND
+      - ACCOUNT_SUSPENDED
+      - ACCOUNT_THROTTLED
+      - ACCOUNT_DAILY_QUOTA_EXCEEDED
+      - INVALID_SENDING_POOL_NAME
+      - ACCOUNT_SENDING_PAUSED
+      - CONFIGURATION_SET_SENDING_PAUSED
+      - INVALID_PARAMETER
+      - TRANSIENT_FAILURE
+      - FAILED
     CampaignId:
       type: string
     CaseId:
       type: string
     Charset:
       type: string
+    CloudWatchDimensionConfigurations:
+      type: array
+      items:
+        $ref: '#/components/schemas/CloudWatchDimensionConfiguration'
     ComplaintFeedbackType:
       type: string
     ComplaintSubType:
       type: string
     ConfigurationSetName:
       type: string
+    ConfigurationSetNameList:
+      type: array
+      items:
+        $ref: '#/components/schemas/ConfigurationSetName'
+    ContactLanguage:
+      type: string
+      enum:
+      - EN
+      - JA
+    ContactListImportAction:
+      type: string
+      enum:
+      - DELETE
+      - PUT
     ContactListName:
       type: string
+    Counter:
+      type: integer
+      format: int64
+      default: 0
     CustomRedirectDomain:
       type: string
+    CustomVerificationEmailTemplatesList:
+      type: array
+      items:
+        $ref: '#/components/schemas/CustomVerificationEmailTemplateMetadata'
+      description: <p>A list of the custom verification email templates that exist
+        in your account.</p>
+    DailyVolumes:
+      type: array
+      items:
+        $ref: '#/components/schemas/DailyVolume'
+    DataFormat:
+      type: string
+      enum:
+      - CSV
+      - JSON
+      description: "<p>The data format of a file, can be one of the following:</p>\n\
+        \         <ul>\n            <li>\n               <p>\n                  <code>CSV</code>\
+        \ – A comma-separated values file.</p>\n            </li>\n            <li>\n\
+        \               <p>\n                  <code>JSON</code> – A JSON file.</p>\n\
+        \            </li>\n         </ul>"
+    DedicatedIpList:
+      type: array
+      items:
+        $ref: '#/components/schemas/DedicatedIp'
+      description: <p>A list of dedicated IP addresses that are associated with your
+        Amazon Web Services account.</p>
     DefaultDimensionValue:
       type: string
+    DeliverabilityDashboardAccountStatus:
+      type: string
+      enum:
+      - ACTIVE
+      - PENDING_EXPIRATION
+      - DISABLED
+      description: "<p>The current status of your Deliverability dashboard subscription.\
+        \ If this value is\n                <code>PENDING_EXPIRATION</code>, your\
+        \ subscription is scheduled to expire at the end\n            of the current\
+        \ calendar month.</p>"
+    DeliverabilityTestReports:
+      type: array
+      items:
+        $ref: '#/components/schemas/DeliverabilityTestReport'
+    DeliverabilityTestStatus:
+      type: string
+      enum:
+      - IN_PROGRESS
+      - COMPLETED
+      description: "<p>The status of a predictive inbox placement test. If the status\
+        \ is <code>IN_PROGRESS</code>, then the predictive inbox placement test is\n\
+        \            currently running. Predictive inbox placement tests are usually\
+        \ complete within 24 hours of creating the test.\n            If the status\
+        \ is <code>COMPLETE</code>, then the test is finished, and you can use the\n\
+        \                <code>GetDeliverabilityTestReport</code> operation to view\
+        \ the results of the\n            test.</p>"
     DeliverabilityTestSubject:
       type: string
+    DeliveryEventType:
+      type: string
+      enum:
+      - SEND
+      - DELIVERY
+      - TRANSIENT_BOUNCE
+      - PERMANENT_BOUNCE
+      - UNDETERMINED_BOUNCE
+      - COMPLAINT
+      description: "<p>The type of delivery events:</p>\n         <ul>\n         \
+        \   <li>\n               <p>\n                  <code>SEND</code> - The send\
+        \ request was successful and SES will\n                    attempt to deliver\
+        \ the message to the recipient’s mail server. (If account-level\n        \
+        \            or global suppression is being used, SES will still count it\
+        \ as a send,\n                    but delivery is suppressed.)</p>\n     \
+        \       </li>\n            <li>\n               <p>\n                  <code>DELIVERY</code>\
+        \ - SES successfully delivered the email to the\n                    recipient's\
+        \ mail server. Excludes deliveries to the mailbox simulator and\n        \
+        \            emails addressed to more than one recipient.</p>\n          \
+        \  </li>\n            <li>\n               <p>\n                  <code>TRANSIENT_BOUNCE</code>\
+        \ - Feedback received for\n                    delivery failures excluding\
+        \ issues with non-existent mailboxes. Excludes bounces from the\n        \
+        \            mailbox simulator, and those from emails addressed to more than\
+        \ one recipient.</p>\n            </li>\n            <li>\n              \
+        \ <p>\n                  <code>PERMANENT_BOUNCE</code> - Feedback received\
+        \ for\n                    emails sent to non-existent mailboxes. Excludes\
+        \ bounces from the mailbox simulator, those\n                    originating\
+        \ from your account-level suppression list (if enabled), and those from emails\n\
+        \                    addressed to more than one recipient.</p>\n         \
+        \   </li>\n            <li>\n               <p>\n                  <code>UNDETERMINED_BOUNCE</code>\
+        \ - SES was unable to determine the bounce reason.</p>\n            </li>\n\
+        \            <li>\n               <p>\n                  <code>COMPLAINT</code>\
+        \ - Complaint received for the email.\n                    This excludes complaints\
+        \ from the mailbox simulator, those originating from\n                   \
+        \ your account-level suppression list (if enabled), and those from emails\
+        \ addressed to more\n                    than one recipient.</p>\n       \
+        \     </li>\n         </ul>"
     Description:
       type: string
     DiagnosticCode:
       type: string
     DimensionName:
       type: string
+    DimensionValueSource:
+      type: string
+      enum:
+      - MESSAGE_TAG
+      - EMAIL_HEADER
+      - LINK_TAG
+      description: "<p>The location where the Amazon SES API v2 finds the value of\
+        \ a dimension to publish to Amazon CloudWatch. To\n            use the message\
+        \ tags that you specify using an <code>X-SES-MESSAGE-TAGS</code> header or\n\
+        \            a parameter to the <code>SendEmail</code> or <code>SendRawEmail</code>\
+        \ API, choose\n                <code>messageTag</code>. To use your own email\
+        \ headers, choose\n                <code>emailHeader</code>. To use link tags,\
+        \ choose <code>linkTags</code>.</p>"
+    Dimensions:
+      type: object
+      additionalProperties:
+        $ref: '#/components/schemas/MetricDimensionValue'
     DisplayName:
       type: string
+    DkimSigningAttributesOrigin:
+      type: string
+      enum:
+      - AWS_SES
+      - EXTERNAL
+      - AWS_SES_AF_SOUTH_1
+      - AWS_SES_EU_NORTH_1
+      - AWS_SES_AP_SOUTH_1
+      - AWS_SES_EU_WEST_3
+      - AWS_SES_EU_WEST_2
+      - AWS_SES_EU_SOUTH_1
+      - AWS_SES_EU_WEST_1
+      - AWS_SES_AP_NORTHEAST_3
+      - AWS_SES_AP_NORTHEAST_2
+      - AWS_SES_ME_SOUTH_1
+      - AWS_SES_AP_NORTHEAST_1
+      - AWS_SES_IL_CENTRAL_1
+      - AWS_SES_SA_EAST_1
+      - AWS_SES_CA_CENTRAL_1
+      - AWS_SES_AP_SOUTHEAST_1
+      - AWS_SES_AP_SOUTHEAST_2
+      - AWS_SES_AP_SOUTHEAST_3
+      - AWS_SES_EU_CENTRAL_1
+      - AWS_SES_US_EAST_1
+      - AWS_SES_US_EAST_2
+      - AWS_SES_US_WEST_1
+      - AWS_SES_US_WEST_2
+    DkimSigningKeyLength:
+      type: string
+      enum:
+      - RSA_1024_BIT
+      - RSA_2048_BIT
+    DkimStatus:
+      type: string
+      enum:
+      - PENDING
+      - SUCCESS
+      - FAILED
+      - TEMPORARY_FAILURE
+      - NOT_STARTED
+      description: "<p>The DKIM authentication status of the identity. The status\
+        \ can be one of the\n            following:</p>\n         <ul>\n         \
+        \   <li>\n               <p>\n                  <code>PENDING</code> – The\
+        \ verification process was initiated, but Amazon SES\n                   \
+        \ hasn't yet detected the DKIM records in the DNS configuration for the\n\
+        \                    domain.</p>\n            </li>\n            <li>\n  \
+        \             <p>\n                  <code>SUCCESS</code> – The verification\
+        \ process completed\n                    successfully.</p>\n            </li>\n\
+        \            <li>\n               <p>\n                  <code>FAILED</code>\
+        \ – The verification process failed. This typically\n                    occurs\
+        \ when Amazon SES fails to find the DKIM records in the DNS configuration\
+        \ of the\n                    domain.</p>\n            </li>\n           \
+        \ <li>\n               <p>\n                  <code>TEMPORARY_FAILURE</code>\
+        \ – A temporary issue is preventing Amazon SES\n                    from determining\
+        \ the DKIM authentication status of the domain.</p>\n            </li>\n \
+        \           <li>\n               <p>\n                  <code>NOT_STARTED</code>\
+        \ – The DKIM verification process hasn't been\n                    initiated\
+        \ for the domain.</p>\n            </li>\n         </ul>"
     DnsToken:
       type: string
+    DnsTokenList:
+      type: array
+      items:
+        $ref: '#/components/schemas/DnsToken'
     Domain:
       type: string
+    DomainDeliverabilityCampaignList:
+      type: array
+      items:
+        $ref: '#/components/schemas/DomainDeliverabilityCampaign'
+      description: <p></p>
+    DomainDeliverabilityTrackingOptions:
+      type: array
+      items:
+        $ref: '#/components/schemas/DomainDeliverabilityTrackingOption'
+      description: "<p>An object that contains information about the Deliverability\
+        \ dashboard subscription for a\n            verified domain that you use to\
+        \ send email and currently has an active Deliverability dashboard\n      \
+        \      subscription. If a Deliverability dashboard subscription is active\
+        \ for a domain, you gain access\n            to reputation, inbox placement,\
+        \ and other metrics for the domain.</p>"
+    DomainIspPlacements:
+      type: array
+      items:
+        $ref: '#/components/schemas/DomainIspPlacement'
     EmailAddress:
       type: string
+    EmailAddressFilterList:
+      type: array
+      items:
+        $ref: '#/components/schemas/InsightsEmailAddress'
+    EmailAddressList:
+      type: array
+      items:
+        $ref: '#/components/schemas/EmailAddress'
+    EmailInsightsList:
+      type: array
+      items:
+        $ref: '#/components/schemas/EmailInsights'
     EmailSubject:
       type: string
       minLength: 1
       maxLength: 998
+    EmailSubjectFilterList:
+      type: array
+      items:
+        $ref: '#/components/schemas/EmailSubject'
     EmailTemplateData:
       type: string
       minLength: 0
       maxLength: 262144
     EmailTemplateHtml:
       type: string
+    EmailTemplateMetadataList:
+      type: array
+      items:
+        $ref: '#/components/schemas/EmailTemplateMetadata'
+      description: <p>A list of the EmailTemplateMetadata object.</p>
     EmailTemplateName:
       type: string
       minLength: 1
@@ -151,12 +464,79 @@ components:
       pattern: ^[\w\-_]+$
       minLength: 1
       maxLength: 64
+    EngagementEventType:
+      type: string
+      enum:
+      - OPEN
+      - CLICK
+      description: "<p>The type of delivery events:</p>\n         <ul>\n         \
+        \   <li>\n               <p>\n                  <code>OPEN</code> - Open event\
+        \ for emails including open trackers.\n                    Excludes opens\
+        \ for emails addressed to more than one recipient.</p>\n            </li>\n\
+        \            <li>\n               <p>\n                  <code>CLICK</code>\
+        \ - Click event for emails including wrapped links.\n                    Excludes\
+        \ clicks for emails addressed to more than one recipient.</p>\n          \
+        \  </li>\n         </ul>"
     ErrorMessage:
       type: string
     Esp:
       type: string
+    Esps:
+      type: array
+      items:
+        $ref: '#/components/schemas/Esp'
     EventDestinationName:
       type: string
+    EventDestinations:
+      type: array
+      items:
+        $ref: '#/components/schemas/EventDestination'
+    EventType:
+      type: string
+      enum:
+      - SEND
+      - REJECT
+      - BOUNCE
+      - COMPLAINT
+      - DELIVERY
+      - OPEN
+      - CLICK
+      - RENDERING_FAILURE
+      - DELIVERY_DELAY
+      - SUBSCRIPTION
+      description: "<p>An email sending event type. For example, email sends, opens,\
+        \ and bounces are all\n            email events.</p>"
+    EventTypes:
+      type: array
+      items:
+        $ref: '#/components/schemas/EventType'
+    ExportDimensionValue:
+      type: array
+      items:
+        $ref: '#/components/schemas/MetricDimensionValue'
+    ExportDimensions:
+      type: object
+      additionalProperties:
+        $ref: '#/components/schemas/ExportDimensionValue'
+    ExportJobSummaryList:
+      type: array
+      items:
+        $ref: '#/components/schemas/ExportJobSummary'
+      description: <p>A list of the export job summaries.</p>
+    ExportMetrics:
+      type: array
+      items:
+        $ref: '#/components/schemas/ExportMetric'
+    ExportSourceType:
+      type: string
+      enum:
+      - METRICS_DATA
+      - MESSAGE_INSIGHTS
+      description: "<p>The type of data source of an export, can be one of the following:</p>\n\
+        \         <ul>\n            <li>\n               <p>\n                  <code>METRICS_DATA</code>\
+        \ - The metrics export.</p>\n            </li>\n            <li>\n       \
+        \        <p>\n                  <code>MESSAGE_INSIGHTS</code> - The Message\
+        \ Insights export.</p>\n            </li>\n         </ul>"
     ExportedRecordsCount:
       type: integer
     FailedRecordsCount:
@@ -165,40 +545,218 @@ components:
       type: string
     FailureRedirectionURL:
       type: string
+    FeatureStatus:
+      type: string
+      enum:
+      - ENABLED
+      - DISABLED
     FeedbackId:
       type: string
     GeneralEnforcementStatus:
       type: string
+    HttpsPolicy:
+      type: string
+      enum:
+      - REQUIRE
+      - REQUIRE_OPEN_ONLY
+      - OPTIONAL
+      description: "<p>The https policy to use for tracking open and click events.\
+        \ If the value is OPTIONAL or HttpsPolicy is not\n        specified, the open\
+        \ trackers use HTTP and click tracker use the original protocol of the link.\n\
+        \        If the value is REQUIRE, both open and click tracker uses HTTPS and\
+        \ if the value is REQUIRE_OPEN_ONLY\n            open tracker uses HTTPS and\
+        \ link tracker is same as original protocol of the link.\n        </p>"
     Identity:
       type: string
       minLength: 1
+    IdentityInfoList:
+      type: array
+      items:
+        $ref: '#/components/schemas/IdentityInfo'
+    IdentityType:
+      type: string
+      enum:
+      - EMAIL_ADDRESS
+      - DOMAIN
+      - MANAGED_DOMAIN
     ImageUrl:
       type: string
+    ImportDestinationType:
+      type: string
+      enum:
+      - SUPPRESSION_LIST
+      - CONTACT_LIST
+      description: "<p>The destination of the import job, which can be used to list\
+        \ import jobs that have a\n            certain <code>ImportDestinationType</code>.</p>"
+    ImportJobSummaryList:
+      type: array
+      items:
+        $ref: '#/components/schemas/ImportJobSummary'
+      description: <p>A list of the import job summaries.</p>
     InsightsEmailAddress:
       type: string
       minLength: 1
       maxLength: 320
+    InsightsEvents:
+      type: array
+      items:
+        $ref: '#/components/schemas/InsightsEvent'
     Ip:
       type: string
+    IpList:
+      type: array
+      items:
+        $ref: '#/components/schemas/Ip'
     Isp:
       type: string
+    IspFilterList:
+      type: array
+      items:
+        $ref: '#/components/schemas/Isp'
     IspName:
       type: string
+    IspNameList:
+      type: array
+      items:
+        $ref: '#/components/schemas/IspName'
+    IspPlacements:
+      type: array
+      items:
+        $ref: '#/components/schemas/IspPlacement'
     JobId:
       type: string
       minLength: 1
+    JobStatus:
+      type: string
+      enum:
+      - CREATED
+      - PROCESSING
+      - COMPLETED
+      - FAILED
+      - CANCELLED
+      description: "<p>The status of a job.</p>\n         <ul>\n            <li>\n\
+        \               <p>\n                  <code>CREATED</code> – Job has just\
+        \ been created.</p>\n            </li>\n            <li>\n               <p>\n\
+        \                  <code>PROCESSING</code> – Job is processing.</p>\n    \
+        \        </li>\n            <li>\n               <p>\n                  <code>ERROR</code>\
+        \ – An error occurred during processing.</p>\n            </li>\n        \
+        \    <li>\n               <p>\n                  <code>COMPLETED</code> –\
+        \ Job has completed processing successfully.</p>\n            </li>\n    \
+        \     </ul>"
+    LastDeliveryEventList:
+      type: array
+      items:
+        $ref: '#/components/schemas/DeliveryEventType'
+    LastEngagementEventList:
+      type: array
+      items:
+        $ref: '#/components/schemas/EngagementEventType'
+    LastFreshStart:
+      type: string
+      format: date-time
+      description: "<p>The date and time (in Unix time) when the reputation metrics\
+        \ were last given a fresh\n            start. When your account is given a\
+        \ fresh start, your reputation metrics are calculated\n            starting\
+        \ from the date of the fresh start.</p>"
+    ListOfContactLists:
+      type: array
+      items:
+        $ref: '#/components/schemas/ContactList'
+    ListOfContacts:
+      type: array
+      items:
+        $ref: '#/components/schemas/Contact'
+    ListOfDedicatedIpPools:
+      type: array
+      items:
+        $ref: '#/components/schemas/PoolName'
+      description: <p>A list of dedicated IP pools that are associated with your Amazon
+        Web Services account.</p>
     ListRecommendationFilterValue:
       type: string
       minLength: 1
       maxLength: 512
+    ListRecommendationsFilter:
+      type: object
+      additionalProperties:
+        $ref: '#/components/schemas/ListRecommendationFilterValue'
+      description: "<p>An object that contains mapping between <code>ListRecommendationsFilterKey</code>\n\
+        \            and <code>ListRecommendationFilterValue</code> to filter by.</p>"
+    ListRecommendationsFilterKey:
+      type: string
+      enum:
+      - TYPE
+      - IMPACT
+      - STATUS
+      - RESOURCE_ARN
+      description: "<p>The <code>ListRecommendations</code> filter type. This can\
+        \ be one of the following:</p>\n         <ul>\n            <li>\n        \
+        \       <p>\n                  <code>TYPE</code> – The recommendation type,\
+        \ with values like <code>DKIM</code>,\n                    <code>SPF</code>,\
+        \ <code>DMARC</code>, <code>BIMI</code>, or <code>COMPLAINT</code>.</p>\n\
+        \            </li>\n            <li>\n               <p>\n               \
+        \   <code>IMPACT</code> – The recommendation impact, with values like\n  \
+        \                  <code>HIGH</code> or <code>LOW</code>.</p>\n          \
+        \  </li>\n            <li>\n               <p>\n                  <code>STATUS</code>\
+        \ – The recommendation status, with values like\n                    <code>OPEN</code>\
+        \ or <code>FIXED</code>.</p>\n            </li>\n            <li>\n      \
+        \         <p>\n                  <code>RESOURCE_ARN</code> – The resource\
+        \ affected by the recommendation,\n                    with values like <code>arn:aws:ses:us-east-1:123456789012:identity/example.com</code>.</p>\n\
+        \            </li>\n         </ul>"
     MailFromDomainName:
       type: string
+    MailFromDomainStatus:
+      type: string
+      enum:
+      - PENDING
+      - SUCCESS
+      - FAILED
+      - TEMPORARY_FAILURE
+      description: "<p>The status of the MAIL FROM domain. This status can have the\
+        \ following values:</p>\n         <ul>\n            <li>\n               <p>\n\
+        \                  <code>PENDING</code> – Amazon SES hasn't started searching\
+        \ for the MX record\n                    yet.</p>\n            </li>\n   \
+        \         <li>\n               <p>\n                  <code>SUCCESS</code>\
+        \ – Amazon SES detected the required MX record for the\n                 \
+        \   MAIL FROM domain.</p>\n            </li>\n            <li>\n         \
+        \      <p>\n                  <code>FAILED</code> – Amazon SES can't find\
+        \ the required MX record, or the\n                    record no longer exists.</p>\n\
+        \            </li>\n            <li>\n               <p>\n               \
+        \   <code>TEMPORARY_FAILURE</code> – A temporary issue occurred, which\n \
+        \                   prevented Amazon SES from determining the status of the\
+        \ MAIL FROM domain.</p>\n            </li>\n         </ul>"
+    MailType:
+      type: string
+      enum:
+      - MARKETING
+      - TRANSACTIONAL
+    Max24HourSend:
+      type: number
+      format: double
+      default: 0
+    MaxDeliverySeconds:
+      type: integer
+      format: int64
+      minimum: 300
+      maximum: 50400
     MaxItems:
       type: integer
+    MaxSendRate:
+      type: number
+      format: double
+      default: 0
     MessageContent:
       type: string
     MessageData:
       type: string
+    MessageHeaderList:
+      type: array
+      items:
+        $ref: '#/components/schemas/MessageHeader'
+      description: "<p>A list of message headers. The list of message headers has\
+        \ to meet the following\n            criteria:</p>\n         <ul>\n      \
+        \      <li>\n               <p>Can contain no more than 15 headers in one\
+        \ message.</p>\n            </li>\n         </ul>"
     MessageHeaderName:
       type: string
       pattern: ^[!-9;-@A-~]+$
@@ -213,12 +771,124 @@ components:
       type: integer
       minimum: 1
       maximum: 10000
+    MessageTagList:
+      type: array
+      items:
+        $ref: '#/components/schemas/MessageTag'
+      description: <p>A list of message tags.</p>
     MessageTagName:
       type: string
     MessageTagValue:
       type: string
+    Metric:
+      type: string
+      enum:
+      - SEND
+      - COMPLAINT
+      - PERMANENT_BOUNCE
+      - TRANSIENT_BOUNCE
+      - OPEN
+      - CLICK
+      - DELIVERY
+      - DELIVERY_OPEN
+      - DELIVERY_CLICK
+      - DELIVERY_COMPLAINT
+      description: "<p>The metric to export, can be one of the following:</p>\n  \
+        \       <ul>\n            <li>\n               <p>\n                  <code>SEND</code>\
+        \ - Emails sent eligible for tracking in the VDM\n                    dashboard.\
+        \ This excludes emails sent to the mailbox simulator and emails\n        \
+        \            addressed to more than one recipient.</p>\n            </li>\n\
+        \            <li>\n               <p>\n                  <code>COMPLAINT</code>\
+        \ - Complaints received for your account. This\n                    excludes\
+        \ complaints from the mailbox simulator, those originating from your\n   \
+        \                 account-level suppression list (if enabled), and those for\
+        \ emails addressed to\n                    more than one recipient</p>\n \
+        \           </li>\n            <li>\n               <p>\n                \
+        \  <code>PERMANENT_BOUNCE</code> - Permanent bounces - i.e., feedback\n  \
+        \                  received for emails sent to non-existent mailboxes. Excludes\
+        \ bounces from the\n                    mailbox simulator, those originating\
+        \ from your account-level suppression list\n                    (if enabled),\
+        \ and those for emails addressed to more than one recipient.</p>\n       \
+        \     </li>\n            <li>\n               <p>\n                  <code>TRANSIENT_BOUNCE</code>\
+        \ - Transient bounces - i.e., feedback\n                    received for delivery\
+        \ failures excluding issues with non-existent mailboxes.\n               \
+        \     Excludes bounces from the mailbox simulator, and those for emails addressed\
+        \ to\n                    more than one recipient.</p>\n            </li>\n\
+        \            <li>\n               <p>\n                  <code>OPEN</code>\
+        \ - Unique open events for emails including open\n                    trackers.\
+        \ Excludes opens for emails addressed to more than one recipient.</p>\n  \
+        \          </li>\n            <li>\n               <p>\n                 \
+        \ <code>CLICK</code> - Unique click events for emails including wrapped\n\
+        \                    links. Excludes clicks for emails addressed to more than\
+        \ one recipient.</p>\n            </li>\n            <li>\n              \
+        \ <p>\n                  <code>DELIVERY</code> - Successful deliveries for\
+        \ email sending\n                    attempts. Excludes deliveries to the\
+        \ mailbox simulator and for emails addressed\n                    to more\
+        \ than one recipient.</p>\n            </li>\n            <li>\n         \
+        \      <p>\n                  <code>DELIVERY_OPEN</code> - Successful deliveries\
+        \ for email sending\n                    attempts. Excludes deliveries to\
+        \ the mailbox simulator, for emails addressed to\n                    more\
+        \ than one recipient, and emails without open trackers.</p>\n            </li>\n\
+        \            <li>\n               <p>\n                  <code>DELIVERY_CLICK</code>\
+        \ - Successful deliveries for email sending\n                    attempts.\
+        \ Excludes deliveries to the mailbox simulator, for emails addressed to\n\
+        \                    more than one recipient, and emails without click trackers.</p>\n\
+        \            </li>\n            <li>\n               <p>\n               \
+        \   <code>DELIVERY_COMPLAINT</code> - Successful deliveries for email\n  \
+        \                  sending attempts. Excludes deliveries to the mailbox simulator,\
+        \ for emails\n                    addressed to more than one recipient, and\
+        \ emails addressed to recipients hosted\n                    by ISPs with\
+        \ which Amazon SES does not have a feedback loop agreement.</p>\n        \
+        \    </li>\n         </ul>"
+    MetricAggregation:
+      type: string
+      enum:
+      - RATE
+      - VOLUME
+      description: "<p>The aggregation to apply to a metric, can be one of the following:</p>\n\
+        \         <ul>\n            <li>\n               <p>\n                  <code>VOLUME</code>\
+        \ - The volume of events for this metric.</p>\n            </li>\n       \
+        \     <li>\n               <p>\n                  <code>RATE</code> - The\
+        \ rate for this metric relative to the\n                    <code>SEND</code>\
+        \ metric volume.</p>\n            </li>\n         </ul>"
+    MetricDataErrorList:
+      type: array
+      items:
+        $ref: '#/components/schemas/MetricDataError'
+    MetricDataResultList:
+      type: array
+      items:
+        $ref: '#/components/schemas/MetricDataResult'
+    MetricDimensionName:
+      type: string
+      enum:
+      - EMAIL_IDENTITY
+      - CONFIGURATION_SET
+      - ISP
+      description: "<p>The <code>BatchGetMetricDataQuery</code> dimension name. This\
+        \ can be one of the following:</p>\n         <ul>\n            <li>\n    \
+        \           <p>\n                  <code>EMAIL_IDENTITY</code> – The email\
+        \ identity used when sending messages.</p>\n            </li>\n          \
+        \  <li>\n               <p>\n                  <code>CONFIGURATION_SET</code>\
+        \ – The configuration set used when sending messages\n                   \
+        \ (if one was used).</p>\n            </li>\n            <li>\n          \
+        \     <p>\n                  <code>ISP</code> – The recipient ISP (e.g. <code>Gmail</code>,\
+        \ <code>Yahoo</code>,\n                    etc.).</p>\n            </li>\n\
+        \         </ul>"
     MetricDimensionValue:
       type: string
+    MetricNamespace:
+      type: string
+      enum:
+      - VDM
+    MetricValueList:
+      type: array
+      items:
+        $ref: '#/components/schemas/Counter'
+    MultiRegionEndpoints:
+      type: array
+      items:
+        $ref: '#/components/schemas/MultiRegionEndpoint'
     NextToken:
       type: string
     NextTokenV2:
@@ -232,11 +902,21 @@ components:
       type: integer
       minimum: 1
       maximum: 1000
+    Percentage:
+      type: number
+      format: double
+      description: <p>An object that contains information about inbox placement percentages.</p>
     Percentage100Wrapper:
       type: integer
     Policy:
       type: string
       minLength: 1
+    PolicyMap:
+      type: object
+      additionalProperties:
+        $ref: '#/components/schemas/Policy'
+      description: "<p>An object that contains mapping between <code>PolicyName</code>\
+        \ and\n                <code>Policy</code> text.</p>"
     PolicyName:
       type: string
       minLength: 1
@@ -252,27 +932,106 @@ components:
       maxLength: 20480
     ProcessedRecordsCount:
       type: integer
+    QueryErrorCode:
+      type: string
+      enum:
+      - INTERNAL_FAILURE
+      - ACCESS_DENIED
     QueryErrorMessage:
       type: string
     QueryIdentifier:
       type: string
       minLength: 1
       maxLength: 255
+    RawAttachmentData:
+      type: string
+      format: byte
+    RawMessageData:
+      type: string
+      format: byte
+      description: "<p>The raw email message. The message has to meet the following\
+        \ criteria:</p>\n         <ul>\n            <li>\n               <p>The message\
+        \ has to contain a header and a body, separated by one blank\n           \
+        \         line.</p>\n            </li>\n            <li>\n               <p>All\
+        \ of the required header fields must be present in the message.</p>\n    \
+        \        </li>\n            <li>\n               <p>Each part of a multipart\
+        \ MIME message must be formatted properly.</p>\n            </li>\n      \
+        \      <li>\n               <p>Attachments must be in a file format that the\
+        \ Amazon SES API v2 supports.\n                    </p>\n            </li>\n\
+        \            <li>\n               <p>The entire message must be Base64 encoded.</p>\n\
+        \            </li>\n            <li>\n               <p>If any of the MIME\
+        \ parts in your message contain content that is outside of\n             \
+        \       the 7-bit ASCII character range, you should encode that content to\
+        \ ensure that\n                    recipients' email clients render the message\
+        \ properly.</p>\n            </li>\n            <li>\n               <p>The\
+        \ length of any single line of text in the message can't exceed 1,000\n  \
+        \                  characters. This restriction is defined in <a href=\"https://tools.ietf.org/html/rfc5321\"\
+        >RFC 5321</a>.</p>\n            </li>\n         </ul>"
     RblName:
       type: string
     RecommendationDescription:
       type: string
+    RecommendationImpact:
+      type: string
+      enum:
+      - LOW
+      - HIGH
+    RecommendationStatus:
+      type: string
+      enum:
+      - OPEN
+      - FIXED
+    RecommendationType:
+      type: string
+      enum:
+      - DKIM
+      - DMARC
+      - SPF
+      - BIMI
+      - COMPLAINT
+    RecommendationsList:
+      type: array
+      items:
+        $ref: '#/components/schemas/Recommendation'
     Region:
       type: string
+    Regions:
+      type: array
+      items:
+        $ref: '#/components/schemas/Region'
     RenderedEmailTemplate:
       type: string
     ReportId:
       type: string
     ReportName:
       type: string
+    ReviewStatus:
+      type: string
+      enum:
+      - PENDING
+      - FAILED
+      - GRANTED
+      - DENIED
+    Routes:
+      type: array
+      items:
+        $ref: '#/components/schemas/Route'
+      description: <p>A list of routes between which the traffic will be split when
+        sending through the multi-region endpoint (global-endpoint).</p>
+    RoutesDetails:
+      type: array
+      items:
+        $ref: '#/components/schemas/RouteDetails'
+      description: <p>A list of route configuration details. Must contain exactly
+        one route configuration.</p>
     S3Url:
       type: string
       pattern: ^s3:\/\/([^\/]+)\/(.*?([^\/]+)\/?)$
+    ScalingMode:
+      type: string
+      enum:
+      - STANDARD
+      - MANAGED
     Selector:
       type: string
       pattern: ^(([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9]))$
@@ -280,18 +1039,114 @@ components:
       maxLength: 63
     SendingPoolName:
       type: string
+    SentLast24Hours:
+      type: number
+      format: double
+      default: 0
+    SerialNumber:
+      type: integer
+      format: int64
+      default: 0
+    Status:
+      type: string
+      enum:
+      - CREATING
+      - READY
+      - FAILED
+      - DELETING
+      description: "<p>The status of the multi-region endpoint (global-endpoint).</p>\n\
+        \         <ul>\n            <li>\n               <p>\n                  <code>CREATING</code>\
+        \ – The resource is being provisioned.</p>\n            </li>\n          \
+        \  <li>\n               <p>\n                  <code>READY</code> – The resource\
+        \ is ready to use.</p>\n            </li>\n            <li>\n            \
+        \   <p>\n                  <code>FAILED</code> – The resource failed to be\
+        \ provisioned.</p>\n            </li>\n            <li>\n               <p>\n\
+        \                  <code>DELETING</code> – The resource is being deleted as\
+        \ requested.</p>\n            </li>\n         </ul>"
     Subject:
       type: string
+    SubscriptionStatus:
+      type: string
+      enum:
+      - OPT_IN
+      - OPT_OUT
     SuccessRedirectionURL:
       type: string
+    SuppressedDestinationSummaries:
+      type: array
+      items:
+        $ref: '#/components/schemas/SuppressedDestinationSummary'
+    SuppressionListImportAction:
+      type: string
+      enum:
+      - DELETE
+      - PUT
+      description: "<p>The type of action to perform on the address. The following\
+        \ are possible values:</p>\n         <ul>\n            <li>\n            \
+        \   <p>PUT: add the addresses to the suppression list.</p>\n            </li>\n\
+        \            <li>\n               <p>DELETE: remove the address from the suppression\
+        \ list.</p>\n            </li>\n         </ul>"
+    SuppressionListReason:
+      type: string
+      enum:
+      - BOUNCE
+      - COMPLAINT
+      description: "<p>The reason that the address was added to the suppression list\
+        \ for your account. The\n            value can be one of the following:</p>\n\
+        \         <ul>\n            <li>\n               <p>\n                  <code>COMPLAINT</code>\
+        \ – Amazon SES added an email address to the suppression\n               \
+        \     list for your account because a message sent to that address results\
+        \ in a\n                    complaint.</p>\n            </li>\n          \
+        \  <li>\n               <p>\n                  <code>BOUNCE</code> – Amazon\
+        \ SES added an email address to the suppression\n                    list\
+        \ for your account because a message sent to that address results in a hard\n\
+        \                    bounce.</p>\n            </li>\n         </ul>"
+    SuppressionListReasons:
+      type: array
+      items:
+        $ref: '#/components/schemas/SuppressionListReason'
     TagKey:
       type: string
+    TagKeyList:
+      type: array
+      items:
+        $ref: '#/components/schemas/TagKey'
+    TagList:
+      type: array
+      items:
+        $ref: '#/components/schemas/Tag'
     TagValue:
       type: string
     TemplateContent:
       type: string
+    Timestamp:
+      type: string
+      format: date-time
+    TimestampList:
+      type: array
+      items:
+        $ref: '#/components/schemas/Timestamp'
+    TlsPolicy:
+      type: string
+      enum:
+      - REQUIRE
+      - OPTIONAL
+      description: "<p>Specifies whether messages that use the configuration set are\
+        \ required to use\n            Transport Layer Security (TLS). If the value\
+        \ is <code>Require</code>, messages are only\n            delivered if a TLS\
+        \ connection can be established. If the value is <code>Optional</code>,\n\
+        \            messages can be delivered in plain text if a TLS connection can't\
+        \ be established.</p>"
     TopicName:
       type: string
+    TopicPreferenceList:
+      type: array
+      items:
+        $ref: '#/components/schemas/TopicPreference'
+    Topics:
+      type: array
+      items:
+        $ref: '#/components/schemas/Topic'
     UnsubscribeAll:
       type: boolean
       default: false
@@ -302,6 +1157,37 @@ components:
     UseDefaultIfPreferenceUnavailable:
       type: boolean
       default: false
+    VerificationError:
+      type: string
+      enum:
+      - SERVICE_ERROR
+      - DNS_SERVER_ERROR
+      - HOST_NOT_FOUND
+      - TYPE_NOT_FOUND
+      - INVALID_VALUE
+      - REPLICATION_ACCESS_DENIED
+      - REPLICATION_PRIMARY_NOT_FOUND
+      - REPLICATION_PRIMARY_BYO_DKIM_NOT_SUPPORTED
+      - REPLICATION_REPLICA_AS_PRIMARY_NOT_SUPPORTED
+      - REPLICATION_PRIMARY_INVALID_REGION
+    VerificationStatus:
+      type: string
+      enum:
+      - PENDING
+      - SUCCESS
+      - FAILED
+      - TEMPORARY_FAILURE
+      - NOT_STARTED
+    Volume:
+      type: integer
+      format: int64
+      description: <p>An object that contains information about inbox placement volume.</p>
+    WarmupStatus:
+      type: string
+      enum:
+      - IN_PROGRESS
+      - DONE
+      description: <p>The warmup status of a dedicated IP.</p>
     WebsiteURL:
       type: string
       pattern: ^(([^:/?#]+):)?(//([^/?#]*))?([^?#]*)(\?([^#]*))?(#(.*))?$

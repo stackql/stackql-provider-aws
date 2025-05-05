@@ -48,15 +48,46 @@ servers:
 paths: {}
 components:
   schemas:
+    StructureIdList:
+      type: array
+      items:
+        type: string
+    AcceleratorName:
+      type: string
+      enum:
+      - t4
+      - a10g
+      - l4
+      - l40s
     AcceleratorRuntime:
       type: string
       minLength: 1
       maxLength: 100
+    AcceleratorSelections:
+      type: array
+      items:
+        $ref: '#/components/schemas/AcceleratorSelection'
+    AcceleratorType:
+      type: string
+      enum:
+      - gpu
+    AcceleratorTypes:
+      type: array
+      items:
+        $ref: '#/components/schemas/AcceleratorType'
     AccessKeyId:
       type: string
+    AcquiredLimits:
+      type: array
+      items:
+        $ref: '#/components/schemas/AcquiredLimit'
     AggregationId:
       type: string
       pattern: ^[0-9a-f]{32}$
+    AllowedStorageProfileIds:
+      type: array
+      items:
+        $ref: '#/components/schemas/StorageProfileId'
     AmountCapabilityName:
       type: string
       pattern: ^([a-zA-Z][a-zA-Z0-9]{0,63}:)?amount(\.[a-zA-Z][a-zA-Z0-9]{0,63})+$
@@ -65,6 +96,34 @@ components:
     AmountRequirementName:
       type: string
       maxLength: 1024
+    AssignedSessionActionDefinition:
+      allOf:
+      - allOf:
+        - $ref: '#/components/schemas/AssignedEnvironmentEnterSessionActionDefinition'
+        description: |-
+          The environment a session starts on.
+      - allOf:
+        - $ref: '#/components/schemas/AssignedEnvironmentExitSessionActionDefinition'
+        description: |-
+          The environment a session exits from.
+      - allOf:
+        - $ref: '#/components/schemas/AssignedTaskRunSessionActionDefinition'
+        description: |-
+          The task run.
+      - allOf:
+        - $ref: '#/components/schemas/AssignedSyncInputJobAttachmentsSessionActionDefinition'
+        description: |-
+          The job attachment to sync with an assigned session action.
+      description: |-
+        The definition of the assigned session action.
+    AssignedSessionActions:
+      type: array
+      items:
+        $ref: '#/components/schemas/AssignedSessionAction'
+    AssignedSessions:
+      type: object
+      additionalProperties:
+        $ref: '#/components/schemas/AssignedSession'
     AttributeCapabilityName:
       type: string
       pattern: ^([a-zA-Z][a-zA-Z0-9]{0,63}:)?attr(\.[a-zA-Z][a-zA-Z0-9]{0,63})+$
@@ -75,13 +134,70 @@ components:
       pattern: ^[a-zA-Z_]([a-zA-Z0-9_\-]{0,99})$
       minLength: 1
       maxLength: 100
+    AttributeCapabilityValuesList:
+      type: array
+      items:
+        $ref: '#/components/schemas/AttributeCapabilityValue'
+    AutoScalingMode:
+      type: string
+      enum:
+      - NO_SCALING
+      - EVENT_BASED_AUTO_SCALING
+    AutoScalingStatus:
+      type: string
+      enum:
+      - GROWING
+      - STEADY
+      - SHRINKING
+    BatchGetJobEntityErrors:
+      type: array
+      items:
+        $ref: '#/components/schemas/GetJobEntityError'
+    BatchGetJobEntityList:
+      type: array
+      items:
+        $ref: '#/components/schemas/JobEntity'
     BoundedString:
       type: string
       minLength: 1
       maxLength: 64
+    BudgetActionType:
+      type: string
+      enum:
+      - STOP_SCHEDULING_AND_COMPLETE_TASKS
+      - STOP_SCHEDULING_AND_CANCEL_TASKS
+    BudgetActionsToAdd:
+      type: array
+      items:
+        $ref: '#/components/schemas/BudgetActionToAdd'
+    BudgetActionsToRemove:
+      type: array
+      items:
+        $ref: '#/components/schemas/BudgetActionToRemove'
     BudgetId:
       type: string
       pattern: ^budget-[0-9a-f]{32}$
+    BudgetSchedule:
+      allOf:
+      - allOf:
+        - $ref: '#/components/schemas/FixedBudgetSchedule'
+        description: |-
+          The fixed start and end time of the budget's schedule.
+      description: |-
+        The start and end time of the budget.
+    BudgetStatus:
+      type: string
+      enum:
+      - ACTIVE
+      - INACTIVE
+    BudgetSummaries:
+      type: array
+      items:
+        $ref: '#/components/schemas/BudgetSummary'
+    CancelSessionActions:
+      type: object
+      additionalProperties:
+        $ref: '#/components/schemas/SessionActionIdList'
     ClientToken:
       type: string
       minLength: 1
@@ -90,14 +206,101 @@ components:
       type: string
       minLength: 1
       maxLength: 1280
+    ComparisonOperator:
+      type: string
+      enum:
+      - EQUAL
+      - NOT_EQUAL
+      - GREATER_THAN_EQUAL_TO
+      - GREATER_THAN
+      - LESS_THAN_EQUAL_TO
+      - LESS_THAN
+    CompletedStatus:
+      type: string
+      enum:
+      - SUCCEEDED
+      - FAILED
+      - INTERRUPTED
+      - CANCELED
+      - NEVER_ATTEMPTED
+    ConflictExceptionReason:
+      type: string
+      enum:
+      - CONFLICT_EXCEPTION
+      - CONCURRENT_MODIFICATION
+      - RESOURCE_ALREADY_EXISTS
+      - RESOURCE_IN_USE
+      - STATUS_CONFLICT
+    ConsumedUsageLimit:
+      type: number
+      format: float
+      minimum: 0.01
+    CpuArchitectureType:
+      type: string
+      enum:
+      - x86_64
+      - arm64
+    CreateJobTargetTaskRunStatus:
+      type: string
+      enum:
+      - READY
+      - SUSPENDED
+    CreatedAt:
+      type: string
+      format: date-time
     CreatedBy:
       type: string
+    CustomFleetAmountCapabilities:
+      type: array
+      items:
+        $ref: '#/components/schemas/FleetAmountCapability'
+    CustomFleetAttributeCapabilities:
+      type: array
+      items:
+        $ref: '#/components/schemas/FleetAttributeCapability'
+    CustomerManagedFleetOperatingSystemFamily:
+      type: string
+      enum:
+      - WINDOWS
+      - LINUX
+      - MACOS
+    DeadlinePrincipalType:
+      type: string
+      enum:
+      - USER
+      - GROUP
+    DefaultQueueBudgetAction:
+      type: string
+      enum:
+      - NONE
+      - STOP_SCHEDULING_AND_COMPLETE_TASKS
+      - STOP_SCHEDULING_AND_CANCEL_TASKS
+    DependenciesList:
+      type: array
+      items:
+        $ref: '#/components/schemas/StepId'
+    DependencyConsumerResolutionStatus:
+      type: string
+      enum:
+      - RESOLVED
+      - UNRESOLVED
     Description:
       type: string
       minLength: 0
       maxLength: 100
+    DesiredWorkerStatus:
+      type: string
+      enum:
+      - STOPPED
     DnsName:
       type: string
+    Document:
+      type: object
+      additionalProperties: true
+      x-sensitive: true
+    Double:
+      type: number
+      format: double
     EbsIops:
       type: integer
       minimum: 3000
@@ -106,6 +309,17 @@ components:
       type: integer
       minimum: 125
       maximum: 1000
+    Ec2MarketType:
+      type: string
+      enum:
+      - on-demand
+      - spot
+    EndedAt:
+      type: string
+      format: date-time
+    EndsAt:
+      type: string
+      format: date-time
     EnvironmentId:
       type: string
       pattern: ^(STEP:step-[0-9a-f]{32}:.*)|(JOB:job-[0-9a-f]{32}:.*)$
@@ -117,22 +331,108 @@ components:
       type: string
       minLength: 1
       maxLength: 15000
+    EnvironmentTemplateType:
+      type: string
+      enum:
+      - JSON
+      - YAML
+    ExceptionContext:
+      type: object
+      additionalProperties:
+        $ref: '#/components/schemas/String'
     FarmId:
       type: string
       pattern: ^farm-[0-9a-f]{32}$
+    FarmMembers:
+      type: array
+      items:
+        $ref: '#/components/schemas/FarmMember'
+    FarmSummaries:
+      type: array
+      items:
+        $ref: '#/components/schemas/FarmSummary'
     FileSystemLocationName:
       type: string
       pattern: ^[0-9A-Za-z ]*$
       minLength: 1
       maxLength: 64
+    FileSystemLocationType:
+      type: string
+      enum:
+      - SHARED
+      - LOCAL
+    FileSystemLocationsList:
+      type: array
+      items:
+        $ref: '#/components/schemas/FileSystemLocation'
+    FleetAmountCapabilities:
+      type: array
+      items:
+        $ref: '#/components/schemas/FleetAmountCapability'
+    FleetAttributeCapabilities:
+      type: array
+      items:
+        $ref: '#/components/schemas/FleetAttributeCapability'
+    FleetConfiguration:
+      allOf:
+      - allOf:
+        - $ref: '#/components/schemas/CustomerManagedFleetConfiguration'
+        description: |-
+          The customer managed fleets within a fleet configuration.
+      - allOf:
+        - $ref: '#/components/schemas/ServiceManagedEc2FleetConfiguration'
+        description: |-
+          The service managed Amazon EC2 instances for a fleet configuration.
+      description: |-
+        Fleet configuration details.
     FleetId:
       type: string
       pattern: ^fleet-[0-9a-f]{32}$
+    FleetIds:
+      type: array
+      items:
+        $ref: '#/components/schemas/FleetId'
+    FleetMembers:
+      type: array
+      items:
+        $ref: '#/components/schemas/FleetMember'
+    FleetStatus:
+      type: string
+      enum:
+      - ACTIVE
+      - CREATE_IN_PROGRESS
+      - UPDATE_IN_PROGRESS
+      - CREATE_FAILED
+      - UPDATE_FAILED
+    FleetSummaries:
+      type: array
+      items:
+        $ref: '#/components/schemas/FleetSummary'
     FloatString:
       type: string
       pattern: ^[-]?(0|[1-9][0-9]*)([.][0-9]+)?([eE][+-]?[0-9]+)?$
       minLength: 1
       maxLength: 26
+    GetJobEntityError:
+      allOf:
+      - allOf:
+        - $ref: '#/components/schemas/JobDetailsError'
+        description: |-
+          The job details for the failed job entity.
+      - allOf:
+        - $ref: '#/components/schemas/JobAttachmentDetailsError'
+        description: |-
+          The job attachment details for the failed job entity.
+      - allOf:
+        - $ref: '#/components/schemas/StepDetailsError'
+        description: |-
+          The step details for the failed job entity.
+      - allOf:
+        - $ref: '#/components/schemas/EnvironmentDetailsError'
+        description: |-
+          The environment details for the failed job entity.
+      description: |-
+        The error for the job entity.
     HostName:
       type: string
       pattern: ^[a-zA-Z0-9_\.\-]{0,255}$
@@ -157,6 +457,10 @@ components:
     InstanceType:
       type: string
       pattern: ^[a-zA-Z0-9]+\.[a-zA-Z0-9]+$
+    InstanceTypes:
+      type: array
+      items:
+        $ref: '#/components/schemas/InstanceType'
     IntString:
       type: string
       pattern: ^[-]?(0|[1-9][0-9]*)$
@@ -167,39 +471,197 @@ components:
     IpV4Address:
       type: string
       pattern: ^(?:[0-9]{1,3}\.){3}[0-9]{1,3}$
+    IpV4Addresses:
+      type: array
+      items:
+        $ref: '#/components/schemas/IpV4Address'
     IpV6Address:
       type: string
       pattern: ^(?:[A-F0-9]{1,4}:){7}[A-F0-9]{1,4}$
+    IpV6Addresses:
+      type: array
+      items:
+        $ref: '#/components/schemas/IpV6Address'
+    JobAttachmentsFileSystem:
+      type: string
+      enum:
+      - COPIED
+      - VIRTUAL
     JobDescription:
       type: string
       minLength: 1
       maxLength: 2048
+    JobEntity:
+      allOf:
+      - allOf:
+        - $ref: '#/components/schemas/JobDetailsEntity'
+        description: |-
+          The job details.
+      - allOf:
+        - $ref: '#/components/schemas/JobAttachmentDetailsEntity'
+        description: |-
+          The job attachment details.
+      - allOf:
+        - $ref: '#/components/schemas/StepDetailsEntity'
+        description: |-
+          The step details.
+      - allOf:
+        - $ref: '#/components/schemas/EnvironmentDetailsEntity'
+        description: |-
+          The environment details for the job entity.
+      description: |-
+        The details of a job entity.
+    JobEntityErrorCode:
+      type: string
+      enum:
+      - AccessDeniedException
+      - InternalServerException
+      - ValidationException
+      - ResourceNotFoundException
+      - MaxPayloadSizeExceeded
+      - ConflictException
+    JobEntityIdentifiers:
+      type: array
+      items:
+        $ref: '#/components/schemas/JobEntityIdentifiersUnion'
+    JobEntityIdentifiersUnion:
+      allOf:
+      - allOf:
+        - $ref: '#/components/schemas/JobDetailsIdentifiers'
+        description: |-
+          The job details.
+      - allOf:
+        - $ref: '#/components/schemas/JobAttachmentDetailsIdentifiers'
+        description: |-
+          The job attachment details.
+      - allOf:
+        - $ref: '#/components/schemas/StepDetailsIdentifiers'
+        description: |-
+          The step details.
+      - allOf:
+        - $ref: '#/components/schemas/EnvironmentDetailsIdentifiers'
+        description: |-
+          The environment details.
+      description: |-
+        The details of a job entity identifier.
     JobId:
       type: string
       pattern: ^job-[0-9a-f]{32}$
+    JobLifecycleStatus:
+      type: string
+      enum:
+      - CREATE_IN_PROGRESS
+      - CREATE_FAILED
+      - CREATE_COMPLETE
+      - UPLOAD_IN_PROGRESS
+      - UPLOAD_FAILED
+      - UPDATE_IN_PROGRESS
+      - UPDATE_FAILED
+      - UPDATE_SUCCEEDED
+      - ARCHIVED
+    JobMembers:
+      type: array
+      items:
+        $ref: '#/components/schemas/JobMember'
     JobName:
       type: string
       minLength: 1
       maxLength: 128
+    JobParameter:
+      allOf:
+      - allOf:
+        - $ref: '#/components/schemas/IntString'
+        description: |-
+          A signed integer represented as a string.
+      - allOf:
+        - $ref: '#/components/schemas/FloatString'
+        description: |-
+          A double precision IEEE-754 floating point number represented as a string.
+      - allOf:
+        - $ref: '#/components/schemas/ParameterString'
+        description: |-
+          A UTF-8 string.
+      - allOf:
+        - $ref: '#/components/schemas/PathString'
+        description: |-
+          A file system path represented as a string.
+      description: |-
+        The details of job parameters.
+    JobParameterDefinition:
+      type: object
+      additionalProperties: true
+    JobParameterDefinitions:
+      type: array
+      items:
+        $ref: '#/components/schemas/JobParameterDefinition'
+    JobParameters:
+      type: object
+      additionalProperties:
+        $ref: '#/components/schemas/JobParameter'
     JobPriority:
       type: integer
       minimum: 0
       maximum: 100
+    JobSearchSummaries:
+      type: array
+      items:
+        $ref: '#/components/schemas/JobSearchSummary'
+    JobSummaries:
+      type: array
+      items:
+        $ref: '#/components/schemas/JobSummary'
+    JobTargetTaskRunStatus:
+      type: string
+      enum:
+      - READY
+      - FAILED
+      - SUCCEEDED
+      - CANCELED
+      - SUSPENDED
+      - PENDING
     JobTemplate:
       type: string
       minLength: 1
       maxLength: 300000
+    JobTemplateType:
+      type: string
+      enum:
+      - JSON
+      - YAML
     KmsKeyArn:
       type: string
       pattern: ^arn:(aws[a-zA-Z-]*):kms:[a-z]{2}((-gov)|(-iso(b?)))?-[a-z]+-\d{1}:\d{12}:key/[\w-]{1,120}$
     LicenseEndpointId:
       type: string
       pattern: ^le-[0-9a-f]{32}$
+    LicenseEndpointStatus:
+      type: string
+      enum:
+      - CREATE_IN_PROGRESS
+      - DELETE_IN_PROGRESS
+      - READY
+      - NOT_READY
+    LicenseEndpointSummaries:
+      type: array
+      items:
+        $ref: '#/components/schemas/LicenseEndpointSummary'
     LicenseProduct:
       type: string
     LimitId:
       type: string
       pattern: ^limit-[0-9a-f]{32}$
+    LimitSummaries:
+      type: array
+      items:
+        $ref: '#/components/schemas/LimitSummary'
+    ListAttributeCapabilityValue:
+      type: array
+      items:
+        $ref: '#/components/schemas/AttributeCapabilityValue'
+    ListSessionsForWorkerSummaries:
+      type: array
+      items:
+        $ref: '#/components/schemas/WorkerSessionSummary'
     LogDriver:
       type: string
       minLength: 1
@@ -208,6 +670,23 @@ components:
       type: string
       minLength: 1
       maxLength: 512
+    LogOptions:
+      type: object
+      additionalProperties:
+        $ref: '#/components/schemas/String'
+    LogParameters:
+      type: object
+      additionalProperties:
+        $ref: '#/components/schemas/String'
+    LogicalOperator:
+      type: string
+      enum:
+      - AND
+      - OR
+    ManifestPropertiesList:
+      type: array
+      items:
+        $ref: '#/components/schemas/ManifestProperties'
     MaxCount:
       type: integer
       minimum: -1
@@ -229,6 +708,13 @@ components:
       type: integer
       minimum: -1
       maximum: 2147483647
+    MembershipLevel:
+      type: string
+      enum:
+      - VIEWER
+      - CONTRIBUTOR
+      - OWNER
+      - MANAGER
     MemoryAmountMiB:
       type: integer
       minimum: 512
@@ -236,6 +722,10 @@ components:
     MeteredProductId:
       type: string
       pattern: ^[0-9a-z]{1,32}-[.0-9a-z]{1,32}$
+    MeteredProductSummaryList:
+      type: array
+      items:
+        $ref: '#/components/schemas/MeteredProductSummary'
     MinOneMaxInteger:
       type: integer
       minimum: 1
@@ -251,10 +741,18 @@ components:
     MonitorId:
       type: string
       pattern: ^monitor-[0-9a-f]{32}$
+    MonitorSummaries:
+      type: array
+      items:
+        $ref: '#/components/schemas/MonitorSummary'
     NextItemOffset:
       type: integer
       minimum: 0
       maximum: 10000
+    OutputRelativeDirectoriesList:
+      type: array
+      items:
+        $ref: '#/components/schemas/String'
     ParameterString:
       type: string
       minLength: 0
@@ -263,10 +761,26 @@ components:
       type: string
       minLength: 1
       maxLength: 256
+    PathFormat:
+      type: string
+      enum:
+      - windows
+      - posix
+    PathMappingRules:
+      type: array
+      items:
+        $ref: '#/components/schemas/PathMappingRule'
     PathString:
       type: string
       minLength: 0
       maxLength: 1024
+    Period:
+      type: string
+      enum:
+      - HOURLY
+      - DAILY
+      - WEEKLY
+      - MONTHLY
     PortNumber:
       type: integer
       minimum: 1024
@@ -279,16 +793,78 @@ components:
       type: integer
       minimum: -2147483648
       maximum: 2147483647
+    QueueBlockedReason:
+      type: string
+      enum:
+      - NO_BUDGET_CONFIGURED
+      - BUDGET_THRESHOLD_REACHED
     QueueEnvironmentId:
       type: string
       pattern: ^queueenv-[0-9a-f]{32}$
+    QueueEnvironmentSummaries:
+      type: array
+      items:
+        $ref: '#/components/schemas/QueueEnvironmentSummary'
+    QueueFleetAssociationStatus:
+      type: string
+      enum:
+      - ACTIVE
+      - STOP_SCHEDULING_AND_COMPLETE_TASKS
+      - STOP_SCHEDULING_AND_CANCEL_TASKS
+      - STOPPED
+    QueueFleetAssociationSummaries:
+      type: array
+      items:
+        $ref: '#/components/schemas/QueueFleetAssociationSummary'
     QueueId:
       type: string
       pattern: ^queue-[0-9a-f]{32}$
+    QueueIds:
+      type: array
+      items:
+        $ref: '#/components/schemas/QueueId'
+    QueueLimitAssociationStatus:
+      type: string
+      enum:
+      - ACTIVE
+      - STOP_LIMIT_USAGE_AND_COMPLETE_TASKS
+      - STOP_LIMIT_USAGE_AND_CANCEL_TASKS
+      - STOPPED
+    QueueLimitAssociationSummaries:
+      type: array
+      items:
+        $ref: '#/components/schemas/QueueLimitAssociationSummary'
+    QueueMemberList:
+      type: array
+      items:
+        $ref: '#/components/schemas/QueueMember'
+    QueueStatus:
+      type: string
+      enum:
+      - IDLE
+      - SCHEDULING
+      - SCHEDULING_BLOCKED
+    QueueSummaries:
+      type: array
+      items:
+        $ref: '#/components/schemas/QueueSummary'
+    RequiredFileSystemLocationNames:
+      type: array
+      items:
+        $ref: '#/components/schemas/FileSystemLocationName'
     ResourceName:
       type: string
       minLength: 1
       maxLength: 100
+    ResponseBudgetActionList:
+      type: array
+      items:
+        $ref: '#/components/schemas/ResponseBudgetAction'
+    RunAs:
+      type: string
+      enum:
+      - QUEUE_CONFIGURED_USER
+      - WORKER_AGENT_USER
     S3BucketName:
       type: string
       minLength: 1
@@ -302,31 +878,231 @@ components:
       pattern: ^[a-zA-Z0-9-_/]+$
       minLength: 1
       maxLength: 63
+    SearchFilterExpression:
+      allOf:
+      - allOf:
+        - $ref: '#/components/schemas/DateTimeFilterExpression'
+        description: |-
+          Filters based on date and time.
+      - allOf:
+        - $ref: '#/components/schemas/ParameterFilterExpression'
+        description: |-
+          Filters by parameter.
+      - allOf:
+        - $ref: '#/components/schemas/SearchTermFilterExpression'
+        description: |-
+          Filters by a specified search term.
+      - allOf:
+        - $ref: '#/components/schemas/StringFilterExpression'
+        description: |-
+          Filters by a string.
+      - allOf:
+        - $ref: '#/components/schemas/SearchGroupedFilterExpressions'
+        description: |-
+          Filters by group.
+      description: |-
+        The type of search filter to apply.
+    SearchFilterExpressions:
+      type: array
+      items:
+        $ref: '#/components/schemas/SearchFilterExpression'
+    SearchSortExpression:
+      allOf:
+      - allOf:
+        - $ref: '#/components/schemas/UserJobsFirst'
+        description: |-
+          Options for sorting a particular user's jobs first.
+      - allOf:
+        - $ref: '#/components/schemas/FieldSortExpression'
+        description: |-
+          Options for sorting by a field.
+      - allOf:
+        - $ref: '#/components/schemas/ParameterSortExpression'
+        description: |-
+          Options for sorting by a parameter.
+      description: |-
+        The resources to search.
+    SearchSortExpressions:
+      type: array
+      items:
+        $ref: '#/components/schemas/SearchSortExpression'
     SearchTerm:
       type: string
       minLength: 1
       maxLength: 256
+    SearchTermMatchingType:
+      type: string
+      enum:
+      - FUZZY_MATCH
+      - CONTAINS
     SecretAccessKey:
       type: string
     SecurityGroupId:
       type: string
       pattern: ^sg-[\w]{1,120}$
+    SecurityGroupIdList:
+      type: array
+      items:
+        $ref: '#/components/schemas/SecurityGroupId'
+    ServiceManagedFleetOperatingSystemFamily:
+      type: string
+      enum:
+      - WINDOWS
+      - LINUX
+    ServiceQuotaExceededExceptionReason:
+      type: string
+      enum:
+      - SERVICE_QUOTA_EXCEEDED_EXCEPTION
+      - KMS_KEY_LIMIT_EXCEEDED
+    SessionActionDefinition:
+      allOf:
+      - allOf:
+        - $ref: '#/components/schemas/EnvironmentEnterSessionActionDefinition'
+        description: |-
+          The environment to enter into.
+      - allOf:
+        - $ref: '#/components/schemas/EnvironmentExitSessionActionDefinition'
+        description: |-
+          The environment to exit from.
+      - allOf:
+        - $ref: '#/components/schemas/TaskRunSessionActionDefinition'
+        description: |-
+          The task run in the session.
+      - allOf:
+        - $ref: '#/components/schemas/SyncInputJobAttachmentsSessionActionDefinition'
+        description: |-
+          The job attachments to sync with a session action.
+      description: |-
+        The definition of the session action.
+    SessionActionDefinitionSummary:
+      allOf:
+      - allOf:
+        - $ref: '#/components/schemas/EnvironmentEnterSessionActionDefinitionSummary'
+        description: |-
+          The environment to enter into.
+      - allOf:
+        - $ref: '#/components/schemas/EnvironmentExitSessionActionDefinitionSummary'
+        description: |-
+          The environment to exit from.
+      - allOf:
+        - $ref: '#/components/schemas/TaskRunSessionActionDefinitionSummary'
+        description: |-
+          The task run.
+      - allOf:
+        - $ref: '#/components/schemas/SyncInputJobAttachmentsSessionActionDefinitionSummary'
+        description: |-
+          The job attachments to sync with the session action definition.
+      description: |-
+        The details of a session action definition.
     SessionActionId:
       type: string
       pattern: ^sessionaction-[0-9a-f]{32}-(0|([1-9][0-9]{0,9}))$
+    SessionActionIdList:
+      type: array
+      items:
+        $ref: '#/components/schemas/SessionActionId'
     SessionActionProgressMessage:
       type: string
       minLength: 0
       maxLength: 4096
+    SessionActionProgressPercent:
+      type: number
+      format: float
+      minimum: 0
+      maximum: 100
+    SessionActionStatus:
+      type: string
+      enum:
+      - ASSIGNED
+      - RUNNING
+      - CANCELING
+      - SUCCEEDED
+      - FAILED
+      - INTERRUPTED
+      - CANCELED
+      - NEVER_ATTEMPTED
+      - SCHEDULED
+      - RECLAIMING
+      - RECLAIMED
+    SessionActionSummaries:
+      type: array
+      items:
+        $ref: '#/components/schemas/SessionActionSummary'
     SessionId:
       type: string
       pattern: ^session-[0-9a-f]{32}$
+    SessionLifecycleStatus:
+      type: string
+      enum:
+      - STARTED
+      - UPDATE_IN_PROGRESS
+      - UPDATE_SUCCEEDED
+      - UPDATE_FAILED
+      - ENDED
+    SessionLifecycleTargetStatus:
+      type: string
+      enum:
+      - ENDED
+    SessionSummaries:
+      type: array
+      items:
+        $ref: '#/components/schemas/SessionSummary'
     SessionToken:
       type: string
+    SessionsStatisticsAggregationStatus:
+      type: string
+      enum:
+      - IN_PROGRESS
+      - TIMEOUT
+      - FAILED
+      - COMPLETED
+    SessionsStatisticsResources:
+      allOf:
+      - allOf:
+        - $ref: '#/components/schemas/QueueIds'
+        description: |-
+          One to 10 queue IDs that specify the queues to return statistics for. If you specify the `queueIds` field, you can't specify the `fleetIds` field.
+      - allOf:
+        - $ref: '#/components/schemas/FleetIds'
+        description: |-
+          One to 10 fleet IDs that specify the fleets to return statistics for. If you specify the `fleetIds` field, you can't specify the `queueIds` field.
+      description: |-
+        Specifies the fleet IDs or queue IDs to return statistics. You can specify only fleet IDs or queue IDS, not both.
+    SortOrder:
+      type: string
+      enum:
+      - ASCENDING
+      - DESCENDING
+    StartedAt:
+      type: string
+      format: date-time
+    StartsAt:
+      type: string
+      format: date-time
+    StatisticsList:
+      type: array
+      items:
+        $ref: '#/components/schemas/Statistics'
     StatusMessage:
       type: string
       minLength: 0
       maxLength: 1024
+    StepAmountCapabilities:
+      type: array
+      items:
+        $ref: '#/components/schemas/StepAmountCapability'
+    StepAttributeCapabilities:
+      type: array
+      items:
+        $ref: '#/components/schemas/StepAttributeCapability'
+    StepConsumers:
+      type: array
+      items:
+        $ref: '#/components/schemas/StepConsumer'
+    StepDependencies:
+      type: array
+      items:
+        $ref: '#/components/schemas/StepDependency'
     StepDescription:
       type: string
       minLength: 1
@@ -334,23 +1110,72 @@ components:
     StepId:
       type: string
       pattern: ^step-[0-9a-f]{32}$
+    StepLifecycleStatus:
+      type: string
+      enum:
+      - CREATE_COMPLETE
+      - UPDATE_IN_PROGRESS
+      - UPDATE_FAILED
+      - UPDATE_SUCCEEDED
     StepName:
       type: string
       minLength: 1
       maxLength: 64
+    StepParameterList:
+      type: array
+      items:
+        $ref: '#/components/schemas/StepParameter'
     StepParameterName:
       type: string
       minLength: 1
       maxLength: 64
+    StepParameterType:
+      type: string
+      enum:
+      - INT
+      - FLOAT
+      - STRING
+      - PATH
+    StepSearchSummaries:
+      type: array
+      items:
+        $ref: '#/components/schemas/StepSearchSummary'
+    StepSummaries:
+      type: array
+      items:
+        $ref: '#/components/schemas/StepSummary'
+    StepTargetTaskRunStatus:
+      type: string
+      enum:
+      - READY
+      - FAILED
+      - SUCCEEDED
+      - CANCELED
+      - SUSPENDED
+      - PENDING
     StorageProfileId:
       type: string
       pattern: ^sp-[0-9a-f]{32}$
+    StorageProfileOperatingSystemFamily:
+      type: string
+      enum:
+      - WINDOWS
+      - LINUX
+      - MACOS
+    StorageProfileSummaries:
+      type: array
+      items:
+        $ref: '#/components/schemas/StorageProfileSummary'
     String:
       type: string
     StringFilter:
       type: string
       minLength: 1
       maxLength: 256
+    StringList:
+      type: array
+      items:
+        $ref: '#/components/schemas/String'
     Subdomain:
       type: string
       pattern: ^[a-z0-9-]{1,100}$
@@ -359,13 +1184,90 @@ components:
       pattern: ^subnet-[\w]{1,120}$
       minLength: 1
       maxLength: 32
+    SubnetIdList:
+      type: array
+      items:
+        $ref: '#/components/schemas/SubnetId'
+    Tags:
+      type: object
+      additionalProperties:
+        $ref: '#/components/schemas/String'
     TaskId:
       type: string
       pattern: ^task-[0-9a-f]{32}-(0|([1-9][0-9]{0,9}))$
+    TaskParameterValue:
+      allOf:
+      - allOf:
+        - $ref: '#/components/schemas/IntString'
+        description: |-
+          A signed integer represented as a string.
+      - allOf:
+        - $ref: '#/components/schemas/FloatString'
+        description: |-
+          A double precision IEEE-754 floating point number represented as a string.
+      - allOf:
+        - $ref: '#/components/schemas/ParameterString'
+        description: |-
+          A UTF-8 string.
+      - allOf:
+        - $ref: '#/components/schemas/PathString'
+        description: |-
+          A file system path represented as a string.
+      description: |-
+        The data types for the task parameters.
+      x-sensitive: true
+    TaskParameters:
+      type: object
+      additionalProperties:
+        $ref: '#/components/schemas/TaskParameterValue'
     TaskRetryCount:
       type: integer
       minimum: 0
       maximum: 2147483647
+    TaskRunStatus:
+      type: string
+      enum:
+      - PENDING
+      - READY
+      - ASSIGNED
+      - STARTING
+      - SCHEDULED
+      - INTERRUPTING
+      - RUNNING
+      - SUSPENDED
+      - CANCELED
+      - FAILED
+      - SUCCEEDED
+      - NOT_COMPATIBLE
+    TaskRunStatusCounts:
+      type: object
+      additionalProperties:
+        $ref: '#/components/schemas/Integer'
+    TaskSearchSummaries:
+      type: array
+      items:
+        $ref: '#/components/schemas/TaskSearchSummary'
+    TaskSummaries:
+      type: array
+      items:
+        $ref: '#/components/schemas/TaskSummary'
+    TaskTargetRunStatus:
+      type: string
+      enum:
+      - READY
+      - FAILED
+      - SUCCEEDED
+      - CANCELED
+      - SUSPENDED
+      - PENDING
+    ThresholdPercentage:
+      type: number
+      format: float
+      minimum: 0
+      maximum: 100
+    Timestamp:
+      type: string
+      format: date-time
     Timezone:
       type: string
       pattern: ^UTC[-+][01][0-9]:(30|00)$
@@ -375,20 +1277,125 @@ components:
       type: integer
       minimum: 0
       maximum: 10000
+    UpdateJobLifecycleStatus:
+      type: string
+      enum:
+      - ARCHIVED
+    UpdateQueueFleetAssociationStatus:
+      type: string
+      enum:
+      - ACTIVE
+      - STOP_SCHEDULING_AND_COMPLETE_TASKS
+      - STOP_SCHEDULING_AND_CANCEL_TASKS
+    UpdateQueueLimitAssociationStatus:
+      type: string
+      enum:
+      - ACTIVE
+      - STOP_LIMIT_USAGE_AND_COMPLETE_TASKS
+      - STOP_LIMIT_USAGE_AND_CANCEL_TASKS
     UpdateWorkerScheduleInterval:
       type: integer
       minimum: 0
+    UpdatedAt:
+      type: string
+      format: date-time
     UpdatedBy:
       type: string
+    UpdatedSessionActions:
+      type: object
+      additionalProperties:
+        $ref: '#/components/schemas/UpdatedSessionActionInfo'
+    UpdatedWorkerStatus:
+      type: string
+      enum:
+      - STARTED
+      - STOPPING
+      - STOPPED
     Url:
       type: string
+    UsageGroupBy:
+      type: array
+      items:
+        $ref: '#/components/schemas/UsageGroupByField'
+    UsageGroupByField:
+      type: string
+      enum:
+      - QUEUE_ID
+      - FLEET_ID
+      - JOB_ID
+      - USER_ID
+      - USAGE_TYPE
+      - INSTANCE_TYPE
+      - LICENSE_PRODUCT
+    UsageStatistic:
+      type: string
+      enum:
+      - SUM
+      - MIN
+      - MAX
+      - AVG
+    UsageStatistics:
+      type: array
+      items:
+        $ref: '#/components/schemas/UsageStatistic'
+    UsageTrackingResource:
+      allOf:
+      - allOf:
+        - $ref: '#/components/schemas/QueueId'
+        description: |-
+          The queue ID.
+      description: |-
+        The usage details of the allotted budget.
+    UsageType:
+      type: string
+      enum:
+      - COMPUTE
+      - LICENSE
     UserId:
       type: string
+    ValidationExceptionFieldList:
+      type: array
+      items:
+        $ref: '#/components/schemas/ValidationExceptionField'
+    ValidationExceptionReason:
+      type: string
+      enum:
+      - UNKNOWN_OPERATION
+      - CANNOT_PARSE
+      - FIELD_VALIDATION_FAILED
+      - OTHER
     VpcId:
       type: string
       pattern: ^vpc-[\w]{1,120}$
       minLength: 1
       maxLength: 32
+    WorkerAmountCapabilityList:
+      type: array
+      items:
+        $ref: '#/components/schemas/WorkerAmountCapability'
+    WorkerAttributeCapabilityList:
+      type: array
+      items:
+        $ref: '#/components/schemas/WorkerAttributeCapability'
     WorkerId:
       type: string
       pattern: ^worker-[0-9a-f]{32}$
+    WorkerSearchSummaries:
+      type: array
+      items:
+        $ref: '#/components/schemas/WorkerSearchSummary'
+    WorkerStatus:
+      type: string
+      enum:
+      - CREATED
+      - STARTED
+      - STOPPING
+      - STOPPED
+      - NOT_RESPONDING
+      - NOT_COMPATIBLE
+      - RUNNING
+      - IDLE
+    WorkerSummaries:
+      type: array
+      items:
+        $ref: '#/components/schemas/WorkerSummary'

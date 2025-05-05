@@ -117,6 +117,16 @@ components:
       type: string
       minLength: 0
       maxLength: 256
+    DICOMAttribute:
+      type: string
+      format: byte
+      minLength: 1
+      maxLength: 10000
+      x-sensitive: true
+    DICOMImportJobSummaries:
+      type: array
+      items:
+        $ref: '#/components/schemas/DICOMImportJobSummary'
     DICOMNumberOfStudyRelatedInstances:
       type: integer
       default: 0
@@ -189,6 +199,21 @@ components:
       pattern: ^[A-Za-z0-9._/#-]+$
       minLength: 1
       maxLength: 256
+    DatastoreStatus:
+      type: string
+      enum:
+      - CREATING
+      - CREATE_FAILED
+      - ACTIVE
+      - DELETING
+      - DELETED
+    DatastoreSummaries:
+      type: array
+      items:
+        $ref: '#/components/schemas/DatastoreSummary'
+    Date:
+      type: string
+      format: date-time
     ImageFrameId:
       type: string
       pattern: ^[0-9a-z]{32}$
@@ -198,6 +223,36 @@ components:
     ImageSetId:
       type: string
       pattern: ^[0-9a-z]{32}$
+    ImageSetMetadataBlob:
+      type: string
+      format: byte
+    ImageSetPropertiesList:
+      type: array
+      items:
+        $ref: '#/components/schemas/ImageSetProperties'
+    ImageSetState:
+      type: string
+      enum:
+      - ACTIVE
+      - LOCKED
+      - DELETED
+    ImageSetWorkflowStatus:
+      type: string
+      enum:
+      - CREATED
+      - COPIED
+      - COPYING
+      - COPYING_WITH_READ_ONLY_ACCESS
+      - COPY_FAILED
+      - UPDATING
+      - UPDATED
+      - UPDATE_FAILED
+      - DELETING
+      - DELETED
+    ImageSetsMetadataSummaries:
+      type: array
+      items:
+        $ref: '#/components/schemas/ImageSetsMetadataSummary'
     JobId:
       type: string
       pattern: ^[0-9a-z]+$
@@ -208,6 +263,13 @@ components:
       pattern: ^[A-Za-z0-9._/#-]+$
       minLength: 1
       maxLength: 64
+    JobStatus:
+      type: string
+      enum:
+      - SUBMITTED
+      - IN_PROGRESS
+      - COMPLETED
+      - FAILED
     KmsKeyArn:
       type: string
       pattern: ^arn:aws[a-zA-Z-]{0,16}:kms:[a-z]{2}(-[a-z]{1,16}){1,3}-\d{1}:\d{12}:((key/[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12})|(alias/[a-zA-Z0-9:/_-]{1,256}))$
@@ -218,11 +280,33 @@ components:
       pattern: ^[\w -:]+$
       minLength: 1
       maxLength: 2048
+    MetadataUpdates:
+      allOf:
+      - allOf:
+        - $ref: '#/components/schemas/DICOMUpdates'
+        description: |-
+          The object containing `removableAttributes` and `updatableAttributes`.
+      - allOf:
+        - $ref: '#/components/schemas/ImageSetExternalVersionId'
+        description: |-
+          Specifies the previous image set version ID to revert the current image set back to.
+
+          You must provide either `revertToVersionId` or `DICOMUpdates` in your request. A `ValidationException` error is thrown if both parameters are provided at the same time.
+      description: |-
+        Contains DICOMUpdates.
     NextToken:
       type: string
       pattern: ^\p{ASCII}{0,8192}$
       minLength: 1
       maxLength: 8192
+    Operator:
+      type: string
+      enum:
+      - EQUAL
+      - BETWEEN
+    PayloadBlob:
+      type: string
+      format: byte
     RoleArn:
       type: string
       pattern: ^arn:aws(-[^:]+)?:iam::[0-9]{12}:role/.+$
@@ -233,11 +317,74 @@ components:
       pattern: ^s3://[a-z0-9][\.\-a-z0-9]{1,61}[a-z0-9](/.*)?$
       minLength: 1
       maxLength: 1024
+    SearchByAttributeValue:
+      allOf:
+      - allOf:
+        - $ref: '#/components/schemas/DICOMPatientId'
+        description: |-
+          The patient ID input for search.
+      - allOf:
+        - $ref: '#/components/schemas/DICOMAccessionNumber'
+        description: |-
+          The DICOM accession number for search.
+      - allOf:
+        - $ref: '#/components/schemas/DICOMStudyId'
+        description: |-
+          The DICOM study ID for search.
+      - allOf:
+        - $ref: '#/components/schemas/DICOMStudyInstanceUID'
+        description: |-
+          The DICOM study instance UID for search.
+      - allOf:
+        - $ref: '#/components/schemas/DICOMSeriesInstanceUID'
+        description: |-
+          The Series Instance UID input for search.
+      - allOf:
+        - $ref: '#/components/schemas/Date'
+        description: |-
+          The created at time of the image set provided for search.
+      - allOf:
+        - $ref: '#/components/schemas/Date'
+        description: |-
+          The timestamp input for search.
+      - allOf:
+        - $ref: '#/components/schemas/DICOMStudyDateAndTime'
+        description: |-
+          The aggregated structure containing DICOM study date and study time for search.
+      description: |-
+        The search input attribute value.
+    SearchByAttributeValues:
+      type: array
+      items:
+        $ref: '#/components/schemas/SearchByAttributeValue'
+    SearchFilters:
+      type: array
+      items:
+        $ref: '#/components/schemas/SearchFilter'
+    SortField:
+      type: string
+      enum:
+      - updatedAt
+      - createdAt
+      - DICOMStudyDateAndTime
+    SortOrder:
+      type: string
+      enum:
+      - ASC
+      - DESC
     TagKey:
       type: string
       pattern: ^(?!aws:)[a-zA-Z+-=._:/]+$
       minLength: 1
       maxLength: 128
+    TagKeyList:
+      type: array
+      items:
+        $ref: '#/components/schemas/TagKey'
+    TagMap:
+      type: object
+      additionalProperties:
+        $ref: '#/components/schemas/TagValue'
     TagValue:
       type: string
       minLength: 0

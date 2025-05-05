@@ -90,6 +90,10 @@ components:
       - AWS::CloudTrail::EventDataStore
       - AWS::S3Tables::Table
       - AWS::S3Express::AccessPoint
+    AccessList:
+      type: array
+      items:
+        $ref: '#/components/schemas/Access'
     AccessPointArn:
       type: string
       pattern: ^arn:[^:]*:s3:[^:]*:[^:]*:accesspoint/.*$
@@ -97,6 +101,10 @@ components:
       type: string
     AccessPreviewFindingId:
       type: string
+    AccessPreviewFindingsList:
+      type: array
+      items:
+        $ref: '#/components/schemas/AccessPreviewFinding'
     AccessPreviewId:
       type: string
       pattern: ^[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$
@@ -111,8 +119,32 @@ components:
       enum:
       - INTERNAL_ERROR
       - INVALID_CONFIGURATION
+    AccessPreviewsList:
+      type: array
+      items:
+        $ref: '#/components/schemas/AccessPreviewSummary'
+    AccountAggregations:
+      type: array
+      items:
+        $ref: '#/components/schemas/FindingAggregationAccountDetails'
+    AccountIdsList:
+      type: array
+      items:
+        type: string
     AclCanonicalId:
       type: string
+    AclGrantee:
+      allOf:
+      - allOf:
+        - $ref: '#/components/schemas/AclCanonicalId'
+        description: |-
+          The value specified is the canonical user ID of an Amazon Web Services account.
+      - allOf:
+        - $ref: '#/components/schemas/AclUri'
+        description: |-
+          Used for granting permissions to a predefined group.
+      description: |-
+        You specify each grantee as a type-value pair using one of these types. You can specify only one type of grantee. For more information, see [PutBucketAcl](https://docs.aws.amazon.com/AmazonS3/latest/API/API_PutBucketAcl.html).
     AclPermission:
       type: string
       enum:
@@ -125,9 +157,33 @@ components:
       type: string
     Action:
       type: string
+    ActionList:
+      type: array
+      items:
+        type: string
+    ActionsList:
+      type: array
+      items:
+        $ref: '#/components/schemas/Action'
+    AnalysisRuleCriteriaList:
+      type: array
+      items:
+        $ref: '#/components/schemas/AnalysisRuleCriteria'
+    AnalyzedResourcesList:
+      type: array
+      items:
+        $ref: '#/components/schemas/AnalyzedResourceSummary'
     AnalyzerArn:
       type: string
       pattern: ^[^:]*:[^:]*:[^:]*:[^:]*:[^:]*:analyzer/.{1,255}$
+    AnalyzerConfiguration:
+      allOf:
+      - allOf:
+        - $ref: '#/components/schemas/UnusedAccessConfiguration'
+        description: |-
+          Specifies the configuration of an unused access analyzer for an Amazon Web Services organization or account.
+      description: |-
+        Contains information about the configuration of an analyzer for an Amazon Web Services organization or account.
     AnalyzerStatus:
       type: string
       enum:
@@ -135,6 +191,14 @@ components:
       - CREATING
       - DISABLED
       - FAILED
+    AnalyzersList:
+      type: array
+      items:
+        $ref: '#/components/schemas/AnalyzerSummary'
+    ArchiveRulesList:
+      type: array
+      items:
+        $ref: '#/components/schemas/ArchiveRuleSummary'
     CheckAccessNotGrantedResult:
       type: string
       enum:
@@ -153,6 +217,74 @@ components:
     CloudTrailArn:
       type: string
       pattern: ^arn:[^:]*:cloudtrail:[^:]*:[^:]*:trail/.{1,576}$
+    ConditionKeyMap:
+      type: object
+      additionalProperties:
+        $ref: '#/components/schemas/String'
+    Configuration:
+      allOf:
+      - allOf:
+        - $ref: '#/components/schemas/EbsSnapshotConfiguration'
+        description: |-
+          The access control configuration is for an Amazon EBS volume snapshot.
+      - allOf:
+        - $ref: '#/components/schemas/EcrRepositoryConfiguration'
+        description: |-
+          The access control configuration is for an Amazon ECR repository.
+      - allOf:
+        - $ref: '#/components/schemas/IamRoleConfiguration'
+        description: |-
+          The access control configuration is for an IAM role.
+      - allOf:
+        - $ref: '#/components/schemas/EfsFileSystemConfiguration'
+        description: |-
+          The access control configuration is for an Amazon EFS file system.
+      - allOf:
+        - $ref: '#/components/schemas/KmsKeyConfiguration'
+        description: |-
+          The access control configuration is for a KMS key.
+      - allOf:
+        - $ref: '#/components/schemas/RdsDbClusterSnapshotConfiguration'
+        description: |-
+          The access control configuration is for an Amazon RDS DB cluster snapshot.
+      - allOf:
+        - $ref: '#/components/schemas/RdsDbSnapshotConfiguration'
+        description: |-
+          The access control configuration is for an Amazon RDS DB snapshot.
+      - allOf:
+        - $ref: '#/components/schemas/SecretsManagerSecretConfiguration'
+        description: |-
+          The access control configuration is for a Secrets Manager secret.
+      - allOf:
+        - $ref: '#/components/schemas/S3BucketConfiguration'
+        description: |-
+          The access control configuration is for an Amazon S3 bucket.
+      - allOf:
+        - $ref: '#/components/schemas/SnsTopicConfiguration'
+        description: |-
+          The access control configuration is for an Amazon SNS topic
+      - allOf:
+        - $ref: '#/components/schemas/SqsQueueConfiguration'
+        description: |-
+          The access control configuration is for an Amazon SQS queue.
+      - allOf:
+        - $ref: '#/components/schemas/S3ExpressDirectoryBucketConfiguration'
+        description: |-
+          The access control configuration is for an Amazon S3 directory bucket.
+      - allOf:
+        - $ref: '#/components/schemas/DynamodbStreamConfiguration'
+        description: |-
+          The access control configuration is for a DynamoDB stream.
+      - allOf:
+        - $ref: '#/components/schemas/DynamodbTableConfiguration'
+        description: |-
+          The access control configuration is for a DynamoDB table or index.
+      description: |-
+        Access control configuration structures for your resource. You specify the configuration as a type-value pair. You can specify only one type of access control configuration.
+    ConfigurationsMap:
+      type: object
+      additionalProperties:
+        $ref: '#/components/schemas/Configuration'
     ConfigurationsMapKey:
       type: string
     DynamodbStreamPolicy:
@@ -161,22 +293,74 @@ components:
       type: string
     EbsGroup:
       type: string
+    EbsGroupList:
+      type: array
+      items:
+        $ref: '#/components/schemas/EbsGroup'
     EbsSnapshotDataEncryptionKeyId:
       type: string
     EbsUserId:
       type: string
+    EbsUserIdList:
+      type: array
+      items:
+        $ref: '#/components/schemas/EbsUserId'
     EcrRepositoryPolicy:
       type: string
     EfsFileSystemPolicy:
       type: string
+    FilterCriteriaMap:
+      type: object
+      additionalProperties:
+        $ref: '#/components/schemas/Criterion'
+    FindingAggregationAccountDetailsMap:
+      type: object
+      additionalProperties:
+        $ref: '#/components/schemas/Integer'
     FindingChangeType:
       type: string
       enum:
       - CHANGED
       - NEW
       - UNCHANGED
+    FindingDetails:
+      allOf:
+      - allOf:
+        - $ref: '#/components/schemas/ExternalAccessDetails'
+        description: |-
+          The details for an external access analyzer finding.
+      - allOf:
+        - $ref: '#/components/schemas/UnusedPermissionDetails'
+        description: |-
+          The details for an unused access analyzer finding with an unused permission finding type.
+      - allOf:
+        - $ref: '#/components/schemas/UnusedIamUserAccessKeyDetails'
+        description: |-
+          The details for an unused access analyzer finding with an unused IAM user access key finding type.
+      - allOf:
+        - $ref: '#/components/schemas/UnusedIamRoleDetails'
+        description: |-
+          The details for an unused access analyzer finding with an unused IAM role finding type.
+      - allOf:
+        - $ref: '#/components/schemas/UnusedIamUserPasswordDetails'
+        description: |-
+          The details for an unused access analyzer finding with an unused IAM user password finding type.
+      description: |-
+        Contains information about an external access or unused access finding. Only one parameter can be used in a `FindingDetails` object.
+    FindingDetailsList:
+      type: array
+      items:
+        $ref: '#/components/schemas/FindingDetails'
     FindingId:
       type: string
+    FindingIdList:
+      type: array
+      items:
+        $ref: '#/components/schemas/FindingId'
+    FindingSourceList:
+      type: array
+      items:
+        $ref: '#/components/schemas/FindingSource'
     FindingSourceType:
       type: string
       enum:
@@ -203,10 +387,42 @@ components:
       - UnusedIAMUserAccessKey
       - UnusedIAMUserPassword
       - UnusedPermission
+    FindingsList:
+      type: array
+      items:
+        $ref: '#/components/schemas/FindingSummary'
+    FindingsListV2:
+      type: array
+      items:
+        $ref: '#/components/schemas/FindingSummaryV2'
+    FindingsStatistics:
+      allOf:
+      - allOf:
+        - $ref: '#/components/schemas/ExternalAccessFindingsStatistics'
+        description: |-
+          The aggregate statistics for an external access analyzer.
+      - allOf:
+        - $ref: '#/components/schemas/UnusedAccessFindingsStatistics'
+        description: |-
+          The aggregate statistics for an unused access analyzer.
+      description: |-
+        Contains information about the aggregate statistics for an external or unused access analyzer. Only one parameter can be used in a `FindingsStatistics` object.
+    FindingsStatisticsList:
+      type: array
+      items:
+        $ref: '#/components/schemas/FindingsStatistics'
+    GeneratedPolicyList:
+      type: array
+      items:
+        $ref: '#/components/schemas/GeneratedPolicy'
     GranteePrincipal:
       type: string
     IamTrustPolicy:
       type: string
+    InlineArchiveRulesList:
+      type: array
+      items:
+        $ref: '#/components/schemas/InlineArchiveRule'
     IssueCode:
       type: string
     IssuingAccount:
@@ -229,8 +445,16 @@ components:
       - CANCELED
     KmsConstraintsKey:
       type: string
+    KmsConstraintsMap:
+      type: object
+      additionalProperties:
+        $ref: '#/components/schemas/KmsConstraintsValue'
     KmsConstraintsValue:
       type: string
+    KmsGrantConfigurationsList:
+      type: array
+      items:
+        $ref: '#/components/schemas/KmsGrantConfiguration'
     KmsGrantOperation:
       type: string
       enum:
@@ -248,6 +472,14 @@ components:
       - RetireGrant
       - Sign
       - Verify
+    KmsGrantOperationsList:
+      type: array
+      items:
+        $ref: '#/components/schemas/KmsGrantOperation'
+    KmsKeyPoliciesMap:
+      type: object
+      additionalProperties:
+        $ref: '#/components/schemas/KmsKeyPolicy'
     KmsKeyPolicy:
       type: string
     LearnMoreLink:
@@ -265,18 +497,60 @@ components:
       - PT_BR
       - ZH_CN
       - ZH_TW
+    LocationList:
+      type: array
+      items:
+        $ref: '#/components/schemas/Location'
     Name:
       type: string
       pattern: ^[A-Za-z][A-Za-z0-9_.-]*$
       minLength: 1
       maxLength: 255
+    NetworkOriginConfiguration:
+      allOf:
+      - allOf:
+        - $ref: '#/components/schemas/VpcConfiguration'
+      - allOf:
+        - $ref: '#/components/schemas/InternetConfiguration'
+        description: |-
+          The configuration for the Amazon S3 access point or multi-region access point with an `Internet` origin.
+      description: |-
+        The proposed `InternetConfiguration` or `VpcConfiguration` to apply to the Amazon S3 access point. You can make the access point accessible from the internet, or you can specify that all requests made through that access point must originate from a specific virtual private cloud (VPC). You can specify only one type of network configuration. For more information, see [Creating access points](https://docs.aws.amazon.com/AmazonS3/latest/dev/creating-access-points.html).
     OrderBy:
       type: string
       enum:
       - ASC
       - DESC
+    PathElement:
+      allOf:
+      - allOf:
+        - $ref: '#/components/schemas/Integer'
+        description: |-
+          Refers to an index in a JSON array.
+      - allOf:
+        - $ref: '#/components/schemas/String'
+        description: |-
+          Refers to a key in a JSON object.
+      - allOf:
+        - $ref: '#/components/schemas/Substring'
+        description: |-
+          Refers to a substring of a literal string in a JSON object.
+      - allOf:
+        - $ref: '#/components/schemas/String'
+        description: |-
+          Refers to the value associated with a given key in a JSON object.
+      description: |-
+        A single element in a path through the JSON representation of a policy.
+    PathElementList:
+      type: array
+      items:
+        $ref: '#/components/schemas/PathElement'
     PolicyDocument:
       type: string
+    PolicyGenerationList:
+      type: array
+      items:
+        $ref: '#/components/schemas/PolicyGeneration'
     PolicyName:
       type: string
     PolicyType:
@@ -289,16 +563,64 @@ components:
     PrincipalArn:
       type: string
       pattern: ^arn:[^:]*:iam::[^:]*:(role|user)/.{1,576}$
+    PrincipalMap:
+      type: object
+      additionalProperties:
+        $ref: '#/components/schemas/String'
     RdsDbClusterSnapshotAccountId:
       type: string
+    RdsDbClusterSnapshotAccountIdsList:
+      type: array
+      items:
+        $ref: '#/components/schemas/RdsDbClusterSnapshotAccountId'
     RdsDbClusterSnapshotAttributeName:
       type: string
+    RdsDbClusterSnapshotAttributeValue:
+      allOf:
+      - allOf:
+        - $ref: '#/components/schemas/RdsDbClusterSnapshotAccountIdsList'
+        description: |-
+          The Amazon Web Services account IDs that have access to the manual Amazon RDS DB cluster snapshot. If the value `all` is specified, then the Amazon RDS DB cluster snapshot is public and can be copied or restored by all Amazon Web Services accounts.
+
+            * If the configuration is for an existing Amazon RDS DB cluster snapshot and you do not specify the `accountIds` in `RdsDbClusterSnapshotAttributeValue`, then the access preview uses the existing shared `accountIds` for the snapshot.
+
+            * If the access preview is for a new resource and you do not specify the specify the `accountIds` in `RdsDbClusterSnapshotAttributeValue`, then the access preview considers the snapshot without any attributes.
+
+            * To propose deletion of existing shared `accountIds`, you can specify an empty list for `accountIds` in the `RdsDbClusterSnapshotAttributeValue`.
+      description: |-
+        The values for a manual Amazon RDS DB cluster snapshot attribute.
+    RdsDbClusterSnapshotAttributesMap:
+      type: object
+      additionalProperties:
+        $ref: '#/components/schemas/RdsDbClusterSnapshotAttributeValue'
     RdsDbClusterSnapshotKmsKeyId:
       type: string
     RdsDbSnapshotAccountId:
       type: string
+    RdsDbSnapshotAccountIdsList:
+      type: array
+      items:
+        $ref: '#/components/schemas/RdsDbSnapshotAccountId'
     RdsDbSnapshotAttributeName:
       type: string
+    RdsDbSnapshotAttributeValue:
+      allOf:
+      - allOf:
+        - $ref: '#/components/schemas/RdsDbSnapshotAccountIdsList'
+        description: |-
+          The Amazon Web Services account IDs that have access to the manual Amazon RDS DB snapshot. If the value `all` is specified, then the Amazon RDS DB snapshot is public and can be copied or restored by all Amazon Web Services accounts.
+
+            * If the configuration is for an existing Amazon RDS DB snapshot and you do not specify the `accountIds` in `RdsDbSnapshotAttributeValue`, then the access preview uses the existing shared `accountIds` for the snapshot.
+
+            * If the access preview is for a new resource and you do not specify the specify the `accountIds` in `RdsDbSnapshotAttributeValue`, then the access preview considers the snapshot without any attributes.
+
+            * To propose deletion of an existing shared `accountIds`, you can specify an empty list for `accountIds` in the `RdsDbSnapshotAttributeValue`.
+      description: |-
+        The name and values of a manual Amazon RDS DB snapshot attribute. Manual DB snapshot attributes are used to authorize other Amazon Web Services accounts to restore a manual DB snapshot.
+    RdsDbSnapshotAttributesMap:
+      type: object
+      additionalProperties:
+        $ref: '#/components/schemas/RdsDbSnapshotAttributeValue'
     RdsDbSnapshotKmsKeyId:
       type: string
     ReasonCode:
@@ -308,6 +630,10 @@ components:
       - DELEGATED_ADMINISTRATOR_DEREGISTERED
       - ORGANIZATION_DELETED
       - SERVICE_LINKED_ROLE_CREATION_FAILED
+    ReasonSummaryList:
+      type: array
+      items:
+        $ref: '#/components/schemas/ReasonSummary'
     RecommendationType:
       type: string
       enum:
@@ -317,6 +643,22 @@ components:
       enum:
       - CREATE_POLICY
       - DETACH_POLICY
+    RecommendedStep:
+      allOf:
+      - allOf:
+        - $ref: '#/components/schemas/UnusedPermissionsRecommendedStep'
+        description: |-
+          A recommended step for an unused permissions finding.
+      description: |-
+        Contains information about a recommended step for an unused access analyzer finding.
+    RecommendedStepList:
+      type: array
+      items:
+        $ref: '#/components/schemas/RecommendedStep'
+    RegionList:
+      type: array
+      items:
+        type: string
     Resource:
       type: string
       maxLength: 2048
@@ -349,22 +691,46 @@ components:
       - AWS::DynamoDB::Table
       - AWS::DynamoDB::Stream
       - AWS::IAM::User
+    ResourceTypeStatisticsMap:
+      type: object
+      additionalProperties:
+        $ref: '#/components/schemas/ResourceTypeDetails'
+    ResourcesList:
+      type: array
+      items:
+        $ref: '#/components/schemas/Resource'
     RetiringPrincipal:
       type: string
     RoleArn:
       type: string
       pattern: ^arn:[^:]*:iam::[^:]*:role/.{1,576}$
+    S3AccessPointConfigurationsMap:
+      type: object
+      additionalProperties:
+        $ref: '#/components/schemas/S3AccessPointConfiguration'
+    S3BucketAclGrantConfigurationsList:
+      type: array
+      items:
+        $ref: '#/components/schemas/S3BucketAclGrantConfiguration'
     S3BucketPolicy:
       type: string
     S3ExpressDirectoryAccessPointArn:
       type: string
       pattern: ^arn:[^:]*:s3express:[^:]*:[^:]*:accesspoint/.*$
+    S3ExpressDirectoryAccessPointConfigurationsMap:
+      type: object
+      additionalProperties:
+        $ref: '#/components/schemas/S3ExpressDirectoryAccessPointConfiguration'
     S3ExpressDirectoryBucketPolicy:
       type: string
     SecretsManagerSecretKmsId:
       type: string
     SecretsManagerSecretPolicy:
       type: string
+    SharedViaList:
+      type: array
+      items:
+        type: string
     SnsTopicPolicy:
       type: string
       maxLength: 30720
@@ -376,8 +742,31 @@ components:
       - SUCCEEDED
       - FAILED
       - IN_PROGRESS
+    TagKeys:
+      type: array
+      items:
+        type: string
+    TagsList:
+      type: array
+      items:
+        $ref: '#/components/schemas/TagsMap'
+    TagsMap:
+      type: object
+      additionalProperties:
+        $ref: '#/components/schemas/String'
+    Timestamp:
+      type: string
+      format: date-time
     Token:
       type: string
+    TrailList:
+      type: array
+      items:
+        $ref: '#/components/schemas/Trail'
+    TrailPropertiesList:
+      type: array
+      items:
+        $ref: '#/components/schemas/TrailProperties'
     Type:
       type: string
       enum:
@@ -385,6 +774,18 @@ components:
       - ORGANIZATION
       - ACCOUNT_UNUSED_ACCESS
       - ORGANIZATION_UNUSED_ACCESS
+    UnusedAccessTypeStatisticsList:
+      type: array
+      items:
+        $ref: '#/components/schemas/UnusedAccessTypeStatistics'
+    UnusedActionList:
+      type: array
+      items:
+        $ref: '#/components/schemas/UnusedAction'
+    ValidatePolicyFindingList:
+      type: array
+      items:
+        $ref: '#/components/schemas/ValidatePolicyFinding'
     ValidatePolicyFindingType:
       type: string
       enum:
@@ -401,6 +802,10 @@ components:
       - AWS::S3ObjectLambda::AccessPoint
       - AWS::IAM::AssumeRolePolicyDocument
       - AWS::DynamoDB::Table
+    ValidationExceptionFieldList:
+      type: array
+      items:
+        $ref: '#/components/schemas/ValidationExceptionField'
     ValidationExceptionReason:
       type: string
       enum:
@@ -409,6 +814,10 @@ components:
       - fieldValidationFailed
       - other
       - notSupported
+    ValueList:
+      type: array
+      items:
+        type: string
     VpcId:
       type: string
       pattern: ^vpc-([0-9a-f]){8}(([0-9a-f]){9})?$

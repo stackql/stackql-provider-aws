@@ -53,6 +53,13 @@ components:
       maxLength: 12
     ErrorMessage:
       type: string
+    JobStatus:
+      type: string
+      enum:
+      - Not_Yet_Run
+      - Successful
+      - Failed
+      - Disabled
     ListNamespacesLimit:
       type: integer
       minimum: 1
@@ -65,21 +72,38 @@ components:
       type: integer
       minimum: 1
       maximum: 1000
+    MaintenanceStatus:
+      type: string
+      enum:
+      - enabled
+      - disabled
     MetadataLocation:
       type: string
       minLength: 1
       maxLength: 2048
     NamespaceId:
       type: string
+    NamespaceList:
+      type: array
+      items:
+        $ref: '#/components/schemas/NamespaceName'
     NamespaceName:
       type: string
       pattern: ^[0-9a-z_]*$
       minLength: 1
       maxLength: 255
+    NamespaceSummaryList:
+      type: array
+      items:
+        $ref: '#/components/schemas/NamespaceSummary'
     NextToken:
       type: string
       minLength: 1
       maxLength: 2048
+    OpenTableFormat:
+      type: string
+      enum:
+      - ICEBERG
     PositiveInteger:
       type: integer
       minimum: 1
@@ -88,6 +112,15 @@ components:
       type: string
       minLength: 1
       maxLength: 20480
+    SSEAlgorithm:
+      type: string
+      enum:
+      - AES256
+      - aws:kms
+    SchemaFieldList:
+      type: array
+      items:
+        $ref: '#/components/schemas/SchemaField'
     TableARN:
       type: string
       pattern: ^(arn:aws[-a-z0-9]*:[a-z0-9]+:[-a-z0-9]*:[0-9]{12}:bucket/[a-z0-9_-]{3,63}/table/[a-zA-Z0-9-_]{1,255})$
@@ -98,16 +131,84 @@ components:
       pattern: ^(arn:aws[-a-z0-9]*:[a-z0-9]+:[-a-z0-9]*:[0-9]{12}:bucket/[a-z0-9_-]{3,63})$
     TableBucketId:
       type: string
+    TableBucketMaintenanceConfiguration:
+      type: object
+      additionalProperties:
+        $ref: '#/components/schemas/TableBucketMaintenanceConfigurationValue'
+    TableBucketMaintenanceSettings:
+      allOf:
+      - allOf:
+        - $ref: '#/components/schemas/IcebergUnreferencedFileRemovalSettings'
+        description: |-
+          The unreferenced file removal settings for the table bucket.
+      description: |-
+        Contains details about the maintenance settings for the table bucket.
+    TableBucketMaintenanceType:
+      type: string
+      enum:
+      - icebergUnreferencedFileRemoval
     TableBucketName:
       type: string
       pattern: ^[0-9a-z-]*$
       minLength: 3
       maxLength: 63
+    TableBucketSummaryList:
+      type: array
+      items:
+        $ref: '#/components/schemas/TableBucketSummary'
+    TableMaintenanceConfiguration:
+      type: object
+      additionalProperties:
+        $ref: '#/components/schemas/TableMaintenanceConfigurationValue'
+    TableMaintenanceJobStatus:
+      type: object
+      additionalProperties:
+        $ref: '#/components/schemas/TableMaintenanceJobStatusValue'
+    TableMaintenanceJobType:
+      type: string
+      enum:
+      - icebergCompaction
+      - icebergSnapshotManagement
+      - icebergUnreferencedFileRemoval
+    TableMaintenanceSettings:
+      allOf:
+      - allOf:
+        - $ref: '#/components/schemas/IcebergCompactionSettings'
+        description: |-
+          Contains details about the Iceberg compaction settings for the table.
+      - allOf:
+        - $ref: '#/components/schemas/IcebergSnapshotManagementSettings'
+        description: |-
+          Contains details about the Iceberg snapshot management settings for the table.
+      description: |-
+        Contains details about maintenance settings for the table.
+    TableMaintenanceType:
+      type: string
+      enum:
+      - icebergCompaction
+      - icebergSnapshotManagement
+    TableMetadata:
+      allOf:
+      - allOf:
+        - $ref: '#/components/schemas/IcebergMetadata'
+        description: |-
+          Contains details about the metadata of an Iceberg table.
+      description: |-
+        Contains details about the table metadata.
     TableName:
       type: string
       pattern: ^[0-9a-z_]*$
       minLength: 1
       maxLength: 255
+    TableSummaryList:
+      type: array
+      items:
+        $ref: '#/components/schemas/TableSummary'
+    TableType:
+      type: string
+      enum:
+      - customer
+      - aws
     VersionToken:
       type: string
       minLength: 1

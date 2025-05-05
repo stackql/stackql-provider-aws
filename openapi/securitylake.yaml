@@ -54,6 +54,19 @@ servers:
 paths: {}
 components:
   schemas:
+    AccessType:
+      type: string
+      enum:
+      - LAKEFORMATION
+      - S3
+    AccessTypeList:
+      type: array
+      items:
+        $ref: '#/components/schemas/AccessType'
+    AccountList:
+      type: array
+      items:
+        $ref: '#/components/schemas/AwsAccountId'
     AmazonResourceName:
       type: string
       pattern: ^arn:(aws|aws-us-gov|aws-cn):securitylake:[A-Za-z0-9_/.\-]{0,63}:[A-Za-z0-9_/.\-]{0,63}:[A-Za-z0-9][A-Za-z0-9_/.\-]{0,127}$
@@ -64,6 +77,25 @@ components:
       pattern: ^[0-9]{12}$
       minLength: 12
       maxLength: 12
+    AwsLogSourceConfigurationList:
+      type: array
+      items:
+        $ref: '#/components/schemas/AwsLogSourceConfiguration'
+    AwsLogSourceName:
+      type: string
+      enum:
+      - ROUTE53
+      - VPC_FLOW
+      - SH_FINDINGS
+      - CLOUD_TRAIL_MGMT
+      - LAMBDA_EXECUTION
+      - S3_DATA
+      - EKS_AUDIT
+      - WAF
+    AwsLogSourceResourceList:
+      type: array
+      items:
+        $ref: '#/components/schemas/AwsLogSourceResource'
     AwsLogSourceVersion:
       type: string
       pattern: ^(latest|[0-9]\.[0-9])$
@@ -80,6 +112,41 @@ components:
       pattern: ^[A-Za-z0-9\-\.\_]*$
       minLength: 1
       maxLength: 32
+    DataLakeAutoEnableNewAccountConfigurationList:
+      type: array
+      items:
+        $ref: '#/components/schemas/DataLakeAutoEnableNewAccountConfiguration'
+    DataLakeConfigurationList:
+      type: array
+      items:
+        $ref: '#/components/schemas/DataLakeConfiguration'
+    DataLakeExceptionList:
+      type: array
+      items:
+        $ref: '#/components/schemas/DataLakeException'
+    DataLakeLifecycleTransitionList:
+      type: array
+      items:
+        $ref: '#/components/schemas/DataLakeLifecycleTransition'
+    DataLakeResourceList:
+      type: array
+      items:
+        $ref: '#/components/schemas/DataLakeResource'
+    DataLakeSourceList:
+      type: array
+      items:
+        $ref: '#/components/schemas/DataLakeSource'
+    DataLakeSourceStatusList:
+      type: array
+      items:
+        $ref: '#/components/schemas/DataLakeSourceStatus'
+    DataLakeStatus:
+      type: string
+      enum:
+      - INITIALIZED
+      - PENDING
+      - COMPLETED
+      - FAILED
     DataLakeStorageClass:
       type: string
     DescriptionString:
@@ -90,6 +157,31 @@ components:
       pattern: ^[\w+=,.@:\/-]*$
       minLength: 2
       maxLength: 1224
+    HttpMethod:
+      type: string
+      enum:
+      - POST
+      - PUT
+    LogSourceList:
+      type: array
+      items:
+        $ref: '#/components/schemas/LogSource'
+    LogSourceResource:
+      allOf:
+      - allOf:
+        - $ref: '#/components/schemas/AwsLogSourceResource'
+        description: |-
+          Amazon Security Lake supports log and event collection for natively supported Amazon Web Services services. For more information, see the [Amazon Security Lake User Guide](https://docs.aws.amazon.com/security-lake/latest/userguide/internal-sources.html).
+      - allOf:
+        - $ref: '#/components/schemas/CustomLogSourceResource'
+        description: |-
+          Amazon Security Lake supports custom source types. For more information, see the [Amazon Security Lake User Guide](https://docs.aws.amazon.com/security-lake/latest/userguide/custom-sources.html).
+      description: |-
+        The supported source types from which logs and events are collected in Amazon Security Lake. For a list of supported Amazon Web Services services, see the [Amazon Security Lake User Guide](https://docs.aws.amazon.com/security-lake/latest/userguide/internal-sources.html).
+    LogSourceResourceList:
+      type: array
+      items:
+        $ref: '#/components/schemas/LogSourceResource'
     MaxResults:
       type: integer
       minimum: 1
@@ -97,12 +189,32 @@ components:
     NextToken:
       type: string
       maxLength: 2048
+    NotificationConfiguration:
+      allOf:
+      - allOf:
+        - $ref: '#/components/schemas/SqsNotificationConfiguration'
+        description: |-
+          The configurations for SQS subscriber notification.
+      - allOf:
+        - $ref: '#/components/schemas/HttpsNotificationConfiguration'
+        description: |-
+          The configurations used for HTTPS subscriber notification.
+      description: |-
+        Specify the configurations you want to use for subscriber notification to notify the subscriber when new data is written to the data lake for sources that the subscriber consumes in Security Lake.
     OcsfEventClass:
       type: string
       pattern: ^[A-Z\_0-9]*$
+    OcsfEventClassList:
+      type: array
+      items:
+        $ref: '#/components/schemas/OcsfEventClass'
     Region:
       type: string
       pattern: ^(us(-gov)?|af|ap|ca|eu|me|sa)-(central|north|(north(?:east|west))|south|south(?:east|west)|east|west)-\d+$
+    RegionList:
+      type: array
+      items:
+        $ref: '#/components/schemas/Region'
     ResourceShareArn:
       type: string
     ResourceShareName:
@@ -121,6 +233,23 @@ components:
     SafeString:
       type: string
       pattern: ^[\\\w\-_:/.@=+]*$
+    SourceCollectionStatus:
+      type: string
+      enum:
+      - COLLECTING
+      - MISCONFIGURED
+      - NOT_COLLECTING
+    SubscriberResourceList:
+      type: array
+      items:
+        $ref: '#/components/schemas/SubscriberResource'
+    SubscriberStatus:
+      type: string
+      enum:
+      - ACTIVE
+      - DEACTIVATED
+      - PENDING
+      - READY
     SubscriptionProtocol:
       type: string
       pattern: ^[a-z\-]*$
@@ -128,6 +257,14 @@ components:
       type: string
       minLength: 1
       maxLength: 128
+    TagKeyList:
+      type: array
+      items:
+        $ref: '#/components/schemas/TagKey'
+    TagList:
+      type: array
+      items:
+        $ref: '#/components/schemas/Tag'
     TagValue:
       type: string
       minLength: 0

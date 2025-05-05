@@ -53,6 +53,10 @@ components:
       pattern: ^arn:aws[-a-z]*:elasticfilesystem:[0-9a-z-:]+:access-point/fsap-[0-9a-f]{8,40}$
       minLength: 0
       maxLength: 128
+    AccessPointDescriptions:
+      type: array
+      items:
+        $ref: '#/components/schemas/AccessPointDescription'
     AccessPointId:
       type: string
       pattern: ^(arn:aws[-a-z]*:elasticfilesystem:[0-9a-z-:]+:access-point/fsap-[0-9a-f]{8,40}|fsap-[0-9a-f]{8,40})$
@@ -85,6 +89,19 @@ components:
       pattern: ^.+$
       minLength: 1
       maxLength: 64
+    DeletionMode:
+      type: string
+      enum:
+      - ALL_CONFIGURATIONS
+      - LOCAL_CONFIGURATION_ONLY
+    Destinations:
+      type: array
+      items:
+        $ref: '#/components/schemas/Destination'
+    DestinationsToCreate:
+      type: array
+      items:
+        $ref: '#/components/schemas/DestinationToCreate'
     Encrypted:
       type: boolean
     ErrorCode:
@@ -94,11 +111,29 @@ components:
       type: string
     FileSystemArn:
       type: string
+    FileSystemDescriptions:
+      type: array
+      items:
+        $ref: '#/components/schemas/FileSystemDescription'
     FileSystemId:
       type: string
       pattern: ^(arn:aws[-a-z]*:elasticfilesystem:[0-9a-z-:]+:file-system/fs-[0-9a-f]{8,40}|fs-[0-9a-f]{8,40})$
       minLength: 0
       maxLength: 128
+    FileSystemNullableSizeValue:
+      type: integer
+      format: int64
+      minimum: 0
+    FileSystemSizeValue:
+      type: integer
+      format: int64
+      default: 0
+      minimum: 0
+    Gid:
+      type: integer
+      format: int64
+      minimum: 0
+      maximum: 4294967295
     IpAddress:
       type: string
       pattern: ^[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}$
@@ -109,6 +144,19 @@ components:
       pattern: ^([0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}|mrk-[0-9a-f]{32}|alias/[a-zA-Z0-9/_-]+|(arn:aws[-a-z]*:kms:[a-z0-9-]+:\d{12}:((key/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12})|(key/mrk-[0-9a-f]{32})|(alias/[a-zA-Z0-9/_-]+))))$
       minLength: 0
       maxLength: 2048
+    LifeCycleState:
+      type: string
+      enum:
+      - creating
+      - available
+      - updating
+      - deleting
+      - deleted
+      - error
+    LifecyclePolicies:
+      type: array
+      items:
+        $ref: '#/components/schemas/LifecyclePolicy'
     Marker:
       type: string
       pattern: ^.+$
@@ -125,6 +173,10 @@ components:
       type: integer
       default: 0
       minimum: 0
+    MountTargetDescriptions:
+      type: array
+      items:
+        $ref: '#/components/schemas/MountTargetDescription'
     MountTargetId:
       type: string
       pattern: ^fsmt-[0-9a-f]{8,40}$
@@ -134,11 +186,26 @@ components:
       type: string
     NetworkInterfaceId:
       type: string
+    OwnerGid:
+      type: integer
+      format: int64
+      minimum: 0
+      maximum: 4294967295
+    OwnerUid:
+      type: integer
+      format: int64
+      minimum: 0
+      maximum: 4294967295
     Path:
       type: string
       pattern: ^(\/|(\/(?!\.)+[^$#<>;`|&?{}^*/\n]+){1,4})$
       minLength: 1
       maxLength: 100
+    PerformanceMode:
+      type: string
+      enum:
+      - generalPurpose
+      - maxIO
     Permissions:
       type: string
       pattern: ^[0-7]{3,4}$
@@ -149,26 +216,82 @@ components:
       pattern: ^[\s\S]+$
       minLength: 1
       maxLength: 20000
+    ProvisionedThroughputInMibps:
+      type: number
+      format: double
+      minimum: 1.0
     RegionName:
       type: string
       pattern: ^[a-z]{2}-((iso[a-z]{0,1}-)|(gov-)){0,1}[a-z]+-{0,1}[0-9]{0,1}$
       minLength: 1
       maxLength: 64
+    ReplicationConfigurationDescriptions:
+      type: array
+      items:
+        $ref: '#/components/schemas/ReplicationConfigurationDescription'
+    ReplicationOverwriteProtection:
+      type: string
+      enum:
+      - ENABLED
+      - DISABLED
+      - REPLICATING
+    ReplicationStatus:
+      type: string
+      enum:
+      - ENABLED
+      - ENABLING
+      - DELETING
+      - ERROR
+      - PAUSED
+      - PAUSING
+    Resource:
+      type: string
+      enum:
+      - FILE_SYSTEM
+      - MOUNT_TARGET
+      description: An EFS resource, for example a file system or a mount target.
     ResourceId:
       type: string
       pattern: ^(arn:aws[-a-z]*:elasticfilesystem:[0-9a-z-:]+:(access-point/fsap|file-system/fs)-[0-9a-f]{8,40}|fs(ap)?-[0-9a-f]{8,40})$
       minLength: 0
       maxLength: 128
+    ResourceIdType:
+      type: string
+      enum:
+      - LONG_ID
+      - SHORT_ID
+      description: A preference indicating a choice to use 63bit/32bit IDs for all
+        applicable resources.
+    Resources:
+      type: array
+      items:
+        $ref: '#/components/schemas/Resource'
+      description: EFS resources to which a preference applies to.
     RoleArn:
       type: string
       pattern: ^arn:(aws[a-zA-Z-]*)?:iam::\d{12}:role/?[a-zA-Z_0-9+=,.@\-_/]+$
       minLength: 0
       maxLength: 2048
+    SecondaryGids:
+      type: array
+      items:
+        $ref: '#/components/schemas/Gid'
     SecurityGroup:
       type: string
       pattern: ^sg-[0-9a-f]{8,40}$
       minLength: 11
       maxLength: 43
+    SecurityGroups:
+      type: array
+      items:
+        $ref: '#/components/schemas/SecurityGroup'
+    Status:
+      type: string
+      enum:
+      - ENABLED
+      - ENABLING
+      - DISABLED
+      - DISABLING
     StatusMessage:
       type: string
     SubnetId:
@@ -181,15 +304,65 @@ components:
       pattern: ^(?![aA]{1}[wW]{1}[sS]{1}:)([\p{L}\p{Z}\p{N}_.:/=+\-@]+)$
       minLength: 1
       maxLength: 128
+    TagKeys:
+      type: array
+      items:
+        $ref: '#/components/schemas/TagKey'
     TagValue:
       type: string
       pattern: ^([\p{L}\p{Z}\p{N}_.:/=+\-@]*)$
       minLength: 0
       maxLength: 256
+    Tags:
+      type: array
+      items:
+        $ref: '#/components/schemas/Tag'
+    ThroughputMode:
+      type: string
+      enum:
+      - bursting
+      - provisioned
+      - elastic
+    Timestamp:
+      type: string
+      format: date-time
     Token:
       type: string
       pattern: ^.+$
       minLength: 1
       maxLength: 128
+    TransitionToArchiveRules:
+      type: string
+      enum:
+      - AFTER_1_DAY
+      - AFTER_7_DAYS
+      - AFTER_14_DAYS
+      - AFTER_30_DAYS
+      - AFTER_60_DAYS
+      - AFTER_90_DAYS
+      - AFTER_180_DAYS
+      - AFTER_270_DAYS
+      - AFTER_365_DAYS
+    TransitionToIARules:
+      type: string
+      enum:
+      - AFTER_7_DAYS
+      - AFTER_14_DAYS
+      - AFTER_30_DAYS
+      - AFTER_60_DAYS
+      - AFTER_90_DAYS
+      - AFTER_1_DAY
+      - AFTER_180_DAYS
+      - AFTER_270_DAYS
+      - AFTER_365_DAYS
+    TransitionToPrimaryStorageClassRules:
+      type: string
+      enum:
+      - AFTER_1_ACCESS
+    Uid:
+      type: integer
+      format: int64
+      minimum: 0
+      maximum: 4294967295
     VpcId:
       type: string

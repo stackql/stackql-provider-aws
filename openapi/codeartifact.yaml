@@ -165,16 +165,46 @@ components:
       pattern: ^[0-9]{12}$
       minLength: 12
       maxLength: 12
+    AllowPublish:
+      type: string
+      enum:
+      - ALLOW
+      - BLOCK
+    AllowUpstream:
+      type: string
+      enum:
+      - ALLOW
+      - BLOCK
     Arn:
       type: string
       pattern: ^\S+$
       minLength: 1
       maxLength: 1011
+    Asset:
+      type: string
+      format: byte
+    AssetHashes:
+      type: object
+      additionalProperties:
+        $ref: '#/components/schemas/HashValue'
     AssetName:
       type: string
       pattern: ^\P{C}+$
       minLength: 1
       maxLength: 255
+    AssetSummaryList:
+      type: array
+      items:
+        $ref: '#/components/schemas/AssetSummary'
+    AssociatedPackageList:
+      type: array
+      items:
+        $ref: '#/components/schemas/AssociatedPackage'
+    AuthorizationTokenDurationSeconds:
+      type: integer
+      format: int64
+      minimum: 0
+      maximum: 43200
     BooleanOptional:
       type: boolean
     Description:
@@ -187,6 +217,20 @@ components:
       pattern: ^[a-z][a-z0-9\-]{0,48}[a-z0-9]$
       minLength: 2
       maxLength: 50
+    DomainStatus:
+      type: string
+      enum:
+      - Active
+      - Deleted
+    DomainSummaryList:
+      type: array
+      items:
+        $ref: '#/components/schemas/DomainSummary'
+    EndpointType:
+      type: string
+      enum:
+      - dualstack
+      - ipv4
     ErrorMessage:
       type: string
     ExternalConnectionName:
@@ -194,6 +238,17 @@ components:
       pattern: ^[A-Za-z0-9][A-Za-z0-9._\-:]{1,99}$
       minLength: 2
       maxLength: 100
+    ExternalConnectionStatus:
+      type: string
+      enum:
+      - Available
+    HashAlgorithm:
+      type: string
+      enum:
+      - MD5
+      - SHA-1
+      - SHA-256
+      - SHA-512
     HashValue:
       type: string
       pattern: ^[0-9a-f]+$
@@ -202,6 +257,10 @@ components:
     Integer:
       type: integer
       default: 0
+    LicenseInfoList:
+      type: array
+      items:
+        $ref: '#/components/schemas/LicenseInfo'
     ListAllowedRepositoriesForGroupMaxResults:
       type: integer
       minimum: 1
@@ -234,11 +293,76 @@ components:
       type: integer
       minimum: 1
       maximum: 1000
+    Long:
+      type: integer
+      format: int64
+      default: 0
+    LongOptional:
+      type: integer
+      format: int64
+    OriginRestrictions:
+      type: object
+      additionalProperties:
+        $ref: '#/components/schemas/PackageGroupOriginRestrictionMode'
+    PackageDependencyList:
+      type: array
+      items:
+        $ref: '#/components/schemas/PackageDependency'
+    PackageFormat:
+      type: string
+      enum:
+      - npm
+      - pypi
+      - maven
+      - nuget
+      - generic
+      - ruby
+      - swift
+      - cargo
+    PackageGroupAllowedRepositoryList:
+      type: array
+      items:
+        $ref: '#/components/schemas/PackageGroupAllowedRepository'
+    PackageGroupAllowedRepositoryUpdate:
+      type: object
+      additionalProperties:
+        $ref: '#/components/schemas/RepositoryNameList'
+    PackageGroupAllowedRepositoryUpdateType:
+      type: string
+      enum:
+      - ADDED
+      - REMOVED
+    PackageGroupAllowedRepositoryUpdates:
+      type: object
+      additionalProperties:
+        $ref: '#/components/schemas/PackageGroupAllowedRepositoryUpdate'
+    PackageGroupAssociationType:
+      type: string
+      enum:
+      - STRONG
+      - WEAK
     PackageGroupContactInfo:
       type: string
       pattern: ^\P{C}*$
       minLength: 0
       maxLength: 1000
+    PackageGroupOriginRestrictionMode:
+      type: string
+      enum:
+      - ALLOW
+      - ALLOW_SPECIFIC_REPOSITORIES
+      - BLOCK
+      - INHERIT
+    PackageGroupOriginRestrictionType:
+      type: string
+      enum:
+      - EXTERNAL_UPSTREAM
+      - INTERNAL_UPSTREAM
+      - PUBLISH
+    PackageGroupOriginRestrictions:
+      type: object
+      additionalProperties:
+        $ref: '#/components/schemas/PackageGroupOriginRestriction'
     PackageGroupPattern:
       type: string
       pattern: ^[^\p{C}\p{IsWhitespace}]+$
@@ -249,6 +373,10 @@ components:
       pattern: ^\P{C}*$
       minLength: 0
       maxLength: 520
+    PackageGroupSummaryList:
+      type: array
+      items:
+        $ref: '#/components/schemas/PackageGroupSummary'
     PackageName:
       type: string
       pattern: ^[^#/\s]+$
@@ -259,16 +387,64 @@ components:
       pattern: ^[^#/\s]+$
       minLength: 1
       maxLength: 255
+    PackageSummaryList:
+      type: array
+      items:
+        $ref: '#/components/schemas/PackageSummary'
     PackageVersion:
       type: string
       pattern: ^[^#/\s]+$
       minLength: 1
       maxLength: 255
+    PackageVersionErrorCode:
+      type: string
+      enum:
+      - ALREADY_EXISTS
+      - MISMATCHED_REVISION
+      - MISMATCHED_STATUS
+      - NOT_ALLOWED
+      - NOT_FOUND
+      - SKIPPED
+    PackageVersionErrorMap:
+      type: object
+      additionalProperties:
+        $ref: '#/components/schemas/PackageVersionError'
+    PackageVersionList:
+      type: array
+      items:
+        $ref: '#/components/schemas/PackageVersion'
+    PackageVersionOriginType:
+      type: string
+      enum:
+      - INTERNAL
+      - EXTERNAL
+      - UNKNOWN
     PackageVersionRevision:
       type: string
       pattern: ^\S+$
       minLength: 1
       maxLength: 50
+    PackageVersionRevisionMap:
+      type: object
+      additionalProperties:
+        $ref: '#/components/schemas/PackageVersionRevision'
+    PackageVersionSortType:
+      type: string
+      enum:
+      - PUBLISHED_TIME
+    PackageVersionStatus:
+      type: string
+      enum:
+      - Published
+      - Unfinished
+      - Unlisted
+      - Archived
+      - Disposed
+      - Deleted
+    PackageVersionSummaryList:
+      type: array
+      items:
+        $ref: '#/components/schemas/PackageVersionSummary'
     PaginationToken:
       type: string
       pattern: ^\S+$
@@ -284,11 +460,31 @@ components:
       pattern: ^\S+$
       minLength: 1
       maxLength: 100
+    RepositoryExternalConnectionInfoList:
+      type: array
+      items:
+        $ref: '#/components/schemas/RepositoryExternalConnectionInfo'
     RepositoryName:
       type: string
       pattern: ^[A-Za-z0-9][A-Za-z0-9._\-]{1,99}$
       minLength: 2
       maxLength: 100
+    RepositoryNameList:
+      type: array
+      items:
+        $ref: '#/components/schemas/RepositoryName'
+    RepositorySummaryList:
+      type: array
+      items:
+        $ref: '#/components/schemas/RepositorySummary'
+    ResourceType:
+      type: string
+      enum:
+      - domain
+      - repository
+      - package
+      - package-version
+      - asset
     RetryAfterSeconds:
       type: integer
     SHA256:
@@ -302,13 +498,44 @@ components:
       type: string
       minLength: 1
       maxLength: 255
+    SuccessfulPackageVersionInfoMap:
+      type: object
+      additionalProperties:
+        $ref: '#/components/schemas/SuccessfulPackageVersionInfo'
     TagKey:
       type: string
       pattern: ^\P{C}+$
       minLength: 1
       maxLength: 128
+    TagKeyList:
+      type: array
+      items:
+        $ref: '#/components/schemas/TagKey'
+    TagList:
+      type: array
+      items:
+        $ref: '#/components/schemas/Tag'
     TagValue:
       type: string
       pattern: ^\P{C}*$
       minLength: 0
       maxLength: 256
+    Timestamp:
+      type: string
+      format: date-time
+    UpstreamRepositoryInfoList:
+      type: array
+      items:
+        $ref: '#/components/schemas/UpstreamRepositoryInfo'
+    UpstreamRepositoryList:
+      type: array
+      items:
+        $ref: '#/components/schemas/UpstreamRepository'
+    ValidationExceptionReason:
+      type: string
+      enum:
+      - CANNOT_PARSE
+      - ENCRYPTION_KEY_ERROR
+      - FIELD_VALIDATION_FAILED
+      - UNKNOWN_OPERATION
+      - OTHER

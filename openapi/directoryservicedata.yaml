@@ -85,6 +85,44 @@ servers:
 paths: {}
 components:
   schemas:
+    AccessDeniedReason:
+      type: string
+      enum:
+      - IAM_AUTH
+      - DIRECTORY_AUTH
+      - DATA_DISABLED
+    AttributeValue:
+      allOf:
+      - allOf:
+        - $ref: '#/components/schemas/StringAttributeValue'
+        description: |-
+          Indicates that the attribute type value is a string. For example:
+
+          `"S": "S Group"`
+      - allOf:
+        - $ref: '#/components/schemas/NumberAttributeValue'
+        description: |-
+          Indicates that the attribute type value is a number. For example:
+
+          `"N": "16"`
+      - allOf:
+        - $ref: '#/components/schemas/BooleanAttributeValue'
+        description: |-
+          Indicates that the attribute type value is a boolean. For example:
+
+          `"BOOL": true`
+      - allOf:
+        - $ref: '#/components/schemas/StringSetAttributeValue'
+        description: |-
+          Indicates that the attribute type value is a string set. For example:
+
+          `"SS": ["sample_service_class/host.sample.com:1234/sample_service_name_1", "sample_service_class/host.sample.com:1234/sample_service_name_2"]`
+      description: |-
+        The data type for an attribute. Each attribute value is described as a name-value pair. The name is the AD schema name, and the value is the data itself. For a list of supported attributes, see [Directory Service Data Attributes](https://docs.aws.amazon.com/directoryservice/latest/admin-guide/ad_data_attributes.html).
+    Attributes:
+      type: object
+      additionalProperties:
+        $ref: '#/components/schemas/AttributeValue'
     BooleanAttributeValue:
       type: boolean
     ClientToken:
@@ -95,6 +133,14 @@ components:
     DirectoryId:
       type: string
       pattern: ^d-[0-9a-f]{10}$
+    DirectoryUnavailableReason:
+      type: string
+      enum:
+      - INVALID_DIRECTORY_STATE
+      - DIRECTORY_TIMEOUT
+      - DIRECTORY_RESOURCES_EXCEEDED
+      - NO_DISK_SPACE
+      - TRUST_AUTH_FAILURE
     DistinguishedName:
       type: string
       minLength: 1
@@ -109,29 +155,66 @@ components:
       type: string
       minLength: 1
       maxLength: 64
+    GroupList:
+      type: array
+      items:
+        $ref: '#/components/schemas/Group'
     GroupName:
       type: string
       pattern: ^[^:;|=+"*?<>/\\,\[\]@]+$
       minLength: 1
       maxLength: 64
+    GroupScope:
+      type: string
+      enum:
+      - DomainLocal
+      - Global
+      - Universal
+      - BuiltinLocal
+    GroupSummaryList:
+      type: array
+      items:
+        $ref: '#/components/schemas/GroupSummary'
+    GroupType:
+      type: string
+      enum:
+      - Distribution
+      - Security
     LdapDisplayName:
       type: string
       pattern: ^[A-Za-z*][A-Za-z-*]*$
       minLength: 1
       maxLength: 63
+    LdapDisplayNameList:
+      type: array
+      items:
+        $ref: '#/components/schemas/LdapDisplayName'
     MaxResults:
       type: integer
       minimum: 1
       maximum: 250
+    MemberList:
+      type: array
+      items:
+        $ref: '#/components/schemas/Member'
     MemberName:
       type: string
       pattern: ^[^:;|=+"*?<>/\\,\[\]@]+$
       minLength: 1
       maxLength: 63
+    MemberType:
+      type: string
+      enum:
+      - USER
+      - GROUP
+      - COMPUTER
     NextToken:
       type: string
       minLength: 1
       maxLength: 6144
+    NumberAttributeValue:
+      type: integer
+      format: int64
     Realm:
       type: string
       pattern: ^([a-zA-Z0-9]+[\\.-])+([a-zA-Z0-9])+[.]?$
@@ -149,10 +232,25 @@ components:
       type: string
       minLength: 1
       maxLength: 1024
+    StringSetAttributeValue:
+      type: array
+      items:
+        $ref: '#/components/schemas/StringAttributeValue'
+      x-sensitive: true
     Surname:
       type: string
       minLength: 1
       maxLength: 64
+    UpdateType:
+      type: string
+      enum:
+      - ADD
+      - REPLACE
+      - REMOVE
+    UserList:
+      type: array
+      items:
+        $ref: '#/components/schemas/User'
     UserName:
       type: string
       pattern: ^[\w\-.]+$
@@ -162,3 +260,25 @@ components:
       type: string
       minLength: 1
       maxLength: 256
+    UserSummaryList:
+      type: array
+      items:
+        $ref: '#/components/schemas/UserSummary'
+    ValidationExceptionReason:
+      type: string
+      enum:
+      - INVALID_REALM
+      - INVALID_DIRECTORY_TYPE
+      - INVALID_SECONDARY_REGION
+      - INVALID_NEXT_TOKEN
+      - INVALID_ATTRIBUTE_VALUE
+      - INVALID_ATTRIBUTE_NAME
+      - INVALID_ATTRIBUTE_FOR_USER
+      - INVALID_ATTRIBUTE_FOR_GROUP
+      - INVALID_ATTRIBUTE_FOR_SEARCH
+      - INVALID_ATTRIBUTE_FOR_MODIFY
+      - DUPLICATE_ATTRIBUTE
+      - MISSING_ATTRIBUTE
+      - ATTRIBUTE_EXISTS
+      - LDAP_SIZE_LIMIT_EXCEEDED
+      - LDAP_UNSUPPORTED_OPERATION

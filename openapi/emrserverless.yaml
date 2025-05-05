@@ -64,6 +64,10 @@ components:
       pattern: ^[0-9a-z]+$
       minLength: 1
       maxLength: 64
+    ApplicationList:
+      type: array
+      items:
+        $ref: '#/components/schemas/ApplicationSummary'
     ApplicationName:
       type: string
       pattern: ^[A-Za-z0-9._/#-]+$
@@ -79,6 +83,10 @@ components:
       - STOPPING
       - STOPPED
       - TERMINATED
+    ApplicationStateSet:
+      type: array
+      items:
+        $ref: '#/components/schemas/ApplicationState'
     Architecture:
       type: string
       enum:
@@ -92,6 +100,10 @@ components:
       pattern: ^[A-Za-z0-9._-]+$
       minLength: 1
       maxLength: 64
+    ConfigurationList:
+      type: array
+      items:
+        $ref: '#/components/schemas/Configuration'
     ConfigurationPropertyKey:
       type: string
       pattern: ^.*\S.*$
@@ -107,6 +119,9 @@ components:
       pattern: ^[1-9][0-9]*(\s)?(vCPU|vcpu|VCPU)?$
       minLength: 1
       maxLength: 15
+    Date:
+      type: string
+      format: date-time
     DiskSize:
       type: string
       pattern: ^[1-9][0-9]*(\s)?(GB|gb|gB|Gb)$
@@ -115,6 +130,12 @@ components:
     DiskType:
       type: string
       pattern: ^(SHUFFLE_OPTIMIZED|[Ss]huffle_[Oo]ptimized|STANDARD|[Ss]tandard)$
+    Duration:
+      type: integer
+      format: int64
+      default: 0
+      minimum: 0
+      maximum: 1000000
     EncryptionKeyArn:
       type: string
       pattern: ^arn:(aws[a-zA-Z0-9-]*):kms:[a-zA-Z0-9\-]*:([0-9]{12}):key\/[a-zA-Z0-9-]+$
@@ -129,6 +150,10 @@ components:
       pattern: .*\S.*
       minLength: 1
       maxLength: 10280
+    EntryPointArguments:
+      type: array
+      items:
+        $ref: '#/components/schemas/EntryPointArgument'
     EntryPointPath:
       type: string
       pattern: .*\S.*
@@ -157,11 +182,31 @@ components:
       pattern: .*\S.*
       minLength: 1
       maxLength: 256
+    InitialCapacityConfigMap:
+      type: object
+      additionalProperties:
+        $ref: '#/components/schemas/InitialCapacityConfig'
     JobArn:
       type: string
       pattern: ^arn:(aws[a-zA-Z0-9-]*):emr-serverless:.+:(\d{12}):\/applications\/[0-9a-zA-Z]+\/jobruns\/[0-9a-zA-Z]+$
       minLength: 60
       maxLength: 1024
+    JobDriver:
+      allOf:
+      - allOf:
+        - $ref: '#/components/schemas/SparkSubmit'
+        description: |-
+          The job driver parameters specified for Spark.
+      - allOf:
+        - $ref: '#/components/schemas/Hive'
+        description: |-
+          The job driver parameters specified for Hive.
+      description: |-
+        The driver that the job runs on.
+    JobRunAttempts:
+      type: array
+      items:
+        $ref: '#/components/schemas/JobRunAttemptSummary'
     JobRunId:
       type: string
       pattern: ^[0-9a-z]+$
@@ -184,8 +229,16 @@ components:
       - CANCELLING
       - CANCELLED
       - QUEUED
+    JobRunStateSet:
+      type: array
+      items:
+        $ref: '#/components/schemas/JobRunState'
     JobRunType:
       type: string
+    JobRuns:
+      type: array
+      items:
+        $ref: '#/components/schemas/JobRunSummary'
     LogGroupName:
       type: string
       pattern: ^[\.\-_/#A-Za-z0-9]+$
@@ -196,6 +249,14 @@ components:
       pattern: ^[^:*]*$
       minLength: 1
       maxLength: 512
+    LogTypeList:
+      type: array
+      items:
+        $ref: '#/components/schemas/LogTypeString'
+    LogTypeMap:
+      type: object
+      additionalProperties:
+        $ref: '#/components/schemas/LogTypeList'
     LogTypeString:
       type: string
       pattern: ^[a-zA-Z]+[-_]*[a-zA-Z]+$
@@ -236,11 +297,19 @@ components:
       pattern: ^arn:(aws[a-zA-Z0-9-]*):emr-serverless:.+:(\d{12}):\/applications\/[0-9a-zA-Z]+(\/jobruns\/[0-9a-zA-Z]+)?$
       minLength: 60
       maxLength: 1024
+    SecurityGroupIds:
+      type: array
+      items:
+        $ref: '#/components/schemas/SecurityGroupString'
     SecurityGroupString:
       type: string
       pattern: ^[-0-9a-zA-Z]+
       minLength: 1
       maxLength: 32
+    SensitivePropertiesMap:
+      type: object
+      additionalProperties:
+        $ref: '#/components/schemas/ConfigurationPropertyValue'
     SparkSubmitParameters:
       type: string
       pattern: .*\S.*
@@ -256,6 +325,10 @@ components:
       pattern: .*\S.*
       minLength: 1
       maxLength: 256
+    SubnetIds:
+      type: array
+      items:
+        $ref: '#/components/schemas/SubnetString'
     SubnetString:
       type: string
       pattern: ^[-0-9a-zA-Z]+
@@ -266,6 +339,14 @@ components:
       pattern: ^[A-Za-z0-9 /_.:=+@-]+$
       minLength: 1
       maxLength: 128
+    TagKeyList:
+      type: array
+      items:
+        $ref: '#/components/schemas/TagKey'
+    TagMap:
+      type: object
+      additionalProperties:
+        $ref: '#/components/schemas/TagValue'
     TagValue:
       type: string
       pattern: ^[A-Za-z0-9 /_.:=+@-]*$
@@ -280,6 +361,20 @@ components:
       type: string
       minLength: 1
       maxLength: 2048
+    WorkerCounts:
+      type: integer
+      format: int64
+      default: 0
+      minimum: 1
+      maximum: 1000000
+    WorkerTypeSpecificationInputMap:
+      type: object
+      additionalProperties:
+        $ref: '#/components/schemas/WorkerTypeSpecificationInput'
+    WorkerTypeSpecificationMap:
+      type: object
+      additionalProperties:
+        $ref: '#/components/schemas/WorkerTypeSpecification'
     WorkerTypeString:
       type: string
       pattern: ^[a-zA-Z]+[-_]*[a-zA-Z]+$

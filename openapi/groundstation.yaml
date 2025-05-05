@@ -51,27 +51,183 @@ components:
       pattern: ^[\w-]+$
       minLength: 1
       maxLength: 128
+    AgentCpuCoresList:
+      type: array
+      items:
+        type: integer
+    AgentStatus:
+      type: string
+      enum:
+      - SUCCESS
+      - FAILED
+      - ACTIVE
+      - INACTIVE
+    AngleUnits:
+      type: string
+      enum:
+      - DEGREE_ANGLE
+      - RADIAN
     AnyArn:
       type: string
       pattern: ^(arn:aws:)[\s\S]{0,1024}$
       minLength: 5
       maxLength: 1024
+    AuditResults:
+      type: string
+      enum:
+      - HEALTHY
+      - UNHEALTHY
+    BandwidthUnits:
+      type: string
+      enum:
+      - GHz
+      - MHz
+      - kHz
     BucketArn:
       type: string
     CapabilityArn:
       type: string
+    CapabilityArnList:
+      type: array
+      items:
+        $ref: '#/components/schemas/CapabilityArn'
+    CapabilityHealth:
+      type: string
+      enum:
+      - HEALTHY
+      - UNHEALTHY
+    CapabilityHealthReason:
+      type: string
+      enum:
+      - NO_REGISTERED_AGENT
+      - INVALID_IP_OWNERSHIP
+      - NOT_AUTHORIZED_TO_CREATE_SLR
+      - UNVERIFIED_IP_OWNERSHIP
+      - INITIALIZING_DATAPLANE
+      - DATAPLANE_FAILURE
+      - HEALTHY
+    CapabilityHealthReasonList:
+      type: array
+      items:
+        $ref: '#/components/schemas/CapabilityHealthReason'
+    ComponentStatusList:
+      type: array
+      items:
+        $ref: '#/components/schemas/ComponentStatusData'
     ComponentTypeString:
       type: string
       pattern: ^[a-zA-Z0-9_]{1,64}$
+    ComponentVersionList:
+      type: array
+      items:
+        $ref: '#/components/schemas/ComponentVersion'
     ConfigArn:
       type: string
       pattern: ^arn:aws:groundstation:[-a-z0-9]{1,50}:[0-9]{12}:config/[a-z0-9]+(-[a-z0-9]+){0,4}/[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}(/.{1,256})?$
       minLength: 82
       maxLength: 424
+    ConfigCapabilityType:
+      type: string
+      enum:
+      - antenna-downlink
+      - antenna-downlink-demod-decode
+      - tracking
+      - dataflow-endpoint
+      - antenna-uplink
+      - uplink-echo
+      - s3-recording
+    ConfigDetails:
+      allOf:
+      - allOf:
+        - $ref: '#/components/schemas/EndpointDetails'
+      - allOf:
+        - $ref: '#/components/schemas/AntennaDemodDecodeDetails'
+        description: |-
+          Details for antenna demod decode `Config` in a contact.
+      - allOf:
+        - $ref: '#/components/schemas/S3RecordingDetails'
+        description: |-
+          Details for an S3 recording `Config` in a contact.
+      description: |-
+        Details for certain `Config` object types in a contact.
+    ConfigList:
+      type: array
+      items:
+        $ref: '#/components/schemas/ConfigListItem'
+    ConfigTypeData:
+      allOf:
+      - allOf:
+        - $ref: '#/components/schemas/AntennaDownlinkConfig'
+        description: |-
+          Information about how AWS Ground Station should configure an antenna for downlink during a contact.
+      - allOf:
+        - $ref: '#/components/schemas/TrackingConfig'
+        description: |-
+          Object that determines whether tracking should be used during a contact executed with this `Config` in the mission profile.
+      - allOf:
+        - $ref: '#/components/schemas/DataflowEndpointConfig'
+        description: |-
+          Information about the dataflow endpoint `Config`.
+      - allOf:
+        - $ref: '#/components/schemas/AntennaDownlinkDemodDecodeConfig'
+        description: |-
+          Information about how AWS Ground Station should conﬁgure an antenna for downlink demod decode during a contact.
+      - allOf:
+        - $ref: '#/components/schemas/AntennaUplinkConfig'
+        description: |-
+          Information about how AWS Ground Station should conﬁgure an antenna for uplink during a contact.
+      - allOf:
+        - $ref: '#/components/schemas/UplinkEchoConfig'
+        description: |-
+          Information about an uplink echo `Config`.
+
+          Parameters from the `AntennaUplinkConfig`, corresponding to the specified `AntennaUplinkConfigArn`, are used when this `UplinkEchoConfig` is used in a contact.
+      - allOf:
+        - $ref: '#/components/schemas/S3RecordingConfig'
+        description: |-
+          Information about an S3 recording `Config`.
+      description: |-
+        Object containing the parameters of a `Config`.
+
+        See the subtype definitions for what each type of `Config` contains.
+    ContactList:
+      type: array
+      items:
+        $ref: '#/components/schemas/ContactData'
+    ContactStatus:
+      type: string
+      enum:
+      - SCHEDULING
+      - FAILED_TO_SCHEDULE
+      - SCHEDULED
+      - CANCELLED
+      - AWS_CANCELLED
+      - PREPASS
+      - PASS
+      - POSTPASS
+      - COMPLETED
+      - FAILED
+      - AVAILABLE
+      - CANCELLING
+      - AWS_FAILED
+    Criticality:
+      type: string
+      enum:
+      - REQUIRED
+      - PREFERRED
+      - REMOVED
     CustomerEphemerisPriority:
       type: integer
       minimum: 1
       maximum: 99999
+    DataflowEdge:
+      type: array
+      items:
+        $ref: '#/components/schemas/ConfigArn'
+    DataflowEdgeList:
+      type: array
+      items:
+        $ref: '#/components/schemas/DataflowEdge'
     DataflowEndpointGroupArn:
       type: string
       pattern: ^arn:aws:groundstation:[-a-z0-9]{1,50}:[0-9]{12}:dataflow-endpoint-group/[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$
@@ -81,14 +237,97 @@ components:
       type: integer
       minimum: 120
       maximum: 480
+    DataflowEndpointGroupList:
+      type: array
+      items:
+        $ref: '#/components/schemas/DataflowEndpointListItem'
+    DataflowList:
+      type: array
+      items:
+        $ref: '#/components/schemas/DataflowDetail'
     DurationInSeconds:
       type: integer
       minimum: 0
       maximum: 21600
+    EirpUnits:
+      type: string
+      enum:
+      - dBW
+    EndpointDetailsList:
+      type: array
+      items:
+        $ref: '#/components/schemas/EndpointDetails'
+    EndpointStatus:
+      type: string
+      enum:
+      - created
+      - creating
+      - deleted
+      - deleting
+      - failed
+    EphemeridesList:
+      type: array
+      items:
+        $ref: '#/components/schemas/EphemerisItem'
+    EphemerisData:
+      allOf:
+      - allOf:
+        - $ref: '#/components/schemas/TLEEphemeris'
+      - allOf:
+        - $ref: '#/components/schemas/OEMEphemeris'
+      description: |-
+        Ephemeris data.
+    EphemerisInvalidReason:
+      type: string
+      enum:
+      - METADATA_INVALID
+      - TIME_RANGE_INVALID
+      - TRAJECTORY_INVALID
+      - KMS_KEY_INVALID
+      - VALIDATION_ERROR
     EphemerisPriority:
       type: integer
       minimum: 0
       maximum: 99999
+    EphemerisSource:
+      type: string
+      enum:
+      - CUSTOMER_PROVIDED
+      - SPACE_TRACK
+    EphemerisStatus:
+      type: string
+      enum:
+      - VALIDATING
+      - INVALID
+      - ERROR
+      - ENABLED
+      - DISABLED
+      - EXPIRED
+    EphemerisStatusList:
+      type: array
+      items:
+        $ref: '#/components/schemas/EphemerisStatus'
+    EphemerisTypeDescription:
+      allOf:
+      - allOf:
+        - $ref: '#/components/schemas/EphemerisDescription'
+      - allOf:
+        - $ref: '#/components/schemas/EphemerisDescription'
+      description: ""
+    FrequencyUnits:
+      type: string
+      enum:
+      - GHz
+      - MHz
+      - kHz
+    GroundStationIdList:
+      type: array
+      items:
+        $ref: '#/components/schemas/GroundStationName'
+    GroundStationList:
+      type: array
+      items:
+        $ref: '#/components/schemas/GroundStationData'
     GroundStationName:
       type: string
       pattern: ^[ a-zA-Z0-9-._:=]{4,256}$
@@ -104,6 +343,10 @@ components:
       pattern: ^[a-z0-9.-]{1,64}$
       minLength: 1
       maxLength: 64
+    IpAddressList:
+      type: array
+      items:
+        $ref: '#/components/schemas/IpV4Address'
     IpV4Address:
       type: string
       pattern: ^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$
@@ -126,11 +369,31 @@ components:
       maxLength: 256
     KeyArn:
       type: string
+    KmsKey:
+      allOf:
+      - allOf:
+        - $ref: '#/components/schemas/KeyArn'
+        description: |-
+          KMS Key Arn.
+      - allOf:
+        - $ref: '#/components/schemas/KeyAliasArn'
+        description: |-
+          KMS Alias Arn.
+      - allOf:
+        - $ref: '#/components/schemas/KeyAliasName'
+        description: |-
+          KMS Alias Name.
+      description: |-
+        KMS key info.
     MissionProfileArn:
       type: string
       pattern: ^arn:aws:groundstation:[-a-z0-9]{1,50}:[0-9]{12}:mission-profile/[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$
       minLength: 89
       maxLength: 138
+    MissionProfileList:
+      type: array
+      items:
+        $ref: '#/components/schemas/MissionProfileListItem'
     Month:
       type: integer
       minimum: 1
@@ -144,6 +407,12 @@ components:
       pattern: ^[A-Za-z0-9-/+_.=]+$
       minLength: 3
       maxLength: 1000
+    Polarization:
+      type: string
+      enum:
+      - RIGHT_HAND
+      - LEFT_HAND
+      - NONE
     PositiveDurationInSeconds:
       type: integer
       minimum: 1
@@ -175,6 +444,38 @@ components:
       pattern: ^[ a-zA-Z0-9_:-]{1,256}$
       minLength: 1
       maxLength: 256
+    SatelliteList:
+      type: array
+      items:
+        $ref: '#/components/schemas/SatelliteListItem'
+    SecurityGroupIdList:
+      type: array
+      items:
+        type: string
+    SignatureMap:
+      type: object
+      additionalProperties:
+        $ref: '#/components/schemas/Boolean'
+    StatusList:
+      type: array
+      items:
+        $ref: '#/components/schemas/ContactStatus'
+    SubnetList:
+      type: array
+      items:
+        type: string
+    TLEDataList:
+      type: array
+      items:
+        $ref: '#/components/schemas/TLEData'
+    TagKeys:
+      type: array
+      items:
+        $ref: '#/components/schemas/UnboundedString'
+    TagsMap:
+      type: object
+      additionalProperties:
+        $ref: '#/components/schemas/String'
     TleLineOne:
       type: string
       pattern: '^1 [ 0-9]{5}[A-Z] [ 0-9]{5}[ A-Z]{3} [ 0-9]{5}[.][ 0-9]{8} (?:(?:[
@@ -202,6 +503,10 @@ components:
       pattern: ^(0|[1-9]\d*)(\.(0|[1-9]\d*))*$
       minLength: 1
       maxLength: 64
+    VersionStringList:
+      type: array
+      items:
+        $ref: '#/components/schemas/VersionString'
     Year:
       type: integer
       minimum: 2018

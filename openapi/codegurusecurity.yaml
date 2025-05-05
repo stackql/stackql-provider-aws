@@ -50,14 +50,55 @@ servers:
 paths: {}
 components:
   schemas:
+    AnalysisType:
+      type: string
+      enum:
+      - Security
+      - All
+    BatchGetFindingsErrors:
+      type: array
+      items:
+        $ref: '#/components/schemas/BatchGetFindingsError'
+    CategoriesWithMostFindings:
+      type: array
+      items:
+        $ref: '#/components/schemas/CategoryWithFindingNum'
     ClientToken:
       type: string
       pattern: ^[\S]+$
       minLength: 1
       maxLength: 64
+    CodeSnippet:
+      type: array
+      items:
+        $ref: '#/components/schemas/CodeLine'
+    DetectorTags:
+      type: array
+      items:
+        type: string
+    ErrorCode:
+      type: string
+      enum:
+      - DUPLICATE_IDENTIFIER
+      - ITEM_DOES_NOT_EXIST
+      - INTERNAL_ERROR
+      - INVALID_FINDING_ID
+      - INVALID_SCAN_NAME
     ErrorMessage:
       type: string
       minLength: 1
+    FindingIdentifiers:
+      type: array
+      items:
+        $ref: '#/components/schemas/FindingIdentifier'
+    Findings:
+      type: array
+      items:
+        $ref: '#/components/schemas/Finding'
+    FindingsMetricList:
+      type: array
+      items:
+        $ref: '#/components/schemas/AccountFindingsMetric'
     HeaderKey:
       type: string
       minLength: 1
@@ -74,6 +115,26 @@ components:
       pattern: ^[\S]+$
       minLength: 1
       maxLength: 2048
+    ReferenceUrls:
+      type: array
+      items:
+        type: string
+    RelatedVulnerabilities:
+      type: array
+      items:
+        type: string
+    RequestHeaderMap:
+      type: object
+      additionalProperties:
+        $ref: '#/components/schemas/HeaderValue'
+    ResourceId:
+      allOf:
+      - allOf:
+        - $ref: '#/components/schemas/Uuid'
+        description: |-
+          The identifier for the code file uploaded to the resource object. Returned by `CreateUploadUrl` when you upload resources to be scanned.
+      description: |-
+        The identifier for a resource object that contains resources to scan. Specifying a codeArtifactId is required to create a scan.
     S3Url:
       type: string
       minLength: 1
@@ -87,10 +148,59 @@ components:
       pattern: ^arn:aws:codeguru-security:[\S]+:[\d]{12}:scans\/[a-zA-Z0-9-_$:.]*$
       minLength: 1
       maxLength: 300
+    ScanState:
+      type: string
+      enum:
+      - InProgress
+      - Successful
+      - Failed
+    ScanSummaries:
+      type: array
+      items:
+        $ref: '#/components/schemas/ScanSummary'
+    ScanType:
+      type: string
+      enum:
+      - Standard
+      - Express
+    ScansWithMostOpenCriticalFindings:
+      type: array
+      items:
+        $ref: '#/components/schemas/ScanNameWithFindingNum'
+    ScansWithMostOpenFindings:
+      type: array
+      items:
+        $ref: '#/components/schemas/ScanNameWithFindingNum'
+    Severity:
+      type: string
+      enum:
+      - Critical
+      - High
+      - Medium
+      - Low
+      - Info
+    Status:
+      type: string
+      enum:
+      - Closed
+      - Open
+      - All
+    SuggestedFixes:
+      type: array
+      items:
+        $ref: '#/components/schemas/SuggestedFix'
     TagKey:
       type: string
       minLength: 1
       maxLength: 128
+    TagKeyList:
+      type: array
+      items:
+        $ref: '#/components/schemas/TagKey'
+    TagMap:
+      type: object
+      additionalProperties:
+        $ref: '#/components/schemas/TagValue'
     TagValue:
       type: string
       minLength: 0
@@ -98,3 +208,15 @@ components:
     Uuid:
       type: string
       pattern: ^[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$
+    ValidationExceptionFieldList:
+      type: array
+      items:
+        $ref: '#/components/schemas/ValidationExceptionField'
+    ValidationExceptionReason:
+      type: string
+      enum:
+      - unknownOperation
+      - cannotParse
+      - fieldValidationFailed
+      - other
+      - lambdaCodeShaMisMatch

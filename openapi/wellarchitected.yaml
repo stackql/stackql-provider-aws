@@ -48,6 +48,39 @@ servers:
 paths: {}
 components:
   schemas:
+    AccountJiraIssueManagementStatus:
+      type: string
+      enum:
+      - ENABLED
+      - DISABLED
+    AccountSummary:
+      type: object
+      additionalProperties:
+        $ref: '#/components/schemas/CheckStatusCount'
+      description: <p>Account summary for a Well-Architected best practice in relation
+        to Trusted Advisor checks.</p>
+    AdditionalResourceType:
+      type: string
+      enum:
+      - HELPFUL_RESOURCE
+      - IMPROVEMENT_PLAN
+    AdditionalResourcesList:
+      type: array
+      items:
+        $ref: '#/components/schemas/AdditionalResources'
+    AnswerReason:
+      type: string
+      enum:
+      - OUT_OF_SCOPE
+      - BUSINESS_PRIORITIES
+      - ARCHITECTURE_CONSTRAINTS
+      - OTHER
+      - NONE
+    AnswerSummaries:
+      type: array
+      items:
+        $ref: '#/components/schemas/AnswerSummary'
+      description: <p>List of answer summaries of lens review in a workload.</p>
     ApplicationArn:
       type: string
       pattern: ^arn:aws[-a-z]*:servicecatalog:[a-z]{2}(-gov)?-[a-z]+-\d:\d{12}:/applications/[a-z0-9]+$
@@ -64,16 +97,55 @@ components:
       maxLength: 100
     Base64String:
       type: string
+    BestPractices:
+      type: array
+      items:
+        $ref: '#/components/schemas/BestPractice'
     CheckDescription:
       type: string
+    CheckDetails:
+      type: array
+      items:
+        $ref: '#/components/schemas/CheckDetail'
+    CheckFailureReason:
+      type: string
+      enum:
+      - ASSUME_ROLE_ERROR
+      - ACCESS_DENIED
+      - UNKNOWN_ERROR
+      - PREMIUM_SUPPORT_REQUIRED
     CheckId:
       type: string
     CheckName:
       type: string
+    CheckProvider:
+      type: string
+      enum:
+      - TRUSTED_ADVISOR
+    CheckStatus:
+      type: string
+      enum:
+      - OKAY
+      - WARNING
+      - ERROR
+      - NOT_AVAILABLE
+      - FETCH_FAILED
     CheckStatusCount:
       type: integer
       minimum: 1
       maximum: 101
+    CheckSummaries:
+      type: array
+      items:
+        $ref: '#/components/schemas/CheckSummary'
+    ChoiceAnswerSummaries:
+      type: array
+      items:
+        $ref: '#/components/schemas/ChoiceAnswerSummary'
+    ChoiceAnswers:
+      type: array
+      items:
+        $ref: '#/components/schemas/ChoiceAnswer'
     ChoiceContentDisplayText:
       type: string
       minLength: 1
@@ -90,22 +162,69 @@ components:
       type: string
       minLength: 1
       maxLength: 64
+    ChoiceImprovementPlans:
+      type: array
+      items:
+        $ref: '#/components/schemas/ChoiceImprovementPlan'
     ChoiceNotes:
       type: string
       minLength: 0
       maxLength: 250
+    ChoiceReason:
+      type: string
+      enum:
+      - OUT_OF_SCOPE
+      - BUSINESS_PRIORITIES
+      - ARCHITECTURE_CONSTRAINTS
+      - OTHER
+      - NONE
+    ChoiceStatus:
+      type: string
+      enum:
+      - SELECTED
+      - NOT_APPLICABLE
+      - UNSELECTED
     ChoiceTitle:
       type: string
       minLength: 1
       maxLength: 512
+    ChoiceUpdates:
+      type: object
+      additionalProperties:
+        $ref: '#/components/schemas/ChoiceUpdate'
+    Choices:
+      type: array
+      items:
+        $ref: '#/components/schemas/Choice'
+      description: <p>List of choices available for a question.</p>
     ClientRequestToken:
       type: string
       minLength: 1
       maxLength: 2048
+    ConsolidatedReportMetrics:
+      type: array
+      items:
+        $ref: '#/components/schemas/ConsolidatedReportMetric'
     Count:
       type: integer
       minimum: 0
       description: <p>A non-negative integer that denotes how many.</p>
+    DefinitionType:
+      type: string
+      enum:
+      - WORKLOAD_METADATA
+      - APP_REGISTRY
+    DifferenceStatus:
+      type: string
+      enum:
+      - UPDATED
+      - NEW
+      - DELETED
+    DiscoveryIntegrationStatus:
+      type: string
+      enum:
+      - ENABLED
+      - DISABLED
     DisplayText:
       type: string
       minLength: 1
@@ -128,12 +247,36 @@ components:
       type: string
       minLength: 1
       maxLength: 2048
+    ImportLensStatus:
+      type: string
+      enum:
+      - IN_PROGRESS
+      - COMPLETE
+      - ERROR
     ImprovementPlanUrl:
       type: string
       minLength: 1
       maxLength: 2048
+    ImprovementSummaries:
+      type: array
+      items:
+        $ref: '#/components/schemas/ImprovementSummary'
+      description: <p>List of improvement summaries of lens review in a workload.</p>
     IncludeSharedResources:
       type: boolean
+    IntegratingService:
+      type: string
+      enum:
+      - JIRA
+    IntegrationStatus:
+      type: string
+      enum:
+      - CONFIGURED
+      - NOT_CONFIGURED
+    IntegrationStatusInput:
+      type: string
+      enum:
+      - NOT_CONFIGURED
     IsApplicable:
       type: boolean
       description: <p>Defines whether this question is applicable to a lens review.</p>
@@ -141,6 +284,11 @@ components:
       type: boolean
     IsReviewOwnerUpdateAcknowledged:
       type: boolean
+    IssueManagementType:
+      type: string
+      enum:
+      - AUTO
+      - MANUAL
     JiraIssueUrl:
       type: string
       minLength: 1
@@ -154,6 +302,13 @@ components:
       type: string
       minLength: 1
       maxLength: 128
+    LensAliases:
+      type: array
+      items:
+        $ref: '#/components/schemas/LensAlias'
+      description: "<p>List of lens aliases to associate or disassociate with a workload.\
+        \ Up to 10 lenses can be specified.</p>\n         <p>Identify a lens using\
+        \ its <a>LensSummary$LensAlias</a>.</p>"
     LensArn:
       type: string
     LensDescription:
@@ -164,6 +319,10 @@ components:
       type: string
       minLength: 2
       maxLength: 500000
+    LensMetrics:
+      type: array
+      items:
+        $ref: '#/components/schemas/LensMetric'
     LensName:
       type: string
       minLength: 1
@@ -174,6 +333,40 @@ components:
       maxLength: 100
     LensOwner:
       type: string
+    LensReviewSummaries:
+      type: array
+      items:
+        $ref: '#/components/schemas/LensReviewSummary'
+      description: <p>List of lens summaries of lens reviews of a workload.</p>
+    LensShareSummaries:
+      type: array
+      items:
+        $ref: '#/components/schemas/LensShareSummary'
+    LensStatus:
+      type: string
+      enum:
+      - CURRENT
+      - NOT_CURRENT
+      - DEPRECATED
+      - DELETED
+      - UNSHARED
+    LensStatusType:
+      type: string
+      enum:
+      - ALL
+      - DRAFT
+      - PUBLISHED
+    LensSummaries:
+      type: array
+      items:
+        $ref: '#/components/schemas/LensSummary'
+      description: <p>List of lens summaries of available lenses.</p>
+    LensType:
+      type: string
+      enum:
+      - AWS_OFFICIAL
+      - CUSTOM_SHARED
+      - CUSTOM_SELF
     LensVersion:
       type: string
       minLength: 1
@@ -225,6 +418,10 @@ components:
     MaxSelectedProfileChoices:
       type: integer
       minimum: 0
+    MetricType:
+      type: string
+      enum:
+      - WORKLOAD
     MilestoneName:
       type: string
       minLength: 3
@@ -235,6 +432,11 @@ components:
       maximum: 100
       description: "<p>The milestone number.</p>\n         <p>A workload can have\
         \ a maximum of 100 milestones.</p>"
+    MilestoneSummaries:
+      type: array
+      items:
+        $ref: '#/components/schemas/MilestoneSummary'
+      description: <p>A list of milestone summaries.</p>
     MinSelectedProfileChoices:
       type: integer
       minimum: 0
@@ -244,19 +446,63 @@ components:
       type: string
       minLength: 0
       maxLength: 2084
+    NotificationSummaries:
+      type: array
+      items:
+        $ref: '#/components/schemas/NotificationSummary'
+    NotificationType:
+      type: string
+      enum:
+      - LENS_VERSION_UPGRADED
+      - LENS_VERSION_DEPRECATED
+    OrganizationSharingStatus:
+      type: string
+      enum:
+      - ENABLED
+      - DISABLED
+    PermissionType:
+      type: string
+      enum:
+      - READONLY
+      - CONTRIBUTOR
+      description: <p>Permission granted on a share request.</p>
+    PillarDifferences:
+      type: array
+      items:
+        $ref: '#/components/schemas/PillarDifference'
     PillarId:
       type: string
       minLength: 1
       maxLength: 64
+    PillarMetrics:
+      type: array
+      items:
+        $ref: '#/components/schemas/PillarMetric'
     PillarName:
       type: string
       minLength: 1
       maxLength: 128
+    PillarNotes:
+      type: object
+      additionalProperties:
+        $ref: '#/components/schemas/Notes'
+      description: "<p>List of pillar notes of a lens review in a workload.</p>\n\
+        \         <p>For a review template, these are the notes that will be associated\
+        \ with the workload when the template is applied.</p>"
+    PillarReviewSummaries:
+      type: array
+      items:
+        $ref: '#/components/schemas/PillarReviewSummary'
+      description: <p>List of pillar review summaries of lens review in a workload.</p>
     ProfileArn:
       type: string
       pattern: ^arn:aws[-a-z]*:wellarchitected:[a-z]{2}(-gov)?-[a-z]+-\d:\d{12}:profile/[a-z0-9]+$
       minLength: 0
       maxLength: 2084
+    ProfileArns:
+      type: array
+      items:
+        $ref: '#/components/schemas/ProfileArn'
     ProfileDescription:
       type: string
       minLength: 3
@@ -269,40 +515,210 @@ components:
       type: string
       minLength: 0
       maxLength: 100
+    ProfileNotificationSummaries:
+      type: array
+      items:
+        $ref: '#/components/schemas/ProfileNotificationSummary'
+    ProfileNotificationType:
+      type: string
+      enum:
+      - PROFILE_ANSWERS_UPDATED
+      - PROFILE_DELETED
+    ProfileOwnerType:
+      type: string
+      enum:
+      - SELF
+      - SHARED
+    ProfileQuestionChoices:
+      type: array
+      items:
+        $ref: '#/components/schemas/ProfileChoice'
+    ProfileQuestionUpdates:
+      type: array
+      items:
+        $ref: '#/components/schemas/ProfileQuestionUpdate'
+    ProfileQuestions:
+      type: array
+      items:
+        $ref: '#/components/schemas/ProfileQuestion'
+    ProfileShareSummaries:
+      type: array
+      items:
+        $ref: '#/components/schemas/ProfileShareSummary'
+    ProfileSummaries:
+      type: array
+      items:
+        $ref: '#/components/schemas/ProfileSummary'
+    ProfileTemplateQuestionChoices:
+      type: array
+      items:
+        $ref: '#/components/schemas/ProfileTemplateChoice'
     ProfileVersion:
       type: string
       pattern: ^[A-Za-z0-9-]+$
       minLength: 1
       maxLength: 32
+    Question:
+      type: string
+      enum:
+      - UNANSWERED
+      - ANSWERED
+    QuestionCounts:
+      type: object
+      additionalProperties:
+        $ref: '#/components/schemas/Count'
     QuestionDescription:
       type: string
       minLength: 1
       maxLength: 1024
+    QuestionDifferences:
+      type: array
+      items:
+        $ref: '#/components/schemas/QuestionDifference'
     QuestionId:
       type: string
       minLength: 1
       maxLength: 128
+    QuestionMetrics:
+      type: array
+      items:
+        $ref: '#/components/schemas/QuestionMetric'
+    QuestionPriority:
+      type: string
+      enum:
+      - PRIORITIZED
+      - NONE
     QuestionTitle:
       type: string
       minLength: 1
       maxLength: 512
+    QuestionType:
+      type: string
+      enum:
+      - PRIORITIZED
+      - NON_PRIORITIZED
     QuotaCode:
       type: string
+    ReportFormat:
+      type: string
+      enum:
+      - PDF
+      - JSON
     ResourceArn:
       type: string
       pattern: ^arn:aws(-us-gov|-iso(-[a-z])?|-cn)?:wellarchitected:[a-z]{2}(-gov|-iso([a-z])?)?-[a-z]+-\d:\d{12}:(review-template)/[a-f0-9]{32}$
       minLength: 50
       maxLength: 250
+    ReviewTemplateAnswerStatus:
+      type: string
+      enum:
+      - UNANSWERED
+      - ANSWERED
+    ReviewTemplateAnswerSummaries:
+      type: array
+      items:
+        $ref: '#/components/schemas/ReviewTemplateAnswerSummary'
+    ReviewTemplateArns:
+      type: array
+      items:
+        $ref: '#/components/schemas/TemplateArn'
+    ReviewTemplateLensAliases:
+      type: array
+      items:
+        $ref: '#/components/schemas/LensAlias'
+    ReviewTemplateLenses:
+      type: array
+      items:
+        $ref: '#/components/schemas/LensAlias'
+    ReviewTemplatePillarReviewSummaries:
+      type: array
+      items:
+        $ref: '#/components/schemas/ReviewTemplatePillarReviewSummary'
+    ReviewTemplateUpdateStatus:
+      type: string
+      enum:
+      - CURRENT
+      - LENS_NOT_CURRENT
+    ReviewTemplates:
+      type: array
+      items:
+        $ref: '#/components/schemas/ReviewTemplateSummary'
+    Risk:
+      type: string
+      enum:
+      - UNANSWERED
+      - HIGH
+      - MEDIUM
+      - NONE
+      - NOT_APPLICABLE
+      description: <p>The risk for a given workload, lens review, pillar, or question.</p>
+    RiskCounts:
+      type: object
+      additionalProperties:
+        $ref: '#/components/schemas/Count'
+      description: <p>A map from risk names to the count of how many questions have
+        that rating.</p>
+    SelectedChoiceIds:
+      type: array
+      items:
+        $ref: '#/components/schemas/ChoiceId'
+    SelectedChoices:
+      type: array
+      items:
+        $ref: '#/components/schemas/ChoiceId'
+      description: "<p>List of selected choice IDs in a question answer.</p>\n   \
+        \      <p>The values entered replace the previously selected choices.</p>"
+    SelectedPillars:
+      type: array
+      items:
+        $ref: '#/components/schemas/SelectedPillar'
+    SelectedProfileChoiceIds:
+      type: array
+      items:
+        $ref: '#/components/schemas/ChoiceId'
     SelectedQuestionId:
       type: string
+    SelectedQuestionIds:
+      type: array
+      items:
+        $ref: '#/components/schemas/SelectedQuestionId'
     ServiceCode:
       type: string
     ShareId:
       type: string
       pattern: ^[0-9a-f]{32}$
+    ShareInvitationAction:
+      type: string
+      enum:
+      - ACCEPT
+      - REJECT
+      description: <p>Share invitation action taken by contributor.</p>
     ShareInvitationId:
       type: string
       pattern: ^[0-9a-f]{32}$
+    ShareInvitationSummaries:
+      type: array
+      items:
+        $ref: '#/components/schemas/ShareInvitationSummary'
+    ShareResourceType:
+      type: string
+      enum:
+      - WORKLOAD
+      - LENS
+      - PROFILE
+      - TEMPLATE
+    ShareStatus:
+      type: string
+      enum:
+      - ACCEPTED
+      - REJECTED
+      - PENDING
+      - REVOKED
+      - EXPIRED
+      - ASSOCIATING
+      - ASSOCIATED
+      - FAILED
+      description: <p>The status of the share request.</p>
     SharedWith:
       type: string
       minLength: 12
@@ -323,6 +739,14 @@ components:
       type: string
       minLength: 1
       maxLength: 128
+    TagKeyList:
+      type: array
+      items:
+        $ref: '#/components/schemas/TagKey'
+    TagMap:
+      type: object
+      additionalProperties:
+        $ref: '#/components/schemas/TagValue'
     TagValue:
       type: string
       minLength: 0
@@ -347,8 +771,52 @@ components:
       pattern: ^[A-Za-z0-9-_.,:/()@!&?#+'’\s]+$
       minLength: 0
       maxLength: 100
+    TemplateQuestions:
+      type: array
+      items:
+        $ref: '#/components/schemas/ProfileTemplateQuestion'
+    TemplateShareSummaries:
+      type: array
+      items:
+        $ref: '#/components/schemas/TemplateShareSummary'
+    Timestamp:
+      type: string
+      format: date-time
+      description: <p>The date and time recorded.</p>
+    TrustedAdvisorIntegrationStatus:
+      type: string
+      enum:
+      - ENABLED
+      - DISABLED
+    Urls:
+      type: array
+      items:
+        $ref: '#/components/schemas/ChoiceContent'
+    ValidationExceptionFieldList:
+      type: array
+      items:
+        $ref: '#/components/schemas/ValidationExceptionField'
+      description: <p>The fields that caused the error, if applicable.</p>
     ValidationExceptionFieldName:
       type: string
+    ValidationExceptionReason:
+      type: string
+      enum:
+      - UNKNOWN_OPERATION
+      - CANNOT_PARSE
+      - FIELD_VALIDATION_FAILED
+      - OTHER
+      description: <p>The reason why the request failed validation.</p>
+    WorkloadAccountIds:
+      type: array
+      items:
+        $ref: '#/components/schemas/AwsAccountId'
+      description: <p>The list of Amazon Web Services account IDs associated with
+        the workload.</p>
+    WorkloadApplications:
+      type: array
+      items:
+        $ref: '#/components/schemas/ApplicationArn'
     WorkloadArchitecturalDesign:
       type: string
       pattern: ^(|(https?|ftp):\/\/[^\s/$.?#].[^\s]*)$
@@ -356,15 +824,36 @@ components:
       maxLength: 2048
     WorkloadArn:
       type: string
+    WorkloadAwsRegions:
+      type: array
+      items:
+        $ref: '#/components/schemas/AwsRegion'
+      description: "<p>The list of Amazon Web Services Regions associated with the\
+        \ workload, for example,\n                <code>us-east-2</code>, or <code>ca-central-1</code>.</p>"
     WorkloadDescription:
       type: string
       minLength: 3
       maxLength: 250
+    WorkloadEnvironment:
+      type: string
+      enum:
+      - PRODUCTION
+      - PREPRODUCTION
+      description: <p>The environment for the workload.</p>
     WorkloadId:
       type: string
       pattern: ^[0-9a-f]{32}$
       minLength: 32
       maxLength: 32
+    WorkloadImprovementStatus:
+      type: string
+      enum:
+      - NOT_APPLICABLE
+      - NOT_STARTED
+      - IN_PROGRESS
+      - COMPLETE
+      - RISK_ACKNOWLEDGED
+      description: <p>The improvement status for a workload.</p>
     WorkloadIndustry:
       type: string
       minLength: 0
@@ -373,6 +862,20 @@ components:
       type: string
       minLength: 0
       maxLength: 100
+    WorkloadIssueManagementStatus:
+      type: string
+      enum:
+      - ENABLED
+      - DISABLED
+      - INHERIT
+    WorkloadLenses:
+      type: array
+      items:
+        $ref: '#/components/schemas/LensAlias'
+      description: "<p>The list of lenses associated with the workload. Each lens\
+        \ is identified by its <a>LensSummary$LensAlias</a>.</p>\n         <p>If a\
+        \ review template that specifies lenses is applied to the workload, those\
+        \ lenses are applied\n        to the workload in addition to these lenses.</p>"
     WorkloadName:
       type: string
       minLength: 3
@@ -385,7 +888,42 @@ components:
       type: string
       minLength: 3
       maxLength: 25
+    WorkloadNonAwsRegions:
+      type: array
+      items:
+        $ref: '#/components/schemas/WorkloadNonAwsRegion'
+      description: <p> The list of non-Amazon Web Services Regions associated with
+        the workload.</p>
+    WorkloadPillarPriorities:
+      type: array
+      items:
+        $ref: '#/components/schemas/PillarId'
+      description: "<p>The priorities of the pillars, which are used to order items\
+        \ in the improvement plan.\n            Each pillar is represented by its\
+        \ <a>PillarReviewSummary$PillarId</a>.</p>"
+    WorkloadProfileArns:
+      type: array
+      items:
+        $ref: '#/components/schemas/ProfileArn'
+    WorkloadProfiles:
+      type: array
+      items:
+        $ref: '#/components/schemas/WorkloadProfile'
+    WorkloadResourceDefinition:
+      type: array
+      items:
+        $ref: '#/components/schemas/DefinitionType'
     WorkloadReviewOwner:
       type: string
       minLength: 3
       maxLength: 255
+    WorkloadShareSummaries:
+      type: array
+      items:
+        $ref: '#/components/schemas/WorkloadShareSummary'
+      description: <p>A list of workload share summaries.</p>
+    WorkloadSummaries:
+      type: array
+      items:
+        $ref: '#/components/schemas/WorkloadSummary'
+      description: <p>A list of workload summaries.</p>

@@ -48,8 +48,122 @@ components:
   schemas:
     Arn:
       type: string
+    AuthorizationScopes:
+      type: array
+      items:
+        $ref: '#/components/schemas/StringWithLengthBetween1And64'
+      description: <p>A list of authorization scopes configured on a route. The scopes
+        are used with a JWT authorizer to authorize the method invocation. The authorization
+        works by matching the route scopes against the scopes parsed from the access
+        token in the incoming request. The method invocation is authorized if any
+        route scope matches a claimed scope in the access token. Otherwise, the invocation
+        is not authorized. When the route scope is configured, the client must provide
+        an access token instead of an identity token for authorization purposes.</p>
+    AuthorizationType:
+      type: string
+      enum:
+      - NONE
+      - AWS_IAM
+      - CUSTOM
+      - JWT
+      description: <p>The authorization type. For WebSocket APIs, valid values are
+        NONE for open access, AWS_IAM for using AWS IAM permissions, and CUSTOM for
+        using a Lambda authorizer. For HTTP APIs, valid values are NONE for open access,
+        JWT for using JSON Web Tokens, AWS_IAM for using AWS IAM permissions, and
+        CUSTOM for using a Lambda authorizer.</p>
+    AuthorizerType:
+      type: string
+      enum:
+      - REQUEST
+      - JWT
+      description: <p>The authorizer type. Specify REQUEST for a Lambda function using
+        incoming request parameters. Specify JWT to use JSON Web Tokens (supported
+        only for HTTP APIs).</p>
+    ConnectionType:
+      type: string
+      enum:
+      - INTERNET
+      - VPC_LINK
+      description: <p>Represents a connection type.</p>
+    ContentHandlingStrategy:
+      type: string
+      enum:
+      - CONVERT_TO_BINARY
+      - CONVERT_TO_TEXT
+      description: <p>Specifies how to handle response payload content type conversions.
+        Supported only for WebSocket APIs.</p>
+    CorsHeaderList:
+      type: array
+      items:
+        $ref: '#/components/schemas/__string'
+      description: <p>Represents a collection of allowed headers. Supported only for
+        HTTP APIs.</p>
+    CorsMethodList:
+      type: array
+      items:
+        $ref: '#/components/schemas/StringWithLengthBetween1And64'
+      description: <p>Represents a collection of methods. Supported only for HTTP
+        APIs.</p>
+    CorsOriginList:
+      type: array
+      items:
+        $ref: '#/components/schemas/__string'
+      description: <p>Represents a collection of origins. Supported only for HTTP
+        APIs.</p>
+    DeploymentStatus:
+      type: string
+      enum:
+      - PENDING
+      - FAILED
+      - DEPLOYED
+      description: <p>Represents a deployment status.</p>
+    DomainNameConfigurations:
+      type: array
+      items:
+        $ref: '#/components/schemas/DomainNameConfiguration'
+      description: <p>The domain name configurations.</p>
+    DomainNameStatus:
+      type: string
+      enum:
+      - AVAILABLE
+      - UPDATING
+      - PENDING_CERTIFICATE_REIMPORT
+      - PENDING_OWNERSHIP_VERIFICATION
+      description: <p>The status of the domain name migration. The valid values are
+        AVAILABLE, UPDATING, PENDING_CERTIFICATE_REIMPORT, and PENDING_OWNERSHIP_VERIFICATION.
+        If the status is UPDATING, the domain cannot be modified further until the
+        existing operation is complete. If it is AVAILABLE, the domain can be updated.</p>
+    EndpointType:
+      type: string
+      enum:
+      - REGIONAL
+      - EDGE
+      description: <p>Represents an endpoint type.</p>
+    ExportedApi:
+      type: string
+      format: byte
+      description: <p>Represents an exported definition of an API in a particular
+        output format, for example, YAML. The API is serialized to the requested specification,
+        for example, OpenAPI 3.0.</p>
     Id:
       type: string
+    IdentitySourceList:
+      type: array
+      items:
+        $ref: '#/components/schemas/__string'
+      description: <p>The identity source for which authorization is requested. For
+        the REQUEST authorizer, this is required when authorization caching is enabled.
+        The value is a comma-separated string of one or more mapping expressions of
+        the specified request parameters. For example, if an Auth header, a Name query
+        string parameter are defined as identity sources, this value is $method.request.header.Auth,
+        $method.request.querystring.Name. These parameters will be used to derive
+        the authorization caching key and to perform runtime validation of the REQUEST
+        authorizer by verifying all of the identity-related request parameters are
+        present, not null and non-empty. Only when this is true does the authorizer
+        invoke the authorizer Lambda function, otherwise, it returns a 401 Unauthorized
+        response without calling the Lambda function. The valid value is a string
+        of comma-separated mapping expressions of the specified request parameters.
+        When the authorization caching is not enabled, this property is optional.</p>
     IntegerWithLengthBetween0And3600:
       type: integer
       minimum: 0
@@ -66,12 +180,113 @@ components:
       maximum: 86400
       description: <p>An integer with a value between -1 and 86400. Supported only
         for HTTP APIs.</p>
+    IntegrationParameters:
+      type: object
+      additionalProperties:
+        $ref: '#/components/schemas/StringWithLengthBetween1And512'
+      description: "<p>For WebSocket APIs, a key-value map specifying request parameters\
+        \ that are passed from the method request to the backend. The key is an integration\
+        \ request parameter name and the associated value is a method request parameter\
+        \ value or static value that must be enclosed within single quotes and pre-encoded\
+        \ as required by the backend. The method request parameter value must match\
+        \ the pattern of method.request.<replaceable>{location}</replaceable>.<replaceable>{name}</replaceable>\n\
+        \          , where \n            <replaceable>{location}</replaceable>\n \
+        \          is querystring, path, or header; and \n            <replaceable>{name}</replaceable>\n\
+        \           must be a valid and unique method request parameter name.</p>\
+        \ <p>For HTTP API integrations with a specified integrationSubtype, request\
+        \ parameters are a key-value map specifying parameters that are passed to\
+        \ AWS_PROXY integrations. You can provide static values, or map request data,\
+        \ stage variables, or context variables that are evaluated at runtime. To\
+        \ learn more, see <a href=\"https://docs.aws.amazon.com/apigateway/latest/developerguide/http-api-develop-integrations-aws-services.html\"\
+        >Working with AWS service integrations for HTTP APIs</a>.</p> <p>For HTTP\
+        \ API integrations without a specified integrationSubtype request parameters\
+        \ are a key-value map specifying how to transform HTTP requests before sending\
+        \ them to the backend. The key should follow the pattern &lt;action&gt;:&lt;header|querystring|path&gt;.&lt;location&gt;\
+        \ where action can be append, overwrite or remove. For values, you can provide\
+        \ static values, or map request data, stage variables, or context variables\
+        \ that are evaluated at runtime. To learn more, see <a href=\"https://docs.aws.amazon.com/apigateway/latest/developerguide/http-api-parameter-mapping.html\"\
+        >Transforming API requests and responses</a>.</p>"
+    IntegrationType:
+      type: string
+      enum:
+      - AWS
+      - HTTP
+      - MOCK
+      - HTTP_PROXY
+      - AWS_PROXY
+      description: <p>Represents an API method integration type.</p>
+    IpAddressType:
+      type: string
+      enum:
+      - ipv4
+      - dualstack
+      description: <p>The IP address types that can invoke your API or domain name.</p>
+    LoggingLevel:
+      type: string
+      enum:
+      - ERROR
+      - INFO
+      - 'OFF'
+      description: <p>The logging level.</p>
     NextToken:
       type: string
+    PassthroughBehavior:
+      type: string
+      enum:
+      - WHEN_NO_MATCH
+      - NEVER
+      - WHEN_NO_TEMPLATES
+      description: <p>Represents passthrough behavior for an integration response.
+        Supported only for WebSocket APIs.</p>
+    ProtocolType:
+      type: string
+      enum:
+      - WEBSOCKET
+      - HTTP
+      description: Represents a protocol type.
+    ResponseParameters:
+      type: object
+      additionalProperties:
+        $ref: '#/components/schemas/IntegrationParameters'
+      description: <p>Supported only for HTTP APIs. You use response parameters to
+        transform the HTTP response from a backend integration before returning the
+        response to clients.</p>
+    RouteModels:
+      type: object
+      additionalProperties:
+        $ref: '#/components/schemas/StringWithLengthBetween1And128'
+      description: <p>The route models.</p>
+    RouteParameters:
+      type: object
+      additionalProperties:
+        $ref: '#/components/schemas/ParameterConstraints'
+      description: <p>The route parameters.</p>
+    RouteSettingsMap:
+      type: object
+      additionalProperties:
+        $ref: '#/components/schemas/RouteSettings'
+      description: <p>The route settings map.</p>
+    SecurityGroupIdList:
+      type: array
+      items:
+        $ref: '#/components/schemas/__string'
+      description: <p>A list of security group IDs for the VPC link.</p>
+    SecurityPolicy:
+      type: string
+      enum:
+      - TLS_1_0
+      - TLS_1_2
+      description: <p>The Transport Layer Security (TLS) version of the security policy
+        for this domain name. The valid values are TLS_1_0 and TLS_1_2.</p>
     SelectionExpression:
       type: string
     SelectionKey:
       type: string
+    StageVariablesMap:
+      type: object
+      additionalProperties:
+        $ref: '#/components/schemas/StringWithLengthBetween0And2048'
+      description: <p>The stage variable map.</p>
     StringWithLengthBetween0And1024:
       type: string
     StringWithLengthBetween0And2048:
@@ -90,11 +305,100 @@ components:
       type: string
     StringWithLengthBetween1And64:
       type: string
+    SubnetIdList:
+      type: array
+      items:
+        $ref: '#/components/schemas/__string'
+      description: <p>A list of subnet IDs to include in the VPC link.</p>
+    Tags:
+      type: object
+      additionalProperties:
+        $ref: '#/components/schemas/StringWithLengthBetween1And1600'
+      description: <p>Represents a collection of tags associated with the resource.</p>
+    TemplateMap:
+      type: object
+      additionalProperties:
+        $ref: '#/components/schemas/StringWithLengthBetween0And32K'
+      description: <p>A mapping of identifier keys to templates. The value is an actual
+        template script. The key is typically a SelectionKey which is chosen based
+        on evaluating a selection expression.</p>
     UriWithLengthBetween1And2048:
       type: string
+    VpcLinkStatus:
+      type: string
+      enum:
+      - PENDING
+      - AVAILABLE
+      - DELETING
+      - FAILED
+      - INACTIVE
+      description: <p>The status of the VPC link.</p>
+    VpcLinkVersion:
+      type: string
+      enum:
+      - V2
+      description: <p>The version of the VPC link.</p>
     __boolean:
       type: boolean
+    __double:
+      type: number
+      format: double
     __integer:
       type: integer
+    __listOfApi:
+      type: array
+      items:
+        $ref: '#/components/schemas/Api'
+    __listOfApiMapping:
+      type: array
+      items:
+        $ref: '#/components/schemas/ApiMapping'
+    __listOfAuthorizer:
+      type: array
+      items:
+        $ref: '#/components/schemas/Authorizer'
+    __listOfDeployment:
+      type: array
+      items:
+        $ref: '#/components/schemas/Deployment'
+    __listOfDomainName:
+      type: array
+      items:
+        $ref: '#/components/schemas/DomainName'
+    __listOfIntegration:
+      type: array
+      items:
+        $ref: '#/components/schemas/Integration'
+    __listOfIntegrationResponse:
+      type: array
+      items:
+        $ref: '#/components/schemas/IntegrationResponse'
+    __listOfModel:
+      type: array
+      items:
+        $ref: '#/components/schemas/Model'
+    __listOfRoute:
+      type: array
+      items:
+        $ref: '#/components/schemas/Route'
+    __listOfRouteResponse:
+      type: array
+      items:
+        $ref: '#/components/schemas/RouteResponse'
+    __listOfStage:
+      type: array
+      items:
+        $ref: '#/components/schemas/Stage'
+    __listOfVpcLink:
+      type: array
+      items:
+        $ref: '#/components/schemas/VpcLink'
+    __listOf__string:
+      type: array
+      items:
+        $ref: '#/components/schemas/__string'
     __string:
       type: string
+    __timestampIso8601:
+      type: string
+      format: date-time

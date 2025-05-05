@@ -121,24 +121,117 @@ servers:
 paths: {}
 components:
   schemas:
+    ActionInvocations:
+      type: array
+      items:
+        $ref: '#/components/schemas/ActionInvocation'
+    ActionList:
+      type: array
+      items:
+        $ref: '#/components/schemas/Action'
+    ActionPoint:
+      type: string
+      enum:
+      - PRE_CREATE_HOSTED_CONFIGURATION_VERSION
+      - PRE_START_DEPLOYMENT
+      - AT_DEPLOYMENT_TICK
+      - ON_DEPLOYMENT_START
+      - ON_DEPLOYMENT_STEP
+      - ON_DEPLOYMENT_BAKING
+      - ON_DEPLOYMENT_COMPLETE
+      - ON_DEPLOYMENT_ROLLED_BACK
+    ActionsMap:
+      type: object
+      additionalProperties:
+        $ref: '#/components/schemas/ActionList'
+    ApplicationList:
+      type: array
+      items:
+        $ref: '#/components/schemas/Application'
+    AppliedExtensions:
+      type: array
+      items:
+        $ref: '#/components/schemas/AppliedExtension'
     Arn:
       type: string
       pattern: ^arn:(aws[a-zA-Z-]*)?:[a-z]+:([a-z]{2}((-gov)|(-iso([a-z]?)))?-[a-z]+-\d{1})?:(\d{12})?:[a-zA-Z0-9-_/:.]+$
       minLength: 20
       maxLength: 2048
+    BadRequestDetails:
+      allOf:
+      - allOf:
+        - $ref: '#/components/schemas/InvalidConfigurationDetailList'
+        description: |-
+          Detailed information about the bad request exception error when creating a hosted configuration version.
+      description: |-
+        Detailed information about the input that failed to satisfy the constraints specified by a call.
+    BadRequestReason:
+      type: string
+      enum:
+      - InvalidConfiguration
+    Blob:
+      type: string
+      format: byte
+      x-sensitive: true
     Boolean:
       type: boolean
       default: false
+    BytesMeasure:
+      type: string
+      enum:
+      - KILOBYTES
+    ConfigurationProfileSummaryList:
+      type: array
+      items:
+        $ref: '#/components/schemas/ConfigurationProfileSummary'
     ConfigurationProfileType:
       type: string
       pattern: ^[a-zA-Z\.]+$
+    DeletionProtectionCheck:
+      type: string
+      enum:
+      - ACCOUNT_DEFAULT
+      - APPLY
+      - BYPASS
     DeletionProtectionDuration:
       type: integer
       minimum: 15
       maximum: 1440
+    DeploymentEventType:
+      type: string
+      enum:
+      - PERCENTAGE_UPDATED
+      - ROLLBACK_STARTED
+      - ROLLBACK_COMPLETED
+      - BAKE_TIME_STARTED
+      - DEPLOYMENT_STARTED
+      - DEPLOYMENT_COMPLETED
+      - REVERT_COMPLETED
+    DeploymentEvents:
+      type: array
+      items:
+        $ref: '#/components/schemas/DeploymentEvent'
+    DeploymentList:
+      type: array
+      items:
+        $ref: '#/components/schemas/DeploymentSummary'
+    DeploymentState:
+      type: string
+      enum:
+      - BAKING
+      - VALIDATING
+      - DEPLOYING
+      - COMPLETE
+      - ROLLING_BACK
+      - ROLLED_BACK
+      - REVERTED
     DeploymentStrategyId:
       type: string
       pattern: ^(^[a-z0-9]{4,7}$|^AppConfig\.[A-Za-z0-9]{9,40}$)$
+    DeploymentStrategyList:
+      type: array
+      items:
+        $ref: '#/components/schemas/DeploymentStrategy'
     Description:
       type: string
       minLength: 0
@@ -146,9 +239,51 @@ components:
     DynamicParameterKey:
       type: string
       pattern: ^([^#\n]{1,96})#([^\/#\n]{1,64})$
+    DynamicParameterMap:
+      type: object
+      additionalProperties:
+        $ref: '#/components/schemas/StringWithLengthBetween1And2048'
+    EnvironmentList:
+      type: array
+      items:
+        $ref: '#/components/schemas/Environment'
+    EnvironmentState:
+      type: string
+      enum:
+      - READY_FOR_DEPLOYMENT
+      - DEPLOYING
+      - ROLLING_BACK
+      - ROLLED_BACK
+      - REVERTED
+    ExtensionAssociationSummaries:
+      type: array
+      items:
+        $ref: '#/components/schemas/ExtensionAssociationSummary'
     ExtensionOrParameterName:
       type: string
       pattern: ^[^\/#:\n]{1,64}$
+    ExtensionSummaries:
+      type: array
+      items:
+        $ref: '#/components/schemas/ExtensionSummary'
+    Float:
+      type: number
+      format: float
+      default: 0
+    GrowthFactor:
+      type: number
+      format: float
+      minimum: 1.0
+      maximum: 100.0
+    GrowthType:
+      type: string
+      enum:
+      - LINEAR
+      - EXPONENTIAL
+    HostedConfigurationVersionSummaryList:
+      type: array
+      items:
+        $ref: '#/components/schemas/HostedConfigurationVersionSummary'
     Id:
       type: string
       pattern: ^[a-z0-9]{4,7}$
@@ -159,6 +294,13 @@ components:
     Integer:
       type: integer
       default: 0
+    InvalidConfigurationDetailList:
+      type: array
+      items:
+        $ref: '#/components/schemas/InvalidConfigurationDetail'
+    Iso8601DateTime:
+      type: string
+      format: date-time
     KmsKeyIdentifier:
       type: string
       minLength: 1
@@ -180,6 +322,10 @@ components:
       default: 0
       minimum: 0
       maximum: 1440
+    MonitorList:
+      type: array
+      items:
+        $ref: '#/components/schemas/Monitor'
     Name:
       type: string
       minLength: 1
@@ -188,10 +334,28 @@ components:
       type: string
       minLength: 1
       maxLength: 2048
+    ParameterMap:
+      type: object
+      additionalProperties:
+        $ref: '#/components/schemas/Parameter'
+    ParameterValueMap:
+      type: object
+      additionalProperties:
+        $ref: '#/components/schemas/StringWithLengthBetween1And2048'
+    Percentage:
+      type: number
+      format: float
+      minimum: 1.0
+      maximum: 100.0
     QueryName:
       type: string
       minLength: 1
       maxLength: 64
+    ReplicateTo:
+      type: string
+      enum:
+      - NONE
+      - SSM_DOCUMENT
     RoleArn:
       type: string
       pattern: ^((arn):(aws|aws-cn|aws-iso|aws-iso-[a-z]{1}|aws-us-gov):(iam)::\d{12}:role[/].*)$
@@ -219,14 +383,42 @@ components:
       type: string
       minLength: 1
       maxLength: 128
+    TagKeyList:
+      type: array
+      items:
+        $ref: '#/components/schemas/TagKey'
+    TagMap:
+      type: object
+      additionalProperties:
+        $ref: '#/components/schemas/TagValue'
     TagValue:
       type: string
       minLength: 0
       maxLength: 256
+    TriggeredBy:
+      type: string
+      enum:
+      - USER
+      - APPCONFIG
+      - CLOUDWATCH_ALARM
+      - INTERNAL_ERROR
     Uri:
       type: string
       minLength: 1
       maxLength: 2048
+    ValidatorList:
+      type: array
+      items:
+        $ref: '#/components/schemas/Validator'
+    ValidatorType:
+      type: string
+      enum:
+      - JSON_SCHEMA
+      - LAMBDA
+    ValidatorTypeList:
+      type: array
+      items:
+        $ref: '#/components/schemas/ValidatorType'
     Version:
       type: string
       minLength: 1

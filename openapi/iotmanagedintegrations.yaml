@@ -46,6 +46,21 @@ servers:
 paths: {}
 components:
   schemas:
+    AbortConfigCriteriaList:
+      type: array
+      items:
+        $ref: '#/components/schemas/AbortConfigCriteria'
+    AbortCriteriaAction:
+      type: string
+      enum:
+      - CANCEL
+    AbortCriteriaFailureType:
+      type: string
+      enum:
+      - FAILED
+      - REJECTED
+      - TIMED_OUT
+      - ALL
     ActionName:
       type: string
       pattern: ^[/a-zA-Z0-9\._ ]+$
@@ -77,6 +92,12 @@ components:
       pattern: '^[0-9A-Za-z!#$%&()*\+\-;<=>?@^_`{|}~\/: ]+$'
       minLength: 1
       maxLength: 512
+    AuthMaterialType:
+      type: string
+      enum:
+      - WIFI_SETUP_QR_BAR_CODE
+      - ZWAVE_QR_BAR_CODE
+      - ZIGBEE_QR_BAR_CODE
     BaseRatePerMinute:
       type: integer
       minimum: 1
@@ -97,6 +118,10 @@ components:
     CapabilityActionName:
       type: string
       pattern: ^[/a-zA-Z]+$
+    CapabilityActions:
+      type: array
+      items:
+        $ref: '#/components/schemas/CapabilityAction'
     CapabilityId:
       type: string
       pattern: ^[a-zA-Z0-9./]+(@\d+\.\d+)?$
@@ -107,6 +132,30 @@ components:
       pattern: ^[/a-zA-Z0-9\._ ]+$
       minLength: 1
       maxLength: 128
+    CapabilityProperties:
+      type: object
+      additionalProperties: true
+      x-sensitive: true
+    CapabilityReportActions:
+      type: array
+      items:
+        $ref: '#/components/schemas/ActionName'
+    CapabilityReportCapabilities:
+      type: array
+      items:
+        $ref: '#/components/schemas/CapabilityReportCapability'
+    CapabilityReportEndpoints:
+      type: array
+      items:
+        $ref: '#/components/schemas/CapabilityReportEndpoint'
+    CapabilityReportEvents:
+      type: array
+      items:
+        $ref: '#/components/schemas/EventName'
+    CapabilityReportProperties:
+      type: array
+      items:
+        $ref: '#/components/schemas/PropertyName'
     CapabilityReportVersion:
       type: string
       pattern: ^1\.0\.0$
@@ -130,6 +179,14 @@ components:
       pattern: ^[a-zA-Z0-9=_-]+$
       minLength: 1
       maxLength: 64
+    CommandCapabilities:
+      type: array
+      items:
+        $ref: '#/components/schemas/CommandCapability'
+    CommandEndpoints:
+      type: array
+      items:
+        $ref: '#/components/schemas/CommandEndpoint'
     ConfigurationErrorCode:
       type: string
       pattern: ^[a-zA-Z0-9_-]+$
@@ -140,8 +197,17 @@ components:
       pattern: ^[a-zA-Z0-9\-._,]+$
       minLength: 1
       maxLength: 65535
+    ConfigurationState:
+      type: string
+      enum:
+      - ENABLED
+      - UPDATE_IN_PROGRESS
+      - UPDATE_FAILED
     ConnectivityStatus:
       type: boolean
+    ConnectivityTimestamp:
+      type: string
+      format: date-time
     ConnectorAssociationId:
       type: string
       pattern: ^[0-9a-zA-Z]+$
@@ -157,16 +223,26 @@ components:
       pattern: ^[A-Za-z0-9-_]+$
       minLength: 1
       maxLength: 64
+    CreatedAt:
+      type: string
+      format: date-time
     CredentialLockerArn:
       type: string
       pattern: ^arn:aws:iotmanagedintegrations:[0-9a-zA-Z-]+:[0-9]+:credential-locker/[0-9a-zA-Z]+$
       minLength: 32
       maxLength: 1011
+    CredentialLockerCreatedAt:
+      type: string
+      format: date-time
     CredentialLockerId:
       type: string
       pattern: ^[a-zA-Z0-9]*$
       minLength: 1
       maxLength: 64
+    CredentialLockerListDefinition:
+      type: array
+      items:
+        $ref: '#/components/schemas/CredentialLockerSummary'
     CredentialLockerName:
       type: string
       pattern: ^[A-Za-z0-9-_ ]+$
@@ -181,16 +257,30 @@ components:
       maxLength: 2048
     DeliveryDestinationRoleArn:
       type: string
+    DeliveryDestinationType:
+      type: string
+      enum:
+      - KINESIS
+    DestinationCreatedAt:
+      type: string
+      format: date-time
     DestinationDescription:
       type: string
       pattern: ^[0-9A-Za-z_\- ]+$
       minLength: 1
       maxLength: 256
+    DestinationListDefinition:
+      type: array
+      items:
+        $ref: '#/components/schemas/DestinationSummary'
     DestinationName:
       type: string
       pattern: ^[\p{L}\p{N} ._-]+$
       minLength: 1
       maxLength: 128
+    DestinationUpdatedAt:
+      type: string
+      format: date-time
     DeviceDiscoveryArn:
       type: string
       pattern: ^arn:aws:iotmanagedintegrations:[0-9a-zA-Z-]+:[0-9]+:device-discovery/[0-9a-zA-Z]+$
@@ -199,6 +289,13 @@ components:
       pattern: ^[A-Za-z0-9]+$
       minLength: 1
       maxLength: 200
+    DeviceDiscoveryStatus:
+      type: string
+      enum:
+      - RUNNING
+      - SUCCEEDED
+      - FAILED
+      - TIMED_OUT
     DeviceSpecificKey:
       type: string
       pattern: ^[a-zA-Z0-9=_.,@\+\-]+$
@@ -208,15 +305,57 @@ components:
       type: string
       pattern: ^[a-zA-Z0-9=_. ,@\+\-/]+$
       maxLength: 256
+    DeviceTypes:
+      type: array
+      items:
+        $ref: '#/components/schemas/DeviceType'
+    DisconnectReasonValue:
+      type: string
+      enum:
+      - AUTH_ERROR
+      - CLIENT_INITIATED_DISCONNECT
+      - CLIENT_ERROR
+      - CONNECTION_LOST
+      - DUPLICATE_CLIENTID
+      - FORBIDDEN_ACCESS
+      - MQTT_KEEP_ALIVE_TIMEOUT
+      - SERVER_ERROR
+      - SERVER_INITIATED_DISCONNECT
+      - THROTTLED
+      - WEBSOCKET_TTL_EXPIRATION
+      - CUSTOMAUTH_TTL_EXPIRATION
+      - UNKNOWN
+      - NONE
     DiscoveryAuthMaterialString:
       type: string
       pattern: ^[0-9A-Za-z_\-\+=\/:; ]+$
       minLength: 1
       maxLength: 64
+    DiscoveryAuthMaterialType:
+      type: string
+      enum:
+      - ZWAVE_INSTALL_CODE
+    DiscoveryFinishedAt:
+      type: string
+      format: date-time
+    DiscoveryStartedAt:
+      type: string
+      format: date-time
+    DiscoveryType:
+      type: string
+      enum:
+      - ZWAVE
+      - ZIGBEE
+      - CLOUD
     DurationInMinutes:
       type: integer
       minimum: 1
       maximum: 1430
+    EncryptionType:
+      type: string
+      enum:
+      - MANAGED_INTEGRATIONS_DEFAULT_ENCRYPTION
+      - CUSTOMER_KEY_ENCRYPTION
     EndTime:
       type: string
     EndpointAddress:
@@ -231,11 +370,51 @@ components:
       maxLength: 64
     ErrorMessage:
       type: string
+    EventLogConfigurationListDefinition:
+      type: array
+      items:
+        $ref: '#/components/schemas/EventLogConfigurationSummary'
     EventName:
       type: string
       pattern: ^[/a-zA-Z0-9\._ ]+$
       minLength: 1
       maxLength: 128
+    EventType:
+      type: string
+      enum:
+      - DEVICE_COMMAND
+      - DEVICE_COMMAND_REQUEST
+      - DEVICE_EVENT
+      - DEVICE_LIFE_CYCLE
+      - DEVICE_STATE
+      - DEVICE_OTA
+      - CONNECTOR_ASSOCIATION
+      - CONNECTOR_ERROR_REPORT
+    ExecutionNumber:
+      type: integer
+      format: int64
+    HubConfigurationUpdatedAt:
+      type: string
+      format: date-time
+    HubNetworkMode:
+      type: string
+      enum:
+      - STANDARD
+      - NETWORK_WIDE_EXCLUSION
+    HubTokenTimerExpirySettingInSeconds:
+      type: integer
+      format: int64
+      minimum: 1
+    InProgressTimeoutInMinutes:
+      type: integer
+      format: int64
+      minimum: 1
+      maximum: 10080
+    IncrementFactor:
+      type: number
+      format: double
+      minimum: 1.1
+      maximum: 5
     InternationalArticleNumber:
       type: string
       pattern: ^[0-9]+$
@@ -246,6 +425,9 @@ components:
       pattern: ^arn:aws:kms:[0-9a-zA-Z-]+:[0-9]+:key/[0-9a-zA-Z-]+$
       minLength: 1
       maxLength: 200
+    LastUpdatedAt:
+      type: string
+      format: date-time
     LocalStoreFileRotationMaxBytes:
       type: integer
     LocalStoreFileRotationMaxFiles:
@@ -257,6 +439,13 @@ components:
       pattern: ^[A-Za-z0-9]+$
       minLength: 1
       maxLength: 200
+    LogLevel:
+      type: string
+      enum:
+      - DEBUG
+      - ERROR
+      - INFO
+      - WARN
     MacAddress:
       type: string
       minLength: 1
@@ -271,6 +460,14 @@ components:
       pattern: ^[a-zA-Z0-9:_-]*$
       minLength: 1
       maxLength: 64
+    ManagedThingListDefinition:
+      type: array
+      items:
+        $ref: '#/components/schemas/ManagedThingSummary'
+    ManagedThingSchemaListDefinition:
+      type: array
+      items:
+        $ref: '#/components/schemas/ManagedThingSchemaListItem'
     MaxResults:
       type: integer
       minimum: 1
@@ -278,6 +475,10 @@ components:
     MaximumPerMinute:
       type: integer
       minimum: 1
+    MetaData:
+      type: object
+      additionalProperties:
+        $ref: '#/components/schemas/AttributeValue'
     MinNumberOfExecutedThings:
       type: integer
       minimum: 1
@@ -306,6 +507,16 @@ components:
       pattern: ^[a-zA-Z0-9=_.,@\+\-/]+$
       minLength: 1
       maxLength: 64
+    NotificationConfigurationCreatedAt:
+      type: string
+      format: date-time
+    NotificationConfigurationListDefinition:
+      type: array
+      items:
+        $ref: '#/components/schemas/NotificationConfigurationSummary'
+    NotificationConfigurationUpdatedAt:
+      type: string
+      format: date-time
     NumberOfNotifiedThings:
       type: integer
       minimum: 1
@@ -319,11 +530,27 @@ components:
       pattern: ^[0-9A-Za-z_\- ]+$
       minLength: 1
       maxLength: 256
+    OtaMechanism:
+      type: string
+      enum:
+      - PUSH
     OtaNextToken:
       type: string
       pattern: ^[a-zA-Z0-9=_+/-]+$
       minLength: 1
       maxLength: 65535
+    OtaProtocol:
+      type: string
+      enum:
+      - HTTP
+    OtaStatus:
+      type: string
+      enum:
+      - IN_PROGRESS
+      - CANCELED
+      - COMPLETED
+      - DELETION_IN_PROGRESS
+      - SCHEDULED
     OtaTargetQueryString:
       type: string
     OtaTaskArn:
@@ -336,16 +563,44 @@ components:
       pattern: ^[a-zA-Z0-9]*$
       minLength: 1
       maxLength: 64
+    OtaTaskConfigurationListDefinition:
+      type: array
+      items:
+        $ref: '#/components/schemas/OtaTaskConfigurationSummary'
     OtaTaskConfigurationName:
       type: string
       pattern: ^[A-Za-z0-9-_ ]+$
       minLength: 1
       maxLength: 128
+    OtaTaskExecutionStatus:
+      type: string
+      enum:
+      - QUEUED
+      - IN_PROGRESS
+      - SUCCEEDED
+      - FAILED
+      - TIMED_OUT
+      - REJECTED
+      - REMOVED
+      - CANCELED
+    OtaTaskExecutionSummariesListDefinition:
+      type: array
+      items:
+        $ref: '#/components/schemas/OtaTaskExecutionSummaries'
     OtaTaskId:
       type: string
       pattern: ^[A-Za-z0-9]+$
       minLength: 1
       maxLength: 200
+    OtaTaskListDefinition:
+      type: array
+      items:
+        $ref: '#/components/schemas/OtaTaskSummary'
+    OtaType:
+      type: string
+      enum:
+      - ONE_TIME
+      - CONTINUOUS
     Owner:
       type: string
       pattern: ^[a-zA-Z0-9_.,@-]+$
@@ -371,19 +626,67 @@ components:
       pattern: ^[A-Za-z0-9-_]+$
       minLength: 1
       maxLength: 64
+    ProvisioningProfileListDefinition:
+      type: array
+      items:
+        $ref: '#/components/schemas/ProvisioningProfileSummary'
     ProvisioningProfileName:
       type: string
       pattern: ^[0-9A-Za-z_-]+$
       minLength: 1
       maxLength: 36
+    ProvisioningStatus:
+      type: string
+      enum:
+      - UNASSOCIATED
+      - PRE_ASSOCIATED
+      - DISCOVERED
+      - ACTIVATED
+      - DELETION_FAILED
+      - DELETE_IN_PROGRESS
+      - ISOLATED
+      - DELETED
+    ProvisioningType:
+      type: string
+      enum:
+      - FLEET_PROVISIONING
+      - JITR
+    QueuedAt:
+      type: string
+      format: date-time
     RetryAttempt:
       type: integer
+    RetryConfigCriteriaList:
+      type: array
+      items:
+        $ref: '#/components/schemas/RetryConfigCriteria'
+    RetryCriteriaFailureType:
+      type: string
+      enum:
+      - FAILED
+      - TIMED_OUT
+      - ALL
+    Role:
+      type: string
+      enum:
+      - CONTROLLER
+      - DEVICE
     S3Url:
       type: string
       minLength: 1
       maxLength: 1000
+    ScheduleMaintenanceWindowList:
+      type: array
+      items:
+        $ref: '#/components/schemas/ScheduleMaintenanceWindow'
     ScheduleStartTime:
       type: string
+    SchedulingConfigEndBehavior:
+      type: string
+      enum:
+      - STOP_ROLLOUT
+      - CANCEL
+      - FORCE_CANCEL
     SchemaId:
       type: string
       pattern: ^[a-zA-Z0-9./]+$
@@ -394,16 +697,39 @@ components:
       pattern: ^[a-zA-Z0-9., ]+$
       minLength: 1
       maxLength: 256
+    SchemaVersionFormat:
+      type: string
+      enum:
+      - AWS
+      - ZCL
+      - CONNECTOR
+    SchemaVersionList:
+      type: array
+      items:
+        $ref: '#/components/schemas/SchemaVersionListItem'
     SchemaVersionNamespaceName:
       type: string
       pattern: ^[a-z]+$
       minLength: 1
       maxLength: 256
+    SchemaVersionSchema:
+      type: object
+      additionalProperties: true
+    SchemaVersionType:
+      type: string
+      enum:
+      - capability
+      - definition
     SchemaVersionVersion:
       type: string
       pattern: ^(\d+\.\d+|\$latest)$
       minLength: 1
       maxLength: 256
+    SchemaVersionVisibility:
+      type: string
+      enum:
+      - PUBLIC
+      - PRIVATE
     SchemaVersionedId:
       type: string
       pattern: ^[a-zA-Z0-9.\/]+(@(\d+\.\d+|\$latest))?$
@@ -414,6 +740,9 @@ components:
       pattern: ^[A-Za-z0-9-_ ]+$
       minLength: 1
       maxLength: 128
+    SetupAt:
+      type: string
+      format: date-time
     SmartHomeResourceId:
       type: string
       pattern: ^[a-zA-Z0-9+*]*$
@@ -424,6 +753,17 @@ components:
       pattern: ^[*]$|^(managed-thing|credential-locker|provisioning-profile|ota-task)$
     StartTime:
       type: string
+    StartedAt:
+      type: string
+      format: date-time
+    StateCapabilities:
+      type: array
+      items:
+        $ref: '#/components/schemas/StateCapability'
+    StateEndpoints:
+      type: array
+      items:
+        $ref: '#/components/schemas/StateEndpoint'
     TagKey:
       type: string
       minLength: 1
@@ -432,6 +772,18 @@ components:
       type: string
       minLength: 0
       maxLength: 256
+    TagsMap:
+      type: object
+      additionalProperties:
+        $ref: '#/components/schemas/TagValue'
+    Target:
+      type: array
+      items:
+        type: string
+    ThresholdPercentage:
+      type: number
+      format: double
+      maximum: 100
     TraceId:
       type: string
       pattern: ^[a-zA-Z0-9:=_-]+$
@@ -442,7 +794,13 @@ components:
       pattern: ^[0-9]+$
       minLength: 12
       maxLength: 12
+    UpdatedAt:
+      type: string
+      format: date-time
     UploadLog:
       type: boolean
     UploadPeriodMinutes:
       type: integer
+    ValidationSchema:
+      type: object
+      additionalProperties: true

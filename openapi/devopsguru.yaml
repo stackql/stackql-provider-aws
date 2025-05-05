@@ -50,6 +50,21 @@ servers:
 paths: {}
 components:
   schemas:
+    AccountHealths:
+      type: array
+      items:
+        $ref: '#/components/schemas/AccountHealth'
+    AccountIdList:
+      type: array
+      items:
+        $ref: '#/components/schemas/AwsAccountId'
+    AnalyzedResourceCount:
+      type: integer
+      format: int64
+    AnomalousLogGroups:
+      type: array
+      items:
+        $ref: '#/components/schemas/AnomalousLogGroup'
     AnomalyDescription:
       type: string
     AnomalyId:
@@ -57,29 +72,78 @@ components:
       pattern: ^[\w~.-]*$
       minLength: 1
       maxLength: 100
+    AnomalyLimit:
+      type: number
+      format: double
     AnomalyName:
       type: string
+    AnomalyResources:
+      type: array
+      items:
+        $ref: '#/components/schemas/AnomalyResource'
+    AnomalySeverity:
+      type: string
+      enum:
+      - LOW
+      - MEDIUM
+      - HIGH
     AnomalySource:
       type: string
+    AnomalyStatus:
+      type: string
+      enum:
+      - ONGOING
+      - CLOSED
+    AnomalyType:
+      type: string
+      enum:
+      - CAUSAL
+      - CONTEXTUAL
     AppBoundaryKey:
       type: string
       pattern: ^([\p{L}\p{Z}\p{N}_.:/=+\-@]*)$
       minLength: 1
       maxLength: 128
+    AssociatedResourceArns:
+      type: array
+      items:
+        $ref: '#/components/schemas/ResourceArn'
     AwsAccountId:
       type: string
       pattern: ^\d{12}$
       minLength: 12
       maxLength: 12
+    Channels:
+      type: array
+      items:
+        $ref: '#/components/schemas/NotificationChannel'
     ClientToken:
       type: string
       pattern: ^[a-zA-Z0-9]+[a-zA-Z0-9-]*$
       minLength: 1
       maxLength: 100
+    CloudFormationHealths:
+      type: array
+      items:
+        $ref: '#/components/schemas/CloudFormationHealth'
+    CloudWatchMetricDataStatusCode:
+      type: string
+      enum:
+      - Complete
+      - InternalError
+      - PartialData
+    CloudWatchMetricsDetails:
+      type: array
+      items:
+        $ref: '#/components/schemas/CloudWatchMetricsDetail'
     CloudWatchMetricsDimensionName:
       type: string
     CloudWatchMetricsDimensionValue:
       type: string
+    CloudWatchMetricsDimensions:
+      type: array
+      items:
+        $ref: '#/components/schemas/CloudWatchMetricsDimension'
     CloudWatchMetricsMetricName:
       type: string
     CloudWatchMetricsNamespace:
@@ -87,11 +151,44 @@ components:
     CloudWatchMetricsPeriod:
       type: integer
       default: 0
+    CloudWatchMetricsStat:
+      type: string
+      enum:
+      - Sum
+      - Average
+      - SampleCount
+      - Minimum
+      - Maximum
+      - p99
+      - p90
+      - p50
     CloudWatchMetricsUnit:
       type: string
+    Cost:
+      type: number
+      format: double
+      default: 0
     CostEstimationServiceResourceCount:
       type: integer
       default: 0
+    CostEstimationServiceResourceState:
+      type: string
+      enum:
+      - ACTIVE
+      - INACTIVE
+    CostEstimationStackNames:
+      type: array
+      items:
+        $ref: '#/components/schemas/StackName'
+    CostEstimationStatus:
+      type: string
+      enum:
+      - ONGOING
+      - COMPLETED
+    CostEstimationTagValues:
+      type: array
+      items:
+        $ref: '#/components/schemas/TagValue'
     ErrorMessageString:
       type: string
     ErrorNameString:
@@ -100,6 +197,19 @@ components:
       type: string
     ErrorServiceCodeString:
       type: string
+    EventClass:
+      type: string
+      enum:
+      - INFRASTRUCTURE
+      - DEPLOYMENT
+      - SECURITY_CHANGE
+      - CONFIG_CHANGE
+      - SCHEMA_CHANGE
+    EventDataSource:
+      type: string
+      enum:
+      - AWS_CLOUD_TRAIL
+      - AWS_CODE_DEPLOY
     EventId:
       type: string
     EventName:
@@ -121,17 +231,38 @@ components:
       pattern: ^.*$
       minLength: 0
       maxLength: 2048
+    EventResources:
+      type: array
+      items:
+        $ref: '#/components/schemas/EventResource'
     EventSource:
       type: string
       pattern: ^[a-z]+[a-z0-9]*\.amazonaws\.com|aws\.events$
       minLength: 10
       maxLength: 50
+    EventSourceOptInStatus:
+      type: string
+      enum:
+      - ENABLED
+      - DISABLED
+    Events:
+      type: array
+      items:
+        $ref: '#/components/schemas/Event'
     Explanation:
       type: string
       minLength: 1
       maxLength: 2048
     InsightDescription:
       type: string
+    InsightFeedbackOption:
+      type: string
+      enum:
+      - VALID_COLLECTION
+      - RECOMMENDATION_USEFUL
+      - ALERT_TOO_SENSITIVE
+      - DATA_NOISY_ANOMALY
+      - DATA_INCORRECT
     InsightId:
       type: string
       pattern: ^[\w-]*$
@@ -142,6 +273,30 @@ components:
       pattern: ^[\s\S]*$
       minLength: 1
       maxLength: 530
+    InsightSeverities:
+      type: array
+      items:
+        $ref: '#/components/schemas/InsightSeverity'
+    InsightSeverity:
+      type: string
+      enum:
+      - LOW
+      - MEDIUM
+      - HIGH
+    InsightStatus:
+      type: string
+      enum:
+      - ONGOING
+      - CLOSED
+    InsightStatuses:
+      type: array
+      items:
+        $ref: '#/components/schemas/InsightStatus'
+    InsightType:
+      type: string
+      enum:
+      - REACTIVE
+      - PROACTIVE
     KMSKeyId:
       type: string
       pattern: ^.*$
@@ -159,18 +314,59 @@ components:
       type: integer
       minimum: 1
       maximum: 200
+    ListInsightsAccountIdList:
+      type: array
+      items:
+        $ref: '#/components/schemas/AwsAccountId'
     ListInsightsMaxResults:
       type: integer
       minimum: 1
       maximum: 100
+    ListInsightsOrganizationalUnitIdList:
+      type: array
+      items:
+        $ref: '#/components/schemas/OrganizationalUnitId'
     ListMonitoredResourcesMaxResults:
       type: integer
       minimum: 1
       maximum: 50
+    Locale:
+      type: string
+      enum:
+      - DE_DE
+      - EN_US
+      - EN_GB
+      - ES_ES
+      - FR_FR
+      - IT_IT
+      - JA_JP
+      - KO_KR
+      - PT_BR
+      - ZH_CN
+      - ZH_TW
+    LogAnomalyClasses:
+      type: array
+      items:
+        $ref: '#/components/schemas/LogAnomalyClass'
+    LogAnomalyShowcases:
+      type: array
+      items:
+        $ref: '#/components/schemas/LogAnomalyShowcase'
     LogAnomalyToken:
       type: string
       minLength: 1
       maxLength: 2048
+    LogAnomalyType:
+      type: string
+      enum:
+      - KEYWORD
+      - KEYWORD_TOKEN
+      - FORMAT
+      - HTTP_CODE
+      - BLOCK_FORMAT
+      - NUMERICAL_POINT
+      - NUMERICAL_NAN
+      - NEW_FIELD_NAME
     LogEventId:
       type: string
       minLength: 1
@@ -183,6 +379,16 @@ components:
       type: string
       minLength: 1
       maxLength: 512
+    MeanTimeToRecoverInMilliseconds:
+      type: integer
+      format: int64
+    MetricValue:
+      type: number
+      format: double
+    MonitoredResourceIdentifiers:
+      type: array
+      items:
+        $ref: '#/components/schemas/MonitoredResourceIdentifier'
     MonitoredResourceName:
       type: string
       pattern: ^[\.\-_\/#A-Za-z0-9]+$
@@ -193,6 +399,18 @@ components:
       pattern: ^[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$
       minLength: 36
       maxLength: 36
+    NotificationMessageType:
+      type: string
+      enum:
+      - NEW_INSIGHT
+      - CLOSED_INSIGHT
+      - NEW_ASSOCIATION
+      - SEVERITY_UPGRADED
+      - NEW_RECOMMENDATION
+    NotificationMessageTypes:
+      type: array
+      items:
+        $ref: '#/components/schemas/NotificationMessageType'
     NumMetricsAnalyzed:
       type: integer
       default: 0
@@ -214,21 +432,47 @@ components:
     NumberOfLogLinesScanned:
       type: integer
       default: 0
+    OptInStatus:
+      type: string
+      enum:
+      - ENABLED
+      - DISABLED
+      description: "<p> Specifies if DevOps Guru is enabled to create an Amazon Web\
+        \ Services Systems Manager OpsItem for each created\n\t\t\tinsight. </p>"
     OrganizationResourceCollectionMaxResults:
       type: integer
       minimum: 1
       maximum: 500
+    OrganizationResourceCollectionType:
+      type: string
+      enum:
+      - AWS_CLOUD_FORMATION
+      - AWS_SERVICE
+      - AWS_ACCOUNT
+      - AWS_TAGS
     OrganizationalUnitId:
       type: string
       pattern: ^ou-[0-9a-z]{4,32}-[a-z0-9]{8,32}$
       minLength: 0
       maxLength: 68
+    OrganizationalUnitIdList:
+      type: array
+      items:
+        $ref: '#/components/schemas/OrganizationalUnitId'
     PerformanceInsightsMetricDimension:
       type: string
+    PerformanceInsightsMetricDimensions:
+      type: array
+      items:
+        $ref: '#/components/schemas/PerformanceInsightsMetricDimension'
     PerformanceInsightsMetricDisplayName:
       type: string
     PerformanceInsightsMetricFilterKey:
       type: string
+    PerformanceInsightsMetricFilterMap:
+      type: object
+      additionalProperties:
+        $ref: '#/components/schemas/PerformanceInsightsMetricFilterValue'
     PerformanceInsightsMetricFilterValue:
       type: string
     PerformanceInsightsMetricGroup:
@@ -241,10 +485,49 @@ components:
       type: string
     PerformanceInsightsMetricUnit:
       type: string
+    PerformanceInsightsMetricsDetails:
+      type: array
+      items:
+        $ref: '#/components/schemas/PerformanceInsightsMetricsDetail'
+    PerformanceInsightsReferenceDataList:
+      type: array
+      items:
+        $ref: '#/components/schemas/PerformanceInsightsReferenceData'
     PerformanceInsightsReferenceName:
       type: string
     PerformanceInsightsStatType:
       type: string
+    PerformanceInsightsStats:
+      type: array
+      items:
+        $ref: '#/components/schemas/PerformanceInsightsStat'
+    PerformanceInsightsValueDouble:
+      type: number
+      format: double
+    ProactiveAnomalies:
+      type: array
+      items:
+        $ref: '#/components/schemas/ProactiveAnomalySummary'
+    ProactiveInsights:
+      type: array
+      items:
+        $ref: '#/components/schemas/ProactiveInsightSummary'
+    ProactiveOrganizationInsights:
+      type: array
+      items:
+        $ref: '#/components/schemas/ProactiveOrganizationInsightSummary'
+    ReactiveAnomalies:
+      type: array
+      items:
+        $ref: '#/components/schemas/ReactiveAnomalySummary'
+    ReactiveInsights:
+      type: array
+      items:
+        $ref: '#/components/schemas/ReactiveInsightSummary'
+    ReactiveOrganizationInsights:
+      type: array
+      items:
+        $ref: '#/components/schemas/ReactiveOrganizationInsightSummary'
     RecommendationCategory:
       type: string
     RecommendationDescription:
@@ -255,10 +538,22 @@ components:
       type: string
     RecommendationReason:
       type: string
+    RecommendationRelatedAnomalies:
+      type: array
+      items:
+        $ref: '#/components/schemas/RecommendationRelatedAnomaly'
     RecommendationRelatedAnomalyResourceName:
       type: string
     RecommendationRelatedAnomalyResourceType:
       type: string
+    RecommendationRelatedAnomalyResources:
+      type: array
+      items:
+        $ref: '#/components/schemas/RecommendationRelatedAnomalyResource'
+    RecommendationRelatedCloudWatchMetricsSourceDetails:
+      type: array
+      items:
+        $ref: '#/components/schemas/RecommendationRelatedCloudWatchMetricsSourceDetail'
     RecommendationRelatedCloudWatchMetricsSourceMetricName:
       type: string
     RecommendationRelatedCloudWatchMetricsSourceNamespace:
@@ -269,24 +564,92 @@ components:
       type: string
     RecommendationRelatedEventResourceType:
       type: string
+    RecommendationRelatedEventResources:
+      type: array
+      items:
+        $ref: '#/components/schemas/RecommendationRelatedEventResource'
+    RecommendationRelatedEvents:
+      type: array
+      items:
+        $ref: '#/components/schemas/RecommendationRelatedEvent'
+    Recommendations:
+      type: array
+      items:
+        $ref: '#/components/schemas/Recommendation'
+    RelatedAnomalySourceDetails:
+      type: array
+      items:
+        $ref: '#/components/schemas/RecommendationRelatedAnomalySourceDetail'
     ResourceArn:
       type: string
       minLength: 20
       maxLength: 2048
+    ResourceCollectionType:
+      type: string
+      enum:
+      - AWS_CLOUD_FORMATION
+      - AWS_SERVICE
+      - AWS_TAGS
+    ResourceHours:
+      type: integer
+      format: int64
     ResourceIdString:
       type: string
     ResourceIdType:
       type: string
     ResourceName:
       type: string
+    ResourcePermission:
+      type: string
+      enum:
+      - FULL_PERMISSION
+      - MISSING_PERMISSION
     ResourceType:
       type: string
       pattern: ^[a-zA-Z]+[a-zA-Z0-9-_:]*$
       minLength: 1
       maxLength: 256
+    ResourceTypeFilter:
+      type: string
+      enum:
+      - LOG_GROUPS
+      - CLOUDFRONT_DISTRIBUTION
+      - DYNAMODB_TABLE
+      - EC2_NAT_GATEWAY
+      - ECS_CLUSTER
+      - ECS_SERVICE
+      - EKS_CLUSTER
+      - ELASTIC_BEANSTALK_ENVIRONMENT
+      - ELASTIC_LOAD_BALANCER_LOAD_BALANCER
+      - ELASTIC_LOAD_BALANCING_V2_LOAD_BALANCER
+      - ELASTIC_LOAD_BALANCING_V2_TARGET_GROUP
+      - ELASTICACHE_CACHE_CLUSTER
+      - ELASTICSEARCH_DOMAIN
+      - KINESIS_STREAM
+      - LAMBDA_FUNCTION
+      - OPEN_SEARCH_SERVICE_DOMAIN
+      - RDS_DB_INSTANCE
+      - RDS_DB_CLUSTER
+      - REDSHIFT_CLUSTER
+      - ROUTE53_HOSTED_ZONE
+      - ROUTE53_HEALTH_CHECK
+      - S3_BUCKET
+      - SAGEMAKER_ENDPOINT
+      - SNS_TOPIC
+      - SQS_QUEUE
+      - STEP_FUNCTIONS_ACTIVITY
+      - STEP_FUNCTIONS_STATE_MACHINE
+    ResourceTypeFilters:
+      type: array
+      items:
+        $ref: '#/components/schemas/ResourceTypeFilter'
     RetryAfterSeconds:
       type: integer
       default: 0
+    SearchInsightsAccountIdList:
+      type: array
+      items:
+        $ref: '#/components/schemas/AwsAccountId'
     SearchInsightsMaxResults:
       type: integer
       minimum: 1
@@ -295,6 +658,51 @@ components:
       type: integer
       minimum: 1
       maximum: 100
+    ServerSideEncryptionType:
+      type: string
+      enum:
+      - CUSTOMER_MANAGED_KEY
+      - AWS_OWNED_KMS_KEY
+    ServiceHealths:
+      type: array
+      items:
+        $ref: '#/components/schemas/ServiceHealth'
+    ServiceName:
+      type: string
+      enum:
+      - API_GATEWAY
+      - APPLICATION_ELB
+      - AUTO_SCALING_GROUP
+      - CLOUD_FRONT
+      - DYNAMO_DB
+      - EC2
+      - ECS
+      - EKS
+      - ELASTIC_BEANSTALK
+      - ELASTI_CACHE
+      - ELB
+      - ES
+      - KINESIS
+      - LAMBDA
+      - NAT_GATEWAY
+      - NETWORK_ELB
+      - RDS
+      - REDSHIFT
+      - ROUTE_53
+      - S3
+      - SAGE_MAKER
+      - SNS
+      - SQS
+      - STEP_FUNCTIONS
+      - SWF
+    ServiceNames:
+      type: array
+      items:
+        $ref: '#/components/schemas/ServiceName'
+    ServiceResourceCosts:
+      type: array
+      items:
+        $ref: '#/components/schemas/ServiceResourceCost'
     SsmOpsItemId:
       type: string
       pattern: ^.*$
@@ -305,18 +713,81 @@ components:
       pattern: ^[a-zA-Z*]+[a-zA-Z0-9-]*$
       minLength: 1
       maxLength: 128
+    StackNames:
+      type: array
+      items:
+        $ref: '#/components/schemas/StackName'
+    TagCollectionFilters:
+      type: array
+      items:
+        $ref: '#/components/schemas/TagCollectionFilter'
+    TagCollections:
+      type: array
+      items:
+        $ref: '#/components/schemas/TagCollection'
+    TagCostEstimationResourceCollectionFilters:
+      type: array
+      items:
+        $ref: '#/components/schemas/TagCostEstimationResourceCollectionFilter'
+    TagHealths:
+      type: array
+      items:
+        $ref: '#/components/schemas/TagHealth'
     TagValue:
       type: string
       pattern: ^([\p{L}\p{Z}\p{N}_.:/=+\-@]*|\*)$
       minLength: 0
       maxLength: 256
+    TagValues:
+      type: array
+      items:
+        $ref: '#/components/schemas/TagValue'
+    Timestamp:
+      type: string
+      format: date-time
+    TimestampMetricValuePairList:
+      type: array
+      items:
+        $ref: '#/components/schemas/TimestampMetricValuePair'
     TopicArn:
       type: string
       pattern: ^arn:aws[a-z0-9-]*:sns:[a-z0-9-]+:\d{12}:[^:]+$
       minLength: 36
       maxLength: 1024
+    UpdateResourceCollectionAction:
+      type: string
+      enum:
+      - ADD
+      - REMOVE
+    UpdateStackNames:
+      type: array
+      items:
+        $ref: '#/components/schemas/StackName'
+    UpdateTagCollectionFilters:
+      type: array
+      items:
+        $ref: '#/components/schemas/UpdateTagCollectionFilter'
+    UpdateTagValues:
+      type: array
+      items:
+        $ref: '#/components/schemas/TagValue'
     UuidNextToken:
       type: string
       pattern: ^[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$
       minLength: 36
       maxLength: 36
+    ValidationExceptionFields:
+      type: array
+      items:
+        $ref: '#/components/schemas/ValidationExceptionField'
+      description: <p> An array of fields that are associated with the validation
+        exception. </p>
+    ValidationExceptionReason:
+      type: string
+      enum:
+      - UNKNOWN_OPERATION
+      - CANNOT_PARSE
+      - FIELD_VALIDATION_FAILED
+      - OTHER
+      - INVALID_PARAMETER_COMBINATION
+      - PARAMETER_INCONSISTENT_WITH_SERVICE_STATE

@@ -53,6 +53,27 @@ components:
     BaseScreenshotConfigIgnoreCoordinate:
       type: string
       pattern: ^(-?\d{1,5}\.?\d{0,2},){3}(-?\d{1,5}\.?\d{0,2}){1}$
+    BaseScreenshotIgnoreCoordinates:
+      type: array
+      items:
+        $ref: '#/components/schemas/BaseScreenshotConfigIgnoreCoordinate'
+    BaseScreenshots:
+      type: array
+      items:
+        $ref: '#/components/schemas/BaseScreenshot'
+    Blob:
+      type: string
+      format: byte
+      minLength: 1
+      maxLength: 10000000
+    Canaries:
+      type: array
+      items:
+        $ref: '#/components/schemas/Canary'
+    CanariesLastRun:
+      type: array
+      items:
+        $ref: '#/components/schemas/CanaryLastRun'
     CanaryArn:
       type: string
       pattern: ^arn:(aws[a-zA-Z-]*)?:synthetics:[a-z]{2,4}(-[a-z]{2,4})?-[a-z]+-\d{1}:\d{12}:canary:[0-9a-z_\-]{1,255}$
@@ -63,16 +84,75 @@ components:
       pattern: ^[0-9a-z_\-]+$
       minLength: 1
       maxLength: 255
+    CanaryRunState:
+      type: string
+      enum:
+      - RUNNING
+      - PASSED
+      - FAILED
+    CanaryRunStateReasonCode:
+      type: string
+      enum:
+      - CANARY_FAILURE
+      - EXECUTION_FAILURE
+    CanaryRuns:
+      type: array
+      items:
+        $ref: '#/components/schemas/CanaryRun'
+    CanaryState:
+      type: string
+      enum:
+      - CREATING
+      - READY
+      - STARTING
+      - RUNNING
+      - UPDATING
+      - STOPPING
+      - STOPPED
+      - ERROR
+      - DELETING
+    CanaryStateReasonCode:
+      type: string
+      enum:
+      - INVALID_PERMISSIONS
+      - CREATE_PENDING
+      - CREATE_IN_PROGRESS
+      - CREATE_FAILED
+      - UPDATE_PENDING
+      - UPDATE_IN_PROGRESS
+      - UPDATE_COMPLETE
+      - ROLLBACK_COMPLETE
+      - ROLLBACK_FAILED
+      - DELETE_IN_PROGRESS
+      - DELETE_FAILED
+      - SYNC_DELETE_IN_PROGRESS
     CodeHandler:
       type: string
       pattern: ^([0-9a-zA-Z_-]+\/)*[0-9A-Za-z_\\-]+\.[A-Za-z_][A-Za-z0-9_]*$
       minLength: 1
       maxLength: 128
+    DescribeCanariesLastRunNameFilter:
+      type: array
+      items:
+        $ref: '#/components/schemas/CanaryName'
+    DescribeCanariesNameFilter:
+      type: array
+      items:
+        $ref: '#/components/schemas/CanaryName'
+    EncryptionMode:
+      type: string
+      enum:
+      - SSE_S3
+      - SSE_KMS
     EnvironmentVariableName:
       type: string
       pattern: ^[a-zA-Z]([a-zA-Z0-9_])+$
     EnvironmentVariableValue:
       type: string
+    EnvironmentVariablesMap:
+      type: object
+      additionalProperties:
+        $ref: '#/components/schemas/EnvironmentVariableValue'
     ErrorMessage:
       type: string
     FunctionArn:
@@ -93,6 +173,10 @@ components:
       type: string
       minLength: 1
       maxLength: 64
+    GroupSummaryList:
+      type: array
+      items:
+        $ref: '#/components/schemas/GroupSummary'
     KmsKeyArn:
       type: string
       pattern: ^arn:(aws[a-zA-Z-]*)?:kms:[a-z]{2,4}(-[a-z]{2,4})?-[a-z]+-\d{1}:\d{12}:key/[\w\-\/]+$
@@ -110,6 +194,11 @@ components:
       type: integer
       minimum: 1
       maximum: 20
+    MaxOneYearInSeconds:
+      type: integer
+      format: int64
+      minimum: 0
+      maximum: 31622400
     MaxSize100:
       type: integer
       minimum: 1
@@ -129,33 +218,73 @@ components:
       pattern: ^.+$
       minLength: 1
       maxLength: 512
+    ProvisionedResourceCleanupSetting:
+      type: string
+      enum:
+      - AUTOMATIC
+      - 'OFF'
     ResourceArn:
       type: string
       pattern: ^arn:(aws[a-zA-Z-]*)?:synthetics:[a-z]{2,4}(-[a-z]{2,4})?-[a-z]+-\d{1}:\d{12}:(canary|group):[0-9a-z_\-]+$
       minLength: 1
       maxLength: 2048
+    ResourceList:
+      type: array
+      items:
+        $ref: '#/components/schemas/ResourceToTag'
+    ResourceToTag:
+      type: string
+      enum:
+      - lambda-function
     RoleArn:
       type: string
       pattern: ^arn:(aws[a-zA-Z-]*)?:iam::\d{12}:role/?[a-zA-Z_0-9+=,.@\-_/]+$
       minLength: 1
       maxLength: 2048
+    RuntimeVersionList:
+      type: array
+      items:
+        $ref: '#/components/schemas/RuntimeVersion'
     SecurityGroupId:
       type: string
+    SecurityGroupIds:
+      type: array
+      items:
+        $ref: '#/components/schemas/SecurityGroupId'
     String:
       type: string
       minLength: 1
       maxLength: 1024
+    StringList:
+      type: array
+      items:
+        $ref: '#/components/schemas/String'
     SubnetId:
       type: string
+    SubnetIds:
+      type: array
+      items:
+        $ref: '#/components/schemas/SubnetId'
     TagKey:
       type: string
       pattern: ^(?!aws:)[a-zA-Z+-=._:/]+$
       minLength: 1
       maxLength: 128
+    TagKeyList:
+      type: array
+      items:
+        $ref: '#/components/schemas/TagKey'
+    TagMap:
+      type: object
+      additionalProperties:
+        $ref: '#/components/schemas/TagValue'
     TagValue:
       type: string
       minLength: 0
       maxLength: 256
+    Timestamp:
+      type: string
+      format: date-time
     Token:
       type: string
       minLength: 4

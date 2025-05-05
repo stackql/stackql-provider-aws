@@ -68,11 +68,23 @@ components:
       type: string
     ComponentType:
       type: string
+    DestinationCategory:
+      type: string
+      enum:
+      - INTRA_AZ
+      - INTER_AZ
+      - INTER_VPC
+      - UNCLASSIFIED
+      - AMAZON_S3
+      - AMAZON_DYNAMODB
     InstanceArn:
       type: string
     InstanceId:
       type: string
       pattern: ^i-[a-zA-Z0-9]{8,32}$
+    Iso8601Timestamp:
+      type: string
+      format: date-time
     Limit:
       type: integer
       minimum: 1
@@ -81,11 +93,93 @@ components:
       type: integer
       minimum: 1
       maximum: 25
+    MetricUnit:
+      type: string
+      enum:
+      - Seconds
+      - Microseconds
+      - Milliseconds
+      - Bytes
+      - Kilobytes
+      - Megabytes
+      - Gigabytes
+      - Terabytes
+      - Bits
+      - Kilobits
+      - Megabits
+      - Gigabits
+      - Terabits
+      - Percent
+      - Count
+      - Bytes/Second
+      - Kilobytes/Second
+      - Megabytes/Second
+      - Gigabytes/Second
+      - Terabytes/Second
+      - Bits/Second
+      - Kilobits/Second
+      - Megabits/Second
+      - Gigabits/Second
+      - Terabits/Second
+      - Count/Second
+      - None
     MonitorArn:
       type: string
       pattern: ^arn:.*$
       minLength: 20
       maxLength: 512
+    MonitorList:
+      type: array
+      items:
+        $ref: '#/components/schemas/MonitorSummary'
+    MonitorLocalResourceType:
+      type: string
+      enum:
+      - AWS::EC2::VPC
+      - AWS::AvailabilityZone
+      - AWS::EC2::Subnet
+    MonitorLocalResources:
+      type: array
+      items:
+        $ref: '#/components/schemas/MonitorLocalResource'
+    MonitorMetric:
+      type: string
+      enum:
+      - ROUND_TRIP_TIME
+      - TIMEOUTS
+      - RETRANSMISSIONS
+      - DATA_TRANSFERRED
+    MonitorRemoteResourceType:
+      type: string
+      enum:
+      - AWS::EC2::VPC
+      - AWS::AvailabilityZone
+      - AWS::EC2::Subnet
+      - AWS::AWSService
+    MonitorRemoteResources:
+      type: array
+      items:
+        $ref: '#/components/schemas/MonitorRemoteResource'
+    MonitorStatus:
+      type: string
+      enum:
+      - PENDING
+      - ACTIVE
+      - INACTIVE
+      - ERROR
+      - DELETING
+    MonitorTopContributorsRowList:
+      type: array
+      items:
+        $ref: '#/components/schemas/MonitorTopContributorsRow'
+    QueryStatus:
+      type: string
+      enum:
+      - QUEUED
+      - RUNNING
+      - SUCCEEDED
+      - FAILED
+      - CANCELED
     ResourceName:
       type: string
       pattern: ^[a-zA-Z0-9_.-]+$
@@ -93,6 +187,16 @@ components:
       maxLength: 255
     ScopeId:
       type: string
+    ScopeStatus:
+      type: string
+      enum:
+      - SUCCEEDED
+      - IN_PROGRESS
+      - FAILED
+    ScopeSummaryList:
+      type: array
+      items:
+        $ref: '#/components/schemas/ScopeSummary'
     SubnetArn:
       type: string
     SubnetId:
@@ -102,10 +206,38 @@ components:
       type: string
       minLength: 1
       maxLength: 128
+    TagKeyList:
+      type: array
+      items:
+        $ref: '#/components/schemas/TagKey'
+    TagMap:
+      type: object
+      additionalProperties:
+        $ref: '#/components/schemas/TagValue'
     TagValue:
       type: string
       minLength: 0
       maxLength: 256
+    TargetId:
+      allOf:
+      - allOf:
+        - $ref: '#/components/schemas/AccountId'
+        description: |-
+          The identifier for the account for a target.
+      description: |-
+        A target ID is an internally-generated identifier for a target. A target allows you to identify all the resources in a Network Flow Monitor scope. Currently, a target is always an Amazon Web Services account.
+    TargetResourceList:
+      type: array
+      items:
+        $ref: '#/components/schemas/TargetResource'
+    TargetType:
+      type: string
+      enum:
+      - ACCOUNT
+    TraversedConstructsList:
+      type: array
+      items:
+        $ref: '#/components/schemas/TraversedComponent'
     UuidString:
       type: string
       pattern: ^[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$
@@ -116,3 +248,26 @@ components:
     VpcId:
       type: string
       pattern: ^vpc-[a-zA-Z0-9]{8,32}$
+    WorkloadInsightsMetric:
+      type: string
+      enum:
+      - TIMEOUTS
+      - RETRANSMISSIONS
+      - DATA_TRANSFERRED
+    WorkloadInsightsTopContributorsDataPoints:
+      type: array
+      items:
+        $ref: '#/components/schemas/WorkloadInsightsTopContributorsDataPoint'
+    WorkloadInsightsTopContributorsRowList:
+      type: array
+      items:
+        $ref: '#/components/schemas/WorkloadInsightsTopContributorsRow'
+    WorkloadInsightsTopContributorsTimestampsList:
+      type: array
+      items:
+        type: string
+        format: date-time
+    WorkloadInsightsTopContributorsValuesList:
+      type: array
+      items:
+        type: number

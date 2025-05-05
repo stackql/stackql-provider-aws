@@ -48,6 +48,18 @@ servers:
 paths: {}
 components:
   schemas:
+    AnalysisStatusUnion:
+      allOf:
+      - allOf:
+        - $ref: '#/components/schemas/RuntimeAnalysisStatus'
+        description: |-
+          The status of the analysis.
+      - allOf:
+        - $ref: '#/components/schemas/SrcCodeOrDbAnalysisStatus'
+        description: |-
+          The status of the source code or database analysis.
+      description: |-
+        A combination of existing analysis statuses.
     AnalysisType:
       type: string
       enum:
@@ -55,6 +67,30 @@ components:
       - DATABASE_ANALYSIS
       - RUNTIME_ANALYSIS
       - BINARY_ANALYSIS
+    AnalyzableServerSummaryList:
+      type: array
+      items:
+        $ref: '#/components/schemas/AnalyzableServerSummary'
+    AnalyzerNameUnion:
+      allOf:
+      - allOf:
+        - $ref: '#/components/schemas/BinaryAnalyzerName'
+        description: |-
+          The binary analyzer names.
+      - allOf:
+        - $ref: '#/components/schemas/RunTimeAnalyzerName'
+        description: |-
+          The assessment analyzer names.
+      - allOf:
+        - $ref: '#/components/schemas/SourceCodeAnalyzerName'
+        description: |-
+          The source code analyzer names.
+      description: |-
+        The combination of the existing analyzers.
+    AntipatternReportResultList:
+      type: array
+      items:
+        $ref: '#/components/schemas/AntipatternReportResult'
     AntipatternReportStatus:
       type: string
       enum:
@@ -105,10 +141,18 @@ components:
       - DESTINATION
       - ANALYSIS_STATUS
       - ERROR_CATEGORY
+    ApplicationComponentDetails:
+      type: array
+      items:
+        $ref: '#/components/schemas/ApplicationComponentDetail'
     ApplicationComponentId:
       type: string
       pattern: '[0-9a-zA-Z-]+'
       maxLength: 44
+    ApplicationComponentStrategies:
+      type: array
+      items:
+        $ref: '#/components/schemas/ApplicationComponentStrategy'
     ApplicationMode:
       type: string
       enum:
@@ -133,6 +177,22 @@ components:
       pattern: .*\S.*
       minLength: 0
       maxLength: 512
+    AssessmentTargetValues:
+      type: array
+      items:
+        $ref: '#/components/schemas/String'
+    AssessmentTargets:
+      type: array
+      items:
+        $ref: '#/components/schemas/AssessmentTarget'
+    AssociatedApplications:
+      type: array
+      items:
+        $ref: '#/components/schemas/AssociatedApplication'
+    AssociatedServerIDs:
+      type: array
+      items:
+        $ref: '#/components/schemas/String'
     AsyncTaskId:
       type: string
       pattern: '[0-9a-z-:]+'
@@ -150,6 +210,10 @@ components:
       - None specified
       - AWS Elastic BeanStalk
       - AWS Fargate
+    AwsManagedTargetDestinations:
+      type: array
+      items:
+        $ref: '#/components/schemas/AwsManagedTargetDestination'
     BinaryAnalyzerName:
       type: string
       enum:
@@ -166,6 +230,10 @@ components:
       enum:
       - COLLECTOR_HEALTHY
       - COLLECTOR_UNHEALTHY
+    Collectors:
+      type: array
+      items:
+        $ref: '#/components/schemas/Collector'
     Condition:
       type: string
       enum:
@@ -186,6 +254,26 @@ components:
       - AWS-managed
       - Self-manage
       - No preference
+    DatabaseMigrationPreference:
+      allOf:
+      - allOf:
+        - $ref: '#/components/schemas/Heterogeneous'
+        description: |-
+          Indicates whether you are interested in moving from one type of database to another. For example, from SQL Server to Amazon Aurora MySQL-Compatible Edition.
+      - allOf:
+        - $ref: '#/components/schemas/Homogeneous'
+        description: |-
+          Indicates whether you are interested in moving to the same type of database into AWS. For example, from SQL Server in your environment to SQL Server on AWS.
+      - allOf:
+        - $ref: '#/components/schemas/NoDatabaseMigrationPreference'
+        description: |-
+          Indicated that you do not prefer heterogeneous or homogeneous.
+      description: |-
+        Preferences for migrating a database to AWS.
+    GroupIds:
+      type: array
+      items:
+        $ref: '#/components/schemas/Group'
     GroupName:
       type: string
       enum:
@@ -204,15 +292,27 @@ components:
       - SAP
       - Db2 LUW
       - MongoDB
+    HeterogeneousTargetDatabaseEngines:
+      type: array
+      items:
+        $ref: '#/components/schemas/HeterogeneousTargetDatabaseEngine'
     HomogeneousTargetDatabaseEngine:
       type: string
       enum:
       - None specified
+    HomogeneousTargetDatabaseEngines:
+      type: array
+      items:
+        $ref: '#/components/schemas/HomogeneousTargetDatabaseEngine'
     IPAddress:
       type: string
       pattern: ^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])$
       minLength: 0
       maxLength: 15
+    IPAddressBasedRemoteInfoList:
+      type: array
+      items:
+        $ref: '#/components/schemas/IPAddressBasedRemoteInfo'
     ImportFileTaskStatus:
       type: string
       enum:
@@ -236,6 +336,34 @@ components:
       pattern: .*
       minLength: 0
       maxLength: 1024
+    ListAntipatternSeveritySummary:
+      type: array
+      items:
+        $ref: '#/components/schemas/AntipatternSeveritySummary'
+    ListApplicationComponentStatusSummary:
+      type: array
+      items:
+        $ref: '#/components/schemas/ApplicationComponentStatusSummary'
+    ListApplicationComponentSummary:
+      type: array
+      items:
+        $ref: '#/components/schemas/ApplicationComponentSummary'
+    ListImportFileTaskInformation:
+      type: array
+      items:
+        $ref: '#/components/schemas/ImportFileTaskInformation'
+    ListServerStatusSummary:
+      type: array
+      items:
+        $ref: '#/components/schemas/ServerStatusSummary'
+    ListServerSummary:
+      type: array
+      items:
+        $ref: '#/components/schemas/ServerSummary'
+    ListStrategySummary:
+      type: array
+      items:
+        $ref: '#/components/schemas/StrategySummary'
     Location:
       type: string
       pattern: .*\S.*
@@ -246,6 +374,22 @@ components:
       pattern: ^([0-9A-Fa-f]{2}[:-]){5}([0-9A-Fa-f]{2})|([0-9a-fA-F]{4}\\.[0-9a-fA-F]{4}\\.[0-9a-fA-F]{4})$”$
       minLength: 0
       maxLength: 17
+    ManagementPreference:
+      allOf:
+      - allOf:
+        - $ref: '#/components/schemas/AwsManagedResources'
+        description: |-
+          Indicates interest in solutions that are managed by AWS.
+      - allOf:
+        - $ref: '#/components/schemas/SelfManageResources'
+        description: |-
+          Indicates interest in managing your own resources on AWS.
+      - allOf:
+        - $ref: '#/components/schemas/NoManagementPreference'
+        description: |-
+          No specific preference.
+      description: |-
+        Preferences for migrating an application to AWS.
     MaxResult:
       type: integer
     NetMask:
@@ -253,6 +397,10 @@ components:
       pattern: .*
       minLength: 0
       maxLength: 1024
+    NetworkInfoList:
+      type: array
+      items:
+        $ref: '#/components/schemas/NetworkInfo'
     NextToken:
       type: string
       pattern: .*\S.*
@@ -267,6 +415,10 @@ components:
       - Amazon Elastic Cloud Compute (EC2)
       - Amazon Elastic Container Service (ECS)
       - Amazon Elastic Kubernetes Service (EKS)
+    NoPreferenceTargetDestinations:
+      type: array
+      items:
+        $ref: '#/components/schemas/NoPreferenceTargetDestination'
     OSType:
       type: string
       enum:
@@ -282,6 +434,10 @@ components:
       enum:
       - Excel
       - Json
+    PipelineInfoList:
+      type: array
+      items:
+        $ref: '#/components/schemas/PipelineInfo'
     PipelineType:
       type: string
       enum:
@@ -302,6 +458,9 @@ components:
       pattern: .*\S.*
       minLength: 0
       maxLength: 512
+    RecommendationReportTimeStamp:
+      type: string
+      format: date-time
     RecommendationTaskId:
       type: string
       pattern: '[0-9a-z-:]+'
@@ -320,6 +479,10 @@ components:
       - Database
       - Process
       - DatabaseProcess
+    ResultList:
+      type: array
+      items:
+        $ref: '#/components/schemas/Result'
     RunTimeAnalyzerName:
       type: string
       enum:
@@ -355,6 +518,10 @@ components:
       pattern: .*\S.*
       minLength: 0
       maxLength: 1024
+    S3Keys:
+      type: array
+      items:
+        $ref: '#/components/schemas/String'
     SecretsManagerKey:
       type: string
       pattern: .*
@@ -367,6 +534,10 @@ components:
       - Amazon Elastic Cloud Compute (EC2)
       - Amazon Elastic Container Service (ECS)
       - Amazon Elastic Kubernetes Service (EKS)
+    SelfManageTargetDestinations:
+      type: array
+      items:
+        $ref: '#/components/schemas/SelfManageTargetDestination'
     ServerCriteria:
       type: string
       enum:
@@ -377,6 +548,10 @@ components:
       - SERVER_ID
       - ANALYSIS_STATUS
       - ERROR_CATEGORY
+    ServerDetails:
+      type: array
+      items:
+        $ref: '#/components/schemas/ServerDetail'
     ServerErrorCategory:
       type: string
       enum:
@@ -398,6 +573,10 @@ components:
       - EndOfSupportWindowsServer
       - Redhat
       - Other
+    ServerStrategies:
+      type: array
+      items:
+        $ref: '#/components/schemas/ServerStrategy'
     Severity:
       type: string
       enum:
@@ -416,6 +595,14 @@ components:
       - JAVA_ANALYZER
       - BYTECODE_ANALYZER
       - PORTING_ASSISTANT
+    SourceCodeList:
+      type: array
+      items:
+        $ref: '#/components/schemas/SourceCode'
+    SourceCodeRepositories:
+      type: array
+      items:
+        $ref: '#/components/schemas/SourceCodeRepository'
     SourceVersion:
       type: string
       pattern: .*\S.*
@@ -471,6 +658,10 @@ components:
       - SAP
       - Db2 LUW
       - MongoDB
+    TargetDatabaseEngines:
+      type: array
+      items:
+        $ref: '#/components/schemas/TargetDatabaseEngine'
     TargetDestination:
       type: string
       enum:
@@ -488,6 +679,9 @@ components:
       - Amazon DynamoDB
       - Amazon Relational Database Service
       - Babelfish for Aurora PostgreSQL
+    TimeStamp:
+      type: string
+      format: date-time
     TranformationToolDescription:
       type: string
       pattern: .*\S.*
@@ -511,12 +705,20 @@ components:
       - Schema Conversion Tool
       - Database Migration Service
       - Native SQL Server Backup/Restore
+    VcenterBasedRemoteInfoList:
+      type: array
+      items:
+        $ref: '#/components/schemas/VcenterBasedRemoteInfo'
     VersionControl:
       type: string
       enum:
       - GITHUB
       - GITHUB_ENTERPRISE
       - AZURE_DEVOPS_GIT
+    VersionControlInfoList:
+      type: array
+      items:
+        $ref: '#/components/schemas/VersionControlInfo'
     VersionControlType:
       type: string
       enum:

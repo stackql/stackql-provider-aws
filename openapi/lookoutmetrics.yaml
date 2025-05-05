@@ -46,6 +46,11 @@ servers:
 paths: {}
 components:
   schemas:
+    AggregationFunction:
+      type: string
+      enum:
+      - AVG
+      - SUM
     AlertDescription:
       type: string
       pattern: \S
@@ -56,21 +61,76 @@ components:
       pattern: ^[a-zA-Z0-9][a-zA-Z0-9\-_]*$
       minLength: 1
       maxLength: 63
+    AlertStatus:
+      type: string
+      enum:
+      - ACTIVE
+      - INACTIVE
+    AlertSummaryList:
+      type: array
+      items:
+        $ref: '#/components/schemas/AlertSummary'
+    AlertType:
+      type: string
+      enum:
+      - SNS
+      - LAMBDA
+    AnomalyDetectionTaskStatus:
+      type: string
+      enum:
+      - PENDING
+      - IN_PROGRESS
+      - COMPLETED
+      - FAILED
+      - FAILED_TO_SCHEDULE
     AnomalyDetectionTaskStatusMessage:
       type: string
       pattern: \S
       minLength: 1
       maxLength: 256
+    AnomalyDetectorDataQualityMetricList:
+      type: array
+      items:
+        $ref: '#/components/schemas/AnomalyDetectorDataQualityMetric'
     AnomalyDetectorDescription:
       type: string
       pattern: \S
       minLength: 1
       maxLength: 256
+    AnomalyDetectorFailureType:
+      type: string
+      enum:
+      - ACTIVATION_FAILURE
+      - BACK_TEST_ACTIVATION_FAILURE
+      - DELETION_FAILURE
+      - DEACTIVATION_FAILURE
     AnomalyDetectorName:
       type: string
       pattern: ^[a-zA-Z0-9][a-zA-Z0-9\-_]*$
       minLength: 1
       maxLength: 63
+    AnomalyDetectorStatus:
+      type: string
+      enum:
+      - ACTIVE
+      - ACTIVATING
+      - DELETING
+      - FAILED
+      - INACTIVE
+      - LEARNING
+      - BACK_TEST_ACTIVATING
+      - BACK_TEST_ACTIVE
+      - BACK_TEST_COMPLETE
+      - DEACTIVATED
+      - DEACTIVATING
+    AnomalyDetectorSummaryList:
+      type: array
+      items:
+        $ref: '#/components/schemas/AnomalyDetectorSummary'
+    AnomalyGroupSummaryList:
+      type: array
+      items:
+        $ref: '#/components/schemas/AnomalyGroupSummary'
     Arn:
       type: string
       pattern: ^arn:([a-z\d-]+):.*:.*:.*:.+$
@@ -103,8 +163,17 @@ components:
       maxLength: 128
     BinaryAttributeValue:
       type: string
+    BinaryListAttributeValue:
+      type: array
+      items:
+        $ref: '#/components/schemas/BinaryAttributeValue'
     Boolean:
       type: boolean
+    CSVFileCompression:
+      type: string
+      enum:
+      - NONE
+      - GZIP
     Charset:
       type: string
       pattern: ^[a-zA-Z0-9][a-zA-Z0-9\-_]*$
@@ -115,6 +184,12 @@ components:
       pattern: ^[a-zA-Z0-9][a-zA-Z0-9\-_]*$
       minLength: 1
       maxLength: 63
+    Confidence:
+      type: string
+      enum:
+      - HIGH
+      - LOW
+      - NONE
     DataItem:
       type: string
     DataQualityMetricDescription:
@@ -122,6 +197,23 @@ components:
       pattern: \S
       minLength: 1
       maxLength: 256
+    DataQualityMetricList:
+      type: array
+      items:
+        $ref: '#/components/schemas/DataQualityMetric'
+    DataQualityMetricType:
+      type: string
+      enum:
+      - COLUMN_COMPLETENESS
+      - DIMENSION_UNIQUENESS
+      - TIME_SERIES_COUNT
+      - ROWS_PROCESSED
+      - ROWS_PARTIAL_COMPLIANCE
+      - INVALID_ROWS_COMPLIANCE
+      - BACKTEST_TRAINING_DATA_START_TIME_STAMP
+      - BACKTEST_TRAINING_DATA_END_TIME_STAMP
+      - BACKTEST_INFERENCE_DATA_START_TIME_STAMP
+      - BACKTEST_INFERENCE_DATA_END_TIME_STAMP
     DatabaseHost:
       type: string
       pattern: \S
@@ -141,29 +233,100 @@ components:
       pattern: ^[^\r\n]$
       minLength: 0
       maxLength: 1
+    DimensionContributionList:
+      type: array
+      items:
+        $ref: '#/components/schemas/DimensionContribution'
+    DimensionFilterList:
+      type: array
+      items:
+        $ref: '#/components/schemas/DimensionFilter'
+    DimensionList:
+      type: array
+      items:
+        $ref: '#/components/schemas/ColumnName'
+    DimensionNameValueList:
+      type: array
+      items:
+        $ref: '#/components/schemas/DimensionNameValue'
     DimensionValue:
       type: string
+    DimensionValueContributionList:
+      type: array
+      items:
+        $ref: '#/components/schemas/DimensionValueContribution'
+    DimensionValueList:
+      type: array
+      items:
+        $ref: '#/components/schemas/DimensionValue'
+    Double:
+      type: number
+      format: double
     ErrorMessage:
       type: string
       minLength: 0
       maxLength: 256
+    ExecutionList:
+      type: array
+      items:
+        $ref: '#/components/schemas/ExecutionStatus'
     FieldName:
       type: string
+    FilterList:
+      type: array
+      items:
+        $ref: '#/components/schemas/Filter'
+    FilterOperation:
+      type: string
+      enum:
+      - EQUALS
     FlowName:
       type: string
       pattern: ^[a-zA-Z0-9][\w!@#.-]+$
       minLength: 0
       maxLength: 256
+    Frequency:
+      type: string
+      enum:
+      - P1D
+      - PT1H
+      - PT10M
+      - PT5M
+    HeaderList:
+      type: array
+      items:
+        $ref: '#/components/schemas/ColumnName'
     HeaderValue:
       type: string
+    HeaderValueList:
+      type: array
+      items:
+        $ref: '#/components/schemas/HeaderValue'
     HistoricalDataPath:
       type: string
       pattern: ^s3://[a-z0-9].+$
       minLength: 0
       maxLength: 1024
+    HistoricalDataPathList:
+      type: array
+      items:
+        $ref: '#/components/schemas/HistoricalDataPath'
     Integer:
       type: integer
       default: 0
+    InterMetricImpactList:
+      type: array
+      items:
+        $ref: '#/components/schemas/InterMetricImpactDetails'
+    ItemizedMetricStatsList:
+      type: array
+      items:
+        $ref: '#/components/schemas/ItemizedMetricStats'
+    JsonFileCompression:
+      type: string
+      enum:
+      - NONE
+      - GZIP
     KmsKeyArn:
       type: string
       pattern: ^arn:aws.*:kms:.*:[0-9]{12}:key/[a-z0-9]{8}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{12}$
@@ -175,21 +338,57 @@ components:
       maximum: 100
     Message:
       type: string
+    MetricChangePercentage:
+      type: number
+      format: double
+      minimum: 0.0
+      maximum: 100.0
+    MetricLevelImpactList:
+      type: array
+      items:
+        $ref: '#/components/schemas/MetricLevelImpact'
+    MetricList:
+      type: array
+      items:
+        $ref: '#/components/schemas/Metric'
     MetricName:
       type: string
       pattern: ^[a-zA-Z0-9][a-zA-Z0-9\-_]*$
       minLength: 0
       maxLength: 256
+    MetricNameList:
+      type: array
+      items:
+        $ref: '#/components/schemas/MetricName'
+    MetricSetDataQualityMetricList:
+      type: array
+      items:
+        $ref: '#/components/schemas/MetricSetDataQualityMetric'
     MetricSetDescription:
       type: string
       pattern: \S
       minLength: 1
       maxLength: 256
+    MetricSetDimensionFilterList:
+      type: array
+      items:
+        $ref: '#/components/schemas/MetricSetDimensionFilter'
     MetricSetName:
       type: string
       pattern: ^[a-zA-Z0-9][a-zA-Z0-9\-_]*$
       minLength: 1
       maxLength: 63
+    MetricSetSummaryList:
+      type: array
+      items:
+        $ref: '#/components/schemas/MetricSetSummary'
+    MetricValue:
+      type: number
+      format: double
+    MetricValueList:
+      type: array
+      items:
+        $ref: '#/components/schemas/MetricValue'
     Namespace:
       type: string
       pattern: ^[^:]
@@ -202,6 +401,10 @@ components:
       maxLength: 3000
     NumberAttributeValue:
       type: string
+    NumberListAttributeValue:
+      type: array
+      items:
+        $ref: '#/components/schemas/NumberAttributeValue'
     Offset:
       type: integer
       default: 0
@@ -244,15 +447,37 @@ components:
       pattern: \S
       minLength: 1
       maxLength: 256
+    RelationshipType:
+      type: string
+      enum:
+      - CAUSE_OF_INPUT_ANOMALY_GROUP
+      - EFFECT_OF_INPUT_ANOMALY_GROUP
     ResourceId:
       type: string
     ResourceType:
       type: string
+    SampleRow:
+      type: array
+      items:
+        $ref: '#/components/schemas/DataItem'
+    SampleRows:
+      type: array
+      items:
+        $ref: '#/components/schemas/SampleRow'
+    Score:
+      type: number
+      format: double
+      minimum: 0.0
+      maximum: 100.0
     SecurityGroupId:
       type: string
       pattern: ^[-0-9a-zA-Z]+$
       minLength: 1
       maxLength: 255
+    SecurityGroupIdList:
+      type: array
+      items:
+        $ref: '#/components/schemas/SecurityGroupId'
     SensitivityThreshold:
       type: integer
       default: 0
@@ -260,13 +485,27 @@ components:
       maximum: 100
     ServiceCode:
       type: string
+    SnsFormat:
+      type: string
+      enum:
+      - LONG_TEXT
+      - SHORT_TEXT
+      - JSON
     StringAttributeValue:
       type: string
+    StringListAttributeValue:
+      type: array
+      items:
+        $ref: '#/components/schemas/StringAttributeValue'
     SubnetId:
       type: string
       pattern: ^[\-0-9a-zA-Z]+$
       minLength: 0
       maxLength: 255
+    SubnetIdList:
+      type: array
+      items:
+        $ref: '#/components/schemas/SubnetId'
     TableName:
       type: string
       pattern: ^[a-zA-Z][a-zA-Z0-9_.]*$
@@ -276,6 +515,14 @@ components:
       type: string
       minLength: 1
       maxLength: 128
+    TagKeyList:
+      type: array
+      items:
+        $ref: '#/components/schemas/TagKey'
+    TagMap:
+      type: object
+      additionalProperties:
+        $ref: '#/components/schemas/TagValue'
     TagValue:
       type: string
       minLength: 0
@@ -285,11 +532,30 @@ components:
       pattern: ^s3://[a-zA-Z0-9_\-\/ {}=]+$
       minLength: 0
       maxLength: 1024
+    TemplatedPathList:
+      type: array
+      items:
+        $ref: '#/components/schemas/TemplatedPath'
+    TimeSeriesFeedbackList:
+      type: array
+      items:
+        $ref: '#/components/schemas/TimeSeriesFeedback'
     TimeSeriesId:
       type: string
       pattern: \S
       minLength: 0
       maxLength: 520
+    TimeSeriesList:
+      type: array
+      items:
+        $ref: '#/components/schemas/TimeSeries'
+    Timestamp:
+      type: string
+      format: date-time
+    TimestampList:
+      type: array
+      items:
+        $ref: '#/components/schemas/TimestampString'
     TimestampString:
       type: string
       pattern: ^([12]\d{3})-(1[0-2]|0[1-9])-(0[1-9]|[12]\d|3[01])T([01]\d|2[0-3]):([0-5]\d):([0-5]\d)(Z|(\+|\-)(0\d|1[0-2]):([0-5]\d)(\[[[:alnum:]\/\_]+\])?)$
@@ -305,3 +571,14 @@ components:
       pattern: ^[a-z0-9]{8}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{12}$
       minLength: 0
       maxLength: 63
+    ValidationExceptionFieldList:
+      type: array
+      items:
+        $ref: '#/components/schemas/ValidationExceptionField'
+    ValidationExceptionReason:
+      type: string
+      enum:
+      - UNKNOWN_OPERATION
+      - CANNOT_PARSE
+      - FIELD_VALIDATION_FAILED
+      - OTHER

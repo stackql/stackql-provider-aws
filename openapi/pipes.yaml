@@ -70,17 +70,33 @@ components:
       type: integer
       minimum: 2
       maximum: 10000
+    BatchDependsOn:
+      type: array
+      items:
+        $ref: '#/components/schemas/BatchJobDependency'
+    BatchEnvironmentVariableList:
+      type: array
+      items:
+        $ref: '#/components/schemas/BatchEnvironmentVariable'
     BatchJobDependencyType:
       type: string
       enum:
       - N_TO_N
       - SEQUENTIAL
+    BatchParametersMap:
+      type: object
+      additionalProperties:
+        $ref: '#/components/schemas/String'
     BatchResourceRequirementType:
       type: string
       enum:
       - GPU
       - MEMORY
       - VCPU
+    BatchResourceRequirementsList:
+      type: array
+      items:
+        $ref: '#/components/schemas/BatchResourceRequirement'
     BatchRetryAttempts:
       type: integer
       minimum: 1
@@ -92,6 +108,10 @@ components:
       type: string
       minLength: 1
       maxLength: 255
+    CapacityProviderStrategy:
+      type: array
+      items:
+        $ref: '#/components/schemas/CapacityProviderStrategyItem'
     CapacityProviderStrategyItemBase:
       type: integer
       default: 0
@@ -115,6 +135,10 @@ components:
       type: string
       minLength: 1
       maxLength: 128
+    DimensionMappings:
+      type: array
+      items:
+        $ref: '#/components/schemas/DimensionMapping'
     DimensionName:
       type: string
       minLength: 1
@@ -132,15 +156,35 @@ components:
       enum:
       - TRIM_HORIZON
       - LATEST
+    EcsContainerOverrideList:
+      type: array
+      items:
+        $ref: '#/components/schemas/EcsContainerOverride'
+    EcsEnvironmentFileList:
+      type: array
+      items:
+        $ref: '#/components/schemas/EcsEnvironmentFile'
     EcsEnvironmentFileType:
       type: string
       enum:
       - s3
+    EcsEnvironmentVariableList:
+      type: array
+      items:
+        $ref: '#/components/schemas/EcsEnvironmentVariable'
+    EcsInferenceAcceleratorOverrideList:
+      type: array
+      items:
+        $ref: '#/components/schemas/EcsInferenceAcceleratorOverride'
     EcsResourceRequirementType:
       type: string
       enum:
       - GPU
       - InferenceAccelerator
+    EcsResourceRequirementsList:
+      type: array
+      items:
+        $ref: '#/components/schemas/EcsResourceRequirement'
     EndpointString:
       type: string
       pattern: ^(([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])\.)*([A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9\-]*[A-Za-z0-9]):[0-9]{1,5}$
@@ -168,6 +212,10 @@ components:
       pattern: ^[A-Za-z0-9\-]+[\.][A-Za-z0-9\-]+$
       minLength: 1
       maxLength: 50
+    EventBridgeEventResourceList:
+      type: array
+      items:
+        $ref: '#/components/schemas/ArnOrJsonPath'
     EventBridgeEventSource:
       type: string
       pattern: (?=[/\.\-_A-Za-z0-9]+)((?!aws\.).*)|(\$(\.[\w/_-]+(\[(\d+|\*)\])*)*)
@@ -177,6 +225,10 @@ components:
       type: string
       minLength: 0
       maxLength: 4096
+    FilterList:
+      type: array
+      items:
+        $ref: '#/components/schemas/Filter'
     FirehoseArn:
       type: string
       pattern: ^(^arn:aws([a-z]|\-)*:firehose:([a-z]{2,4}((-gov)|(-de)|(-iso([a-z]?)))?-[a-z]+(-\d{1})?):(\d{12}):deliverystream/[a-zA-Z0-9_.-]{1,64})$
@@ -187,11 +239,19 @@ components:
       pattern: ^[!#$%&'*+-.^_`|~0-9a-zA-Z]+|(\$(\.[\w/_-]+(\[(\d+|\*)\])*)*)$
       minLength: 0
       maxLength: 512
+    HeaderParametersMap:
+      type: object
+      additionalProperties:
+        $ref: '#/components/schemas/HeaderValue'
     HeaderValue:
       type: string
       pattern: ^[ \t]*[\x20-\x7E]+([ \t]+[\x20-\x7E]+)*[ \t]*|(\$(\.[\w/_-]+(\[(\d+|\*)\])*)*)$
       minLength: 0
       maxLength: 512
+    IncludeExecutionData:
+      type: array
+      items:
+        $ref: '#/components/schemas/IncludeExecutionDataOption'
     IncludeExecutionDataOption:
       type: string
       enum:
@@ -205,6 +265,10 @@ components:
       pattern: ^\$(\.[\w/_-]+(\[(\d+|\*)\])*)*$
       minLength: 1
       maxLength: 256
+    KafkaBootstrapServers:
+      type: array
+      items:
+        $ref: '#/components/schemas/EndpointString'
     KafkaTopicName:
       type: string
       pattern: ^[^.]([a-zA-Z0-9\-_.]+)$
@@ -257,11 +321,31 @@ components:
       type: string
       minLength: 1
       maxLength: 256
+    MQBrokerAccessCredentials:
+      allOf:
+      - allOf:
+        - $ref: '#/components/schemas/SecretManagerArn'
+        description: |-
+          The ARN of the Secrets Manager secret.
+      description: |-
+        The Secrets Manager secret that stores your broker credentials.
     MQBrokerQueueName:
       type: string
       pattern: ^[\s\S]*$
       minLength: 1
       maxLength: 1000
+    MSKAccessCredentials:
+      allOf:
+      - allOf:
+        - $ref: '#/components/schemas/SecretManagerArn'
+        description: |-
+          The ARN of the Secrets Manager secret.
+      - allOf:
+        - $ref: '#/components/schemas/SecretManagerArn'
+        description: |-
+          The ARN of the Secrets Manager secret.
+      description: |-
+        The Secrets Manager secret that stores your stream credentials.
     MSKStartPosition:
       type: string
       enum:
@@ -303,10 +387,18 @@ components:
       type: string
       minLength: 0
       maxLength: 100
+    MultiMeasureAttributeMappings:
+      type: array
+      items:
+        $ref: '#/components/schemas/MultiMeasureAttributeMapping'
     MultiMeasureAttributeName:
       type: string
       minLength: 1
       maxLength: 256
+    MultiMeasureMappings:
+      type: array
+      items:
+        $ref: '#/components/schemas/MultiMeasureMapping'
     MultiMeasureName:
       type: string
       minLength: 1
@@ -327,6 +419,10 @@ components:
     PathParameter:
       type: string
       pattern: ^(?!\s*$).+|(\$(\.[\w/_-]+(\[(\d+|\*)\])*)*)$
+    PathParameterList:
+      type: array
+      items:
+        $ref: '#/components/schemas/PathParameter'
     PipeArn:
       type: string
       pattern: ^arn:aws([a-z]|\-)*:([a-zA-Z0-9\-]+):([a-z]|\d|\-)*:([0-9]{12})?:(.+)$
@@ -337,6 +433,10 @@ components:
       pattern: ^.*$
       minLength: 0
       maxLength: 512
+    PipeList:
+      type: array
+      items:
+        $ref: '#/components/schemas/Pipe'
     PipeName:
       type: string
       pattern: ^[\.\-_A-Za-z0-9]+$
@@ -379,6 +479,14 @@ components:
       enum:
       - distinctInstance
       - memberOf
+    PlacementConstraints:
+      type: array
+      items:
+        $ref: '#/components/schemas/PlacementConstraint'
+    PlacementStrategies:
+      type: array
+      items:
+        $ref: '#/components/schemas/PlacementStrategy'
     PlacementStrategyField:
       type: string
       minLength: 0
@@ -398,6 +506,10 @@ components:
       pattern: ^[^\x00-\x1F\x7F]+|(\$(\.[\w/_-]+(\[(\d+|\*)\])*)*)$
       minLength: 0
       maxLength: 512
+    QueryStringParametersMap:
+      type: object
+      additionalProperties:
+        $ref: '#/components/schemas/QueryStringValue'
     QueryStringValue:
       type: string
       pattern: ^[^\x00-\x09\x0B\x0C\x0E-\x1F\x7F]+|(\$(\.[\w/_-]+(\[(\d+|\*)\])*)*)$
@@ -433,6 +545,10 @@ components:
       - json
       - plain
       - w3c
+    SageMakerPipelineParameterList:
+      type: array
+      items:
+        $ref: '#/components/schemas/SageMakerPipelineParameter'
     SageMakerPipelineParameterName:
       type: string
       pattern: ^[a-zA-Z0-9](-*[a-zA-Z0-9])*|(\$(\.[\w/_-]+(\[(\d+|\*)\])*)*)$
@@ -462,21 +578,63 @@ components:
       pattern: ^sg-[0-9a-zA-Z]*$
       minLength: 1
       maxLength: 1024
+    SecurityGroupIds:
+      type: array
+      items:
+        $ref: '#/components/schemas/SecurityGroupId'
+      description: List of SecurityGroupId.
+    SecurityGroups:
+      type: array
+      items:
+        $ref: '#/components/schemas/SecurityGroup'
+    SelfManagedKafkaAccessConfigurationCredentials:
+      allOf:
+      - allOf:
+        - $ref: '#/components/schemas/SecretManagerArn'
+        description: |-
+          The ARN of the Secrets Manager secret.
+      - allOf:
+        - $ref: '#/components/schemas/SecretManagerArn'
+        description: |-
+          The ARN of the Secrets Manager secret.
+      - allOf:
+        - $ref: '#/components/schemas/SecretManagerArn'
+        description: |-
+          The ARN of the Secrets Manager secret.
+      - allOf:
+        - $ref: '#/components/schemas/SecretManagerArn'
+        description: |-
+          The ARN of the Secrets Manager secret.
+      description: |-
+        The Secrets Manager secret that stores your stream credentials.
     SelfManagedKafkaStartPosition:
       type: string
       enum:
       - TRIM_HORIZON
       - LATEST
+    SingleMeasureMappings:
+      type: array
+      items:
+        $ref: '#/components/schemas/SingleMeasureMapping'
     Sql:
       type: string
       minLength: 1
       maxLength: 100000
+    Sqls:
+      type: array
+      items:
+        $ref: '#/components/schemas/Sql'
+      description: // A list of SQLs.
     StatementName:
       type: string
       minLength: 1
       maxLength: 500
     String:
       type: string
+    StringList:
+      type: array
+      items:
+        $ref: '#/components/schemas/String'
     Subnet:
       type: string
       pattern: ^subnet-[0-9a-z]*|(\$(\.[\w/_-]+(\[(\d+|\*)\])*)*)$
@@ -487,10 +645,31 @@ components:
       pattern: ^subnet-[0-9a-z]*$
       minLength: 1
       maxLength: 1024
+    SubnetIds:
+      type: array
+      items:
+        $ref: '#/components/schemas/SubnetId'
+      description: List of SubnetId.
+    Subnets:
+      type: array
+      items:
+        $ref: '#/components/schemas/Subnet'
     TagKey:
       type: string
       minLength: 1
       maxLength: 128
+    TagKeyList:
+      type: array
+      items:
+        $ref: '#/components/schemas/TagKey'
+    TagList:
+      type: array
+      items:
+        $ref: '#/components/schemas/Tag'
+    TagMap:
+      type: object
+      additionalProperties:
+        $ref: '#/components/schemas/TagValue'
     TagValue:
       type: string
       minLength: 0
@@ -504,6 +683,9 @@ components:
       type: string
       minLength: 1
       maxLength: 256
+    Timestamp:
+      type: string
+      format: date-time
     TimestampFormat:
       type: string
       minLength: 1
@@ -513,6 +695,10 @@ components:
       pattern: ^[a-zA-Z0-9-\/*:_+=.@-]*$
       minLength: 1
       maxLength: 200
+    ValidationExceptionFieldList:
+      type: array
+      items:
+        $ref: '#/components/schemas/ValidationExceptionField'
     VersionValue:
       type: string
       minLength: 1

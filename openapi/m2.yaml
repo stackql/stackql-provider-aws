@@ -46,6 +46,10 @@ servers:
 paths: {}
 components:
   schemas:
+    AlternateKeyList:
+      type: array
+      items:
+        $ref: '#/components/schemas/AlternateKey'
     ApplicationDeploymentLifecycle:
       type: string
       enum:
@@ -65,19 +69,47 @@ components:
       - Failed
       - Deleting
       - Deleting From Environment
+    ApplicationSummaryList:
+      type: array
+      items:
+        $ref: '#/components/schemas/ApplicationSummary'
     ApplicationVersionLifecycle:
       type: string
       enum:
       - Creating
       - Available
       - Failed
+    ApplicationVersionSummaryList:
+      type: array
+      items:
+        $ref: '#/components/schemas/ApplicationVersionSummary'
     Arn:
       type: string
       pattern: ^arn:(aws|aws-cn|aws-iso|aws-iso-[a-z]{1}|aws-us-gov):[A-Za-z0-9][A-Za-z0-9_/.-]{0,62}:([a-z]{2}-((iso[a-z]{0,1}-)|(gov-)){0,1}[a-z]+-[0-9]|):[0-9]{12}:[A-Za-z0-9/][A-Za-z0-9:_/+=,@.-]{0,1023}$
+    ArnList:
+      type: array
+      items:
+        $ref: '#/components/schemas/Arn'
     AuthSecretsManagerArn:
       type: string
       minLength: 20
       maxLength: 2048
+    BatchJobDefinition:
+      allOf:
+      - allOf:
+        - $ref: '#/components/schemas/FileBatchJobDefinition'
+        description: |-
+          Specifies a file containing a batch job definition.
+      - allOf:
+        - $ref: '#/components/schemas/ScriptBatchJobDefinition'
+        description: |-
+          A script containing a batch job definition.
+      description: |-
+        Defines the details of a batch job.
+    BatchJobDefinitions:
+      type: array
+      items:
+        $ref: '#/components/schemas/BatchJobDefinition'
     BatchJobExecutionStatus:
       type: string
       enum:
@@ -91,6 +123,41 @@ components:
       - Failed
       - Purged
       - Succeeded With Warning
+    BatchJobExecutionSummaryList:
+      type: array
+      items:
+        $ref: '#/components/schemas/BatchJobExecutionSummary'
+    BatchJobIdentifier:
+      allOf:
+      - allOf:
+        - $ref: '#/components/schemas/FileBatchJobIdentifier'
+        description: |-
+          Specifies a file associated with a specific batch job.
+      - allOf:
+        - $ref: '#/components/schemas/ScriptBatchJobIdentifier'
+        description: |-
+          A batch job identifier in which the batch job to run is identified by the script name.
+      - allOf:
+        - $ref: '#/components/schemas/S3BatchJobIdentifier'
+        description: |-
+          Specifies an Amazon S3 location that identifies the batch jobs that you want to run. Use this identifier to run ad hoc batch jobs.
+      - allOf:
+        - $ref: '#/components/schemas/RestartBatchJobIdentifier'
+        description: |-
+          Specifies the required information for restart, including `executionId` and `JobStepRestartMarker`.
+      description: |-
+        Identifies a specific batch job.
+    BatchJobParametersMap:
+      type: object
+      additionalProperties:
+        $ref: '#/components/schemas/BatchParamValue'
+      description: 'Job parameters are optional.
+
+        Can contain up to 500 entries.'
+    BatchJobStepList:
+      type: array
+      items:
+        $ref: '#/components/schemas/JobStep'
     BatchJobType:
       type: string
       enum:
@@ -115,6 +182,46 @@ components:
       type: string
       pattern: ^[!-~]+$
       maxLength: 128
+    DataSetExportConfig:
+      allOf:
+      - allOf:
+        - $ref: '#/components/schemas/String'
+        description: |-
+          The Amazon S3 location of the data sets.
+      - allOf:
+        - $ref: '#/components/schemas/DataSetExportList'
+        description: |-
+          The data sets.
+      description: |-
+        Identifies one or more data sets you want to import with the CreateDataSetExportTask operation.
+    DataSetExportList:
+      type: array
+      items:
+        $ref: '#/components/schemas/DataSetExportItem'
+    DataSetExportTaskList:
+      type: array
+      items:
+        $ref: '#/components/schemas/DataSetExportTask'
+    DataSetImportConfig:
+      allOf:
+      - allOf:
+        - $ref: '#/components/schemas/String2000'
+        description: |-
+          The Amazon S3 location of the data sets.
+      - allOf:
+        - $ref: '#/components/schemas/DataSetImportList'
+        description: |-
+          The data sets.
+      description: |-
+        Identifies one or more data sets you want to import with the CreateDataSetImportTask operation.
+    DataSetImportList:
+      type: array
+      items:
+        $ref: '#/components/schemas/DataSetImportItem'
+    DataSetImportTaskList:
+      type: array
+      items:
+        $ref: '#/components/schemas/DataSetImportTask'
     DataSetTaskLifecycle:
       type: string
       enum:
@@ -122,6 +229,62 @@ components:
       - Running
       - Completed
       - Failed
+    DataSetsSummaryList:
+      type: array
+      items:
+        $ref: '#/components/schemas/DataSetSummary'
+    DatasetDetailOrgAttributes:
+      allOf:
+      - allOf:
+        - $ref: '#/components/schemas/VsamDetailAttributes'
+        description: |-
+          The details of a VSAM data set.
+      - allOf:
+        - $ref: '#/components/schemas/GdgDetailAttributes'
+        description: |-
+          The generation data group of the data set.
+      - allOf:
+        - $ref: '#/components/schemas/PoDetailAttributes'
+        description: |-
+          The details of a PO type data set.
+      - allOf:
+        - $ref: '#/components/schemas/PsDetailAttributes'
+        description: |-
+          The details of a PS type data set.
+      description: |-
+        Additional details about the data set. Different attributes correspond to different data set organizations. The values are populated based on datasetOrg, storageType and backend (Blu Age or Micro Focus).
+    DatasetOrgAttributes:
+      allOf:
+      - allOf:
+        - $ref: '#/components/schemas/VsamAttributes'
+        description: |-
+          The details of a VSAM data set.
+      - allOf:
+        - $ref: '#/components/schemas/GdgAttributes'
+        description: |-
+          The generation data group of the data set.
+      - allOf:
+        - $ref: '#/components/schemas/PoAttributes'
+        description: |-
+          The details of a PO type data set.
+      - allOf:
+        - $ref: '#/components/schemas/PsAttributes'
+        description: |-
+          The details of a PS type data set.
+      description: |-
+        Additional details about the data set. Different attributes correspond to different data set organizations. The values are populated based on datasetOrg, storageType and backend (Blu Age or Micro Focus).
+    Definition:
+      allOf:
+      - allOf:
+        - $ref: '#/components/schemas/String2000'
+        description: |-
+          The S3 bucket that contains the application definition.
+      - allOf:
+        - $ref: '#/components/schemas/StringFree65000'
+        description: |-
+          The content of the application definition. This is a JSON object that contains the resource configuration/definitions that identify an application.
+      description: |-
+        The application definition for a particular application.
     DeploymentLifecycle:
       type: string
       enum:
@@ -129,6 +292,10 @@ components:
       - Succeeded
       - Failed
       - Updating Deployment
+    DeploymentList:
+      type: array
+      items:
+        $ref: '#/components/schemas/DeploymentSummary'
     EngineType:
       type: string
       enum:
@@ -137,6 +304,10 @@ components:
     EngineVersion:
       type: string
       pattern: ^\S{1,10}$
+    EngineVersionsSummaryList:
+      type: array
+      items:
+        $ref: '#/components/schemas/EngineVersionsSummary'
     EntityDescription:
       type: string
       minLength: 0
@@ -144,6 +315,10 @@ components:
     EntityName:
       type: string
       pattern: ^[A-Za-z0-9][A-Za-z0-9_\-]{1,59}$
+    EntityNameList:
+      type: array
+      items:
+        $ref: '#/components/schemas/EntityName'
     EnvironmentLifecycle:
       type: string
       enum:
@@ -153,12 +328,40 @@ components:
       - Deleting
       - Failed
       - UnHealthy
+    EnvironmentSummaryList:
+      type: array
+      items:
+        $ref: '#/components/schemas/EnvironmentSummary'
+    ExternalLocation:
+      allOf:
+      - allOf:
+        - $ref: '#/components/schemas/String2000'
+        description: |-
+          The URI of the Amazon S3 bucket.
+      description: |-
+        Defines an external storage location.
     Identifier:
       type: string
       pattern: ^\S{1,80}$
+    IdentifierList:
+      type: array
+      items:
+        $ref: '#/components/schemas/Identifier'
     Integer:
       type: integer
       default: 0
+    JobIdentifier:
+      allOf:
+      - allOf:
+        - $ref: '#/components/schemas/String'
+        description: |-
+          The name of the file that contains the batch job definition.
+      - allOf:
+        - $ref: '#/components/schemas/String'
+        description: |-
+          The name of the script that contains the batch job definition.
+      description: |-
+        Identifies a specific batch job.
     KMSKeyId:
       type: string
       pattern: ^[a-zA-Z0-9:/_-]+$
@@ -168,6 +371,10 @@ components:
       type: string
       minLength: 1
       maxLength: 512
+    LogGroupSummaries:
+      type: array
+      items:
+        $ref: '#/components/schemas/LogGroupSummary'
     MaxResults:
       type: integer
       minimum: 1
@@ -180,6 +387,26 @@ components:
     NextToken:
       type: string
       pattern: ^\S{1,2000}$
+    PortList:
+      type: array
+      items:
+        $ref: '#/components/schemas/Integer'
+    StorageConfiguration:
+      allOf:
+      - allOf:
+        - $ref: '#/components/schemas/EfsStorageConfiguration'
+        description: |-
+          Defines the storage configuration for an Amazon EFS file system.
+      - allOf:
+        - $ref: '#/components/schemas/FsxStorageConfiguration'
+        description: |-
+          Defines the storage configuration for an Amazon FSx file system.
+      description: |-
+        Defines the storage configuration for a runtime environment.
+    StorageConfigurationList:
+      type: array
+      items:
+        $ref: '#/components/schemas/StorageConfiguration'
     String100:
       type: string
       pattern: ^\S{1,100}$
@@ -192,9 +419,17 @@ components:
     String2000:
       type: string
       pattern: ^\S{1,2000}$
+    String20List:
+      type: array
+      items:
+        $ref: '#/components/schemas/String20'
     String50:
       type: string
       pattern: ^\S{1,50}$
+    String50List:
+      type: array
+      items:
+        $ref: '#/components/schemas/String50'
     StringFree65000:
       type: string
       minLength: 1
@@ -204,10 +439,25 @@ components:
       pattern: ^(?!aws:).+$
       minLength: 1
       maxLength: 128
+    TagKeyList:
+      type: array
+      items:
+        $ref: '#/components/schemas/TagKey'
+    TagMap:
+      type: object
+      additionalProperties:
+        $ref: '#/components/schemas/TagValue'
     TagValue:
       type: string
       minLength: 0
       maxLength: 256
+    Timestamp:
+      type: string
+      format: date-time
+    ValidationExceptionFieldList:
+      type: array
+      items:
+        $ref: '#/components/schemas/ValidationExceptionField'
     ValidationExceptionReason:
       type: string
       enum:

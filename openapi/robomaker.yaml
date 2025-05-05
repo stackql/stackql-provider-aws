@@ -46,11 +46,24 @@ servers:
 paths: {}
 components:
   schemas:
+    Architecture:
+      type: string
+      enum:
+      - X86_64
+      - ARM64
+      - ARMHF
     Arn:
       type: string
       pattern: '^arn:'
       minLength: 1
       maxLength: 1224
+    Arns:
+      type: array
+      items:
+        $ref: '#/components/schemas/Arn'
+    BatchTimeoutInSeconds:
+      type: integer
+      format: int64
     Boolean:
       type: boolean
       default: false
@@ -66,6 +79,87 @@ components:
       pattern: ^[a-zA-Z0-9_.\-]*$
       minLength: 1
       maxLength: 1024
+    CommandList:
+      type: array
+      items:
+        $ref: '#/components/schemas/NonEmptyString'
+    ComputeType:
+      type: string
+      enum:
+      - CPU
+      - GPU_AND_CPU
+    CreateSimulationJobRequests:
+      type: array
+      items:
+        $ref: '#/components/schemas/SimulationJobRequest'
+    CreatedAt:
+      type: string
+      format: date-time
+    DataSourceConfigs:
+      type: array
+      items:
+        $ref: '#/components/schemas/DataSourceConfig'
+    DataSourceNames:
+      type: array
+      items:
+        $ref: '#/components/schemas/Name'
+    DataSourceType:
+      type: string
+      enum:
+      - Prefix
+      - Archive
+      - File
+    DataSources:
+      type: array
+      items:
+        $ref: '#/components/schemas/DataSource'
+    DeploymentApplicationConfigs:
+      type: array
+      items:
+        $ref: '#/components/schemas/DeploymentApplicationConfig'
+    DeploymentJobErrorCode:
+      type: string
+      enum:
+      - ResourceNotFound
+      - EnvironmentSetupError
+      - EtagMismatch
+      - FailureThresholdBreached
+      - RobotDeploymentAborted
+      - RobotDeploymentNoResponse
+      - RobotAgentConnectionTimeout
+      - GreengrassDeploymentFailed
+      - InvalidGreengrassGroup
+      - MissingRobotArchitecture
+      - MissingRobotApplicationArchitecture
+      - MissingRobotDeploymentResource
+      - GreengrassGroupVersionDoesNotExist
+      - LambdaDeleted
+      - ExtractingBundleFailure
+      - PreLaunchFileFailure
+      - PostLaunchFileFailure
+      - BadPermissionError
+      - DownloadConditionFailed
+      - BadLambdaAssociated
+      - InternalServerError
+      - RobotApplicationDoesNotExist
+      - DeploymentFleetDoesNotExist
+      - FleetDeploymentTimeout
+    DeploymentJobs:
+      type: array
+      items:
+        $ref: '#/components/schemas/DeploymentJob'
+    DeploymentStatus:
+      type: string
+      enum:
+      - Pending
+      - Preparing
+      - InProgress
+      - Failed
+      - Succeeded
+      - Canceled
+    DeploymentTimeout:
+      type: integer
+      format: int64
     DeploymentVersion:
       type: string
       pattern: ^[0-9]*$
@@ -76,11 +170,44 @@ components:
       pattern: ^[A-Z_][A-Z0-9_]*$
       minLength: 1
       maxLength: 1024
+    EnvironmentVariableMap:
+      type: object
+      additionalProperties:
+        $ref: '#/components/schemas/EnvironmentVariableValue'
     EnvironmentVariableValue:
       type: string
       pattern: .*
       minLength: 1
       maxLength: 1024
+    ExitBehavior:
+      type: string
+      enum:
+      - FAIL
+      - RESTART
+    FailedAt:
+      type: string
+      format: date-time
+    FailedCreateSimulationJobRequests:
+      type: array
+      items:
+        $ref: '#/components/schemas/FailedCreateSimulationJobRequest'
+    FailureBehavior:
+      type: string
+      enum:
+      - Fail
+      - Continue
+    FilterValues:
+      type: array
+      items:
+        $ref: '#/components/schemas/Name'
+    Filters:
+      type: array
+      items:
+        $ref: '#/components/schemas/Filter'
+    Fleets:
+      type: array
+      items:
+        $ref: '#/components/schemas/Fleet'
     FloorplanCount:
       type: integer
     GPUUnit:
@@ -114,11 +241,21 @@ components:
       default: 0
     InteriorCountPerFloorplan:
       type: integer
+    JobDuration:
+      type: integer
+      format: int64
+      default: 0
     Json:
       type: string
       pattern: ^[\S\s]+$
       minLength: 1
       maxLength: 262144
+    LastStartedAt:
+      type: string
+      format: date-time
+    LastUpdatedAt:
+      type: string
+      format: date-time
     MaxConcurrency:
       type: integer
     MaxResults:
@@ -147,6 +284,11 @@ components:
       pattern: .*
       minLength: 1
       maxLength: 1024
+    PercentDone:
+      type: number
+      format: float
+      minimum: 0.0
+      maximum: 100.0
     Percentage:
       type: integer
       minimum: 1
@@ -155,6 +297,14 @@ components:
       type: integer
       minimum: 1
       maximum: 65535
+    PortMappingList:
+      type: array
+      items:
+        $ref: '#/components/schemas/PortMapping'
+    RenderingEngineType:
+      type: string
+      enum:
+      - OGRE
     RenderingEngineVersionType:
       type: string
       pattern: ^1.x$
@@ -170,6 +320,59 @@ components:
       pattern: ^[a-zA-Z0-9_.\-]*$
       minLength: 1
       maxLength: 40
+    RobotApplicationConfigs:
+      type: array
+      items:
+        $ref: '#/components/schemas/RobotApplicationConfig'
+    RobotApplicationNames:
+      type: array
+      items:
+        $ref: '#/components/schemas/Name'
+    RobotApplicationSummaries:
+      type: array
+      items:
+        $ref: '#/components/schemas/RobotApplicationSummary'
+    RobotDeploymentStep:
+      type: string
+      enum:
+      - Validating
+      - DownloadingExtracting
+      - ExecutingDownloadCondition
+      - ExecutingPreLaunch
+      - Launching
+      - ExecutingPostLaunch
+      - Finished
+    RobotDeploymentSummary:
+      type: array
+      items:
+        $ref: '#/components/schemas/RobotDeployment'
+    RobotSoftwareSuiteType:
+      type: string
+      enum:
+      - ROS
+      - ROS2
+      - General
+    RobotSoftwareSuiteVersionType:
+      type: string
+      enum:
+      - Kinetic
+      - Melodic
+      - Dashing
+      - Foxy
+    RobotStatus:
+      type: string
+      enum:
+      - Available
+      - Registered
+      - PendingNewDeployment
+      - Deploying
+      - Failed
+      - InSync
+      - NoResponse
+    Robots:
+      type: array
+      items:
+        $ref: '#/components/schemas/Robot'
     S3Bucket:
       type: string
       pattern: ^[a-z0-9][a-z0-9.\-]*[a-z0-9]$
@@ -177,6 +380,10 @@ components:
       maxLength: 63
     S3Etag:
       type: string
+    S3Etags:
+      type: array
+      items:
+        $ref: '#/components/schemas/S3Etag'
     S3Key:
       type: string
       pattern: .*
@@ -187,20 +394,149 @@ components:
       pattern: .*
       minLength: 0
       maxLength: 1024
+    S3KeyOutputs:
+      type: array
+      items:
+        $ref: '#/components/schemas/S3KeyOutput'
+    S3KeysOrPrefixes:
+      type: array
+      items:
+        $ref: '#/components/schemas/S3KeyOrPrefix'
+    SecurityGroups:
+      type: array
+      items:
+        $ref: '#/components/schemas/NonEmptyString'
+    SimulationApplicationConfigs:
+      type: array
+      items:
+        $ref: '#/components/schemas/SimulationApplicationConfig'
+    SimulationApplicationNames:
+      type: array
+      items:
+        $ref: '#/components/schemas/Name'
+    SimulationApplicationSummaries:
+      type: array
+      items:
+        $ref: '#/components/schemas/SimulationApplicationSummary'
+    SimulationJobBatchErrorCode:
+      type: string
+      enum:
+      - InternalServiceError
+    SimulationJobBatchStatus:
+      type: string
+      enum:
+      - Pending
+      - InProgress
+      - Failed
+      - Completed
+      - Canceled
+      - Canceling
+      - Completing
+      - TimingOut
+      - TimedOut
+    SimulationJobBatchSummaries:
+      type: array
+      items:
+        $ref: '#/components/schemas/SimulationJobBatchSummary'
+    SimulationJobErrorCode:
+      type: string
+      enum:
+      - InternalServiceError
+      - RobotApplicationCrash
+      - SimulationApplicationCrash
+      - RobotApplicationHealthCheckFailure
+      - SimulationApplicationHealthCheckFailure
+      - BadPermissionsRobotApplication
+      - BadPermissionsSimulationApplication
+      - BadPermissionsS3Object
+      - BadPermissionsS3Output
+      - BadPermissionsCloudwatchLogs
+      - SubnetIpLimitExceeded
+      - ENILimitExceeded
+      - BadPermissionsUserCredentials
+      - InvalidBundleRobotApplication
+      - InvalidBundleSimulationApplication
+      - InvalidS3Resource
+      - ThrottlingError
+      - LimitExceeded
+      - MismatchedEtag
+      - RobotApplicationVersionMismatchedEtag
+      - SimulationApplicationVersionMismatchedEtag
+      - ResourceNotFound
+      - RequestThrottled
+      - BatchTimedOut
+      - BatchCanceled
+      - InvalidInput
+      - WrongRegionS3Bucket
+      - WrongRegionS3Output
+      - WrongRegionRobotApplication
+      - WrongRegionSimulationApplication
+      - UploadContentMismatchError
+    SimulationJobStatus:
+      type: string
+      enum:
+      - Pending
+      - Preparing
+      - Running
+      - Restarting
+      - Completed
+      - Failed
+      - RunningFailed
+      - Terminating
+      - Terminated
+      - Canceled
+    SimulationJobSummaries:
+      type: array
+      items:
+        $ref: '#/components/schemas/SimulationJobSummary'
+    SimulationJobs:
+      type: array
+      items:
+        $ref: '#/components/schemas/SimulationJob'
+    SimulationSoftwareSuiteType:
+      type: string
+      enum:
+      - Gazebo
+      - RosbagPlay
+      - SimulationRuntime
     SimulationSoftwareSuiteVersionType:
       type: string
       pattern: ^7|9|11|Kinetic|Melodic|Dashing|Foxy$
       minLength: 0
       maxLength: 1024
+    SimulationTimeMillis:
+      type: integer
+      format: int64
+      default: 0
     SimulationUnit:
       type: integer
       minimum: 1
       maximum: 15
+    SourceConfigs:
+      type: array
+      items:
+        $ref: '#/components/schemas/SourceConfig'
+    Sources:
+      type: array
+      items:
+        $ref: '#/components/schemas/Source'
+    Subnets:
+      type: array
+      items:
+        $ref: '#/components/schemas/NonEmptyString'
     TagKey:
       type: string
       pattern: ^[a-zA-Z0-9 _.\-\/+=:]*$
       minLength: 1
       maxLength: 128
+    TagKeyList:
+      type: array
+      items:
+        $ref: '#/components/schemas/TagKey'
+    TagMap:
+      type: object
+      additionalProperties:
+        $ref: '#/components/schemas/TagValue'
     TagValue:
       type: string
       pattern: ^[a-zA-Z0-9 _.\-\/+=:]*$
@@ -211,11 +547,28 @@ components:
       pattern: .*
       minLength: 0
       maxLength: 255
+    TemplateSummaries:
+      type: array
+      items:
+        $ref: '#/components/schemas/TemplateSummary'
+    Tools:
+      type: array
+      items:
+        $ref: '#/components/schemas/Tool'
     UnrestrictedCommand:
       type: string
       pattern: .*
       minLength: 1
       maxLength: 1024
+    UploadBehavior:
+      type: string
+      enum:
+      - UPLOAD_ON_TERMINATE
+      - UPLOAD_ROLLING_AUTO_REMOVE
+    UploadConfigurations:
+      type: array
+      items:
+        $ref: '#/components/schemas/UploadConfiguration'
     Version:
       type: string
       pattern: ^(\$LATEST)|[0-9]*$
@@ -226,5 +579,62 @@ components:
       pattern: ^ALL$
       minLength: 1
       maxLength: 255
+    WorldConfigs:
+      type: array
+      items:
+        $ref: '#/components/schemas/WorldConfig'
+    WorldExportJobErrorCode:
+      type: string
+      enum:
+      - InternalServiceError
+      - LimitExceeded
+      - ResourceNotFound
+      - RequestThrottled
+      - InvalidInput
+      - AccessDenied
+    WorldExportJobStatus:
+      type: string
+      enum:
+      - Pending
+      - Running
+      - Completed
+      - Failed
+      - Canceling
+      - Canceled
+    WorldExportJobSummaries:
+      type: array
+      items:
+        $ref: '#/components/schemas/WorldExportJobSummary'
+    WorldFailures:
+      type: array
+      items:
+        $ref: '#/components/schemas/WorldFailure'
+    WorldGenerationJobErrorCode:
+      type: string
+      enum:
+      - InternalServiceError
+      - LimitExceeded
+      - ResourceNotFound
+      - RequestThrottled
+      - InvalidInput
+      - AllWorldGenerationFailed
+    WorldGenerationJobStatus:
+      type: string
+      enum:
+      - Pending
+      - Running
+      - Completed
+      - Failed
+      - PartialFailed
+      - Canceling
+      - Canceled
+    WorldGenerationJobSummaries:
+      type: array
+      items:
+        $ref: '#/components/schemas/WorldGenerationJobSummary'
+    WorldSummaries:
+      type: array
+      items:
+        $ref: '#/components/schemas/WorldSummary'
     errorMessage:
       type: string
