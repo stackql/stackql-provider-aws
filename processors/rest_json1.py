@@ -2,7 +2,7 @@
 
 import json, yaml
 from pathlib import Path
-from processors.shared_functions import LiteralStr, add_info, literal_str_representer, add_servers, init_openapi_spec
+from processors.shared_functions import LiteralStr, add_info, literal_str_representer, add_servers, init_openapi_spec, add_component_schema_string, add_component_schema_boolean, add_component_schema_integer
 
 yaml.add_representer(LiteralStr, literal_str_representer)
 
@@ -32,27 +32,15 @@ def process(model_entry):
         if shape.get("type") == "service": 
             add_info(openapi_spec, shape)
             add_servers(openapi_spec, file_name, shape)
+        elif shape.get("type") == "string":
+            add_component_schema_string(openapi_spec, shape_name, shape)
+        elif shape.get("type") == "boolean":
+            add_component_schema_boolean(openapi_spec, shape_name, shape)
+        elif shape.get("type") == "integer":
+            add_component_schema_integer(openapi_spec, shape_name, shape)
 
-            # does it have resources?
-            resources = shape.get("resources", [])
-            if resources:
-                print(f"resources: {len(resources)}")
-            else:
-                operations = shape.get("operations", [])
-                print(f"operations: {len(operations)}")
-
-
-
-        # elif shape.get("type") == "operation":
-
-
-# traits		  
-				
-#                 "smithy.api#paginated": {
-#                     "inputToken": "nextToken",
-#                     "outputToken": "nextToken",
-#                     "pageSize": "maxResults"
-#                 },
+        # elif shape.get("type") == "structure":
+        #     add_component(openapi_spec, shape_name, shape, shapes)
 
 
     # Write output YAML

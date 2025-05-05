@@ -85,4 +85,85 @@ def add_servers(openapi_spec, versionless_service_name, service_shape):
 
     openapi_spec["servers"] = servers_block
     return openapi_spec
-    
+
+def add_component_schema_string(openapi_spec, shape_name, shape):
+    short_name = shape_name.split("#")[-1]
+
+    schema = {
+        "type": "string"
+    }
+
+    traits = shape.get("traits", {})
+
+    # Description
+    if "smithy.api#description" in traits:
+        schema["description"] = traits["smithy.api#description"]
+
+    # Enum values
+    if "smithy.api#enum" in traits:
+        schema["enum"] = [entry["value"] for entry in traits["smithy.api#enum"]]
+
+    # Pattern constraint
+    if "smithy.api#pattern" in traits:
+        schema["pattern"] = traits["smithy.api#pattern"]
+
+    # Length constraints
+    if "smithy.api#length" in traits:
+        length = traits["smithy.api#length"]
+        if "min" in length:
+            schema["minLength"] = length["min"]
+        if "max" in length:
+            schema["maxLength"] = length["max"]
+
+    openapi_spec["components"]["schemas"][short_name] = schema
+
+def add_component_schema_boolean(openapi_spec, shape_name, shape):
+    # Strip namespace if present
+    if "#" in shape_name:
+        shape_name = shape_name.split("#")[-1]
+
+    schema = {
+        "type": "boolean"
+    }
+
+    traits = shape.get("traits", {})
+
+    # Optional default value
+    if "smithy.api#default" in traits:
+        schema["default"] = traits["smithy.api#default"]
+
+    # Optional description
+    if "smithy.api#documentation" in traits:
+        schema["description"] = traits["smithy.api#documentation"]
+
+    openapi_spec["components"]["schemas"][shape_name] = schema
+
+def add_component_schema_integer(openapi_spec, shape_name, shape):
+    # Remove Smithy namespace prefix
+    if "#" in shape_name:
+        shape_name = shape_name.split("#")[-1]
+
+    schema = {
+        "type": "integer"
+    }
+
+    traits = shape.get("traits", {})
+
+    # Add default if present
+    if "smithy.api#default" in traits:
+        schema["default"] = traits["smithy.api#default"]
+
+    # Add range (min/max)
+    if "smithy.api#range" in traits:
+        range_trait = traits["smithy.api#range"]
+        if "min" in range_trait:
+            schema["minimum"] = range_trait["min"]
+        if "max" in range_trait:
+            schema["maximum"] = range_trait["max"]
+
+    # Add description
+    if "smithy.api#documentation" in traits:
+        schema["description"] = traits["smithy.api#documentation"]
+
+    openapi_spec["components"]["schemas"][shape_name] = schema
+
