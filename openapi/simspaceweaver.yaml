@@ -7,7 +7,7 @@ info:
   x-stackql-serviceName: simspaceweaver
   x-aws-serviceName: simspaceweaver
   x-aws-protocol: aws.protocols#restJson1
-  x-dateGenerated: '2025-05-05'
+  x-dateGenerated: '2025-05-07'
   version: '2022-10-28'
   title: AWS SimSpace Weaver
   description: |-
@@ -47,9 +47,749 @@ servers:
       - sa-east-1
       - me-south-1
       default: us-east-1
-paths: {}
+paths:
+  /createsnapshot:
+    post:
+      operationId: CreateSnapshot
+      description: |-
+        Creates a snapshot of the specified simulation. A snapshot is a file that contains simulation state data at a specific time. The state data saved in a snapshot includes entity data from the State Fabric, the simulation configuration specified in the schema, and the clock tick number. You can use the snapshot to initialize a new simulation. For more information about snapshots, see [Snapshots](https://docs.aws.amazon.com/simspaceweaver/latest/userguide/working-with_snapshots.html) in the _SimSpace Weaver User Guide_.
+
+        You specify a `Destination` when you create a snapshot. The `Destination` is the name of an Amazon S3 bucket and an optional `ObjectKeyPrefix`. The `ObjectKeyPrefix` is usually the name of a folder in the bucket. SimSpace Weaver creates a `snapshot` folder inside the `Destination` and places the snapshot file there.
+
+        The snapshot file is an Amazon S3 object. It has an object key with the form: ` _object-key-prefix_ /snapshot/_simulation-name_ -_YYMMdd_ -_HHmm_ -_ss_.zip`, where:
+
+          * ` _YY_ ` is the 2-digit year
+
+          * ` _MM_ ` is the 2-digit month
+
+          * ` _dd_ ` is the 2-digit day of the month
+
+          * ` _HH_ ` is the 2-digit hour (24-hour clock)
+
+          * ` _mm_ ` is the 2-digit minutes
+
+          * ` _ss_ ` is the 2-digit seconds
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                Simulation:
+                  $ref: '#/components/schemas/SimSpaceWeaverResourceName'
+                Destination:
+                  $ref: '#/components/schemas/S3Destination'
+      responses:
+        '200': {}
+        '403':
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '409':
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConflictException'
+        '500':
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerException'
+        '404':
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+        '400':
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+  /deleteapp:
+    delete:
+      operationId: DeleteApp
+      description: |-
+        Deletes the instance of the given custom app.
+      parameters:
+      - name: simulation
+        in: query
+        required: true
+        schema:
+          $ref: '#/components/schemas/SimSpaceWeaverResourceName'
+      - name: domain
+        in: query
+        required: true
+        schema:
+          $ref: '#/components/schemas/SimSpaceWeaverResourceName'
+      - name: app
+        in: query
+        required: true
+        schema:
+          $ref: '#/components/schemas/SimSpaceWeaverResourceName'
+      responses:
+        '200': {}
+        '403':
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '409':
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConflictException'
+        '500':
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerException'
+        '404':
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+        '400':
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+  /deletesimulation:
+    delete:
+      operationId: DeleteSimulation
+      description: |-
+        Deletes all SimSpace Weaver resources assigned to the given simulation.
+
+        Your simulation uses resources in other Amazon Web Services. This API operation doesn't delete resources in other Amazon Web Services.
+      parameters:
+      - name: simulation
+        in: query
+        required: true
+        schema:
+          $ref: '#/components/schemas/SimSpaceWeaverResourceName'
+      responses:
+        '200': {}
+        '403':
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '409':
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConflictException'
+        '500':
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerException'
+        '404':
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+        '400':
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+  /describeapp:
+    get:
+      operationId: DescribeApp
+      description: |-
+        Returns the state of the given custom app.
+      parameters:
+      - name: simulation
+        in: query
+        required: true
+        schema:
+          $ref: '#/components/schemas/SimSpaceWeaverResourceName'
+      - name: domain
+        in: query
+        required: true
+        schema:
+          $ref: '#/components/schemas/SimSpaceWeaverResourceName'
+      - name: app
+        in: query
+        required: true
+        schema:
+          $ref: '#/components/schemas/SimSpaceWeaverLongResourceName'
+      responses:
+        '200': {}
+        '403':
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '500':
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerException'
+        '404':
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+        '400':
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+  /describesimulation:
+    get:
+      operationId: DescribeSimulation
+      description: |-
+        Returns the current state of the given simulation.
+      parameters:
+      - name: simulation
+        in: query
+        required: true
+        schema:
+          $ref: '#/components/schemas/SimSpaceWeaverResourceName'
+      responses:
+        '200': {}
+        '403':
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '500':
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerException'
+        '404':
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+        '400':
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+  /listapps:
+    get:
+      operationId: ListApps
+      description: |-
+        Lists all custom apps or service apps for the given simulation and domain.
+      parameters:
+      - name: simulation
+        in: query
+        required: true
+        schema:
+          $ref: '#/components/schemas/SimSpaceWeaverResourceName'
+      - name: domain
+        in: query
+        required: false
+        schema:
+          $ref: '#/components/schemas/SimSpaceWeaverResourceName'
+      - name: maxResults
+        in: query
+        required: false
+        schema:
+          $ref: '#/components/schemas/PositiveInteger'
+      - name: nextToken
+        in: query
+        required: false
+        schema:
+          $ref: '#/components/schemas/OptionalString'
+      responses:
+        '200': {}
+        '403':
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '500':
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerException'
+        '404':
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+        '400':
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+  /listsimulations:
+    get:
+      operationId: ListSimulations
+      description: |-
+        Lists the SimSpace Weaver simulations in the Amazon Web Services account used to make the API call.
+      parameters:
+      - name: maxResults
+        in: query
+        required: false
+        schema:
+          $ref: '#/components/schemas/PositiveInteger'
+      - name: nextToken
+        in: query
+        required: false
+        schema:
+          $ref: '#/components/schemas/OptionalString'
+      responses:
+        '200': {}
+        '403':
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '500':
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerException'
+        '400':
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+  /tags/{ResourceArn}:
+    get:
+      operationId: ListTagsForResource
+      description: |-
+        Lists all tags on a SimSpace Weaver resource.
+      parameters:
+      - name: ResourceArn
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/SimSpaceWeaverArn'
+      responses:
+        '200': {}
+        '404':
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+        '400':
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+    post:
+      operationId: TagResource
+      description: |-
+        Adds tags to a SimSpace Weaver resource. For more information about tags, see [Tagging Amazon Web Services resources](https://docs.aws.amazon.com/general/latest/gr/aws_tagging.html) in the _Amazon Web Services General Reference_.
+      parameters:
+      - name: ResourceArn
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/SimSpaceWeaverArn'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                Tags:
+                  $ref: '#/components/schemas/TagMap'
+      responses:
+        '200': {}
+        '404':
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+        '400':
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+    delete:
+      operationId: UntagResource
+      description: |-
+        Removes tags from a SimSpace Weaver resource. For more information about tags, see [Tagging Amazon Web Services resources](https://docs.aws.amazon.com/general/latest/gr/aws_tagging.html) in the _Amazon Web Services General Reference_.
+      parameters:
+      - name: ResourceArn
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/SimSpaceWeaverArn'
+      - name: tagKeys
+        in: query
+        required: true
+        schema:
+          $ref: '#/components/schemas/TagKeyList'
+      responses:
+        '200': {}
+        '404':
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+        '400':
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+  /startapp:
+    post:
+      operationId: StartApp
+      description: |-
+        Starts a custom app with the configuration specified in the simulation schema.
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                ClientToken:
+                  $ref: '#/components/schemas/ClientToken'
+                Simulation:
+                  $ref: '#/components/schemas/SimSpaceWeaverResourceName'
+                Domain:
+                  $ref: '#/components/schemas/SimSpaceWeaverResourceName'
+                Name:
+                  $ref: '#/components/schemas/SimSpaceWeaverResourceName'
+                Description:
+                  $ref: '#/components/schemas/Description'
+                LaunchOverrides:
+                  $ref: '#/components/schemas/LaunchOverrides'
+      responses:
+        '200': {}
+        '403':
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '409':
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConflictException'
+        '500':
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerException'
+        '402':
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServiceQuotaExceededException'
+        '400':
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+  /startclock:
+    post:
+      operationId: StartClock
+      description: |-
+        Starts the simulation clock.
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                Simulation:
+                  $ref: '#/components/schemas/SimSpaceWeaverResourceName'
+      responses:
+        '200': {}
+        '403':
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '409':
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConflictException'
+        '500':
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerException'
+        '404':
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+        '400':
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+  /startsimulation:
+    post:
+      operationId: StartSimulation
+      description: |-
+        Starts a simulation with the given name. You must choose to start your simulation from a schema or from a snapshot. For more information about the schema, see the [schema reference](https://docs.aws.amazon.com/simspaceweaver/latest/userguide/schema-reference.html) in the _SimSpace Weaver User Guide_. For more information about snapshots, see [Snapshots](https://docs.aws.amazon.com/simspaceweaver/latest/userguide/working-with_snapshots.html) in the _SimSpace Weaver User Guide_.
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                ClientToken:
+                  $ref: '#/components/schemas/ClientToken'
+                Name:
+                  $ref: '#/components/schemas/SimSpaceWeaverResourceName'
+                Description:
+                  $ref: '#/components/schemas/Description'
+                RoleArn:
+                  $ref: '#/components/schemas/RoleArn'
+                SchemaS3Location:
+                  $ref: '#/components/schemas/S3Location'
+                MaximumDuration:
+                  $ref: '#/components/schemas/TimeToLiveString'
+                Tags:
+                  $ref: '#/components/schemas/TagMap'
+                SnapshotS3Location:
+                  $ref: '#/components/schemas/S3Location'
+      responses:
+        '200': {}
+        '403':
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '409':
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConflictException'
+        '500':
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerException'
+        '402':
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServiceQuotaExceededException'
+        '400':
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+  /stopapp:
+    post:
+      operationId: StopApp
+      description: |-
+        Stops the given custom app and shuts down all of its allocated compute resources.
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                Simulation:
+                  $ref: '#/components/schemas/SimSpaceWeaverResourceName'
+                Domain:
+                  $ref: '#/components/schemas/SimSpaceWeaverResourceName'
+                App:
+                  $ref: '#/components/schemas/SimSpaceWeaverResourceName'
+      responses:
+        '200': {}
+        '403':
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '409':
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConflictException'
+        '500':
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerException'
+        '404':
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+        '400':
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+  /stopclock:
+    post:
+      operationId: StopClock
+      description: |-
+        Stops the simulation clock.
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                Simulation:
+                  $ref: '#/components/schemas/SimSpaceWeaverResourceName'
+      responses:
+        '200': {}
+        '403':
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '409':
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConflictException'
+        '500':
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerException'
+        '404':
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+        '400':
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+  /stopsimulation:
+    post:
+      operationId: StopSimulation
+      description: |-
+        Stops the given simulation.
+
+        You can't restart a simulation after you stop it. If you want to restart a simulation, then you must stop it, delete it, and start a new instance of it.
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                Simulation:
+                  $ref: '#/components/schemas/SimSpaceWeaverResourceName'
+      responses:
+        '200': {}
+        '403':
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '409':
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConflictException'
+        '500':
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerException'
+        '404':
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+        '400':
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
 components:
   schemas:
+    AccessDeniedException:
+      type: object
+      properties:
+        Message:
+          $ref: '#/components/schemas/NonEmptyString'
+      description: ''
     AppPortMappings:
       type: array
       items:
@@ -77,18 +817,278 @@ components:
       - UNKNOWN
       - STARTED
       - STOPPED
+    CloudWatchLogsLogGroup:
+      type: object
+      properties:
+        LogGroupArn:
+          allOf:
+          - $ref: '#/components/schemas/LogGroupArn'
+          description: The Amazon Resource Name (ARN) of the Amazon CloudWatch Logs
+            log group for the simulation. For more information about ARNs, see [Amazon
+            Resource Names (ARNs)](https://docs.aws.amazon.com/general/latest/gr/aws-arns-and-namespaces.html)
+            in the _Amazon Web Services General Reference_. For more information about
+            log groups, see [Working with log groups and log streams](https://docs.aws.amazon.com/AmazonCloudWatch/latest/logs/Working-with-log-groups-and-streams.html)
+            in the _Amazon CloudWatch Logs User Guide_.
+      description: The Amazon CloudWatch Logs log group for the simulation. For more
+        information about log groups, see [Working with log groups and log streams](https://docs.aws.amazon.com/AmazonCloudWatch/latest/logs/Working-with-log-groups-and-streams.html)
+        in the _Amazon CloudWatch Logs User Guide_.
+    ConflictException:
+      type: object
+      properties:
+        Message:
+          $ref: '#/components/schemas/NonEmptyString'
+      description: ''
+    CreateSnapshotInput:
+      type: object
+      properties:
+        Simulation:
+          allOf:
+          - $ref: '#/components/schemas/SimSpaceWeaverResourceName'
+          description: The name of the simulation.
+        Destination:
+          allOf:
+          - $ref: '#/components/schemas/S3Destination'
+          description: 'The Amazon S3 bucket and optional folder (object key prefix)
+            where SimSpace Weaver creates the snapshot file.
+
+
+            The Amazon S3 bucket must be in the same Amazon Web Services Region as
+            the simulation.'
+      required:
+      - Simulation
+      - Destination
+    CreateSnapshotOutput:
+      type: object
+      properties: {}
+    DeleteAppInput:
+      type: object
+      properties:
+        Simulation:
+          allOf:
+          - $ref: '#/components/schemas/SimSpaceWeaverResourceName'
+          description: The name of the simulation of the app.
+        Domain:
+          allOf:
+          - $ref: '#/components/schemas/SimSpaceWeaverResourceName'
+          description: The name of the domain of the app.
+        App:
+          allOf:
+          - $ref: '#/components/schemas/SimSpaceWeaverResourceName'
+          description: The name of the app.
+      required:
+      - Simulation
+      - Domain
+      - App
+    DeleteAppOutput:
+      type: object
+      properties: {}
+    DeleteSimulationInput:
+      type: object
+      properties:
+        Simulation:
+          allOf:
+          - $ref: '#/components/schemas/SimSpaceWeaverResourceName'
+          description: The name of the simulation.
+      required:
+      - Simulation
+    DeleteSimulationOutput:
+      type: object
+      properties: {}
+    DescribeAppInput:
+      type: object
+      properties:
+        Simulation:
+          allOf:
+          - $ref: '#/components/schemas/SimSpaceWeaverResourceName'
+          description: The name of the simulation of the app.
+        Domain:
+          allOf:
+          - $ref: '#/components/schemas/SimSpaceWeaverResourceName'
+          description: The name of the domain of the app.
+        App:
+          allOf:
+          - $ref: '#/components/schemas/SimSpaceWeaverLongResourceName'
+          description: The name of the app.
+      required:
+      - Simulation
+      - Domain
+      - App
+    DescribeAppOutput:
+      type: object
+      properties:
+        Name:
+          allOf:
+          - $ref: '#/components/schemas/SimSpaceWeaverLongResourceName'
+          description: The name of the app.
+        Simulation:
+          allOf:
+          - $ref: '#/components/schemas/SimSpaceWeaverResourceName'
+          description: The name of the simulation of the app.
+        Domain:
+          allOf:
+          - $ref: '#/components/schemas/SimSpaceWeaverResourceName'
+          description: The name of the domain of the app.
+        Status:
+          allOf:
+          - $ref: '#/components/schemas/SimulationAppStatus'
+          description: The current lifecycle state of the custom app.
+        TargetStatus:
+          allOf:
+          - $ref: '#/components/schemas/SimulationAppTargetStatus'
+          description: The desired lifecycle state of the custom app.
+        LaunchOverrides:
+          $ref: '#/components/schemas/LaunchOverrides'
+        Description:
+          allOf:
+          - $ref: '#/components/schemas/Description'
+          description: The description of the app.
+        EndpointInfo:
+          allOf:
+          - $ref: '#/components/schemas/SimulationAppEndpointInfo'
+          description: Information about the network endpoint for the custom app.
+            You can use the endpoint to connect to the custom app.
+    DescribeSimulationInput:
+      type: object
+      properties:
+        Simulation:
+          allOf:
+          - $ref: '#/components/schemas/SimSpaceWeaverResourceName'
+          description: The name of the simulation.
+      required:
+      - Simulation
+    DescribeSimulationOutput:
+      type: object
+      properties:
+        Name:
+          allOf:
+          - $ref: '#/components/schemas/SimSpaceWeaverResourceName'
+          description: The name of the simulation.
+        ExecutionId:
+          allOf:
+          - $ref: '#/components/schemas/UUID'
+          description: A universally unique identifier (UUID) for this simulation.
+        Arn:
+          allOf:
+          - $ref: '#/components/schemas/SimSpaceWeaverArn'
+          description: The Amazon Resource Name (ARN) of the simulation. For more
+            information about ARNs, see [Amazon Resource Names (ARNs)](https://docs.aws.amazon.com/general/latest/gr/aws-arns-and-namespaces.html)
+            in the _Amazon Web Services General Reference_.
+        Description:
+          allOf:
+          - $ref: '#/components/schemas/Description'
+          description: The description of the simulation.
+        RoleArn:
+          allOf:
+          - $ref: '#/components/schemas/RoleArn'
+          description: The Amazon Resource Name (ARN) of the Identity and Access Management
+            (IAM) role that the simulation assumes to perform actions. For more information
+            about ARNs, see [Amazon Resource Names (ARNs)](https://docs.aws.amazon.com/general/latest/gr/aws-arns-and-namespaces.html)
+            in the _Amazon Web Services General Reference_. For more information about
+            IAM roles, see [IAM roles](https://docs.aws.amazon.com/IAM/latest/UserGuide/id_roles.html)
+            in the _Identity and Access Management User Guide_.
+        CreationTime:
+          allOf:
+          - $ref: '#/components/schemas/Timestamp'
+          description: The time when the simulation was created, expressed as the
+            number of seconds and milliseconds in UTC since the Unix epoch (0:0:0.000,
+            January 1, 1970).
+        Status:
+          allOf:
+          - $ref: '#/components/schemas/SimulationStatus'
+          description: The current lifecycle state of the simulation.
+        TargetStatus:
+          allOf:
+          - $ref: '#/components/schemas/SimulationTargetStatus'
+          description: The desired lifecycle state of the simulation.
+        SchemaS3Location:
+          allOf:
+          - $ref: '#/components/schemas/S3Location'
+          description: The location of the simulation schema in Amazon Simple Storage
+            Service (Amazon S3). For more information about Amazon S3, see the [ _Amazon
+            Simple Storage Service User Guide_ ](https://docs.aws.amazon.com/AmazonS3/latest/userguide/Welcome.html).
+        SchemaError:
+          allOf:
+          - $ref: '#/components/schemas/OptionalString'
+          description: An error message that SimSpace Weaver returns only if there
+            is a problem with the simulation schema.
+        LoggingConfiguration:
+          allOf:
+          - $ref: '#/components/schemas/LoggingConfiguration'
+          description: Settings that control how SimSpace Weaver handles your simulation
+            log data.
+        LiveSimulationState:
+          allOf:
+          - $ref: '#/components/schemas/LiveSimulationState'
+          description: A collection of additional state information, such as domain
+            and clock configuration.
+        MaximumDuration:
+          allOf:
+          - $ref: '#/components/schemas/TimeToLiveString'
+          description: The maximum running time of the simulation, specified as a
+            number of minutes (m or M), hours (h or H), or days (d or D). The simulation
+            stops when it reaches this limit. The maximum value is `14D`, or its equivalent
+            in the other units. The default value is `14D`. A value equivalent to
+            `0` makes the simulation immediately transition to `Stopping` as soon
+            as it reaches `Started`.
+        SnapshotS3Location:
+          $ref: '#/components/schemas/S3Location'
+        StartError:
+          allOf:
+          - $ref: '#/components/schemas/OptionalString'
+          description: An error message that SimSpace Weaver returns only if a problem
+            occurs when the simulation is in the `STARTING` state.
     Description:
       type: string
       minLength: 0
       maxLength: 500
+    Domain:
+      type: object
+      properties:
+        Name:
+          allOf:
+          - $ref: '#/components/schemas/SimSpaceWeaverResourceName'
+          description: The name of the domain.
+        Lifecycle:
+          allOf:
+          - $ref: '#/components/schemas/LifecycleManagementStrategy'
+          description: "The type of lifecycle management for apps in the domain. Indicates\
+            \ whether apps in this domain are _managed_ (SimSpace Weaver starts and\
+            \ stops the apps) or _unmanaged_ (you must start and stop the apps).\n\
+            \n**Lifecycle types**\n\n  * `PerWorker` – Managed: SimSpace Weaver starts\
+            \ one app on each worker.\n\n  * `BySpatialSubdivision` – Managed: SimSpace\
+            \ Weaver starts one app for each spatial partition.\n\n  * `ByRequest`\
+            \ – Unmanaged: You use the `StartApp` API to start the apps and use the\
+            \ `StopApp` API to stop the apps."
+      description: 'A collection of app instances that run the same executable app
+        code and have the same launch options and commands.
+
+
+        For more information about domains, see [Key concepts: Domains](https://docs.aws.amazon.com/simspaceweaver/latest/userguide/what-is_key-concepts.html#what-is_key-concepts_domains)
+        in the _SimSpace Weaver User Guide_.'
     DomainList:
       type: array
       items:
         $ref: '#/components/schemas/Domain'
+    InternalServerException:
+      type: object
+      properties:
+        Message:
+          $ref: '#/components/schemas/NonEmptyString'
+      description: ''
     LaunchCommandList:
       type: array
       items:
         $ref: '#/components/schemas/NonEmptyString'
+    LaunchOverrides:
+      type: object
+      properties:
+        LaunchCommands:
+          allOf:
+          - $ref: '#/components/schemas/LaunchCommandList'
+          description: App launch commands and command line parameters that override
+            the launch command configured in the simulation schema.
+      description: Options that apply when the app starts. These options override
+        default behavior.
     LifecycleManagementStrategy:
       type: string
       enum:
@@ -96,6 +1096,131 @@ components:
       - PerWorker
       - BySpatialSubdivision
       - ByRequest
+    ListAppsInput:
+      type: object
+      properties:
+        Simulation:
+          allOf:
+          - $ref: '#/components/schemas/SimSpaceWeaverResourceName'
+          description: The name of the simulation that you want to list apps for.
+        Domain:
+          allOf:
+          - $ref: '#/components/schemas/SimSpaceWeaverResourceName'
+          description: The name of the domain that you want to list apps for.
+        MaxResults:
+          allOf:
+          - $ref: '#/components/schemas/PositiveInteger'
+          description: The maximum number of apps to list.
+        NextToken:
+          allOf:
+          - $ref: '#/components/schemas/OptionalString'
+          description: If SimSpace Weaver returns `nextToken`, then there are more
+            results available. The value of `nextToken` is a unique pagination token
+            for each page. To retrieve the next page, call the operation again using
+            the returned token. Keep all other arguments unchanged. If no results
+            remain, then `nextToken` is set to `null`. Each pagination token expires
+            after 24 hours. If you provide a token that isn't valid, then you receive
+            an _HTTP 400 ValidationException_ error.
+      required:
+      - Simulation
+    ListAppsOutput:
+      type: object
+      properties:
+        Apps:
+          allOf:
+          - $ref: '#/components/schemas/SimulationAppList'
+          description: The list of apps for the given simulation and domain.
+        NextToken:
+          allOf:
+          - $ref: '#/components/schemas/OptionalString'
+          description: If SimSpace Weaver returns `nextToken`, then there are more
+            results available. The value of `nextToken` is a unique pagination token
+            for each page. To retrieve the next page, call the operation again using
+            the returned token. Keep all other arguments unchanged. If no results
+            remain, then `nextToken` is set to `null`. Each pagination token expires
+            after 24 hours. If you provide a token that isn't valid, then you receive
+            an _HTTP 400 ValidationException_ error.
+    ListSimulationsInput:
+      type: object
+      properties:
+        MaxResults:
+          allOf:
+          - $ref: '#/components/schemas/PositiveInteger'
+          description: The maximum number of simulations to list.
+        NextToken:
+          allOf:
+          - $ref: '#/components/schemas/OptionalString'
+          description: If SimSpace Weaver returns `nextToken`, then there are more
+            results available. The value of `nextToken` is a unique pagination token
+            for each page. To retrieve the next page, call the operation again using
+            the returned token. Keep all other arguments unchanged. If no results
+            remain, then `nextToken` is set to `null`. Each pagination token expires
+            after 24 hours. If you provide a token that isn't valid, then you receive
+            an _HTTP 400 ValidationException_ error.
+    ListSimulationsOutput:
+      type: object
+      properties:
+        Simulations:
+          allOf:
+          - $ref: '#/components/schemas/SimulationList'
+          description: The list of simulations.
+        NextToken:
+          allOf:
+          - $ref: '#/components/schemas/OptionalString'
+          description: If SimSpace Weaver returns `nextToken`, then there are more
+            results available. The value of `nextToken` is a unique pagination token
+            for each page. To retrieve the next page, call the operation again using
+            the returned token. Keep all other arguments unchanged. If no results
+            remain, then `nextToken` is set to `null`. Each pagination token expires
+            after 24 hours. If you provide a token that isn't valid, then you receive
+            an _HTTP 400 ValidationException_ error.
+    ListTagsForResourceInput:
+      type: object
+      properties:
+        ResourceArn:
+          allOf:
+          - $ref: '#/components/schemas/SimSpaceWeaverArn'
+          description: The Amazon Resource Name (ARN) of the resource. For more information
+            about ARNs, see [Amazon Resource Names (ARNs)](https://docs.aws.amazon.com/general/latest/gr/aws-arns-and-namespaces.html)
+            in the _Amazon Web Services General Reference_.
+      required:
+      - ResourceArn
+    ListTagsForResourceOutput:
+      type: object
+      properties:
+        Tags:
+          allOf:
+          - $ref: '#/components/schemas/TagMap'
+          description: The list of tags for the resource.
+    LiveSimulationState:
+      type: object
+      properties:
+        Domains:
+          allOf:
+          - $ref: '#/components/schemas/DomainList'
+          description: 'A list of domains for the simulation. For more information
+            about domains, see [Key concepts: Domains](https://docs.aws.amazon.com/simspaceweaver/latest/userguide/what-is_key-concepts.html#what-is_key-concepts_domains)
+            in the _SimSpace Weaver User Guide_.'
+        Clocks:
+          allOf:
+          - $ref: '#/components/schemas/SimulationClockList'
+          description: 'A list of simulation clocks.
+
+
+            At this time, a simulation has only one clock.'
+      description: A collection of additional state information, such as domain and
+        clock configuration.
+    LogDestination:
+      type: object
+      properties:
+        CloudWatchLogsLogGroup:
+          allOf:
+          - $ref: '#/components/schemas/CloudWatchLogsLogGroup'
+          description: An Amazon CloudWatch Logs log group that stores simulation
+            log data. For more information about log groups, see [Working with log
+            groups and log streams](https://docs.aws.amazon.com/AmazonCloudWatch/latest/logs/Working-with-log-groups-and-streams.html)
+            in the _Amazon CloudWatch Logs User Guide_.
+      description: The location where SimSpace Weaver sends simulation log data.
     LogDestinations:
       type: array
       items:
@@ -105,6 +1230,15 @@ components:
       pattern: ^arn:(?:aws|aws-cn|aws-us-gov):log-group:([a-z]{2}-[a-z]+-\d{1}):(\d{12})?:role\/(.+)$
       minLength: 0
       maxLength: 1600
+    LoggingConfiguration:
+      type: object
+      properties:
+        Destinations:
+          allOf:
+          - $ref: '#/components/schemas/LogDestinations'
+          description: A list of the locations where SimSpace Weaver sends simulation
+            log data.
+      description: The logging configuration for a simulation.
     NonEmptyString:
       type: string
       minLength: 1
@@ -126,11 +1260,66 @@ components:
     PositiveInteger:
       type: integer
       minimum: 1
+    ResourceNotFoundException:
+      type: object
+      properties:
+        Message:
+          $ref: '#/components/schemas/NonEmptyString'
+      description: ''
     RoleArn:
       type: string
       pattern: ^arn:(?:aws|aws-cn|aws-us-gov):iam::(\d{12})?:role\/(.+)$
       minLength: 0
       maxLength: 1600
+    S3Destination:
+      type: object
+      properties:
+        BucketName:
+          allOf:
+          - $ref: '#/components/schemas/BucketName'
+          description: The name of an Amazon S3 bucket. For more information about
+            buckets, see [Creating, configuring, and working with Amazon S3 buckets](https://docs.aws.amazon.com/AmazonS3/latest/userguide/creating-buckets-s3.html)
+            in the _Amazon Simple Storage Service User Guide_.
+        ObjectKeyPrefix:
+          allOf:
+          - $ref: '#/components/schemas/ObjectKeyPrefix'
+          description: A string prefix for an Amazon S3 object key. It's usually a
+            folder name. For more information about folders in Amazon S3, see [Organizing
+            objects in the Amazon S3 console using folders](https://docs.aws.amazon.com/AmazonS3/latest/userguide/using-folders.html)
+            in the _Amazon Simple Storage Service User Guide_.
+      required:
+      - BucketName
+      description: An Amazon S3 bucket and optional folder (object key prefix) where
+        SimSpace Weaver creates a file.
+    S3Location:
+      type: object
+      properties:
+        BucketName:
+          allOf:
+          - $ref: '#/components/schemas/BucketName'
+          description: The name of an Amazon S3 bucket. For more information about
+            buckets, see [Creating, configuring, and working with Amazon S3 buckets](https://docs.aws.amazon.com/AmazonS3/latest/userguide/creating-buckets-s3.html)
+            in the _Amazon Simple Storage Service User Guide_.
+        ObjectKey:
+          allOf:
+          - $ref: '#/components/schemas/ObjectKey'
+          description: The key name of an object in Amazon S3. For more information
+            about Amazon S3 objects and object keys, see [Uploading, downloading,
+            and working with objects in Amazon S3](https://docs.aws.amazon.com/AmazonS3/latest/userguide/uploading-downloading-objects.html)
+            in the _Amazon Simple Storage Service User Guide_.
+      required:
+      - BucketName
+      - ObjectKey
+      description: A location in Amazon Simple Storage Service (Amazon S3) where SimSpace
+        Weaver stores simulation data, such as your app .zip files and schema file.
+        For more information about Amazon S3, see the [ _Amazon Simple Storage Service
+        User Guide_ ](https://docs.aws.amazon.com/AmazonS3/latest/userguide/Welcome.html).
+    ServiceQuotaExceededException:
+      type: object
+      properties:
+        Message:
+          $ref: '#/components/schemas/NonEmptyString'
+      description: ''
     SimSpaceWeaverArn:
       type: string
       pattern: ^arn:(?:aws|aws-cn|aws-us-gov):simspaceweaver:([a-z]{2}-[a-z]+-\d{1}):(\d{12})?:([a-z]+)\/(.+)$
@@ -146,10 +1335,70 @@ components:
       pattern: ^[a-zA-Z0-9_.-]+$
       minLength: 1
       maxLength: 64
+    SimulationAppEndpointInfo:
+      type: object
+      properties:
+        Address:
+          allOf:
+          - $ref: '#/components/schemas/NonEmptyString'
+          description: The IP address of the app. SimSpace Weaver dynamically assigns
+            this IP address when the app starts.
+        IngressPortMappings:
+          allOf:
+          - $ref: '#/components/schemas/AppPortMappings'
+          description: The inbound TCP/UDP port numbers of the app. The combination
+            of an IP address and a port number form a network endpoint.
+      description: 'Information about the network endpoint that you can use to connect
+        to your custom or service app. For more information about SimSpace Weaver
+        apps, see [Key concepts: Apps](https://docs.aws.amazon.com/simspaceweaver/latest/userguide/what-is_key-concepts.html#what-is_key-concepts_apps)
+        in the _SimSpace Weaver User Guide_..'
     SimulationAppList:
       type: array
       items:
         $ref: '#/components/schemas/SimulationAppMetadata'
+    SimulationAppMetadata:
+      type: object
+      properties:
+        Name:
+          allOf:
+          - $ref: '#/components/schemas/SimSpaceWeaverLongResourceName'
+          description: The name of the app.
+        Simulation:
+          allOf:
+          - $ref: '#/components/schemas/SimSpaceWeaverResourceName'
+          description: The name of the simulation of the app.
+        Domain:
+          allOf:
+          - $ref: '#/components/schemas/SimSpaceWeaverResourceName'
+          description: 'The domain of the app. For more information about domains,
+            see [Key concepts: Domains](https://docs.aws.amazon.com/simspaceweaver/latest/userguide/what-is_key-concepts.html#what-is_key-concepts_domains)
+            in the _SimSpace Weaver User Guide_.'
+        Status:
+          allOf:
+          - $ref: '#/components/schemas/SimulationAppStatus'
+          description: The current status of the app.
+        TargetStatus:
+          allOf:
+          - $ref: '#/components/schemas/SimulationAppTargetStatus'
+          description: The desired status of the app.
+      description: A collection of metadata about the app.
+    SimulationAppPortMapping:
+      type: object
+      properties:
+        Declared:
+          allOf:
+          - $ref: '#/components/schemas/PortNumber'
+          description: The TCP/UDP port number of the app, declared in the simulation
+            schema. SimSpace Weaver maps the `Declared` port to the `Actual` port.
+            The source code for the app should bind to the `Declared` port.
+        Actual:
+          allOf:
+          - $ref: '#/components/schemas/PortNumber'
+          description: The TCP/UDP port number of the running app. SimSpace Weaver
+            dynamically assigns this port number when the app starts. SimSpace Weaver
+            maps the `Declared` port to the `Actual` port. Clients connect to the
+            app using the app's IP address and the `Actual` port number.
+      description: A collection of TCP/UDP ports for a custom or service app.
     SimulationAppStatus:
       type: string
       enum:
@@ -165,6 +1414,18 @@ components:
       - UNKNOWN
       - STARTED
       - STOPPED
+    SimulationClock:
+      type: object
+      properties:
+        Status:
+          allOf:
+          - $ref: '#/components/schemas/ClockStatus'
+          description: The current status of the simulation clock.
+        TargetStatus:
+          allOf:
+          - $ref: '#/components/schemas/ClockTargetStatus'
+          description: The desired status of the simulation clock.
+      description: Status information about the simulation clock.
     SimulationClockList:
       type: array
       items:
@@ -173,6 +1434,34 @@ components:
       type: array
       items:
         $ref: '#/components/schemas/SimulationMetadata'
+    SimulationMetadata:
+      type: object
+      properties:
+        Name:
+          allOf:
+          - $ref: '#/components/schemas/SimSpaceWeaverResourceName'
+          description: The name of the simulation.
+        Arn:
+          allOf:
+          - $ref: '#/components/schemas/SimSpaceWeaverArn'
+          description: The Amazon Resource Name (ARN) of the simulation. For more
+            information about ARNs, see [Amazon Resource Names (ARNs)](https://docs.aws.amazon.com/general/latest/gr/aws-arns-and-namespaces.html)
+            in the _Amazon Web Services General Reference_.
+        CreationTime:
+          allOf:
+          - $ref: '#/components/schemas/Timestamp'
+          description: The time when the simulation was created, expressed as the
+            number of seconds and milliseconds in UTC since the Unix epoch (0:0:0.000,
+            January 1, 1970).
+        Status:
+          allOf:
+          - $ref: '#/components/schemas/SimulationStatus'
+          description: The current status of the simulation.
+        TargetStatus:
+          allOf:
+          - $ref: '#/components/schemas/SimulationTargetStatus'
+          description: The desired status of the simulation.
+      description: A collection of data about the simulation.
     SimulationStatus:
       type: string
       enum:
@@ -192,6 +1481,203 @@ components:
       - STARTED
       - STOPPED
       - DELETED
+    StartAppInput:
+      type: object
+      properties:
+        ClientToken:
+          allOf:
+          - $ref: '#/components/schemas/ClientToken'
+          description: A value that you provide to ensure that repeated calls to this
+            API operation using the same parameters complete only once. A `ClientToken`
+            is also known as an _idempotency token_. A `ClientToken` expires after
+            24 hours.
+        Simulation:
+          allOf:
+          - $ref: '#/components/schemas/SimSpaceWeaverResourceName'
+          description: The name of the simulation of the app.
+        Domain:
+          allOf:
+          - $ref: '#/components/schemas/SimSpaceWeaverResourceName'
+          description: The name of the domain of the app.
+        Name:
+          allOf:
+          - $ref: '#/components/schemas/SimSpaceWeaverResourceName'
+          description: The name of the app.
+        Description:
+          allOf:
+          - $ref: '#/components/schemas/Description'
+          description: The description of the app.
+        LaunchOverrides:
+          $ref: '#/components/schemas/LaunchOverrides'
+      required:
+      - Simulation
+      - Domain
+      - Name
+    StartAppOutput:
+      type: object
+      properties:
+        Name:
+          allOf:
+          - $ref: '#/components/schemas/SimSpaceWeaverResourceName'
+          description: The name of the app.
+        Domain:
+          allOf:
+          - $ref: '#/components/schemas/SimSpaceWeaverResourceName'
+          description: The name of the domain of the app.
+        Simulation:
+          allOf:
+          - $ref: '#/components/schemas/SimSpaceWeaverResourceName'
+          description: The name of the simulation of the app.
+    StartClockInput:
+      type: object
+      properties:
+        Simulation:
+          allOf:
+          - $ref: '#/components/schemas/SimSpaceWeaverResourceName'
+          description: The name of the simulation.
+      required:
+      - Simulation
+    StartClockOutput:
+      type: object
+      properties: {}
+    StartSimulationInput:
+      type: object
+      properties:
+        ClientToken:
+          allOf:
+          - $ref: '#/components/schemas/ClientToken'
+          description: A value that you provide to ensure that repeated calls to this
+            API operation using the same parameters complete only once. A `ClientToken`
+            is also known as an _idempotency token_. A `ClientToken` expires after
+            24 hours.
+        Name:
+          allOf:
+          - $ref: '#/components/schemas/SimSpaceWeaverResourceName'
+          description: The name of the simulation.
+        Description:
+          allOf:
+          - $ref: '#/components/schemas/Description'
+          description: The description of the simulation.
+        RoleArn:
+          allOf:
+          - $ref: '#/components/schemas/RoleArn'
+          description: The Amazon Resource Name (ARN) of the Identity and Access Management
+            (IAM) role that the simulation assumes to perform actions. For more information
+            about ARNs, see [Amazon Resource Names (ARNs)](https://docs.aws.amazon.com/general/latest/gr/aws-arns-and-namespaces.html)
+            in the _Amazon Web Services General Reference_. For more information about
+            IAM roles, see [IAM roles](https://docs.aws.amazon.com/IAM/latest/UserGuide/id_roles.html)
+            in the _Identity and Access Management User Guide_.
+        SchemaS3Location:
+          allOf:
+          - $ref: '#/components/schemas/S3Location'
+          description: 'The location of the simulation schema in Amazon Simple Storage
+            Service (Amazon S3). For more information about Amazon S3, see the [ _Amazon
+            Simple Storage Service User Guide_ ](https://docs.aws.amazon.com/AmazonS3/latest/userguide/Welcome.html).
+
+
+            Provide a `SchemaS3Location` to start your simulation from a schema.
+
+
+            If you provide a `SchemaS3Location` then you can''t provide a `SnapshotS3Location`.'
+        MaximumDuration:
+          allOf:
+          - $ref: '#/components/schemas/TimeToLiveString'
+          description: The maximum running time of the simulation, specified as a
+            number of minutes (m or M), hours (h or H), or days (d or D). The simulation
+            stops when it reaches this limit. The maximum value is `14D`, or its equivalent
+            in the other units. The default value is `14D`. A value equivalent to
+            `0` makes the simulation immediately transition to `Stopping` as soon
+            as it reaches `Started`.
+        Tags:
+          allOf:
+          - $ref: '#/components/schemas/TagMap'
+          description: A list of tags for the simulation. For more information about
+            tags, see [Tagging Amazon Web Services resources](https://docs.aws.amazon.com/general/latest/gr/aws_tagging.html)
+            in the _Amazon Web Services General Reference_.
+        SnapshotS3Location:
+          allOf:
+          - $ref: '#/components/schemas/S3Location'
+          description: 'The location of the snapshot .zip file in Amazon Simple Storage
+            Service (Amazon S3). For more information about Amazon S3, see the [ _Amazon
+            Simple Storage Service User Guide_ ](https://docs.aws.amazon.com/AmazonS3/latest/userguide/Welcome.html).
+
+
+            Provide a `SnapshotS3Location` to start your simulation from a snapshot.
+
+
+            The Amazon S3 bucket must be in the same Amazon Web Services Region as
+            the simulation.
+
+
+            If you provide a `SnapshotS3Location` then you can''t provide a `SchemaS3Location`.'
+      required:
+      - Name
+      - RoleArn
+    StartSimulationOutput:
+      type: object
+      properties:
+        Arn:
+          allOf:
+          - $ref: '#/components/schemas/SimSpaceWeaverArn'
+          description: The Amazon Resource Name (ARN) of the simulation. For more
+            information about ARNs, see [Amazon Resource Names (ARNs)](https://docs.aws.amazon.com/general/latest/gr/aws-arns-and-namespaces.html)
+            in the _Amazon Web Services General Reference_.
+        ExecutionId:
+          allOf:
+          - $ref: '#/components/schemas/UUID'
+          description: A universally unique identifier (UUID) for this simulation.
+        CreationTime:
+          allOf:
+          - $ref: '#/components/schemas/Timestamp'
+          description: The time when the simulation was created, expressed as the
+            number of seconds and milliseconds in UTC since the Unix epoch (0:0:0.000,
+            January 1, 1970).
+    StopAppInput:
+      type: object
+      properties:
+        Simulation:
+          allOf:
+          - $ref: '#/components/schemas/SimSpaceWeaverResourceName'
+          description: The name of the simulation of the app.
+        Domain:
+          allOf:
+          - $ref: '#/components/schemas/SimSpaceWeaverResourceName'
+          description: The name of the domain of the app.
+        App:
+          allOf:
+          - $ref: '#/components/schemas/SimSpaceWeaverResourceName'
+          description: The name of the app.
+      required:
+      - Simulation
+      - Domain
+      - App
+    StopAppOutput:
+      type: object
+      properties: {}
+    StopClockInput:
+      type: object
+      properties:
+        Simulation:
+          allOf:
+          - $ref: '#/components/schemas/SimSpaceWeaverResourceName'
+          description: The name of the simulation.
+      required:
+      - Simulation
+    StopClockOutput:
+      type: object
+      properties: {}
+    StopSimulationInput:
+      type: object
+      properties:
+        Simulation:
+          allOf:
+          - $ref: '#/components/schemas/SimSpaceWeaverResourceName'
+          description: The name of the simulation.
+      required:
+      - Simulation
+    StopSimulationOutput:
+      type: object
+      properties: {}
     TagKey:
       type: string
       minLength: 1
@@ -204,6 +1690,26 @@ components:
       type: object
       additionalProperties:
         $ref: '#/components/schemas/TagValue'
+    TagResourceInput:
+      type: object
+      properties:
+        ResourceArn:
+          allOf:
+          - $ref: '#/components/schemas/SimSpaceWeaverArn'
+          description: The Amazon Resource Name (ARN) of the resource that you want
+            to add tags to. For more information about ARNs, see [Amazon Resource
+            Names (ARNs)](https://docs.aws.amazon.com/general/latest/gr/aws-arns-and-namespaces.html)
+            in the _Amazon Web Services General Reference_.
+        Tags:
+          allOf:
+          - $ref: '#/components/schemas/TagMap'
+          description: A list of tags to apply to the resource.
+      required:
+      - ResourceArn
+      - Tags
+    TagResourceOutput:
+      type: object
+      properties: {}
     TagValue:
       type: string
       minLength: 0
@@ -216,7 +1722,39 @@ components:
     Timestamp:
       type: string
       format: date-time
+    TooManyTagsException:
+      type: object
+      properties:
+        Message:
+          $ref: '#/components/schemas/NonEmptyString'
+      description: ''
     UUID:
       type: string
       pattern: ^[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$
       minLength: 36
+    UntagResourceInput:
+      type: object
+      properties:
+        ResourceArn:
+          allOf:
+          - $ref: '#/components/schemas/SimSpaceWeaverArn'
+          description: The Amazon Resource Name (ARN) of the resource that you want
+            to remove tags from. For more information about ARNs, see [Amazon Resource
+            Names (ARNs)](https://docs.aws.amazon.com/general/latest/gr/aws-arns-and-namespaces.html)
+            in the _Amazon Web Services General Reference_.
+        TagKeys:
+          allOf:
+          - $ref: '#/components/schemas/TagKeyList'
+          description: A list of tag keys to remove from the resource.
+      required:
+      - ResourceArn
+      - TagKeys
+    UntagResourceOutput:
+      type: object
+      properties: {}
+    ValidationException:
+      type: object
+      properties:
+        Message:
+          $ref: '#/components/schemas/NonEmptyString'
+      description: ''

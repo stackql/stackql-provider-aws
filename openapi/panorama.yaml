@@ -7,7 +7,7 @@ info:
   x-stackql-serviceName: panorama
   x-aws-serviceName: panorama
   x-aws-protocol: aws.protocols#restJson1
-  x-dateGenerated: '2025-05-05'
+  x-dateGenerated: '2025-05-07'
   version: '2019-07-24'
   title: AWS Panorama
   description: |-
@@ -47,13 +47,1784 @@ servers:
       - sa-east-1
       - me-south-1
       default: us-east-1
-paths: {}
+paths:
+  /application-instances:
+    post:
+      operationId: CreateApplicationInstance
+      description: |-
+        Creates an application instance and deploys it to a device.
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                Name:
+                  $ref: '#/components/schemas/ApplicationInstanceName'
+                Description:
+                  $ref: '#/components/schemas/Description'
+                ManifestPayload:
+                  $ref: '#/components/schemas/ManifestPayload'
+                ManifestOverridesPayload:
+                  $ref: '#/components/schemas/ManifestOverridesPayload'
+                ApplicationInstanceIdToReplace:
+                  $ref: '#/components/schemas/ApplicationInstanceId'
+                RuntimeRoleArn:
+                  $ref: '#/components/schemas/RuntimeRoleArn'
+                DefaultRuntimeContextDevice:
+                  $ref: '#/components/schemas/DefaultRuntimeContextDevice'
+                Tags:
+                  $ref: '#/components/schemas/TagMap'
+      responses:
+        '200': {}
+        '403':
+          description: |-
+            The requestor does not have permission to access the target action or resource.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '500':
+          description: |-
+            An internal error occurred.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerException'
+        '402':
+          description: |-
+            The request would cause a limit to be exceeded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServiceQuotaExceededException'
+        '400':
+          description: |-
+            The request contains an invalid parameter value.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+    get:
+      operationId: ListApplicationInstances
+      description: |-
+        Returns a list of application instances.
+      parameters:
+      - name: deviceId
+        in: query
+        required: false
+        schema:
+          $ref: '#/components/schemas/DeviceId'
+      - name: statusFilter
+        in: query
+        required: false
+        schema:
+          $ref: '#/components/schemas/StatusFilter'
+      - name: maxResults
+        in: query
+        required: false
+        schema:
+          $ref: '#/components/schemas/MaxSize25'
+      - name: nextToken
+        in: query
+        required: false
+        schema:
+          $ref: '#/components/schemas/NextToken'
+      responses:
+        '200': {}
+        '403':
+          description: |-
+            The requestor does not have permission to access the target action or resource.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '500':
+          description: |-
+            An internal error occurred.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerException'
+  /jobs:
+    post:
+      operationId: CreateJobForDevices
+      description: |-
+        Creates a job to run on a device. A job can update a device's software or reboot it.
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                DeviceIds:
+                  $ref: '#/components/schemas/DeviceIdList'
+                DeviceJobConfig:
+                  $ref: '#/components/schemas/DeviceJobConfig'
+                JobType:
+                  $ref: '#/components/schemas/JobType'
+      responses:
+        '200': {}
+        '403':
+          description: |-
+            The requestor does not have permission to access the target action or resource.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '409':
+          description: |-
+            The target resource is in use.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConflictException'
+        '500':
+          description: |-
+            An internal error occurred.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerException'
+        '404':
+          description: |-
+            The target resource was not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+        '400':
+          description: |-
+            The request contains an invalid parameter value.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+    get:
+      operationId: ListDevicesJobs
+      description: |-
+        Returns a list of jobs.
+      parameters:
+      - name: DeviceId
+        in: query
+        required: false
+        schema:
+          $ref: '#/components/schemas/DeviceId'
+      - name: NextToken
+        in: query
+        required: false
+        schema:
+          $ref: '#/components/schemas/NextToken'
+      - name: MaxResults
+        in: query
+        required: false
+        schema:
+          $ref: '#/components/schemas/MaxSize25'
+      responses:
+        '200': {}
+        '403':
+          description: |-
+            The requestor does not have permission to access the target action or resource.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '409':
+          description: |-
+            The target resource is in use.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConflictException'
+        '500':
+          description: |-
+            An internal error occurred.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerException'
+        '404':
+          description: |-
+            The target resource was not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+        '400':
+          description: |-
+            The request contains an invalid parameter value.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+  /packages/template-job:
+    post:
+      operationId: CreateNodeFromTemplateJob
+      description: |-
+        Creates a camera stream node.
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                TemplateType:
+                  $ref: '#/components/schemas/TemplateType'
+                OutputPackageName:
+                  $ref: '#/components/schemas/NodePackageName'
+                OutputPackageVersion:
+                  $ref: '#/components/schemas/NodePackageVersion'
+                NodeName:
+                  $ref: '#/components/schemas/NodeName'
+                NodeDescription:
+                  $ref: '#/components/schemas/Description'
+                TemplateParameters:
+                  $ref: '#/components/schemas/TemplateParametersMap'
+                JobTags:
+                  $ref: '#/components/schemas/JobTagsList'
+      responses:
+        '200': {}
+        '403':
+          description: |-
+            The requestor does not have permission to access the target action or resource.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '409':
+          description: |-
+            The target resource is in use.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConflictException'
+        '500':
+          description: |-
+            An internal error occurred.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerException'
+        '400':
+          description: |-
+            The request contains an invalid parameter value.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+    get:
+      operationId: ListNodeFromTemplateJobs
+      description: |-
+        Returns a list of camera stream node jobs.
+      parameters:
+      - name: NextToken
+        in: query
+        required: false
+        schema:
+          $ref: '#/components/schemas/NextToken'
+      - name: MaxResults
+        in: query
+        required: false
+        schema:
+          $ref: '#/components/schemas/MaxSize25'
+      responses:
+        '200': {}
+        '403':
+          description: |-
+            The requestor does not have permission to access the target action or resource.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '409':
+          description: |-
+            The target resource is in use.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConflictException'
+        '500':
+          description: |-
+            An internal error occurred.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerException'
+        '400':
+          description: |-
+            The request contains an invalid parameter value.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+  /packages:
+    post:
+      operationId: CreatePackage
+      description: |-
+        Creates a package and storage location in an Amazon S3 access point.
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                PackageName:
+                  $ref: '#/components/schemas/NodePackageName'
+                Tags:
+                  $ref: '#/components/schemas/TagMap'
+      responses:
+        '200': {}
+        '403':
+          description: |-
+            The requestor does not have permission to access the target action or resource.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '409':
+          description: |-
+            The target resource is in use.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConflictException'
+        '500':
+          description: |-
+            An internal error occurred.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerException'
+        '400':
+          description: |-
+            The request contains an invalid parameter value.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+    get:
+      operationId: ListPackages
+      description: |-
+        Returns a list of packages.
+      parameters:
+      - name: maxResults
+        in: query
+        required: false
+        schema:
+          $ref: '#/components/schemas/MaxSize25'
+      - name: nextToken
+        in: query
+        required: false
+        schema:
+          $ref: '#/components/schemas/Token'
+      responses:
+        '200': {}
+        '403':
+          description: |-
+            The requestor does not have permission to access the target action or resource.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '409':
+          description: |-
+            The target resource is in use.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConflictException'
+        '500':
+          description: |-
+            An internal error occurred.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerException'
+        '404':
+          description: |-
+            The target resource was not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+        '400':
+          description: |-
+            The request contains an invalid parameter value.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+  /packages/import-jobs:
+    post:
+      operationId: CreatePackageImportJob
+      description: |-
+        Imports a node package.
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                JobType:
+                  $ref: '#/components/schemas/PackageImportJobType'
+                InputConfig:
+                  $ref: '#/components/schemas/PackageImportJobInputConfig'
+                OutputConfig:
+                  $ref: '#/components/schemas/PackageImportJobOutputConfig'
+                ClientToken:
+                  $ref: '#/components/schemas/ClientToken'
+                JobTags:
+                  $ref: '#/components/schemas/JobTagsList'
+      responses:
+        '200': {}
+        '403':
+          description: |-
+            The requestor does not have permission to access the target action or resource.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '409':
+          description: |-
+            The target resource is in use.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConflictException'
+        '500':
+          description: |-
+            An internal error occurred.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerException'
+        '400':
+          description: |-
+            The request contains an invalid parameter value.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+    get:
+      operationId: ListPackageImportJobs
+      description: |-
+        Returns a list of package import jobs.
+      parameters:
+      - name: NextToken
+        in: query
+        required: false
+        schema:
+          $ref: '#/components/schemas/NextToken'
+      - name: MaxResults
+        in: query
+        required: false
+        schema:
+          $ref: '#/components/schemas/MaxSize25'
+      responses:
+        '200': {}
+        '403':
+          description: |-
+            The requestor does not have permission to access the target action or resource.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '409':
+          description: |-
+            The target resource is in use.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConflictException'
+        '500':
+          description: |-
+            An internal error occurred.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerException'
+        '400':
+          description: |-
+            The request contains an invalid parameter value.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+  /devices/{DeviceId}:
+    delete:
+      operationId: DeleteDevice
+      description: |-
+        Deletes a device.
+      parameters:
+      - name: DeviceId
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/DeviceId'
+      responses:
+        '200': {}
+        '403':
+          description: |-
+            The requestor does not have permission to access the target action or resource.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '409':
+          description: |-
+            The target resource is in use.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConflictException'
+        '500':
+          description: |-
+            An internal error occurred.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerException'
+        '404':
+          description: |-
+            The target resource was not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+        '400':
+          description: |-
+            The request contains an invalid parameter value.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+    get:
+      operationId: DescribeDevice
+      description: |-
+        Returns information about a device.
+      parameters:
+      - name: DeviceId
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/DeviceId'
+      responses:
+        '200': {}
+        '403':
+          description: |-
+            The requestor does not have permission to access the target action or resource.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '500':
+          description: |-
+            An internal error occurred.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerException'
+        '404':
+          description: |-
+            The target resource was not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+        '400':
+          description: |-
+            The request contains an invalid parameter value.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+    put:
+      operationId: UpdateDeviceMetadata
+      description: |-
+        Updates a device's metadata.
+      parameters:
+      - name: DeviceId
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/DeviceId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                Description:
+                  $ref: '#/components/schemas/Description'
+      responses:
+        '200': {}
+        '403':
+          description: |-
+            The requestor does not have permission to access the target action or resource.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '409':
+          description: |-
+            The target resource is in use.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConflictException'
+        '500':
+          description: |-
+            An internal error occurred.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerException'
+        '404':
+          description: |-
+            The target resource was not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+        '400':
+          description: |-
+            The request contains an invalid parameter value.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+  /packages/{PackageId}:
+    delete:
+      operationId: DeletePackage
+      description: |-
+        Deletes a package.
+
+        To delete a package, you need permission to call `s3:DeleteObject` in addition to permissions for the AWS Panorama API.
+      parameters:
+      - name: PackageId
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/NodePackageId'
+      - name: ForceDelete
+        in: query
+        required: false
+        schema:
+          $ref: '#/components/schemas/Boolean'
+      responses:
+        '200': {}
+        '403':
+          description: |-
+            The requestor does not have permission to access the target action or resource.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '409':
+          description: |-
+            The target resource is in use.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConflictException'
+        '500':
+          description: |-
+            An internal error occurred.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerException'
+        '404':
+          description: |-
+            The target resource was not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+        '400':
+          description: |-
+            The request contains an invalid parameter value.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+  /packages/{PackageId}/versions/{PackageVersion}/patch/{PatchVersion}:
+    delete:
+      operationId: DeregisterPackageVersion
+      description: |-
+        Deregisters a package version.
+      parameters:
+      - name: OwnerAccount
+        in: query
+        required: false
+        schema:
+          $ref: '#/components/schemas/PackageOwnerAccount'
+      - name: PackageId
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/NodePackageId'
+      - name: PackageVersion
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/NodePackageVersion'
+      - name: PatchVersion
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/NodePackagePatchVersion'
+      - name: UpdatedLatestPatchVersion
+        in: query
+        required: false
+        schema:
+          $ref: '#/components/schemas/NodePackagePatchVersion'
+      responses:
+        '200': {}
+        '403':
+          description: |-
+            The requestor does not have permission to access the target action or resource.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '409':
+          description: |-
+            The target resource is in use.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConflictException'
+        '500':
+          description: |-
+            An internal error occurred.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerException'
+        '404':
+          description: |-
+            The target resource was not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+        '400':
+          description: |-
+            The request contains an invalid parameter value.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+    put:
+      operationId: RegisterPackageVersion
+      description: |-
+        Registers a package version.
+      parameters:
+      - name: PackageId
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/NodePackageId'
+      - name: PackageVersion
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/NodePackageVersion'
+      - name: PatchVersion
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/NodePackagePatchVersion'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                OwnerAccount:
+                  $ref: '#/components/schemas/PackageOwnerAccount'
+                MarkLatest:
+                  $ref: '#/components/schemas/MarkLatestPatch'
+      responses:
+        '200': {}
+        '403':
+          description: |-
+            The requestor does not have permission to access the target action or resource.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '409':
+          description: |-
+            The target resource is in use.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConflictException'
+        '500':
+          description: |-
+            An internal error occurred.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerException'
+        '400':
+          description: |-
+            The request contains an invalid parameter value.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+  /application-instances/{ApplicationInstanceId}:
+    get:
+      operationId: DescribeApplicationInstance
+      description: |-
+        Returns information about an application instance on a device.
+      parameters:
+      - name: ApplicationInstanceId
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/ApplicationInstanceId'
+      responses:
+        '200': {}
+        '403':
+          description: |-
+            The requestor does not have permission to access the target action or resource.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '409':
+          description: |-
+            The target resource is in use.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConflictException'
+        '500':
+          description: |-
+            An internal error occurred.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerException'
+        '404':
+          description: |-
+            The target resource was not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+        '400':
+          description: |-
+            The request contains an invalid parameter value.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+    delete:
+      operationId: RemoveApplicationInstance
+      description: |-
+        Removes an application instance.
+      parameters:
+      - name: ApplicationInstanceId
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/ApplicationInstanceId'
+      responses:
+        '200': {}
+        '403':
+          description: |-
+            The requestor does not have permission to access the target action or resource.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '409':
+          description: |-
+            The target resource is in use.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConflictException'
+        '500':
+          description: |-
+            An internal error occurred.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerException'
+        '404':
+          description: |-
+            The target resource was not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+        '400':
+          description: |-
+            The request contains an invalid parameter value.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+  /application-instances/{ApplicationInstanceId}/details:
+    get:
+      operationId: DescribeApplicationInstanceDetails
+      description: |-
+        Returns information about an application instance's configuration manifest.
+      parameters:
+      - name: ApplicationInstanceId
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/ApplicationInstanceId'
+      responses:
+        '200': {}
+        '403':
+          description: |-
+            The requestor does not have permission to access the target action or resource.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '409':
+          description: |-
+            The target resource is in use.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConflictException'
+        '500':
+          description: |-
+            An internal error occurred.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerException'
+        '404':
+          description: |-
+            The target resource was not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+        '400':
+          description: |-
+            The request contains an invalid parameter value.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+  /jobs/{JobId}:
+    get:
+      operationId: DescribeDeviceJob
+      description: |-
+        Returns information about a device job.
+      parameters:
+      - name: JobId
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/JobId'
+      responses:
+        '200': {}
+        '403':
+          description: |-
+            The requestor does not have permission to access the target action or resource.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '409':
+          description: |-
+            The target resource is in use.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConflictException'
+        '500':
+          description: |-
+            An internal error occurred.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerException'
+        '404':
+          description: |-
+            The target resource was not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+        '400':
+          description: |-
+            The request contains an invalid parameter value.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+  /nodes/{NodeId}:
+    get:
+      operationId: DescribeNode
+      description: |-
+        Returns information about a node.
+      parameters:
+      - name: NodeId
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/NodeId'
+      - name: OwnerAccount
+        in: query
+        required: false
+        schema:
+          $ref: '#/components/schemas/PackageOwnerAccount'
+      responses:
+        '200': {}
+        '403':
+          description: |-
+            The requestor does not have permission to access the target action or resource.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '409':
+          description: |-
+            The target resource is in use.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConflictException'
+        '500':
+          description: |-
+            An internal error occurred.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerException'
+        '404':
+          description: |-
+            The target resource was not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+        '400':
+          description: |-
+            The request contains an invalid parameter value.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+  /packages/template-job/{JobId}:
+    get:
+      operationId: DescribeNodeFromTemplateJob
+      description: |-
+        Returns information about a job to create a camera stream node.
+      parameters:
+      - name: JobId
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/JobId'
+      responses:
+        '200': {}
+        '403':
+          description: |-
+            The requestor does not have permission to access the target action or resource.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '409':
+          description: |-
+            The target resource is in use.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConflictException'
+        '500':
+          description: |-
+            An internal error occurred.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerException'
+        '400':
+          description: |-
+            The request contains an invalid parameter value.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+  /packages/metadata/{PackageId}:
+    get:
+      operationId: DescribePackage
+      description: |-
+        Returns information about a package.
+      parameters:
+      - name: PackageId
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/NodePackageId'
+      responses:
+        '200': {}
+        '403':
+          description: |-
+            The requestor does not have permission to access the target action or resource.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '409':
+          description: |-
+            The target resource is in use.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConflictException'
+        '500':
+          description: |-
+            An internal error occurred.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerException'
+        '404':
+          description: |-
+            The target resource was not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+        '400':
+          description: |-
+            The request contains an invalid parameter value.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+  /packages/import-jobs/{JobId}:
+    get:
+      operationId: DescribePackageImportJob
+      description: |-
+        Returns information about a package import job.
+      parameters:
+      - name: JobId
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/JobId'
+      responses:
+        '200': {}
+        '403':
+          description: |-
+            The requestor does not have permission to access the target action or resource.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '409':
+          description: |-
+            The target resource is in use.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConflictException'
+        '500':
+          description: |-
+            An internal error occurred.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerException'
+        '400':
+          description: |-
+            The request contains an invalid parameter value.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+  /packages/metadata/{PackageId}/versions/{PackageVersion}:
+    get:
+      operationId: DescribePackageVersion
+      description: |-
+        Returns information about a package version.
+      parameters:
+      - name: OwnerAccount
+        in: query
+        required: false
+        schema:
+          $ref: '#/components/schemas/PackageOwnerAccount'
+      - name: PackageId
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/NodePackageId'
+      - name: PackageVersion
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/NodePackageVersion'
+      - name: PatchVersion
+        in: query
+        required: false
+        schema:
+          $ref: '#/components/schemas/NodePackagePatchVersion'
+      responses:
+        '200': {}
+        '403':
+          description: |-
+            The requestor does not have permission to access the target action or resource.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '409':
+          description: |-
+            The target resource is in use.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConflictException'
+        '500':
+          description: |-
+            An internal error occurred.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerException'
+        '404':
+          description: |-
+            The target resource was not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+        '400':
+          description: |-
+            The request contains an invalid parameter value.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+  /application-instances/{ApplicationInstanceId}/package-dependencies:
+    get:
+      operationId: ListApplicationInstanceDependencies
+      description: |-
+        Returns a list of application instance dependencies.
+      parameters:
+      - name: ApplicationInstanceId
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/ApplicationInstanceId'
+      - name: maxResults
+        in: query
+        required: false
+        schema:
+          $ref: '#/components/schemas/MaxSize25'
+      - name: nextToken
+        in: query
+        required: false
+        schema:
+          $ref: '#/components/schemas/NextToken'
+      responses:
+        '200': {}
+        '403':
+          description: |-
+            The requestor does not have permission to access the target action or resource.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '500':
+          description: |-
+            An internal error occurred.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerException'
+  /application-instances/{ApplicationInstanceId}/node-instances:
+    get:
+      operationId: ListApplicationInstanceNodeInstances
+      description: |-
+        Returns a list of application node instances.
+      parameters:
+      - name: ApplicationInstanceId
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/ApplicationInstanceId'
+      - name: maxResults
+        in: query
+        required: false
+        schema:
+          $ref: '#/components/schemas/MaxSize25'
+      - name: nextToken
+        in: query
+        required: false
+        schema:
+          $ref: '#/components/schemas/NextToken'
+      responses:
+        '200': {}
+        '403':
+          description: |-
+            The requestor does not have permission to access the target action or resource.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '500':
+          description: |-
+            An internal error occurred.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerException'
+  /devices:
+    get:
+      operationId: ListDevices
+      description: |-
+        Returns a list of devices.
+      parameters:
+      - name: NextToken
+        in: query
+        required: false
+        schema:
+          $ref: '#/components/schemas/NextToken'
+      - name: MaxResults
+        in: query
+        required: false
+        schema:
+          $ref: '#/components/schemas/MaxSize25'
+      - name: SortBy
+        in: query
+        required: false
+        schema:
+          $ref: '#/components/schemas/ListDevicesSortBy'
+      - name: SortOrder
+        in: query
+        required: false
+        schema:
+          $ref: '#/components/schemas/SortOrder'
+      - name: NameFilter
+        in: query
+        required: false
+        schema:
+          $ref: '#/components/schemas/NameFilter'
+      - name: DeviceAggregatedStatusFilter
+        in: query
+        required: false
+        schema:
+          $ref: '#/components/schemas/DeviceAggregatedStatus'
+      responses:
+        '200': {}
+        '403':
+          description: |-
+            The requestor does not have permission to access the target action or resource.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '409':
+          description: |-
+            The target resource is in use.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConflictException'
+        '500':
+          description: |-
+            An internal error occurred.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerException'
+        '400':
+          description: |-
+            The request contains an invalid parameter value.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+    post:
+      operationId: ProvisionDevice
+      description: |-
+        Creates a device and returns a configuration archive. The configuration archive is a ZIP file that contains a provisioning certificate that is valid for 5 minutes. Name the configuration archive `certificates-omni__device-name_.zip` and transfer it to the device within 5 minutes. Use the included USB storage device and connect it to the USB 3.0 port next to the HDMI output.
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                Name:
+                  $ref: '#/components/schemas/DeviceName'
+                Description:
+                  $ref: '#/components/schemas/Description'
+                Tags:
+                  $ref: '#/components/schemas/TagMap'
+                NetworkingConfiguration:
+                  $ref: '#/components/schemas/NetworkPayload'
+      responses:
+        '200': {}
+        '403':
+          description: |-
+            The requestor does not have permission to access the target action or resource.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '409':
+          description: |-
+            The target resource is in use.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConflictException'
+        '500':
+          description: |-
+            An internal error occurred.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerException'
+        '402':
+          description: |-
+            The request would cause a limit to be exceeded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServiceQuotaExceededException'
+        '400':
+          description: |-
+            The request contains an invalid parameter value.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+  /nodes:
+    get:
+      operationId: ListNodes
+      description: |-
+        Returns a list of nodes.
+      parameters:
+      - name: category
+        in: query
+        required: false
+        schema:
+          $ref: '#/components/schemas/NodeCategory'
+      - name: ownerAccount
+        in: query
+        required: false
+        schema:
+          $ref: '#/components/schemas/PackageOwnerAccount'
+      - name: packageName
+        in: query
+        required: false
+        schema:
+          $ref: '#/components/schemas/NodePackageName'
+      - name: packageVersion
+        in: query
+        required: false
+        schema:
+          $ref: '#/components/schemas/NodePackageVersion'
+      - name: patchVersion
+        in: query
+        required: false
+        schema:
+          $ref: '#/components/schemas/NodePackagePatchVersion'
+      - name: nextToken
+        in: query
+        required: false
+        schema:
+          $ref: '#/components/schemas/Token'
+      - name: maxResults
+        in: query
+        required: false
+        schema:
+          $ref: '#/components/schemas/MaxSize25'
+      responses:
+        '200': {}
+        '409':
+          description: |-
+            The target resource is in use.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConflictException'
+        '500':
+          description: |-
+            An internal error occurred.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerException'
+        '400':
+          description: |-
+            The request contains an invalid parameter value.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+  /tags/{ResourceArn}:
+    get:
+      operationId: ListTagsForResource
+      description: |-
+        Returns a list of tags for a resource.
+      parameters:
+      - name: ResourceArn
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/ResourceArn'
+      responses:
+        '200': {}
+        '500':
+          description: |-
+            An internal error occurred.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerException'
+        '404':
+          description: |-
+            The target resource was not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+        '400':
+          description: |-
+            The request contains an invalid parameter value.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+    post:
+      operationId: TagResource
+      description: |-
+        Tags a resource.
+      parameters:
+      - name: ResourceArn
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/ResourceArn'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                Tags:
+                  $ref: '#/components/schemas/TagMap'
+      responses:
+        '200': {}
+        '500':
+          description: |-
+            An internal error occurred.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerException'
+        '404':
+          description: |-
+            The target resource was not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+        '400':
+          description: |-
+            The request contains an invalid parameter value.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+    delete:
+      operationId: UntagResource
+      description: |-
+        Removes tags from a resource.
+      parameters:
+      - name: ResourceArn
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/ResourceArn'
+      - name: tagKeys
+        in: query
+        required: true
+        schema:
+          $ref: '#/components/schemas/TagKeyList'
+      responses:
+        '200': {}
+        '500':
+          description: |-
+            An internal error occurred.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerException'
+        '404':
+          description: |-
+            The target resource was not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+        '400':
+          description: |-
+            The request contains an invalid parameter value.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+  /application-instances/{ApplicationInstanceId}/node-signals:
+    put:
+      operationId: SignalApplicationInstanceNodeInstances
+      description: |-
+        Signal camera nodes to stop or resume.
+      parameters:
+      - name: ApplicationInstanceId
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/ApplicationInstanceId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                NodeSignals:
+                  $ref: '#/components/schemas/NodeSignalList'
+      responses:
+        '200': {}
+        '403':
+          description: |-
+            The requestor does not have permission to access the target action or resource.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '500':
+          description: |-
+            An internal error occurred.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerException'
+        '402':
+          description: |-
+            The request would cause a limit to be exceeded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServiceQuotaExceededException'
+        '400':
+          description: |-
+            The request contains an invalid parameter value.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
 components:
   schemas:
+    AccessDeniedException:
+      type: object
+      properties:
+        Message:
+          $ref: '#/components/schemas/String'
+      required:
+      - Message
+      description: The requestor does not have permission to access the target action
+        or resource.
+    AlternateSoftwareMetadata:
+      type: object
+      properties:
+        Version:
+          allOf:
+          - $ref: '#/components/schemas/Version'
+          description: The appliance software version.
+      description: Details about a beta appliance software update.
     AlternateSoftwares:
       type: array
       items:
         $ref: '#/components/schemas/AlternateSoftwareMetadata'
+    ApplicationInstance:
+      type: object
+      properties:
+        Name:
+          allOf:
+          - $ref: '#/components/schemas/ApplicationInstanceName'
+          description: The application instance's name.
+        ApplicationInstanceId:
+          allOf:
+          - $ref: '#/components/schemas/ApplicationInstanceId'
+          description: The application instance's ID.
+        DefaultRuntimeContextDevice:
+          allOf:
+          - $ref: '#/components/schemas/DefaultRuntimeContextDevice'
+          description: The device's ID.
+        DefaultRuntimeContextDeviceName:
+          allOf:
+          - $ref: '#/components/schemas/DeviceName'
+          description: The device's name.
+        Description:
+          allOf:
+          - $ref: '#/components/schemas/Description'
+          description: The application instance's description.
+        Status:
+          allOf:
+          - $ref: '#/components/schemas/ApplicationInstanceStatus'
+          description: The application instance's status.
+        HealthStatus:
+          allOf:
+          - $ref: '#/components/schemas/ApplicationInstanceHealthStatus'
+          description: The application instance's health status.
+        StatusDescription:
+          allOf:
+          - $ref: '#/components/schemas/ApplicationInstanceStatusDescription'
+          description: The application instance's status description.
+        CreatedTime:
+          allOf:
+          - $ref: '#/components/schemas/TimeStamp'
+          description: When the application instance was created.
+        Arn:
+          allOf:
+          - $ref: '#/components/schemas/ApplicationInstanceArn'
+          description: The application instance's ARN.
+        Tags:
+          allOf:
+          - $ref: '#/components/schemas/TagMap'
+          description: The application instance's tags.
+        RuntimeContextStates:
+          allOf:
+          - $ref: '#/components/schemas/ReportedRuntimeContextStates'
+          description: The application's state.
+      description: An application instance on a device.
     ApplicationInstanceArn:
       type: string
       minLength: 1
@@ -114,6 +1885,47 @@ components:
       pattern: ^[a-zA-Z0-9\-\_]+$
       minLength: 1
       maxLength: 64
+    ConflictException:
+      type: object
+      properties:
+        Message:
+          $ref: '#/components/schemas/String'
+        ResourceId:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The resource's ID.
+        ResourceType:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The resource's type.
+        ErrorId:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: A unique ID for the error.
+        ErrorArguments:
+          allOf:
+          - $ref: '#/components/schemas/ConflictExceptionErrorArgumentList'
+          description: A list of attributes that led to the exception and their values.
+      required:
+      - Message
+      - ResourceId
+      - ResourceType
+      description: The target resource is in use.
+    ConflictExceptionErrorArgument:
+      type: object
+      properties:
+        Name:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The error argument's name.
+        Value:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The error argument's value.
+      required:
+      - Name
+      - Value
+      description: A conflict exception error argument.
     ConflictExceptionErrorArgumentList:
       type: array
       items:
@@ -123,6 +1935,193 @@ components:
       enum:
       - STATIC_IP
       - DHCP
+    CreateApplicationInstanceRequest:
+      type: object
+      properties:
+        Name:
+          allOf:
+          - $ref: '#/components/schemas/ApplicationInstanceName'
+          description: A name for the application instance.
+        Description:
+          allOf:
+          - $ref: '#/components/schemas/Description'
+          description: A description for the application instance.
+        ManifestPayload:
+          allOf:
+          - $ref: '#/components/schemas/ManifestPayload'
+          description: The application's manifest document.
+        ManifestOverridesPayload:
+          allOf:
+          - $ref: '#/components/schemas/ManifestOverridesPayload'
+          description: Setting overrides for the application manifest.
+        ApplicationInstanceIdToReplace:
+          allOf:
+          - $ref: '#/components/schemas/ApplicationInstanceId'
+          description: The ID of an application instance to replace with the new instance.
+        RuntimeRoleArn:
+          allOf:
+          - $ref: '#/components/schemas/RuntimeRoleArn'
+          description: The ARN of a runtime role for the application instance.
+        DefaultRuntimeContextDevice:
+          allOf:
+          - $ref: '#/components/schemas/DefaultRuntimeContextDevice'
+          description: A device's ID.
+        Tags:
+          allOf:
+          - $ref: '#/components/schemas/TagMap'
+          description: Tags for the application instance.
+      required:
+      - ManifestPayload
+      - DefaultRuntimeContextDevice
+    CreateApplicationInstanceResponse:
+      type: object
+      properties:
+        ApplicationInstanceId:
+          allOf:
+          - $ref: '#/components/schemas/ApplicationInstanceId'
+          description: The application instance's ID.
+      required:
+      - ApplicationInstanceId
+    CreateJobForDevicesRequest:
+      type: object
+      properties:
+        DeviceIds:
+          allOf:
+          - $ref: '#/components/schemas/DeviceIdList'
+          description: ID of target device.
+        DeviceJobConfig:
+          allOf:
+          - $ref: '#/components/schemas/DeviceJobConfig'
+          description: Configuration settings for a software update job.
+        JobType:
+          allOf:
+          - $ref: '#/components/schemas/JobType'
+          description: The type of job to run.
+      required:
+      - DeviceIds
+      - JobType
+    CreateJobForDevicesResponse:
+      type: object
+      properties:
+        Jobs:
+          allOf:
+          - $ref: '#/components/schemas/JobList'
+          description: A list of jobs.
+      required:
+      - Jobs
+    CreateNodeFromTemplateJobRequest:
+      type: object
+      properties:
+        TemplateType:
+          allOf:
+          - $ref: '#/components/schemas/TemplateType'
+          description: The type of node.
+        OutputPackageName:
+          allOf:
+          - $ref: '#/components/schemas/NodePackageName'
+          description: An output package name for the node.
+        OutputPackageVersion:
+          allOf:
+          - $ref: '#/components/schemas/NodePackageVersion'
+          description: An output package version for the node.
+        NodeName:
+          allOf:
+          - $ref: '#/components/schemas/NodeName'
+          description: A name for the node.
+        NodeDescription:
+          allOf:
+          - $ref: '#/components/schemas/Description'
+          description: A description for the node.
+        TemplateParameters:
+          allOf:
+          - $ref: '#/components/schemas/TemplateParametersMap'
+          description: Template parameters for the node.
+        JobTags:
+          allOf:
+          - $ref: '#/components/schemas/JobTagsList'
+          description: Tags for the job.
+      required:
+      - TemplateType
+      - OutputPackageName
+      - OutputPackageVersion
+      - NodeName
+      - TemplateParameters
+    CreateNodeFromTemplateJobResponse:
+      type: object
+      properties:
+        JobId:
+          allOf:
+          - $ref: '#/components/schemas/JobId'
+          description: The job's ID.
+      required:
+      - JobId
+    CreatePackageImportJobRequest:
+      type: object
+      properties:
+        JobType:
+          allOf:
+          - $ref: '#/components/schemas/PackageImportJobType'
+          description: A job type for the package import job.
+        InputConfig:
+          allOf:
+          - $ref: '#/components/schemas/PackageImportJobInputConfig'
+          description: An input config for the package import job.
+        OutputConfig:
+          allOf:
+          - $ref: '#/components/schemas/PackageImportJobOutputConfig'
+          description: An output config for the package import job.
+        ClientToken:
+          allOf:
+          - $ref: '#/components/schemas/ClientToken'
+          description: A client token for the package import job.
+        JobTags:
+          allOf:
+          - $ref: '#/components/schemas/JobTagsList'
+          description: Tags for the package import job.
+      required:
+      - JobType
+      - InputConfig
+      - OutputConfig
+      - ClientToken
+    CreatePackageImportJobResponse:
+      type: object
+      properties:
+        JobId:
+          allOf:
+          - $ref: '#/components/schemas/JobId'
+          description: The job's ID.
+      required:
+      - JobId
+    CreatePackageRequest:
+      type: object
+      properties:
+        PackageName:
+          allOf:
+          - $ref: '#/components/schemas/NodePackageName'
+          description: A name for the package.
+        Tags:
+          allOf:
+          - $ref: '#/components/schemas/TagMap'
+          description: Tags for the package.
+      required:
+      - PackageName
+    CreatePackageResponse:
+      type: object
+      properties:
+        PackageId:
+          allOf:
+          - $ref: '#/components/schemas/NodePackageId'
+          description: The package's ID.
+        Arn:
+          allOf:
+          - $ref: '#/components/schemas/NodePackageArn'
+          description: The package's ARN.
+        StorageLocation:
+          allOf:
+          - $ref: '#/components/schemas/StorageLocation'
+          description: The package's storage location.
+      required:
+      - StorageLocation
     CreatedTime:
       type: string
       format: date-time
@@ -140,6 +2139,673 @@ components:
       pattern: ^[a-zA-Z0-9\-\_]+$
       minLength: 1
       maxLength: 255
+    DeleteDeviceRequest:
+      type: object
+      properties:
+        DeviceId:
+          allOf:
+          - $ref: '#/components/schemas/DeviceId'
+          description: The device's ID.
+      required:
+      - DeviceId
+    DeleteDeviceResponse:
+      type: object
+      properties:
+        DeviceId:
+          allOf:
+          - $ref: '#/components/schemas/DeviceId'
+          description: The device's ID.
+    DeletePackageRequest:
+      type: object
+      properties:
+        PackageId:
+          allOf:
+          - $ref: '#/components/schemas/NodePackageId'
+          description: The package's ID.
+        ForceDelete:
+          allOf:
+          - $ref: '#/components/schemas/Boolean'
+          description: Delete the package even if it has artifacts stored in its access
+            point. Deletes the package's artifacts from Amazon S3.
+      required:
+      - PackageId
+    DeletePackageResponse:
+      type: object
+      properties: {}
+    DeregisterPackageVersionRequest:
+      type: object
+      properties:
+        OwnerAccount:
+          allOf:
+          - $ref: '#/components/schemas/PackageOwnerAccount'
+          description: An owner account.
+        PackageId:
+          allOf:
+          - $ref: '#/components/schemas/NodePackageId'
+          description: A package ID.
+        PackageVersion:
+          allOf:
+          - $ref: '#/components/schemas/NodePackageVersion'
+          description: A package version.
+        PatchVersion:
+          allOf:
+          - $ref: '#/components/schemas/NodePackagePatchVersion'
+          description: A patch version.
+        UpdatedLatestPatchVersion:
+          allOf:
+          - $ref: '#/components/schemas/NodePackagePatchVersion'
+          description: If the version was marked latest, the new version to maker
+            as latest.
+      required:
+      - PackageId
+      - PackageVersion
+      - PatchVersion
+    DeregisterPackageVersionResponse:
+      type: object
+      properties: {}
+    DescribeApplicationInstanceDetailsRequest:
+      type: object
+      properties:
+        ApplicationInstanceId:
+          allOf:
+          - $ref: '#/components/schemas/ApplicationInstanceId'
+          description: The application instance's ID.
+      required:
+      - ApplicationInstanceId
+    DescribeApplicationInstanceDetailsResponse:
+      type: object
+      properties:
+        Name:
+          allOf:
+          - $ref: '#/components/schemas/ApplicationInstanceName'
+          description: The application instance's name.
+        Description:
+          allOf:
+          - $ref: '#/components/schemas/Description'
+          description: The application instance's description.
+        DefaultRuntimeContextDevice:
+          allOf:
+          - $ref: '#/components/schemas/DefaultRuntimeContextDevice'
+          description: The application instance's default runtime context device.
+        ManifestPayload:
+          allOf:
+          - $ref: '#/components/schemas/ManifestPayload'
+          description: The application instance's configuration manifest.
+        ManifestOverridesPayload:
+          allOf:
+          - $ref: '#/components/schemas/ManifestOverridesPayload'
+          description: Parameter overrides for the configuration manifest.
+        ApplicationInstanceIdToReplace:
+          allOf:
+          - $ref: '#/components/schemas/ApplicationInstanceId'
+          description: The ID of the application instance that this instance replaced.
+        CreatedTime:
+          allOf:
+          - $ref: '#/components/schemas/TimeStamp'
+          description: When the application instance was created.
+        ApplicationInstanceId:
+          allOf:
+          - $ref: '#/components/schemas/ApplicationInstanceId'
+          description: The application instance's ID.
+    DescribeApplicationInstanceRequest:
+      type: object
+      properties:
+        ApplicationInstanceId:
+          allOf:
+          - $ref: '#/components/schemas/ApplicationInstanceId'
+          description: The application instance's ID.
+      required:
+      - ApplicationInstanceId
+    DescribeApplicationInstanceResponse:
+      type: object
+      properties:
+        Name:
+          allOf:
+          - $ref: '#/components/schemas/ApplicationInstanceName'
+          description: The application instance's name.
+        Description:
+          allOf:
+          - $ref: '#/components/schemas/Description'
+          description: The application instance's description.
+        DefaultRuntimeContextDevice:
+          allOf:
+          - $ref: '#/components/schemas/DefaultRuntimeContextDevice'
+          description: The device's ID.
+        DefaultRuntimeContextDeviceName:
+          allOf:
+          - $ref: '#/components/schemas/DeviceName'
+          description: The device's bane.
+        ApplicationInstanceIdToReplace:
+          allOf:
+          - $ref: '#/components/schemas/ApplicationInstanceId'
+          description: The ID of the application instance that this instance replaced.
+        RuntimeRoleArn:
+          allOf:
+          - $ref: '#/components/schemas/RuntimeRoleArn'
+          description: The application instance's runtime role ARN.
+        Status:
+          allOf:
+          - $ref: '#/components/schemas/ApplicationInstanceStatus'
+          description: The application instance's status.
+        HealthStatus:
+          allOf:
+          - $ref: '#/components/schemas/ApplicationInstanceHealthStatus'
+          description: The application instance's health status.
+        StatusDescription:
+          allOf:
+          - $ref: '#/components/schemas/ApplicationInstanceStatusDescription'
+          description: The application instance's status description.
+        CreatedTime:
+          allOf:
+          - $ref: '#/components/schemas/TimeStamp'
+          description: When the application instance was created.
+        LastUpdatedTime:
+          allOf:
+          - $ref: '#/components/schemas/TimeStamp'
+          description: The application instance was updated.
+        ApplicationInstanceId:
+          allOf:
+          - $ref: '#/components/schemas/ApplicationInstanceId'
+          description: The application instance's ID.
+        Arn:
+          allOf:
+          - $ref: '#/components/schemas/ApplicationInstanceArn'
+          description: The application instance's ARN.
+        Tags:
+          allOf:
+          - $ref: '#/components/schemas/TagMap'
+          description: The application instance's tags.
+        RuntimeContextStates:
+          allOf:
+          - $ref: '#/components/schemas/ReportedRuntimeContextStates'
+          description: The application instance's state.
+    DescribeDeviceJobRequest:
+      type: object
+      properties:
+        JobId:
+          allOf:
+          - $ref: '#/components/schemas/JobId'
+          description: The job's ID.
+      required:
+      - JobId
+    DescribeDeviceJobResponse:
+      type: object
+      properties:
+        JobId:
+          allOf:
+          - $ref: '#/components/schemas/JobId'
+          description: The job's ID.
+        DeviceId:
+          allOf:
+          - $ref: '#/components/schemas/DeviceId'
+          description: The device's ID.
+        DeviceArn:
+          allOf:
+          - $ref: '#/components/schemas/DeviceArn'
+          description: The device's ARN.
+        DeviceName:
+          allOf:
+          - $ref: '#/components/schemas/DeviceName'
+          description: The device's name.
+        DeviceType:
+          allOf:
+          - $ref: '#/components/schemas/DeviceType'
+          description: The device's type.
+        ImageVersion:
+          allOf:
+          - $ref: '#/components/schemas/ImageVersion'
+          description: For an OTA job, the target version of the device software.
+        Status:
+          allOf:
+          - $ref: '#/components/schemas/UpdateProgress'
+          description: The job's status.
+        CreatedTime:
+          allOf:
+          - $ref: '#/components/schemas/UpdateCreatedTime'
+          description: When the job was created.
+        JobType:
+          allOf:
+          - $ref: '#/components/schemas/JobType'
+          description: The job's type.
+    DescribeDeviceRequest:
+      type: object
+      properties:
+        DeviceId:
+          allOf:
+          - $ref: '#/components/schemas/DeviceId'
+          description: The device's ID.
+      required:
+      - DeviceId
+    DescribeDeviceResponse:
+      type: object
+      properties:
+        DeviceId:
+          allOf:
+          - $ref: '#/components/schemas/DeviceId'
+          description: The device's ID.
+        Name:
+          allOf:
+          - $ref: '#/components/schemas/DeviceName'
+          description: The device's name.
+        Arn:
+          allOf:
+          - $ref: '#/components/schemas/DeviceArn'
+          description: The device's ARN.
+        Description:
+          allOf:
+          - $ref: '#/components/schemas/Description'
+          description: The device's description.
+        Type:
+          allOf:
+          - $ref: '#/components/schemas/DeviceType'
+          description: The device's type.
+        DeviceConnectionStatus:
+          allOf:
+          - $ref: '#/components/schemas/DeviceConnectionStatus'
+          description: The device's connection status.
+        CreatedTime:
+          allOf:
+          - $ref: '#/components/schemas/CreatedTime'
+          description: When the device was created.
+        ProvisioningStatus:
+          allOf:
+          - $ref: '#/components/schemas/DeviceStatus'
+          description: The device's provisioning status.
+        LatestSoftware:
+          allOf:
+          - $ref: '#/components/schemas/LatestSoftware'
+          description: The latest software version available for the device.
+        CurrentSoftware:
+          allOf:
+          - $ref: '#/components/schemas/CurrentSoftware'
+          description: The device's current software version.
+        SerialNumber:
+          allOf:
+          - $ref: '#/components/schemas/DeviceSerialNumber'
+          description: The device's serial number.
+        Tags:
+          allOf:
+          - $ref: '#/components/schemas/TagMap'
+          description: The device's tags.
+        NetworkingConfiguration:
+          allOf:
+          - $ref: '#/components/schemas/NetworkPayload'
+          description: The device's networking configuration.
+        CurrentNetworkingStatus:
+          allOf:
+          - $ref: '#/components/schemas/NetworkStatus'
+          description: The device's networking status.
+        LeaseExpirationTime:
+          allOf:
+          - $ref: '#/components/schemas/LeaseExpirationTime'
+          description: The device's lease expiration time.
+        AlternateSoftwares:
+          allOf:
+          - $ref: '#/components/schemas/AlternateSoftwares'
+          description: Beta software releases available for the device.
+        LatestAlternateSoftware:
+          allOf:
+          - $ref: '#/components/schemas/LatestAlternateSoftware'
+          description: The most recent beta software release.
+        Brand:
+          allOf:
+          - $ref: '#/components/schemas/DeviceBrand'
+          description: The device's maker.
+        LatestDeviceJob:
+          allOf:
+          - $ref: '#/components/schemas/LatestDeviceJob'
+          description: A device's latest job. Includes the target image version, and
+            the job status.
+        DeviceAggregatedStatus:
+          allOf:
+          - $ref: '#/components/schemas/DeviceAggregatedStatus'
+          description: A device's aggregated status. Including the device's connection
+            status, provisioning status, and lease status.
+    DescribeNodeFromTemplateJobRequest:
+      type: object
+      properties:
+        JobId:
+          allOf:
+          - $ref: '#/components/schemas/JobId'
+          description: The job's ID.
+      required:
+      - JobId
+    DescribeNodeFromTemplateJobResponse:
+      type: object
+      properties:
+        JobId:
+          allOf:
+          - $ref: '#/components/schemas/JobId'
+          description: The job's ID.
+        Status:
+          allOf:
+          - $ref: '#/components/schemas/NodeFromTemplateJobStatus'
+          description: The job's status.
+        StatusMessage:
+          allOf:
+          - $ref: '#/components/schemas/NodeFromTemplateJobStatusMessage'
+          description: The job's status message.
+        CreatedTime:
+          allOf:
+          - $ref: '#/components/schemas/CreatedTime'
+          description: When the job was created.
+        LastUpdatedTime:
+          allOf:
+          - $ref: '#/components/schemas/LastUpdatedTime'
+          description: When the job was updated.
+        OutputPackageName:
+          allOf:
+          - $ref: '#/components/schemas/NodePackageName'
+          description: The job's output package name.
+        OutputPackageVersion:
+          allOf:
+          - $ref: '#/components/schemas/NodePackageVersion'
+          description: The job's output package version.
+        NodeName:
+          allOf:
+          - $ref: '#/components/schemas/NodeName'
+          description: The node's name.
+        NodeDescription:
+          allOf:
+          - $ref: '#/components/schemas/Description'
+          description: The node's description.
+        TemplateType:
+          allOf:
+          - $ref: '#/components/schemas/TemplateType'
+          description: The job's template type.
+        TemplateParameters:
+          allOf:
+          - $ref: '#/components/schemas/TemplateParametersMap'
+          description: The job's template parameters.
+        JobTags:
+          allOf:
+          - $ref: '#/components/schemas/JobTagsList'
+          description: The job's tags.
+      required:
+      - JobId
+      - Status
+      - StatusMessage
+      - CreatedTime
+      - LastUpdatedTime
+      - OutputPackageName
+      - OutputPackageVersion
+      - NodeName
+      - TemplateType
+      - TemplateParameters
+    DescribeNodeRequest:
+      type: object
+      properties:
+        NodeId:
+          allOf:
+          - $ref: '#/components/schemas/NodeId'
+          description: The node's ID.
+        OwnerAccount:
+          allOf:
+          - $ref: '#/components/schemas/PackageOwnerAccount'
+          description: The account ID of the node's owner.
+      required:
+      - NodeId
+    DescribeNodeResponse:
+      type: object
+      properties:
+        NodeId:
+          allOf:
+          - $ref: '#/components/schemas/NodeId'
+          description: The node's ID.
+        Name:
+          allOf:
+          - $ref: '#/components/schemas/NodeName'
+          description: The node's name.
+        Category:
+          allOf:
+          - $ref: '#/components/schemas/NodeCategory'
+          description: The node's category.
+        OwnerAccount:
+          allOf:
+          - $ref: '#/components/schemas/PackageOwnerAccount'
+          description: The account ID of the node's owner.
+        PackageName:
+          allOf:
+          - $ref: '#/components/schemas/NodePackageName'
+          description: The node's package name.
+        PackageId:
+          allOf:
+          - $ref: '#/components/schemas/NodePackageId'
+          description: The node's package ID.
+        PackageArn:
+          allOf:
+          - $ref: '#/components/schemas/NodePackageArn'
+          description: The node's ARN.
+        PackageVersion:
+          allOf:
+          - $ref: '#/components/schemas/NodePackageVersion'
+          description: The node's package version.
+        PatchVersion:
+          allOf:
+          - $ref: '#/components/schemas/NodePackagePatchVersion'
+          description: The node's patch version.
+        NodeInterface:
+          allOf:
+          - $ref: '#/components/schemas/NodeInterface'
+          description: The node's interface.
+        AssetName:
+          allOf:
+          - $ref: '#/components/schemas/NodeAssetName'
+          description: The node's asset name.
+        Description:
+          allOf:
+          - $ref: '#/components/schemas/Description'
+          description: The node's description.
+        CreatedTime:
+          allOf:
+          - $ref: '#/components/schemas/TimeStamp'
+          description: When the node was created.
+        LastUpdatedTime:
+          allOf:
+          - $ref: '#/components/schemas/TimeStamp'
+          description: When the node was updated.
+      required:
+      - NodeId
+      - Name
+      - Category
+      - OwnerAccount
+      - PackageName
+      - PackageId
+      - PackageVersion
+      - PatchVersion
+      - NodeInterface
+      - Description
+      - CreatedTime
+      - LastUpdatedTime
+    DescribePackageImportJobRequest:
+      type: object
+      properties:
+        JobId:
+          allOf:
+          - $ref: '#/components/schemas/JobId'
+          description: The job's ID.
+      required:
+      - JobId
+    DescribePackageImportJobResponse:
+      type: object
+      properties:
+        JobId:
+          allOf:
+          - $ref: '#/components/schemas/JobId'
+          description: The job's ID.
+        ClientToken:
+          allOf:
+          - $ref: '#/components/schemas/ClientToken'
+          description: The job's client token.
+        JobType:
+          allOf:
+          - $ref: '#/components/schemas/PackageImportJobType'
+          description: The job's type.
+        InputConfig:
+          allOf:
+          - $ref: '#/components/schemas/PackageImportJobInputConfig'
+          description: The job's input config.
+        OutputConfig:
+          allOf:
+          - $ref: '#/components/schemas/PackageImportJobOutputConfig'
+          description: The job's output config.
+        Output:
+          allOf:
+          - $ref: '#/components/schemas/PackageImportJobOutput'
+          description: The job's output.
+        CreatedTime:
+          allOf:
+          - $ref: '#/components/schemas/CreatedTime'
+          description: When the job was created.
+        LastUpdatedTime:
+          allOf:
+          - $ref: '#/components/schemas/LastUpdatedTime'
+          description: When the job was updated.
+        Status:
+          allOf:
+          - $ref: '#/components/schemas/PackageImportJobStatus'
+          description: The job's status.
+        StatusMessage:
+          allOf:
+          - $ref: '#/components/schemas/PackageImportJobStatusMessage'
+          description: The job's status message.
+        JobTags:
+          allOf:
+          - $ref: '#/components/schemas/JobTagsList'
+          description: The job's tags.
+      required:
+      - JobId
+      - JobType
+      - InputConfig
+      - OutputConfig
+      - Output
+      - CreatedTime
+      - LastUpdatedTime
+      - Status
+      - StatusMessage
+    DescribePackageRequest:
+      type: object
+      properties:
+        PackageId:
+          allOf:
+          - $ref: '#/components/schemas/NodePackageId'
+          description: The package's ID.
+      required:
+      - PackageId
+    DescribePackageResponse:
+      type: object
+      properties:
+        PackageId:
+          allOf:
+          - $ref: '#/components/schemas/NodePackageId'
+          description: The package's ID.
+        PackageName:
+          allOf:
+          - $ref: '#/components/schemas/NodePackageName'
+          description: The package's name.
+        Arn:
+          allOf:
+          - $ref: '#/components/schemas/NodePackageArn'
+          description: The package's ARN.
+        StorageLocation:
+          allOf:
+          - $ref: '#/components/schemas/StorageLocation'
+          description: The package's storage location.
+        ReadAccessPrincipalArns:
+          allOf:
+          - $ref: '#/components/schemas/PrincipalArnsList'
+          description: ARNs of accounts that have read access to the package.
+        WriteAccessPrincipalArns:
+          allOf:
+          - $ref: '#/components/schemas/PrincipalArnsList'
+          description: ARNs of accounts that have write access to the package.
+        CreatedTime:
+          allOf:
+          - $ref: '#/components/schemas/TimeStamp'
+          description: When the package was created.
+        Tags:
+          allOf:
+          - $ref: '#/components/schemas/TagMap'
+          description: The package's tags.
+      required:
+      - PackageId
+      - PackageName
+      - Arn
+      - StorageLocation
+      - CreatedTime
+      - Tags
+    DescribePackageVersionRequest:
+      type: object
+      properties:
+        OwnerAccount:
+          allOf:
+          - $ref: '#/components/schemas/PackageOwnerAccount'
+          description: The version's owner account.
+        PackageId:
+          allOf:
+          - $ref: '#/components/schemas/NodePackageId'
+          description: The version's ID.
+        PackageVersion:
+          allOf:
+          - $ref: '#/components/schemas/NodePackageVersion'
+          description: The version's version.
+        PatchVersion:
+          allOf:
+          - $ref: '#/components/schemas/NodePackagePatchVersion'
+          description: The version's patch version.
+      required:
+      - PackageId
+      - PackageVersion
+    DescribePackageVersionResponse:
+      type: object
+      properties:
+        OwnerAccount:
+          allOf:
+          - $ref: '#/components/schemas/PackageOwnerAccount'
+          description: The account ID of the version's owner.
+        PackageId:
+          allOf:
+          - $ref: '#/components/schemas/NodePackageId'
+          description: The version's ID.
+        PackageArn:
+          allOf:
+          - $ref: '#/components/schemas/NodePackageArn'
+          description: The ARN of the package.
+        PackageName:
+          allOf:
+          - $ref: '#/components/schemas/NodePackageName'
+          description: The version's name.
+        PackageVersion:
+          allOf:
+          - $ref: '#/components/schemas/NodePackageVersion'
+          description: The version's version.
+        PatchVersion:
+          allOf:
+          - $ref: '#/components/schemas/NodePackagePatchVersion'
+          description: The version's patch version.
+        IsLatestPatch:
+          allOf:
+          - $ref: '#/components/schemas/Boolean'
+          description: Whether the version is the latest available.
+        Status:
+          allOf:
+          - $ref: '#/components/schemas/PackageVersionStatus'
+          description: The version's status.
+        StatusDescription:
+          allOf:
+          - $ref: '#/components/schemas/PackageVersionStatusDescription'
+          description: The version's status description.
+        RegisteredTime:
+          allOf:
+          - $ref: '#/components/schemas/TimeStamp'
+          description: The version's registered time.
+      required:
+      - PackageId
+      - PackageName
+      - PackageVersion
+      - PatchVersion
+      - IsLatestPatch
+      - Status
     Description:
       type: string
       pattern: ^.*$
@@ -151,6 +2817,64 @@ components:
       - RUNNING
       - STOPPED
       - REMOVED
+    Device:
+      type: object
+      properties:
+        DeviceId:
+          allOf:
+          - $ref: '#/components/schemas/DeviceId'
+          description: The device's ID.
+        Name:
+          allOf:
+          - $ref: '#/components/schemas/DeviceName'
+          description: The device's name.
+        CreatedTime:
+          allOf:
+          - $ref: '#/components/schemas/CreatedTime'
+          description: When the device was created.
+        ProvisioningStatus:
+          allOf:
+          - $ref: '#/components/schemas/DeviceStatus'
+          description: The device's provisioning status.
+        LastUpdatedTime:
+          allOf:
+          - $ref: '#/components/schemas/LastUpdatedTime'
+          description: When the device was updated.
+        LeaseExpirationTime:
+          allOf:
+          - $ref: '#/components/schemas/LeaseExpirationTime'
+          description: The device's lease expiration time.
+        Brand:
+          allOf:
+          - $ref: '#/components/schemas/DeviceBrand'
+          description: The device's maker.
+        CurrentSoftware:
+          allOf:
+          - $ref: '#/components/schemas/CurrentSoftware'
+          description: A device's current software.
+        Description:
+          allOf:
+          - $ref: '#/components/schemas/Description'
+          description: A description for the device.
+        Tags:
+          allOf:
+          - $ref: '#/components/schemas/TagMap'
+          description: The device's tags.
+        Type:
+          allOf:
+          - $ref: '#/components/schemas/DeviceType'
+          description: The device's type.
+        LatestDeviceJob:
+          allOf:
+          - $ref: '#/components/schemas/LatestDeviceJob'
+          description: A device's latest job. Includes the target image version, and
+            the update job status.
+        DeviceAggregatedStatus:
+          allOf:
+          - $ref: '#/components/schemas/DeviceAggregatedStatus'
+          description: A device's aggregated status. Including the device's connection
+            status, provisioning status, and lease status.
+      description: A device.
     DeviceAggregatedStatus:
       type: string
       enum:
@@ -190,6 +2914,39 @@ components:
       type: array
       items:
         $ref: '#/components/schemas/DeviceId'
+    DeviceJob:
+      type: object
+      properties:
+        DeviceName:
+          allOf:
+          - $ref: '#/components/schemas/DeviceName'
+          description: The name of the target device
+        DeviceId:
+          allOf:
+          - $ref: '#/components/schemas/DeviceId'
+          description: The ID of the target device.
+        JobId:
+          allOf:
+          - $ref: '#/components/schemas/JobId'
+          description: The job's ID.
+        CreatedTime:
+          allOf:
+          - $ref: '#/components/schemas/CreatedTime'
+          description: When the job was created.
+        JobType:
+          allOf:
+          - $ref: '#/components/schemas/JobType'
+          description: The job's type.
+      description: A job that runs on a device.
+    DeviceJobConfig:
+      type: object
+      properties:
+        OTAJobConfig:
+          allOf:
+          - $ref: '#/components/schemas/OTAJobConfig'
+          description: A configuration for an over-the-air (OTA) upgrade. Required
+            for OTA jobs.
+      description: A job's configuration.
     DeviceJobList:
       type: array
       items:
@@ -243,6 +3000,36 @@ components:
       type: array
       items:
         $ref: '#/components/schemas/Dns'
+    EthernetPayload:
+      type: object
+      properties:
+        ConnectionType:
+          allOf:
+          - $ref: '#/components/schemas/ConnectionType'
+          description: How the device gets an IP address.
+        StaticIpConnectionInfo:
+          allOf:
+          - $ref: '#/components/schemas/StaticIpConnectionInfo'
+          description: Network configuration for a static IP connection.
+      required:
+      - ConnectionType
+      description: A device's network configuration.
+    EthernetStatus:
+      type: object
+      properties:
+        IpAddress:
+          allOf:
+          - $ref: '#/components/schemas/IpAddress'
+          description: The device's IP address.
+        ConnectionStatus:
+          allOf:
+          - $ref: '#/components/schemas/NetworkConnectionStatus'
+          description: The device's connection status.
+        HwAddress:
+          allOf:
+          - $ref: '#/components/schemas/HwAddress'
+          description: The device's physical address.
+      description: A device's Ethernet status.
     HwAddress:
       type: string
       minLength: 1
@@ -256,6 +3043,19 @@ components:
       type: array
       items:
         $ref: '#/components/schemas/NodeInputPort'
+    InternalServerException:
+      type: object
+      properties:
+        Message:
+          $ref: '#/components/schemas/String'
+        RetryAfterSeconds:
+          allOf:
+          - $ref: '#/components/schemas/RetryAfterSeconds'
+          description: The number of seconds a client should wait before retrying
+            the call.
+      required:
+      - Message
+      description: An internal error occurred.
     IotThingName:
       type: string
       minLength: 1
@@ -270,6 +3070,18 @@ components:
       pattern: (^([a-z0-9]+(-[a-z0-9]+)*\.)+[a-z]{2,}$)|(^((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d))(:(6553[0-5]|655[0-2]\d|65[0-4]\d{2}|6[0-4]\d{3}|[1-5]\d{4}|[1-9]\d{0,3}))?$)
       minLength: 1
       maxLength: 255
+    Job:
+      type: object
+      properties:
+        JobId:
+          allOf:
+          - $ref: '#/components/schemas/JobId'
+          description: The job's ID.
+        DeviceId:
+          allOf:
+          - $ref: '#/components/schemas/DeviceId'
+          description: The target device's ID.
+      description: A job for a device.
     JobId:
       type: string
       pattern: ^[a-zA-Z0-9\-\_]+$
@@ -279,6 +3091,21 @@ components:
       type: array
       items:
         $ref: '#/components/schemas/Job'
+    JobResourceTags:
+      type: object
+      properties:
+        ResourceType:
+          allOf:
+          - $ref: '#/components/schemas/JobResourceType'
+          description: The job's type.
+        Tags:
+          allOf:
+          - $ref: '#/components/schemas/TagMap'
+          description: The job's tags.
+      required:
+      - ResourceType
+      - Tags
+      description: Tags for a job.
     JobResourceType:
       type: string
       enum:
@@ -299,6 +3126,22 @@ components:
       type: string
       minLength: 1
       maxLength: 255
+    LatestDeviceJob:
+      type: object
+      properties:
+        ImageVersion:
+          allOf:
+          - $ref: '#/components/schemas/ImageVersion'
+          description: The target version of the device software.
+        Status:
+          allOf:
+          - $ref: '#/components/schemas/UpdateProgress'
+          description: Status of the latest device job.
+        JobType:
+          allOf:
+          - $ref: '#/components/schemas/JobType'
+          description: The job's type.
+      description: Returns information about the latest device job.
     LatestSoftware:
       type: string
       minLength: 1
@@ -306,6 +3149,168 @@ components:
     LeaseExpirationTime:
       type: string
       format: date-time
+    ListApplicationInstanceDependenciesRequest:
+      type: object
+      properties:
+        ApplicationInstanceId:
+          allOf:
+          - $ref: '#/components/schemas/ApplicationInstanceId'
+          description: The application instance's ID.
+        MaxResults:
+          allOf:
+          - $ref: '#/components/schemas/MaxSize25'
+          description: The maximum number of application instance dependencies to
+            return in one page of results.
+        NextToken:
+          allOf:
+          - $ref: '#/components/schemas/NextToken'
+          description: Specify the pagination token from a previous request to retrieve
+            the next page of results.
+      required:
+      - ApplicationInstanceId
+    ListApplicationInstanceDependenciesResponse:
+      type: object
+      properties:
+        PackageObjects:
+          allOf:
+          - $ref: '#/components/schemas/PackageObjects'
+          description: A list of package objects.
+        NextToken:
+          allOf:
+          - $ref: '#/components/schemas/NextToken'
+          description: A pagination token that's included if more results are available.
+    ListApplicationInstanceNodeInstancesRequest:
+      type: object
+      properties:
+        ApplicationInstanceId:
+          allOf:
+          - $ref: '#/components/schemas/ApplicationInstanceId'
+          description: The node instances' application instance ID.
+        MaxResults:
+          allOf:
+          - $ref: '#/components/schemas/MaxSize25'
+          description: The maximum number of node instances to return in one page
+            of results.
+        NextToken:
+          allOf:
+          - $ref: '#/components/schemas/NextToken'
+          description: Specify the pagination token from a previous request to retrieve
+            the next page of results.
+      required:
+      - ApplicationInstanceId
+    ListApplicationInstanceNodeInstancesResponse:
+      type: object
+      properties:
+        NodeInstances:
+          allOf:
+          - $ref: '#/components/schemas/NodeInstances'
+          description: A list of node instances.
+        NextToken:
+          allOf:
+          - $ref: '#/components/schemas/NextToken'
+          description: A pagination token that's included if more results are available.
+    ListApplicationInstancesRequest:
+      type: object
+      properties:
+        DeviceId:
+          allOf:
+          - $ref: '#/components/schemas/DeviceId'
+          description: The application instances' device ID.
+        StatusFilter:
+          allOf:
+          - $ref: '#/components/schemas/StatusFilter'
+          description: Only include instances with a specific status.
+        MaxResults:
+          allOf:
+          - $ref: '#/components/schemas/MaxSize25'
+          description: The maximum number of application instances to return in one
+            page of results.
+        NextToken:
+          allOf:
+          - $ref: '#/components/schemas/NextToken'
+          description: Specify the pagination token from a previous request to retrieve
+            the next page of results.
+    ListApplicationInstancesResponse:
+      type: object
+      properties:
+        ApplicationInstances:
+          allOf:
+          - $ref: '#/components/schemas/ApplicationInstances'
+          description: A list of application instances.
+        NextToken:
+          allOf:
+          - $ref: '#/components/schemas/NextToken'
+          description: A pagination token that's included if more results are available.
+    ListDevicesJobsRequest:
+      type: object
+      properties:
+        DeviceId:
+          allOf:
+          - $ref: '#/components/schemas/DeviceId'
+          description: Filter results by the job's target device ID.
+        NextToken:
+          allOf:
+          - $ref: '#/components/schemas/NextToken'
+          description: Specify the pagination token from a previous request to retrieve
+            the next page of results.
+        MaxResults:
+          allOf:
+          - $ref: '#/components/schemas/MaxSize25'
+          description: The maximum number of device jobs to return in one page of
+            results.
+    ListDevicesJobsResponse:
+      type: object
+      properties:
+        DeviceJobs:
+          allOf:
+          - $ref: '#/components/schemas/DeviceJobList'
+          description: A list of jobs.
+        NextToken:
+          allOf:
+          - $ref: '#/components/schemas/NextToken'
+          description: A pagination token that's included if more results are available.
+    ListDevicesRequest:
+      type: object
+      properties:
+        NextToken:
+          allOf:
+          - $ref: '#/components/schemas/NextToken'
+          description: Specify the pagination token from a previous request to retrieve
+            the next page of results.
+        MaxResults:
+          allOf:
+          - $ref: '#/components/schemas/MaxSize25'
+          description: The maximum number of devices to return in one page of results.
+        SortBy:
+          allOf:
+          - $ref: '#/components/schemas/ListDevicesSortBy'
+          description: The target column to be sorted on. Default column sort is CREATED_TIME.
+        SortOrder:
+          allOf:
+          - $ref: '#/components/schemas/SortOrder'
+          description: The sorting order for the returned list. SortOrder is DESCENDING
+            by default based on CREATED_TIME. Otherwise, SortOrder is ASCENDING.
+        NameFilter:
+          allOf:
+          - $ref: '#/components/schemas/NameFilter'
+          description: Filter based on device's name. Prefixes supported.
+        DeviceAggregatedStatusFilter:
+          allOf:
+          - $ref: '#/components/schemas/DeviceAggregatedStatus'
+          description: Filter based on a device's status.
+    ListDevicesResponse:
+      type: object
+      properties:
+        Devices:
+          allOf:
+          - $ref: '#/components/schemas/DeviceList'
+          description: A list of devices.
+        NextToken:
+          allOf:
+          - $ref: '#/components/schemas/NextToken'
+          description: A pagination token that's included if more results are available.
+      required:
+      - Devices
     ListDevicesSortBy:
       type: string
       enum:
@@ -313,6 +3318,140 @@ components:
       - CREATED_TIME
       - NAME
       - DEVICE_AGGREGATED_STATUS
+    ListNodeFromTemplateJobsRequest:
+      type: object
+      properties:
+        NextToken:
+          allOf:
+          - $ref: '#/components/schemas/NextToken'
+          description: Specify the pagination token from a previous request to retrieve
+            the next page of results.
+        MaxResults:
+          allOf:
+          - $ref: '#/components/schemas/MaxSize25'
+          description: The maximum number of node from template jobs to return in
+            one page of results.
+    ListNodeFromTemplateJobsResponse:
+      type: object
+      properties:
+        NodeFromTemplateJobs:
+          allOf:
+          - $ref: '#/components/schemas/NodeFromTemplateJobList'
+          description: A list of jobs.
+        NextToken:
+          allOf:
+          - $ref: '#/components/schemas/NextToken'
+          description: A pagination token that's included if more results are available.
+      required:
+      - NodeFromTemplateJobs
+    ListNodesRequest:
+      type: object
+      properties:
+        Category:
+          allOf:
+          - $ref: '#/components/schemas/NodeCategory'
+          description: Search for nodes by category.
+        OwnerAccount:
+          allOf:
+          - $ref: '#/components/schemas/PackageOwnerAccount'
+          description: Search for nodes by the account ID of the nodes' owner.
+        PackageName:
+          allOf:
+          - $ref: '#/components/schemas/NodePackageName'
+          description: Search for nodes by name.
+        PackageVersion:
+          allOf:
+          - $ref: '#/components/schemas/NodePackageVersion'
+          description: Search for nodes by version.
+        PatchVersion:
+          allOf:
+          - $ref: '#/components/schemas/NodePackagePatchVersion'
+          description: Search for nodes by patch version.
+        NextToken:
+          allOf:
+          - $ref: '#/components/schemas/Token'
+          description: Specify the pagination token from a previous request to retrieve
+            the next page of results.
+        MaxResults:
+          allOf:
+          - $ref: '#/components/schemas/MaxSize25'
+          description: The maximum number of nodes to return in one page of results.
+    ListNodesResponse:
+      type: object
+      properties:
+        Nodes:
+          allOf:
+          - $ref: '#/components/schemas/NodesList'
+          description: A list of nodes.
+        NextToken:
+          allOf:
+          - $ref: '#/components/schemas/Token'
+          description: A pagination token that's included if more results are available.
+    ListPackageImportJobsRequest:
+      type: object
+      properties:
+        NextToken:
+          allOf:
+          - $ref: '#/components/schemas/NextToken'
+          description: Specify the pagination token from a previous request to retrieve
+            the next page of results.
+        MaxResults:
+          allOf:
+          - $ref: '#/components/schemas/MaxSize25'
+          description: The maximum number of package import jobs to return in one
+            page of results.
+    ListPackageImportJobsResponse:
+      type: object
+      properties:
+        PackageImportJobs:
+          allOf:
+          - $ref: '#/components/schemas/PackageImportJobList'
+          description: A list of package import jobs.
+        NextToken:
+          allOf:
+          - $ref: '#/components/schemas/NextToken'
+          description: A pagination token that's included if more results are available.
+      required:
+      - PackageImportJobs
+    ListPackagesRequest:
+      type: object
+      properties:
+        MaxResults:
+          allOf:
+          - $ref: '#/components/schemas/MaxSize25'
+          description: The maximum number of packages to return in one page of results.
+        NextToken:
+          allOf:
+          - $ref: '#/components/schemas/Token'
+          description: Specify the pagination token from a previous request to retrieve
+            the next page of results.
+    ListPackagesResponse:
+      type: object
+      properties:
+        Packages:
+          allOf:
+          - $ref: '#/components/schemas/PackageList'
+          description: A list of packages.
+        NextToken:
+          allOf:
+          - $ref: '#/components/schemas/NextToken'
+          description: A pagination token that's included if more results are available.
+    ListTagsForResourceRequest:
+      type: object
+      properties:
+        ResourceArn:
+          allOf:
+          - $ref: '#/components/schemas/ResourceArn'
+          description: The resource's ARN.
+      required:
+      - ResourceArn
+    ListTagsForResourceResponse:
+      type: object
+      properties:
+        Tags:
+          allOf:
+          - $ref: '#/components/schemas/TagMap'
+          description: A list of tags.
     ManifestOverridesPayload:
       allOf:
       - allOf:
@@ -363,11 +3502,105 @@ components:
       - CONNECTED
       - NOT_CONNECTED
       - CONNECTING
+    NetworkPayload:
+      type: object
+      properties:
+        Ethernet0:
+          allOf:
+          - $ref: '#/components/schemas/EthernetPayload'
+          description: Settings for Ethernet port 0.
+        Ethernet1:
+          allOf:
+          - $ref: '#/components/schemas/EthernetPayload'
+          description: Settings for Ethernet port 1.
+        Ntp:
+          allOf:
+          - $ref: '#/components/schemas/NtpPayload'
+          description: Network time protocol (NTP) server settings.
+      description: The network configuration for a device.
+    NetworkStatus:
+      type: object
+      properties:
+        Ethernet0Status:
+          allOf:
+          - $ref: '#/components/schemas/EthernetStatus'
+          description: The status of Ethernet port 0.
+        Ethernet1Status:
+          allOf:
+          - $ref: '#/components/schemas/EthernetStatus'
+          description: The status of Ethernet port 1.
+        NtpStatus:
+          allOf:
+          - $ref: '#/components/schemas/NtpStatus'
+          description: Details about a network time protocol (NTP) server connection.
+        LastUpdatedTime:
+          allOf:
+          - $ref: '#/components/schemas/LastUpdatedTime'
+          description: When the network status changed.
+      description: The network status of a device.
     NextToken:
       type: string
       pattern: ^.+$
       minLength: 1
       maxLength: 4096
+    Node:
+      type: object
+      properties:
+        NodeId:
+          allOf:
+          - $ref: '#/components/schemas/NodeId'
+          description: The node's ID.
+        Name:
+          allOf:
+          - $ref: '#/components/schemas/NodeName'
+          description: The node's name.
+        Category:
+          allOf:
+          - $ref: '#/components/schemas/NodeCategory'
+          description: The node's category.
+        OwnerAccount:
+          allOf:
+          - $ref: '#/components/schemas/PackageOwnerAccount'
+          description: The account ID of the node's owner.
+        PackageName:
+          allOf:
+          - $ref: '#/components/schemas/NodePackageName'
+          description: The node's package name.
+        PackageId:
+          allOf:
+          - $ref: '#/components/schemas/NodePackageId'
+          description: The node's package ID.
+        PackageArn:
+          allOf:
+          - $ref: '#/components/schemas/NodePackageArn'
+          description: The node's ARN.
+        PackageVersion:
+          allOf:
+          - $ref: '#/components/schemas/NodePackageVersion'
+          description: The node's package version.
+        PatchVersion:
+          allOf:
+          - $ref: '#/components/schemas/NodePackagePatchVersion'
+          description: The node's patch version.
+        Description:
+          allOf:
+          - $ref: '#/components/schemas/Description'
+          description: The node's description.
+        CreatedTime:
+          allOf:
+          - $ref: '#/components/schemas/TimeStamp'
+          description: When the node was created.
+      required:
+      - NodeId
+      - Name
+      - Category
+      - PackageName
+      - PackageId
+      - PackageVersion
+      - PatchVersion
+      - CreatedTime
+      description: An application node that represents a camera stream, a model, code,
+        or output.
     NodeAssetName:
       type: string
       pattern: ^[a-zA-Z0-9\-\_]+$
@@ -380,6 +3613,34 @@ components:
       - ML_MODEL
       - MEDIA_SOURCE
       - MEDIA_SINK
+    NodeFromTemplateJob:
+      type: object
+      properties:
+        JobId:
+          allOf:
+          - $ref: '#/components/schemas/JobId'
+          description: The job's ID.
+        TemplateType:
+          allOf:
+          - $ref: '#/components/schemas/TemplateType'
+          description: The job's template type.
+        Status:
+          allOf:
+          - $ref: '#/components/schemas/NodeFromTemplateJobStatus'
+          description: The job's status.
+        StatusMessage:
+          allOf:
+          - $ref: '#/components/schemas/NodeFromTemplateJobStatusMessage'
+          description: The job's status message.
+        CreatedTime:
+          allOf:
+          - $ref: '#/components/schemas/CreatedTime'
+          description: When the job was created.
+        NodeName:
+          allOf:
+          - $ref: '#/components/schemas/NodeName'
+          description: The node's name.
+      description: A job to create a camera stream node.
     NodeFromTemplateJobList:
       type: array
       items:
@@ -397,6 +3658,65 @@ components:
       pattern: ^[a-zA-Z0-9\-\_\.]+$
       minLength: 1
       maxLength: 255
+    NodeInputPort:
+      type: object
+      properties:
+        Name:
+          allOf:
+          - $ref: '#/components/schemas/PortName'
+          description: The input port's name.
+        Description:
+          allOf:
+          - $ref: '#/components/schemas/Description'
+          description: The input port's description.
+        Type:
+          allOf:
+          - $ref: '#/components/schemas/PortType'
+          description: The input port's type.
+        DefaultValue:
+          allOf:
+          - $ref: '#/components/schemas/PortDefaultValue'
+          description: The input port's default value.
+        MaxConnections:
+          allOf:
+          - $ref: '#/components/schemas/MaxConnections'
+          description: The input port's max connections.
+      description: A node input port.
+    NodeInstance:
+      type: object
+      properties:
+        NodeInstanceId:
+          allOf:
+          - $ref: '#/components/schemas/NodeInstanceId'
+          description: The instance's ID.
+        NodeId:
+          allOf:
+          - $ref: '#/components/schemas/NodeId'
+          description: The node's ID.
+        PackageName:
+          allOf:
+          - $ref: '#/components/schemas/NodePackageName'
+          description: The instance's package name.
+        PackageVersion:
+          allOf:
+          - $ref: '#/components/schemas/NodePackageVersion'
+          description: The instance's package version.
+        PackagePatchVersion:
+          allOf:
+          - $ref: '#/components/schemas/NodePackagePatchVersion'
+          description: The instance's package patch version.
+        NodeName:
+          allOf:
+          - $ref: '#/components/schemas/NodeName'
+          description: The instance's name.
+        CurrentStatus:
+          allOf:
+          - $ref: '#/components/schemas/NodeInstanceStatus'
+          description: The instance's current status.
+      required:
+      - NodeInstanceId
+      - CurrentStatus
+      description: A node instance.
     NodeInstanceId:
       type: string
       pattern: ^[a-zA-Z0-9\-\_]+$
@@ -413,11 +3733,42 @@ components:
       type: array
       items:
         $ref: '#/components/schemas/NodeInstance'
+    NodeInterface:
+      type: object
+      properties:
+        Inputs:
+          allOf:
+          - $ref: '#/components/schemas/InputPortList'
+          description: The node interface's inputs.
+        Outputs:
+          allOf:
+          - $ref: '#/components/schemas/OutputPortList'
+          description: The node interface's outputs.
+      required:
+      - Inputs
+      - Outputs
+      description: A node interface.
     NodeName:
       type: string
       pattern: ^[a-zA-Z0-9\-\_]+$
       minLength: 1
       maxLength: 128
+    NodeOutputPort:
+      type: object
+      properties:
+        Name:
+          allOf:
+          - $ref: '#/components/schemas/PortName'
+          description: The output port's name.
+        Description:
+          allOf:
+          - $ref: '#/components/schemas/Description'
+          description: The output port's description.
+        Type:
+          allOf:
+          - $ref: '#/components/schemas/PortType'
+          description: The output port's type.
+      description: A node output port.
     NodePackageArn:
       type: string
       minLength: 1
@@ -442,6 +3793,21 @@ components:
       pattern: ^([0-9]+)\.([0-9]+)$
       minLength: 1
       maxLength: 255
+    NodeSignal:
+      type: object
+      properties:
+        NodeInstanceId:
+          allOf:
+          - $ref: '#/components/schemas/NodeInstanceId'
+          description: The camera node's name, from the application manifest.
+        Signal:
+          allOf:
+          - $ref: '#/components/schemas/NodeSignalValue'
+          description: The signal value.
+      required:
+      - NodeInstanceId
+      - Signal
+      description: A signal to a camera node to start or stop processing video.
     NodeSignalList:
       type: array
       items:
@@ -455,6 +3821,17 @@ components:
       type: array
       items:
         $ref: '#/components/schemas/Node'
+    NtpPayload:
+      type: object
+      properties:
+        NtpServers:
+          allOf:
+          - $ref: '#/components/schemas/NtpServerList'
+          description: NTP servers to use, in order of preference.
+      required:
+      - NtpServers
+      description: Network time protocol (NTP) server settings. Use this option to
+        connect to local NTP servers instead of `pool.ntp.org`.
     NtpServerList:
       type: array
       items:
@@ -463,6 +3840,36 @@ components:
       type: string
       minLength: 1
       maxLength: 255
+    NtpStatus:
+      type: object
+      properties:
+        ConnectionStatus:
+          allOf:
+          - $ref: '#/components/schemas/NetworkConnectionStatus'
+          description: The connection's status.
+        IpAddress:
+          allOf:
+          - $ref: '#/components/schemas/IpAddress'
+          description: The IP address of the server.
+        NtpServerName:
+          allOf:
+          - $ref: '#/components/schemas/NtpServerName'
+          description: The domain name of the server.
+      description: Details about an NTP server connection.
+    OTAJobConfig:
+      type: object
+      properties:
+        ImageVersion:
+          allOf:
+          - $ref: '#/components/schemas/ImageVersion'
+          description: The target version of the device software.
+        AllowMajorVersionUpdate:
+          allOf:
+          - $ref: '#/components/schemas/Boolean'
+          description: Whether to apply the update if it is a major version change.
+      required:
+      - ImageVersion
+      description: An over-the-air update (OTA) job configuration.
     Object:
       type: string
     ObjectKey:
@@ -470,14 +3877,98 @@ components:
       pattern: ^.+$
       minLength: 1
       maxLength: 255
+    OutPutS3Location:
+      type: object
+      properties:
+        BucketName:
+          allOf:
+          - $ref: '#/components/schemas/BucketName'
+          description: The object's bucket.
+        ObjectKey:
+          allOf:
+          - $ref: '#/components/schemas/ObjectKey'
+          description: The object's key.
+      required:
+      - BucketName
+      - ObjectKey
+      description: The location of an output object in Amazon S3.
     OutputPortList:
       type: array
       items:
         $ref: '#/components/schemas/NodeOutputPort'
+    PackageImportJob:
+      type: object
+      properties:
+        JobId:
+          allOf:
+          - $ref: '#/components/schemas/JobId'
+          description: The job's ID.
+        JobType:
+          allOf:
+          - $ref: '#/components/schemas/PackageImportJobType'
+          description: The job's type.
+        Status:
+          allOf:
+          - $ref: '#/components/schemas/PackageImportJobStatus'
+          description: The job's status.
+        StatusMessage:
+          allOf:
+          - $ref: '#/components/schemas/PackageImportJobStatusMessage'
+          description: The job's status message.
+        CreatedTime:
+          allOf:
+          - $ref: '#/components/schemas/CreatedTime'
+          description: When the job was created.
+        LastUpdatedTime:
+          allOf:
+          - $ref: '#/components/schemas/LastUpdatedTime'
+          description: When the job was updated.
+      description: A job to import a package version.
+    PackageImportJobInputConfig:
+      type: object
+      properties:
+        PackageVersionInputConfig:
+          allOf:
+          - $ref: '#/components/schemas/PackageVersionInputConfig'
+          description: The package version's input configuration.
+      description: A configuration for a package import job.
     PackageImportJobList:
       type: array
       items:
         $ref: '#/components/schemas/PackageImportJob'
+    PackageImportJobOutput:
+      type: object
+      properties:
+        PackageId:
+          allOf:
+          - $ref: '#/components/schemas/NodePackageId'
+          description: The package's ID.
+        PackageVersion:
+          allOf:
+          - $ref: '#/components/schemas/NodePackageVersion'
+          description: The package's version.
+        PatchVersion:
+          allOf:
+          - $ref: '#/components/schemas/NodePackagePatchVersion'
+          description: The package's patch version.
+        OutputS3Location:
+          allOf:
+          - $ref: '#/components/schemas/OutPutS3Location'
+          description: The package's output location.
+      required:
+      - PackageId
+      - PackageVersion
+      - PatchVersion
+      - OutputS3Location
+      description: Results of a package import job.
+    PackageImportJobOutputConfig:
+      type: object
+      properties:
+        PackageVersionOutputConfig:
+          allOf:
+          - $ref: '#/components/schemas/PackageVersionOutputConfig'
+          description: The package version's output configuration.
+      description: An output configuration for a package import job.
     PackageImportJobStatus:
       type: string
       enum:
@@ -495,6 +3986,50 @@ components:
       type: array
       items:
         $ref: '#/components/schemas/PackageListItem'
+    PackageListItem:
+      type: object
+      properties:
+        PackageId:
+          allOf:
+          - $ref: '#/components/schemas/NodePackageId'
+          description: The package's ID.
+        PackageName:
+          allOf:
+          - $ref: '#/components/schemas/NodePackageName'
+          description: The package's name.
+        Arn:
+          allOf:
+          - $ref: '#/components/schemas/NodePackageArn'
+          description: The package's ARN.
+        CreatedTime:
+          allOf:
+          - $ref: '#/components/schemas/TimeStamp'
+          description: When the package was created.
+        Tags:
+          allOf:
+          - $ref: '#/components/schemas/TagMap'
+          description: The package's tags.
+      description: A package summary.
+    PackageObject:
+      type: object
+      properties:
+        Name:
+          allOf:
+          - $ref: '#/components/schemas/NodePackageName'
+          description: The object's name.
+        PackageVersion:
+          allOf:
+          - $ref: '#/components/schemas/NodePackageVersion'
+          description: The object's package version.
+        PatchVersion:
+          allOf:
+          - $ref: '#/components/schemas/NodePackagePatchVersion'
+          description: The object's patch version.
+      required:
+      - Name
+      - PackageVersion
+      - PatchVersion
+      description: A package object.
     PackageObjects:
       type: array
       items:
@@ -504,6 +4039,35 @@ components:
       pattern: ^[0-9a-z\_]+$
       minLength: 1
       maxLength: 12
+    PackageVersionInputConfig:
+      type: object
+      properties:
+        S3Location:
+          allOf:
+          - $ref: '#/components/schemas/S3Location'
+          description: A location in Amazon S3.
+      required:
+      - S3Location
+      description: A package version input configuration.
+    PackageVersionOutputConfig:
+      type: object
+      properties:
+        PackageName:
+          allOf:
+          - $ref: '#/components/schemas/NodePackageName'
+          description: The output's package name.
+        PackageVersion:
+          allOf:
+          - $ref: '#/components/schemas/NodePackageVersion'
+          description: The output's package version.
+        MarkLatest:
+          allOf:
+          - $ref: '#/components/schemas/MarkLatestPatch'
+          description: Indicates that the version is recommended for all users.
+      required:
+      - PackageName
+      - PackageVersion
+      description: A package version output configuration.
     PackageVersionStatus:
       type: string
       enum:
@@ -541,11 +4105,125 @@ components:
       type: array
       items:
         $ref: '#/components/schemas/PrincipalArn'
+    ProvisionDeviceRequest:
+      type: object
+      properties:
+        Name:
+          allOf:
+          - $ref: '#/components/schemas/DeviceName'
+          description: A name for the device.
+        Description:
+          allOf:
+          - $ref: '#/components/schemas/Description'
+          description: A description for the device.
+        Tags:
+          allOf:
+          - $ref: '#/components/schemas/TagMap'
+          description: Tags for the device.
+        NetworkingConfiguration:
+          allOf:
+          - $ref: '#/components/schemas/NetworkPayload'
+          description: A networking configuration for the device.
+      required:
+      - Name
+    ProvisionDeviceResponse:
+      type: object
+      properties:
+        DeviceId:
+          allOf:
+          - $ref: '#/components/schemas/DeviceId'
+          description: The device's ID.
+        Arn:
+          allOf:
+          - $ref: '#/components/schemas/DeviceArn'
+          description: The device's ARN.
+        Status:
+          allOf:
+          - $ref: '#/components/schemas/DeviceStatus'
+          description: The device's status.
+        Certificates:
+          allOf:
+          - $ref: '#/components/schemas/Certificates'
+          description: The device's configuration bundle.
+        IotThingName:
+          allOf:
+          - $ref: '#/components/schemas/IotThingName'
+          description: The device's IoT thing name.
+      required:
+      - Arn
+      - Status
     Region:
       type: string
       pattern: ^.+$
       minLength: 1
       maxLength: 255
+    RegisterPackageVersionRequest:
+      type: object
+      properties:
+        OwnerAccount:
+          allOf:
+          - $ref: '#/components/schemas/PackageOwnerAccount'
+          description: An owner account.
+        PackageId:
+          allOf:
+          - $ref: '#/components/schemas/NodePackageId'
+          description: A package ID.
+        PackageVersion:
+          allOf:
+          - $ref: '#/components/schemas/NodePackageVersion'
+          description: A package version.
+        PatchVersion:
+          allOf:
+          - $ref: '#/components/schemas/NodePackagePatchVersion'
+          description: A patch version.
+        MarkLatest:
+          allOf:
+          - $ref: '#/components/schemas/MarkLatestPatch'
+          description: Whether to mark the new version as the latest version.
+      required:
+      - PackageId
+      - PackageVersion
+      - PatchVersion
+    RegisterPackageVersionResponse:
+      type: object
+      properties: {}
+    RemoveApplicationInstanceRequest:
+      type: object
+      properties:
+        ApplicationInstanceId:
+          allOf:
+          - $ref: '#/components/schemas/ApplicationInstanceId'
+          description: An application instance ID.
+      required:
+      - ApplicationInstanceId
+    RemoveApplicationInstanceResponse:
+      type: object
+      properties: {}
+    ReportedRuntimeContextState:
+      type: object
+      properties:
+        DesiredState:
+          allOf:
+          - $ref: '#/components/schemas/DesiredState'
+          description: The application's desired state.
+        RuntimeContextName:
+          allOf:
+          - $ref: '#/components/schemas/RuntimeContextName'
+          description: The device's name.
+        DeviceReportedStatus:
+          allOf:
+          - $ref: '#/components/schemas/DeviceReportedStatus'
+          description: The application's reported status.
+        DeviceReportedTime:
+          allOf:
+          - $ref: '#/components/schemas/TimeStamp'
+          description: When the device reported the application's state.
+      required:
+      - DesiredState
+      - RuntimeContextName
+      - DeviceReportedStatus
+      - DeviceReportedTime
+      description: An application instance's state.
     ReportedRuntimeContextStates:
       type: array
       items:
@@ -555,6 +4233,24 @@ components:
       pattern: ^.+$
       minLength: 1
       maxLength: 2048
+    ResourceNotFoundException:
+      type: object
+      properties:
+        Message:
+          $ref: '#/components/schemas/String'
+        ResourceId:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The resource's ID.
+        ResourceType:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The resource's type.
+      required:
+      - Message
+      - ResourceId
+      - ResourceType
+      description: The target resource was not found.
     RetryAfterSeconds:
       type: integer
       default: 0
@@ -568,11 +4264,104 @@ components:
       pattern: ^arn:[a-z0-9][-.a-z0-9]{0,62}:iam::[0-9]{12}:role/.+$
       minLength: 1
       maxLength: 255
+    S3Location:
+      type: object
+      properties:
+        Region:
+          allOf:
+          - $ref: '#/components/schemas/Region'
+          description: The bucket's Region.
+        BucketName:
+          allOf:
+          - $ref: '#/components/schemas/BucketName'
+          description: A bucket name.
+        ObjectKey:
+          allOf:
+          - $ref: '#/components/schemas/ObjectKey'
+          description: An object key.
+      required:
+      - BucketName
+      - ObjectKey
+      description: A location in Amazon S3.
+    ServiceQuotaExceededException:
+      type: object
+      properties:
+        Message:
+          $ref: '#/components/schemas/String'
+        ResourceId:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The target resource's ID.
+        ResourceType:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The target resource's type.
+        QuotaCode:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The name of the limit.
+        ServiceCode:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The name of the service.
+      required:
+      - Message
+      - QuotaCode
+      - ServiceCode
+      description: The request would cause a limit to be exceeded.
+    SignalApplicationInstanceNodeInstancesRequest:
+      type: object
+      properties:
+        ApplicationInstanceId:
+          allOf:
+          - $ref: '#/components/schemas/ApplicationInstanceId'
+          description: An application instance ID.
+        NodeSignals:
+          allOf:
+          - $ref: '#/components/schemas/NodeSignalList'
+          description: A list of signals.
+      required:
+      - ApplicationInstanceId
+      - NodeSignals
+    SignalApplicationInstanceNodeInstancesResponse:
+      type: object
+      properties:
+        ApplicationInstanceId:
+          allOf:
+          - $ref: '#/components/schemas/ApplicationInstanceId'
+          description: An application instance ID.
+      required:
+      - ApplicationInstanceId
     SortOrder:
       type: string
       enum:
       - ASCENDING
       - DESCENDING
+    StaticIpConnectionInfo:
+      type: object
+      properties:
+        IpAddress:
+          allOf:
+          - $ref: '#/components/schemas/IpAddress'
+          description: The connection's IP address.
+        Mask:
+          allOf:
+          - $ref: '#/components/schemas/Mask'
+          description: The connection's DNS mask.
+        Dns:
+          allOf:
+          - $ref: '#/components/schemas/DnsList'
+          description: The connection's DNS address.
+        DefaultGateway:
+          allOf:
+          - $ref: '#/components/schemas/DefaultGateway'
+          description: The connection's default gateway.
+      required:
+      - IpAddress
+      - Mask
+      - Dns
+      - DefaultGateway
+      description: A static IP configuration.
     StatusFilter:
       type: string
       enum:
@@ -583,6 +4372,36 @@ components:
       - PROCESSING_DEPLOYMENT
       - PROCESSING_REMOVAL
       - DEPLOYMENT_FAILED
+    StorageLocation:
+      type: object
+      properties:
+        Bucket:
+          allOf:
+          - $ref: '#/components/schemas/Bucket'
+          description: The location's bucket.
+        RepoPrefixLocation:
+          allOf:
+          - $ref: '#/components/schemas/Object'
+          description: The location's repo prefix.
+        GeneratedPrefixLocation:
+          allOf:
+          - $ref: '#/components/schemas/Object'
+          description: The location's generated prefix.
+        BinaryPrefixLocation:
+          allOf:
+          - $ref: '#/components/schemas/Object'
+          description: The location's binary prefix.
+        ManifestPrefixLocation:
+          allOf:
+          - $ref: '#/components/schemas/Object'
+          description: The location's manifest prefix.
+      required:
+      - Bucket
+      - RepoPrefixLocation
+      - GeneratedPrefixLocation
+      - BinaryPrefixLocation
+      - ManifestPrefixLocation
+      description: A storage location.
     String:
       type: string
     TagKey:
@@ -598,6 +4417,23 @@ components:
       type: object
       additionalProperties:
         $ref: '#/components/schemas/TagValue'
+    TagResourceRequest:
+      type: object
+      properties:
+        ResourceArn:
+          allOf:
+          - $ref: '#/components/schemas/ResourceArn'
+          description: The resource's ARN.
+        Tags:
+          allOf:
+          - $ref: '#/components/schemas/TagMap'
+          description: Tags for the resource.
+      required:
+      - ResourceArn
+      - Tags
+    TagResourceResponse:
+      type: object
+      properties: {}
     TagValue:
       type: string
       pattern: ^.*$
@@ -629,9 +4465,46 @@ components:
       pattern: ^.+$
       minLength: 1
       maxLength: 4096
+    UntagResourceRequest:
+      type: object
+      properties:
+        ResourceArn:
+          allOf:
+          - $ref: '#/components/schemas/ResourceArn'
+          description: The resource's ARN.
+        TagKeys:
+          allOf:
+          - $ref: '#/components/schemas/TagKeyList'
+          description: Tag keys to remove.
+      required:
+      - ResourceArn
+      - TagKeys
+    UntagResourceResponse:
+      type: object
+      properties: {}
     UpdateCreatedTime:
       type: string
       format: date-time
+    UpdateDeviceMetadataRequest:
+      type: object
+      properties:
+        DeviceId:
+          allOf:
+          - $ref: '#/components/schemas/DeviceId'
+          description: The device's ID.
+        Description:
+          allOf:
+          - $ref: '#/components/schemas/Description'
+          description: A description for the device.
+      required:
+      - DeviceId
+    UpdateDeviceMetadataResponse:
+      type: object
+      properties:
+        DeviceId:
+          allOf:
+          - $ref: '#/components/schemas/DeviceId'
+          description: The device's ID.
     UpdateProgress:
       type: string
       enum:
@@ -642,10 +4515,64 @@ components:
       - DOWNLOADING
       - COMPLETED
       - FAILED
+    ValidationException:
+      type: object
+      properties:
+        Message:
+          $ref: '#/components/schemas/String'
+        Reason:
+          allOf:
+          - $ref: '#/components/schemas/ValidationExceptionReason'
+          description: The reason that validation failed.
+        ErrorId:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: A unique ID for the error.
+        ErrorArguments:
+          allOf:
+          - $ref: '#/components/schemas/ValidationExceptionErrorArgumentList'
+          description: A list of attributes that led to the exception and their values.
+        Fields:
+          allOf:
+          - $ref: '#/components/schemas/ValidationExceptionFieldList'
+          description: A list of request parameters that failed validation.
+      required:
+      - Message
+      description: The request contains an invalid parameter value.
+    ValidationExceptionErrorArgument:
+      type: object
+      properties:
+        Name:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The argument's name.
+        Value:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The argument's value.
+      required:
+      - Name
+      - Value
+      description: A validation exception error argument.
     ValidationExceptionErrorArgumentList:
       type: array
       items:
         $ref: '#/components/schemas/ValidationExceptionErrorArgument'
+    ValidationExceptionField:
+      type: object
+      properties:
+        Name:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The field's name.
+        Message:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The field's message.
+      required:
+      - Name
+      - Message
+      description: A validation exception field.
     ValidationExceptionFieldList:
       type: array
       items:

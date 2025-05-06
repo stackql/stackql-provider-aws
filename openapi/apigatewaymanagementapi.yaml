@@ -7,7 +7,7 @@ info:
   x-stackql-serviceName: apigatewaymanagementapi
   x-aws-serviceName: apigatewaymanagementapi
   x-aws-protocol: aws.protocols#restJson1
-  x-dateGenerated: '2025-05-05'
+  x-dateGenerated: '2025-05-07'
   version: '2018-11-29'
   title: AmazonApiGatewayManagementApi
   description: |-
@@ -43,7 +43,123 @@ servers:
       - sa-east-1
       - me-south-1
       default: us-east-1
-paths: {}
+paths:
+  /@connections/{ConnectionId}:
+    delete:
+      operationId: DeleteConnection
+      description: |-
+        Delete the connection with the provided id.
+      parameters:
+      - name: ConnectionId
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/__string'
+      responses:
+        '204': {}
+        '403':
+          description: |-
+            The caller is not authorized to invoke this operation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ForbiddenException'
+        '410':
+          description: |-
+            The connection with the provided id no longer exists.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GoneException'
+        '429':
+          description: |-
+            The client is sending more than the allowed number of requests per unit of time or the WebSocket client side buffer is full.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LimitExceededException'
+    get:
+      operationId: GetConnection
+      description: |-
+        Get information about the connection with the provided id.
+      parameters:
+      - name: ConnectionId
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/__string'
+      responses:
+        '200': {}
+        '403':
+          description: |-
+            The caller is not authorized to invoke this operation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ForbiddenException'
+        '410':
+          description: |-
+            The connection with the provided id no longer exists.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GoneException'
+        '429':
+          description: |-
+            The client is sending more than the allowed number of requests per unit of time or the WebSocket client side buffer is full.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LimitExceededException'
+    post:
+      operationId: PostToConnection
+      description: |-
+        Sends the provided data to the specified connection.
+      parameters:
+      - name: ConnectionId
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/__string'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                Data:
+                  $ref: '#/components/schemas/Data'
+      responses:
+        '200': {}
+        '403':
+          description: |-
+            The caller is not authorized to invoke this operation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ForbiddenException'
+        '410':
+          description: |-
+            The connection with the provided id no longer exists.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GoneException'
+        '429':
+          description: |-
+            The client is sending more than the allowed number of requests per unit of time or the WebSocket client side buffer is full.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LimitExceededException'
+        '413':
+          description: |-
+            The data has exceeded the maximum size allowed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PayloadTooLargeException'
 components:
   schemas:
     Data:
@@ -53,6 +169,84 @@ components:
         id.</p>
       minLength: 0
       maxLength: 131072
+    DeleteConnectionRequest:
+      type: object
+      properties:
+        ConnectionId:
+          $ref: '#/components/schemas/__string'
+      required:
+      - ConnectionId
+    ForbiddenException:
+      type: object
+      properties: {}
+      description: The caller is not authorized to invoke this operation.
+    GetConnectionRequest:
+      type: object
+      properties:
+        ConnectionId:
+          $ref: '#/components/schemas/__string'
+      required:
+      - ConnectionId
+    GetConnectionResponse:
+      type: object
+      properties:
+        ConnectedAt:
+          allOf:
+          - $ref: '#/components/schemas/__timestampIso8601'
+          description: The time in ISO 8601 format for when the connection was established.
+        Identity:
+          $ref: '#/components/schemas/Identity'
+        LastActiveAt:
+          allOf:
+          - $ref: '#/components/schemas/__timestampIso8601'
+          description: The time in ISO 8601 format for when the connection was last
+            active.
+    GoneException:
+      type: object
+      properties: {}
+      description: The connection with the provided id no longer exists.
+    Identity:
+      type: object
+      properties:
+        SourceIp:
+          allOf:
+          - $ref: '#/components/schemas/__string'
+          description: The source IP address of the TCP connection making the request
+            to API Gateway.
+        UserAgent:
+          allOf:
+          - $ref: '#/components/schemas/__string'
+          description: The User Agent of the API caller.
+      required:
+      - SourceIp
+      - UserAgent
+    LimitExceededException:
+      type: object
+      properties: {}
+      description: The client is sending more than the allowed number of requests
+        per unit of time or the WebSocket client side buffer is full.
+    PayloadTooLargeException:
+      type: object
+      properties:
+        Message:
+          $ref: '#/components/schemas/__string'
+      description: The data has exceeded the maximum size allowed.
+    PostToConnectionRequest:
+      type: object
+      properties:
+        Data:
+          allOf:
+          - $ref: '#/components/schemas/Data'
+          description: The data to be sent to the client specified by its connection
+            id.
+        ConnectionId:
+          allOf:
+          - $ref: '#/components/schemas/__string'
+          description: The identifier of the connection that a specific client is
+            using.
+      required:
+      - Data
+      - ConnectionId
     __string:
       type: string
     __timestampIso8601:

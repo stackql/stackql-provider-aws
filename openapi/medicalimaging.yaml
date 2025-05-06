@@ -7,7 +7,7 @@ info:
   x-stackql-serviceName: medical_imaging
   x-aws-serviceName: medicalimaging
   x-aws-protocol: aws.protocols#restJson1
-  x-dateGenerated: '2025-05-05'
+  x-dateGenerated: '2025-05-07'
   version: '2023-07-19'
   title: AWS Health Imaging
   description: |-
@@ -93,9 +93,1179 @@ servers:
       - sa-east-1
       - me-south-1
       default: us-east-1
-paths: {}
+paths:
+  /datastore/{datastoreId}/imageSet/{sourceImageSetId}/copyImageSet:
+    post:
+      operationId: CopyImageSet
+      description: |-
+        Copy an image set.
+      parameters:
+      - name: datastoreId
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/DatastoreId'
+      - name: sourceImageSetId
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/ImageSetId'
+      - name: force
+        in: query
+        required: false
+        schema:
+          $ref: '#/components/schemas/Boolean'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                copyImageSetInformation:
+                  $ref: '#/components/schemas/CopyImageSetInformation'
+      responses:
+        '200': {}
+        '403':
+          description: |-
+            The user does not have sufficient access to perform this action.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '409':
+          description: |-
+            Updating or deleting a resource can cause an inconsistent state.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConflictException'
+        '500':
+          description: |-
+            An unexpected error occurred during processing of the request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerException'
+        '404':
+          description: |-
+            The request references a resource which does not exist.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+        '402':
+          description: |-
+            The request caused a service quota to be exceeded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServiceQuotaExceededException'
+        '429':
+          description: |-
+            The request was denied due to throttling.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThrottlingException'
+        '400':
+          description: |-
+            The input fails to satisfy the constraints set by the service.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+  /datastore:
+    post:
+      operationId: CreateDatastore
+      description: |-
+        Create a data store.
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                datastoreName:
+                  $ref: '#/components/schemas/DatastoreName'
+                clientToken:
+                  $ref: '#/components/schemas/ClientToken'
+                tags:
+                  $ref: '#/components/schemas/TagMap'
+                kmsKeyArn:
+                  $ref: '#/components/schemas/KmsKeyArn'
+      responses:
+        '200': {}
+        '403':
+          description: |-
+            The user does not have sufficient access to perform this action.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '409':
+          description: |-
+            Updating or deleting a resource can cause an inconsistent state.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConflictException'
+        '500':
+          description: |-
+            An unexpected error occurred during processing of the request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerException'
+        '402':
+          description: |-
+            The request caused a service quota to be exceeded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServiceQuotaExceededException'
+        '429':
+          description: |-
+            The request was denied due to throttling.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThrottlingException'
+        '400':
+          description: |-
+            The input fails to satisfy the constraints set by the service.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+    get:
+      operationId: ListDatastores
+      description: |-
+        List data stores.
+      parameters:
+      - name: datastoreStatus
+        in: query
+        required: false
+        schema:
+          $ref: '#/components/schemas/DatastoreStatus'
+      - name: nextToken
+        in: query
+        required: false
+        schema:
+          $ref: '#/components/schemas/NextToken'
+      - name: maxResults
+        in: query
+        required: false
+        schema:
+          $ref: '#/components/schemas/Integer'
+      responses:
+        '200': {}
+        '403':
+          description: |-
+            The user does not have sufficient access to perform this action.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '500':
+          description: |-
+            An unexpected error occurred during processing of the request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerException'
+        '429':
+          description: |-
+            The request was denied due to throttling.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThrottlingException'
+        '400':
+          description: |-
+            The input fails to satisfy the constraints set by the service.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+  /datastore/{datastoreId}:
+    delete:
+      operationId: DeleteDatastore
+      description: |-
+        Delete a data store.
+
+        Before a data store can be deleted, you must first delete all image sets within it.
+      parameters:
+      - name: datastoreId
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/DatastoreId'
+      responses:
+        '200': {}
+        '403':
+          description: |-
+            The user does not have sufficient access to perform this action.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '409':
+          description: |-
+            Updating or deleting a resource can cause an inconsistent state.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConflictException'
+        '500':
+          description: |-
+            An unexpected error occurred during processing of the request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerException'
+        '404':
+          description: |-
+            The request references a resource which does not exist.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+        '429':
+          description: |-
+            The request was denied due to throttling.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThrottlingException'
+        '400':
+          description: |-
+            The input fails to satisfy the constraints set by the service.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+    get:
+      operationId: GetDatastore
+      description: |-
+        Get data store properties.
+      parameters:
+      - name: datastoreId
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/DatastoreId'
+      responses:
+        '200': {}
+        '403':
+          description: |-
+            The user does not have sufficient access to perform this action.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '500':
+          description: |-
+            An unexpected error occurred during processing of the request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerException'
+        '404':
+          description: |-
+            The request references a resource which does not exist.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+        '429':
+          description: |-
+            The request was denied due to throttling.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThrottlingException'
+        '400':
+          description: |-
+            The input fails to satisfy the constraints set by the service.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+  /datastore/{datastoreId}/imageSet/{imageSetId}/deleteImageSet:
+    post:
+      operationId: DeleteImageSet
+      description: |-
+        Delete an image set.
+      parameters:
+      - name: datastoreId
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/DatastoreId'
+      - name: imageSetId
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/ImageSetId'
+      responses:
+        '200': {}
+        '403':
+          description: |-
+            The user does not have sufficient access to perform this action.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '409':
+          description: |-
+            Updating or deleting a resource can cause an inconsistent state.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConflictException'
+        '500':
+          description: |-
+            An unexpected error occurred during processing of the request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerException'
+        '404':
+          description: |-
+            The request references a resource which does not exist.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+        '429':
+          description: |-
+            The request was denied due to throttling.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThrottlingException'
+        '400':
+          description: |-
+            The input fails to satisfy the constraints set by the service.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+  /getDICOMImportJob/datastore/{datastoreId}/job/{jobId}:
+    get:
+      operationId: GetDICOMImportJob
+      description: |-
+        Get the import job properties to learn more about the job or job progress.
+
+        The `jobStatus` refers to the execution of the import job. Therefore, an import job can return a `jobStatus` as `COMPLETED` even if validation issues are discovered during the import process. If a `jobStatus` returns as `COMPLETED`, we still recommend you review the output manifests written to S3, as they provide details on the success or failure of individual P10 object imports.
+      parameters:
+      - name: datastoreId
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/DatastoreId'
+      - name: jobId
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/JobId'
+      responses:
+        '200': {}
+        '403':
+          description: |-
+            The user does not have sufficient access to perform this action.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '409':
+          description: |-
+            Updating or deleting a resource can cause an inconsistent state.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConflictException'
+        '500':
+          description: |-
+            An unexpected error occurred during processing of the request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerException'
+        '404':
+          description: |-
+            The request references a resource which does not exist.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+        '429':
+          description: |-
+            The request was denied due to throttling.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThrottlingException'
+        '400':
+          description: |-
+            The input fails to satisfy the constraints set by the service.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+  /datastore/{datastoreId}/imageSet/{imageSetId}/getImageFrame:
+    post:
+      operationId: GetImageFrame
+      description: |-
+        Get an image frame (pixel data) for an image set.
+      parameters:
+      - name: datastoreId
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/DatastoreId'
+      - name: imageSetId
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/ImageSetId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                imageFrameInformation:
+                  $ref: '#/components/schemas/ImageFrameInformation'
+      responses:
+        '200': {}
+        '403':
+          description: |-
+            The user does not have sufficient access to perform this action.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '409':
+          description: |-
+            Updating or deleting a resource can cause an inconsistent state.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConflictException'
+        '500':
+          description: |-
+            An unexpected error occurred during processing of the request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerException'
+        '404':
+          description: |-
+            The request references a resource which does not exist.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+        '429':
+          description: |-
+            The request was denied due to throttling.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThrottlingException'
+        '400':
+          description: |-
+            The input fails to satisfy the constraints set by the service.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+  /datastore/{datastoreId}/imageSet/{imageSetId}/getImageSet:
+    post:
+      operationId: GetImageSet
+      description: |-
+        Get image set properties.
+      parameters:
+      - name: datastoreId
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/DatastoreId'
+      - name: imageSetId
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/ImageSetId'
+      - name: version
+        in: query
+        required: false
+        schema:
+          $ref: '#/components/schemas/ImageSetExternalVersionId'
+      responses:
+        '200': {}
+        '403':
+          description: |-
+            The user does not have sufficient access to perform this action.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '409':
+          description: |-
+            Updating or deleting a resource can cause an inconsistent state.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConflictException'
+        '500':
+          description: |-
+            An unexpected error occurred during processing of the request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerException'
+        '404':
+          description: |-
+            The request references a resource which does not exist.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+        '429':
+          description: |-
+            The request was denied due to throttling.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThrottlingException'
+        '400':
+          description: |-
+            The input fails to satisfy the constraints set by the service.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+  /datastore/{datastoreId}/imageSet/{imageSetId}/getImageSetMetadata:
+    post:
+      operationId: GetImageSetMetadata
+      description: |-
+        Get metadata attributes for an image set.
+      parameters:
+      - name: datastoreId
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/DatastoreId'
+      - name: imageSetId
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/ImageSetId'
+      - name: version
+        in: query
+        required: false
+        schema:
+          $ref: '#/components/schemas/ImageSetExternalVersionId'
+      responses:
+        '200': {}
+        '403':
+          description: |-
+            The user does not have sufficient access to perform this action.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '409':
+          description: |-
+            Updating or deleting a resource can cause an inconsistent state.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConflictException'
+        '500':
+          description: |-
+            An unexpected error occurred during processing of the request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerException'
+        '404':
+          description: |-
+            The request references a resource which does not exist.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+        '429':
+          description: |-
+            The request was denied due to throttling.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThrottlingException'
+        '400':
+          description: |-
+            The input fails to satisfy the constraints set by the service.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+  /listDICOMImportJobs/datastore/{datastoreId}:
+    get:
+      operationId: ListDICOMImportJobs
+      description: |-
+        List import jobs created for a specific data store.
+      parameters:
+      - name: datastoreId
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/DatastoreId'
+      - name: jobStatus
+        in: query
+        required: false
+        schema:
+          $ref: '#/components/schemas/JobStatus'
+      - name: nextToken
+        in: query
+        required: false
+        schema:
+          $ref: '#/components/schemas/NextToken'
+      - name: maxResults
+        in: query
+        required: false
+        schema:
+          $ref: '#/components/schemas/Integer'
+      responses:
+        '200': {}
+        '403':
+          description: |-
+            The user does not have sufficient access to perform this action.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '409':
+          description: |-
+            Updating or deleting a resource can cause an inconsistent state.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConflictException'
+        '500':
+          description: |-
+            An unexpected error occurred during processing of the request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerException'
+        '404':
+          description: |-
+            The request references a resource which does not exist.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+        '429':
+          description: |-
+            The request was denied due to throttling.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThrottlingException'
+        '400':
+          description: |-
+            The input fails to satisfy the constraints set by the service.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+  /datastore/{datastoreId}/imageSet/{imageSetId}/listImageSetVersions:
+    post:
+      operationId: ListImageSetVersions
+      description: |-
+        List image set versions.
+      parameters:
+      - name: datastoreId
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/DatastoreId'
+      - name: imageSetId
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/ImageSetId'
+      - name: nextToken
+        in: query
+        required: false
+        schema:
+          $ref: '#/components/schemas/NextToken'
+      - name: maxResults
+        in: query
+        required: false
+        schema:
+          $ref: '#/components/schemas/Integer'
+      responses:
+        '200': {}
+        '403':
+          description: |-
+            The user does not have sufficient access to perform this action.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '409':
+          description: |-
+            Updating or deleting a resource can cause an inconsistent state.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConflictException'
+        '500':
+          description: |-
+            An unexpected error occurred during processing of the request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerException'
+        '404':
+          description: |-
+            The request references a resource which does not exist.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+        '429':
+          description: |-
+            The request was denied due to throttling.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThrottlingException'
+        '400':
+          description: |-
+            The input fails to satisfy the constraints set by the service.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+  /tags/{resourceArn}:
+    get:
+      operationId: ListTagsForResource
+      description: |-
+        Lists all tags associated with a medical imaging resource.
+      parameters:
+      - name: resourceArn
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/Arn'
+      responses:
+        '200': {}
+        '403':
+          description: |-
+            The user does not have sufficient access to perform this action.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '500':
+          description: |-
+            An unexpected error occurred during processing of the request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerException'
+        '404':
+          description: |-
+            The request references a resource which does not exist.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+        '429':
+          description: |-
+            The request was denied due to throttling.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThrottlingException'
+        '400':
+          description: |-
+            The input fails to satisfy the constraints set by the service.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+    post:
+      operationId: TagResource
+      description: |-
+        Adds a user-specifed key and value tag to a medical imaging resource.
+      parameters:
+      - name: resourceArn
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/Arn'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                tags:
+                  $ref: '#/components/schemas/TagMap'
+      responses:
+        '200': {}
+        '403':
+          description: |-
+            The user does not have sufficient access to perform this action.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '500':
+          description: |-
+            An unexpected error occurred during processing of the request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerException'
+        '404':
+          description: |-
+            The request references a resource which does not exist.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+        '429':
+          description: |-
+            The request was denied due to throttling.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThrottlingException'
+        '400':
+          description: |-
+            The input fails to satisfy the constraints set by the service.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+    delete:
+      operationId: UntagResource
+      description: |-
+        Removes tags from a medical imaging resource.
+      parameters:
+      - name: resourceArn
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/Arn'
+      - name: tagKeys
+        in: query
+        required: true
+        schema:
+          $ref: '#/components/schemas/TagKeyList'
+      responses:
+        '200': {}
+        '403':
+          description: |-
+            The user does not have sufficient access to perform this action.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '500':
+          description: |-
+            An unexpected error occurred during processing of the request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerException'
+        '404':
+          description: |-
+            The request references a resource which does not exist.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+        '429':
+          description: |-
+            The request was denied due to throttling.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThrottlingException'
+        '400':
+          description: |-
+            The input fails to satisfy the constraints set by the service.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+  /datastore/{datastoreId}/searchImageSets:
+    post:
+      operationId: SearchImageSets
+      description: |-
+        Search image sets based on defined input attributes.
+
+        `SearchImageSets` accepts a single search query parameter and returns a paginated response of all image sets that have the matching criteria. All date range queries must be input as `(lowerBound, upperBound)`.
+
+        By default, `SearchImageSets` uses the `updatedAt` field for sorting in descending order from newest to oldest.
+      parameters:
+      - name: datastoreId
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/DatastoreId'
+      - name: maxResults
+        in: query
+        required: false
+        schema:
+          $ref: '#/components/schemas/Integer'
+      - name: nextToken
+        in: query
+        required: false
+        schema:
+          $ref: '#/components/schemas/NextToken'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                searchCriteria:
+                  $ref: '#/components/schemas/SearchCriteria'
+      responses:
+        '200': {}
+        '403':
+          description: |-
+            The user does not have sufficient access to perform this action.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '409':
+          description: |-
+            Updating or deleting a resource can cause an inconsistent state.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConflictException'
+        '500':
+          description: |-
+            An unexpected error occurred during processing of the request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerException'
+        '404':
+          description: |-
+            The request references a resource which does not exist.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+        '429':
+          description: |-
+            The request was denied due to throttling.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThrottlingException'
+        '400':
+          description: |-
+            The input fails to satisfy the constraints set by the service.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+  /startDICOMImportJob/datastore/{datastoreId}:
+    post:
+      operationId: StartDICOMImportJob
+      description: |-
+        Start importing bulk data into an `ACTIVE` data store. The import job imports DICOM P10 files found in the S3 prefix specified by the `inputS3Uri` parameter. The import job stores processing results in the file specified by the `outputS3Uri` parameter.
+      parameters:
+      - name: datastoreId
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/DatastoreId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                jobName:
+                  $ref: '#/components/schemas/JobName'
+                dataAccessRoleArn:
+                  $ref: '#/components/schemas/RoleArn'
+                clientToken:
+                  $ref: '#/components/schemas/ClientToken'
+                inputS3Uri:
+                  $ref: '#/components/schemas/S3Uri'
+                outputS3Uri:
+                  $ref: '#/components/schemas/S3Uri'
+                inputOwnerAccountId:
+                  $ref: '#/components/schemas/AwsAccountId'
+      responses:
+        '200': {}
+        '403':
+          description: |-
+            The user does not have sufficient access to perform this action.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '409':
+          description: |-
+            Updating or deleting a resource can cause an inconsistent state.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConflictException'
+        '500':
+          description: |-
+            An unexpected error occurred during processing of the request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerException'
+        '404':
+          description: |-
+            The request references a resource which does not exist.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+        '402':
+          description: |-
+            The request caused a service quota to be exceeded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServiceQuotaExceededException'
+        '429':
+          description: |-
+            The request was denied due to throttling.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThrottlingException'
+        '400':
+          description: |-
+            The input fails to satisfy the constraints set by the service.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+  /datastore/{datastoreId}/imageSet/{imageSetId}/updateImageSetMetadata:
+    post:
+      operationId: UpdateImageSetMetadata
+      description: |-
+        Update image set metadata attributes.
+      parameters:
+      - name: datastoreId
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/DatastoreId'
+      - name: imageSetId
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/ImageSetId'
+      - name: latestVersion
+        in: query
+        required: true
+        schema:
+          $ref: '#/components/schemas/ImageSetExternalVersionId'
+      - name: force
+        in: query
+        required: false
+        schema:
+          $ref: '#/components/schemas/Boolean'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                updateImageSetMetadataUpdates:
+                  $ref: '#/components/schemas/MetadataUpdates'
+      responses:
+        '200': {}
+        '403':
+          description: |-
+            The user does not have sufficient access to perform this action.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '409':
+          description: |-
+            Updating or deleting a resource can cause an inconsistent state.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConflictException'
+        '500':
+          description: |-
+            An unexpected error occurred during processing of the request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerException'
+        '404':
+          description: |-
+            The request references a resource which does not exist.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+        '402':
+          description: |-
+            The request caused a service quota to be exceeded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServiceQuotaExceededException'
+        '429':
+          description: |-
+            The request was denied due to throttling.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThrottlingException'
+        '400':
+          description: |-
+            The input fails to satisfy the constraints set by the service.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
 components:
   schemas:
+    AccessDeniedException:
+      type: object
+      properties:
+        message:
+          $ref: '#/components/schemas/String'
+      required:
+      - message
+      description: The user does not have sufficient access to perform this action.
     Arn:
       type: string
       pattern: ^arn:aws((-us-gov)|(-iso)|(-iso-b)|(-cn))?:medical-imaging:[a-z0-9-]+:[0-9]{12}:datastore/[0-9a-z]{32}(/imageset/[0-9a-z]{32})?$
@@ -109,10 +1279,218 @@ components:
       pattern: ^[A-Za-z0-9._-]+$
       minLength: 1
       maxLength: 64
+    ConflictException:
+      type: object
+      properties:
+        message:
+          $ref: '#/components/schemas/String'
+      required:
+      - message
+      description: Updating or deleting a resource can cause an inconsistent state.
     CopiableAttributes:
       type: string
       minLength: 1
       maxLength: 260000
+    CopyDestinationImageSet:
+      type: object
+      properties:
+        imageSetId:
+          allOf:
+          - $ref: '#/components/schemas/ImageSetId'
+          description: The image set identifier for the destination image set.
+        latestVersionId:
+          allOf:
+          - $ref: '#/components/schemas/ImageSetExternalVersionId'
+          description: The latest version identifier for the destination image set.
+      required:
+      - imageSetId
+      - latestVersionId
+      description: Copy the destination image set.
+    CopyDestinationImageSetProperties:
+      type: object
+      properties:
+        imageSetId:
+          allOf:
+          - $ref: '#/components/schemas/ImageSetId'
+          description: The image set identifier of the copied image set properties.
+        latestVersionId:
+          allOf:
+          - $ref: '#/components/schemas/ImageSetExternalVersionId'
+          description: The latest version identifier for the destination image set
+            properties.
+        imageSetState:
+          allOf:
+          - $ref: '#/components/schemas/ImageSetState'
+          description: The image set state of the destination image set properties.
+        imageSetWorkflowStatus:
+          allOf:
+          - $ref: '#/components/schemas/ImageSetWorkflowStatus'
+          description: The image set workflow status of the destination image set
+            properties.
+        createdAt:
+          allOf:
+          - $ref: '#/components/schemas/Date'
+          description: The timestamp when the destination image set properties were
+            created.
+        updatedAt:
+          allOf:
+          - $ref: '#/components/schemas/Date'
+          description: The timestamp when the destination image set properties were
+            last updated.
+        imageSetArn:
+          allOf:
+          - $ref: '#/components/schemas/Arn'
+          description: The Amazon Resource Name (ARN) assigned to the destination
+            image set.
+      required:
+      - imageSetId
+      - latestVersionId
+      description: Copy the image set properties of the destination image set.
+    CopyImageSetInformation:
+      type: object
+      properties:
+        sourceImageSet:
+          allOf:
+          - $ref: '#/components/schemas/CopySourceImageSetInformation'
+          description: The source image set.
+        destinationImageSet:
+          allOf:
+          - $ref: '#/components/schemas/CopyDestinationImageSet'
+          description: The destination image set.
+      required:
+      - sourceImageSet
+      description: Copy image set information.
+    CopyImageSetRequest:
+      type: object
+      properties:
+        datastoreId:
+          allOf:
+          - $ref: '#/components/schemas/DatastoreId'
+          description: The data store identifier.
+        sourceImageSetId:
+          allOf:
+          - $ref: '#/components/schemas/ImageSetId'
+          description: The source image set identifier.
+        copyImageSetInformation:
+          allOf:
+          - $ref: '#/components/schemas/CopyImageSetInformation'
+          description: Copy image set information.
+        force:
+          allOf:
+          - $ref: '#/components/schemas/Boolean'
+          description: Setting this flag will force the `CopyImageSet` operation,
+            even if Patient, Study, or Series level metadata are mismatched across
+            the `sourceImageSet` and `destinationImageSet`.
+      required:
+      - datastoreId
+      - sourceImageSetId
+      - copyImageSetInformation
+    CopyImageSetResponse:
+      type: object
+      properties:
+        datastoreId:
+          allOf:
+          - $ref: '#/components/schemas/DatastoreId'
+          description: The data store identifier.
+        sourceImageSetProperties:
+          allOf:
+          - $ref: '#/components/schemas/CopySourceImageSetProperties'
+          description: The properties of the source image set.
+        destinationImageSetProperties:
+          allOf:
+          - $ref: '#/components/schemas/CopyDestinationImageSetProperties'
+          description: The properties of the destination image set.
+      required:
+      - datastoreId
+      - sourceImageSetProperties
+      - destinationImageSetProperties
+    CopySourceImageSetInformation:
+      type: object
+      properties:
+        latestVersionId:
+          allOf:
+          - $ref: '#/components/schemas/ImageSetExternalVersionId'
+          description: The latest version identifier for the source image set.
+        DICOMCopies:
+          allOf:
+          - $ref: '#/components/schemas/MetadataCopies'
+          description: Contains `MetadataCopies` structure and wraps information related
+            to specific copy use cases. For example, when copying subsets.
+      required:
+      - latestVersionId
+      description: Copy source image set information.
+    CopySourceImageSetProperties:
+      type: object
+      properties:
+        imageSetId:
+          allOf:
+          - $ref: '#/components/schemas/ImageSetId'
+          description: The image set identifier for the copied source image set.
+        latestVersionId:
+          allOf:
+          - $ref: '#/components/schemas/ImageSetExternalVersionId'
+          description: The latest version identifier for the copied source image set.
+        imageSetState:
+          allOf:
+          - $ref: '#/components/schemas/ImageSetState'
+          description: The image set state of the copied source image set.
+        imageSetWorkflowStatus:
+          allOf:
+          - $ref: '#/components/schemas/ImageSetWorkflowStatus'
+          description: The workflow status of the copied source image set.
+        createdAt:
+          allOf:
+          - $ref: '#/components/schemas/Date'
+          description: The timestamp when the source image set properties were created.
+        updatedAt:
+          allOf:
+          - $ref: '#/components/schemas/Date'
+          description: The timestamp when the source image set properties were updated.
+        imageSetArn:
+          allOf:
+          - $ref: '#/components/schemas/Arn'
+          description: The Amazon Resource Name (ARN) assigned to the source image
+            set.
+      required:
+      - imageSetId
+      - latestVersionId
+      description: Copy source image set properties.
+    CreateDatastoreRequest:
+      type: object
+      properties:
+        datastoreName:
+          allOf:
+          - $ref: '#/components/schemas/DatastoreName'
+          description: The data store name.
+        clientToken:
+          allOf:
+          - $ref: '#/components/schemas/ClientToken'
+          description: A unique identifier for API idempotency.
+        tags:
+          allOf:
+          - $ref: '#/components/schemas/TagMap'
+          description: The tags provided when creating a data store.
+        kmsKeyArn:
+          allOf:
+          - $ref: '#/components/schemas/KmsKeyArn'
+          description: The Amazon Resource Name (ARN) assigned to the Key Management
+            Service (KMS) key for accessing encrypted data.
+      required:
+      - clientToken
+    CreateDatastoreResponse:
+      type: object
+      properties:
+        datastoreId:
+          allOf:
+          - $ref: '#/components/schemas/DatastoreId'
+          description: The data store identifier.
+        datastoreStatus:
+          allOf:
+          - $ref: '#/components/schemas/DatastoreStatus'
+          description: The data store status.
+      required:
+      - datastoreId
+      - datastoreStatus
     DICOMAccessionNumber:
       type: string
       minLength: 0
@@ -123,10 +1501,107 @@ components:
       minLength: 1
       maxLength: 10000
       x-sensitive: true
+    DICOMImportJobProperties:
+      type: object
+      properties:
+        jobId:
+          allOf:
+          - $ref: '#/components/schemas/JobId'
+          description: The import job identifier.
+        jobName:
+          allOf:
+          - $ref: '#/components/schemas/JobName'
+          description: The import job name.
+        jobStatus:
+          allOf:
+          - $ref: '#/components/schemas/JobStatus'
+          description: The filters for listing import jobs based on status.
+        datastoreId:
+          allOf:
+          - $ref: '#/components/schemas/DatastoreId'
+          description: The data store identifier.
+        dataAccessRoleArn:
+          allOf:
+          - $ref: '#/components/schemas/RoleArn'
+          description: The Amazon Resource Name (ARN) that grants permissions to access
+            medical imaging resources.
+        endedAt:
+          allOf:
+          - $ref: '#/components/schemas/Date'
+          description: The timestamp for when the import job was ended.
+        submittedAt:
+          allOf:
+          - $ref: '#/components/schemas/Date'
+          description: The timestamp for when the import job was submitted.
+        inputS3Uri:
+          allOf:
+          - $ref: '#/components/schemas/S3Uri'
+          description: The input prefix path for the S3 bucket that contains the DICOM
+            P10 files to be imported.
+        outputS3Uri:
+          allOf:
+          - $ref: '#/components/schemas/S3Uri'
+          description: The output prefix of the S3 bucket to upload the results of
+            the DICOM import job.
+        message:
+          allOf:
+          - $ref: '#/components/schemas/Message'
+          description: The error message thrown if an import job fails.
+      required:
+      - jobId
+      - jobName
+      - jobStatus
+      - datastoreId
+      - dataAccessRoleArn
+      - inputS3Uri
+      - outputS3Uri
+      description: Properties of the import job.
     DICOMImportJobSummaries:
       type: array
       items:
         $ref: '#/components/schemas/DICOMImportJobSummary'
+    DICOMImportJobSummary:
+      type: object
+      properties:
+        jobId:
+          allOf:
+          - $ref: '#/components/schemas/JobId'
+          description: The import job identifier.
+        jobName:
+          allOf:
+          - $ref: '#/components/schemas/JobName'
+          description: The import job name.
+        jobStatus:
+          allOf:
+          - $ref: '#/components/schemas/JobStatus'
+          description: The filters for listing import jobs based on status.
+        datastoreId:
+          allOf:
+          - $ref: '#/components/schemas/DatastoreId'
+          description: The data store identifier.
+        dataAccessRoleArn:
+          allOf:
+          - $ref: '#/components/schemas/RoleArn'
+          description: The Amazon Resource Name (ARN) that grants permissions to access
+            medical imaging resources.
+        endedAt:
+          allOf:
+          - $ref: '#/components/schemas/Date'
+          description: The timestamp when an import job ended.
+        submittedAt:
+          allOf:
+          - $ref: '#/components/schemas/Date'
+          description: The timestamp when an import job was submitted.
+        message:
+          allOf:
+          - $ref: '#/components/schemas/Message'
+          description: The error message thrown if an import job fails.
+      required:
+      - jobId
+      - jobName
+      - jobStatus
+      - datastoreId
+      description: Summary of import job.
     DICOMNumberOfStudyRelatedInstances:
       type: integer
       default: 0
@@ -174,6 +1649,21 @@ components:
       type: string
       minLength: 0
       maxLength: 18
+    DICOMStudyDateAndTime:
+      type: object
+      properties:
+        DICOMStudyDate:
+          allOf:
+          - $ref: '#/components/schemas/DICOMStudyDate'
+          description: The DICOM study date provided in `yyMMdd` format.
+        DICOMStudyTime:
+          allOf:
+          - $ref: '#/components/schemas/DICOMStudyTime'
+          description: The DICOM study time provided in `HHmmss.FFFFFF` format.
+      required:
+      - DICOMStudyDate
+      description: The aggregated structure to store DICOM study date and study time
+        for search capabilities.
     DICOMStudyDescription:
       type: string
       minLength: 0
@@ -191,6 +1681,87 @@ components:
       type: string
       minLength: 0
       maxLength: 28
+    DICOMTags:
+      type: object
+      properties:
+        DICOMPatientId:
+          allOf:
+          - $ref: '#/components/schemas/DICOMPatientId'
+          description: The unique identifier for a patient in a DICOM Study.
+        DICOMPatientName:
+          allOf:
+          - $ref: '#/components/schemas/DICOMPatientName'
+          description: The patient name.
+        DICOMPatientBirthDate:
+          allOf:
+          - $ref: '#/components/schemas/DICOMPatientBirthDate'
+          description: The patient birth date.
+        DICOMPatientSex:
+          allOf:
+          - $ref: '#/components/schemas/DICOMPatientSex'
+          description: The patient sex.
+        DICOMStudyInstanceUID:
+          allOf:
+          - $ref: '#/components/schemas/DICOMStudyInstanceUID'
+          description: The DICOM provided identifier for the Study Instance UID.
+        DICOMStudyId:
+          allOf:
+          - $ref: '#/components/schemas/DICOMStudyId'
+          description: The DICOM provided identifier for the Study ID.
+        DICOMStudyDescription:
+          allOf:
+          - $ref: '#/components/schemas/DICOMStudyDescription'
+          description: The DICOM provided Study Description.
+        DICOMNumberOfStudyRelatedSeries:
+          allOf:
+          - $ref: '#/components/schemas/DICOMNumberOfStudyRelatedSeries'
+          description: The total number of series in the DICOM study.
+        DICOMNumberOfStudyRelatedInstances:
+          allOf:
+          - $ref: '#/components/schemas/DICOMNumberOfStudyRelatedInstances'
+          description: The total number of instances in the DICOM study.
+        DICOMAccessionNumber:
+          allOf:
+          - $ref: '#/components/schemas/DICOMAccessionNumber'
+          description: The accession number for the DICOM study.
+        DICOMSeriesInstanceUID:
+          allOf:
+          - $ref: '#/components/schemas/DICOMSeriesInstanceUID'
+          description: The DICOM provided identifier for the Series Instance UID.
+        DICOMSeriesModality:
+          allOf:
+          - $ref: '#/components/schemas/DICOMSeriesModality'
+          description: The DICOM provided identifier for the series Modality.
+        DICOMSeriesBodyPart:
+          allOf:
+          - $ref: '#/components/schemas/DICOMSeriesBodyPart'
+          description: The DICOM provided identifier for the series Body Part Examined.
+        DICOMSeriesNumber:
+          allOf:
+          - $ref: '#/components/schemas/DICOMSeriesNumber'
+          description: The DICOM provided identifier for the Series Number.
+        DICOMStudyDate:
+          allOf:
+          - $ref: '#/components/schemas/DICOMStudyDate'
+          description: The study date.
+        DICOMStudyTime:
+          allOf:
+          - $ref: '#/components/schemas/DICOMStudyTime'
+          description: The study time.
+      description: The DICOM attributes returned as a part of a response. Each image
+        set has these properties as part of a search result.
+    DICOMUpdates:
+      type: object
+      properties:
+        removableAttributes:
+          allOf:
+          - $ref: '#/components/schemas/DICOMAttribute'
+          description: The DICOM tags to be removed from `ImageSetMetadata`.
+        updatableAttributes:
+          allOf:
+          - $ref: '#/components/schemas/DICOMAttribute'
+          description: The DICOM tags that need to be updated in `ImageSetMetadata`.
+      description: The object containing `removableAttributes` and `updatableAttributes`.
     DatastoreId:
       type: string
       pattern: ^[0-9a-z]{32}$
@@ -199,6 +1770,43 @@ components:
       pattern: ^[A-Za-z0-9._/#-]+$
       minLength: 1
       maxLength: 256
+    DatastoreProperties:
+      type: object
+      properties:
+        datastoreId:
+          allOf:
+          - $ref: '#/components/schemas/DatastoreId'
+          description: The data store identifier.
+        datastoreName:
+          allOf:
+          - $ref: '#/components/schemas/DatastoreName'
+          description: The data store name.
+        datastoreStatus:
+          allOf:
+          - $ref: '#/components/schemas/DatastoreStatus'
+          description: The data store status.
+        kmsKeyArn:
+          allOf:
+          - $ref: '#/components/schemas/KmsKeyArn'
+          description: The Amazon Resource Name (ARN) assigned to the Key Management
+            Service (KMS) key for accessing encrypted data.
+        datastoreArn:
+          allOf:
+          - $ref: '#/components/schemas/Arn'
+          description: The Amazon Resource Name (ARN) for the data store.
+        createdAt:
+          allOf:
+          - $ref: '#/components/schemas/Date'
+          description: The timestamp when the data store was created.
+        updatedAt:
+          allOf:
+          - $ref: '#/components/schemas/Date'
+          description: The timestamp when the data store was last updated.
+      required:
+      - datastoreId
+      - datastoreName
+      - datastoreStatus
+      description: The properties associated with the data store.
     DatastoreStatus:
       type: string
       enum:
@@ -211,12 +1819,299 @@ components:
       type: array
       items:
         $ref: '#/components/schemas/DatastoreSummary'
+    DatastoreSummary:
+      type: object
+      properties:
+        datastoreId:
+          allOf:
+          - $ref: '#/components/schemas/DatastoreId'
+          description: The data store identifier.
+        datastoreName:
+          allOf:
+          - $ref: '#/components/schemas/DatastoreName'
+          description: The data store name.
+        datastoreStatus:
+          allOf:
+          - $ref: '#/components/schemas/DatastoreStatus'
+          description: The data store status.
+        datastoreArn:
+          allOf:
+          - $ref: '#/components/schemas/Arn'
+          description: The Amazon Resource Name (ARN) for the data store.
+        createdAt:
+          allOf:
+          - $ref: '#/components/schemas/Date'
+          description: The timestamp when the data store was created.
+        updatedAt:
+          allOf:
+          - $ref: '#/components/schemas/Date'
+          description: The timestamp when the data store was last updated.
+      required:
+      - datastoreId
+      - datastoreName
+      - datastoreStatus
+      description: List of summaries of data stores.
     Date:
       type: string
       format: date-time
+    DeleteDatastoreRequest:
+      type: object
+      properties:
+        datastoreId:
+          allOf:
+          - $ref: '#/components/schemas/DatastoreId'
+          description: The data store identifier.
+      required:
+      - datastoreId
+    DeleteDatastoreResponse:
+      type: object
+      properties:
+        datastoreId:
+          allOf:
+          - $ref: '#/components/schemas/DatastoreId'
+          description: The data store identifier.
+        datastoreStatus:
+          allOf:
+          - $ref: '#/components/schemas/DatastoreStatus'
+          description: The data store status.
+      required:
+      - datastoreId
+      - datastoreStatus
+    DeleteImageSetRequest:
+      type: object
+      properties:
+        datastoreId:
+          allOf:
+          - $ref: '#/components/schemas/DatastoreId'
+          description: The data store identifier.
+        imageSetId:
+          allOf:
+          - $ref: '#/components/schemas/ImageSetId'
+          description: The image set identifier.
+      required:
+      - datastoreId
+      - imageSetId
+    DeleteImageSetResponse:
+      type: object
+      properties:
+        datastoreId:
+          allOf:
+          - $ref: '#/components/schemas/DatastoreId'
+          description: The data store identifier.
+        imageSetId:
+          allOf:
+          - $ref: '#/components/schemas/ImageSetId'
+          description: The image set identifier.
+        imageSetState:
+          allOf:
+          - $ref: '#/components/schemas/ImageSetState'
+          description: The image set state.
+        imageSetWorkflowStatus:
+          allOf:
+          - $ref: '#/components/schemas/ImageSetWorkflowStatus'
+          description: The image set workflow status.
+      required:
+      - datastoreId
+      - imageSetId
+      - imageSetState
+      - imageSetWorkflowStatus
+    GetDICOMImportJobRequest:
+      type: object
+      properties:
+        datastoreId:
+          allOf:
+          - $ref: '#/components/schemas/DatastoreId'
+          description: The data store identifier.
+        jobId:
+          allOf:
+          - $ref: '#/components/schemas/JobId'
+          description: The import job identifier.
+      required:
+      - datastoreId
+      - jobId
+    GetDICOMImportJobResponse:
+      type: object
+      properties:
+        jobProperties:
+          allOf:
+          - $ref: '#/components/schemas/DICOMImportJobProperties'
+          description: The properties of the import job.
+      required:
+      - jobProperties
+    GetDatastoreRequest:
+      type: object
+      properties:
+        datastoreId:
+          allOf:
+          - $ref: '#/components/schemas/DatastoreId'
+          description: The data store identifier.
+      required:
+      - datastoreId
+    GetDatastoreResponse:
+      type: object
+      properties:
+        datastoreProperties:
+          allOf:
+          - $ref: '#/components/schemas/DatastoreProperties'
+          description: The data store properties.
+      required:
+      - datastoreProperties
+    GetImageFrameRequest:
+      type: object
+      properties:
+        datastoreId:
+          allOf:
+          - $ref: '#/components/schemas/DatastoreId'
+          description: The data store identifier.
+        imageSetId:
+          allOf:
+          - $ref: '#/components/schemas/ImageSetId'
+          description: The image set identifier.
+        imageFrameInformation:
+          allOf:
+          - $ref: '#/components/schemas/ImageFrameInformation'
+          description: Information about the image frame (pixel data) identifier.
+      required:
+      - datastoreId
+      - imageSetId
+      - imageFrameInformation
+    GetImageFrameResponse:
+      type: object
+      properties:
+        imageFrameBlob:
+          allOf:
+          - $ref: '#/components/schemas/PayloadBlob'
+          description: The blob containing the aggregated image frame information.
+        contentType:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The format in which the image frame information is returned
+            to the customer. Default is `application/octet-stream`.
+      required:
+      - imageFrameBlob
+    GetImageSetMetadataRequest:
+      type: object
+      properties:
+        datastoreId:
+          allOf:
+          - $ref: '#/components/schemas/DatastoreId'
+          description: The data store identifier.
+        imageSetId:
+          allOf:
+          - $ref: '#/components/schemas/ImageSetId'
+          description: The image set identifier.
+        versionId:
+          allOf:
+          - $ref: '#/components/schemas/ImageSetExternalVersionId'
+          description: The image set version identifier.
+      required:
+      - datastoreId
+      - imageSetId
+    GetImageSetMetadataResponse:
+      type: object
+      properties:
+        imageSetMetadataBlob:
+          allOf:
+          - $ref: '#/components/schemas/ImageSetMetadataBlob'
+          description: The blob containing the aggregated metadata information for
+            the image set.
+        contentType:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The format in which the study metadata is returned to the customer.
+            Default is `text/plain`.
+        contentEncoding:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The compression format in which image set metadata attributes
+            are returned.
+      required:
+      - imageSetMetadataBlob
+    GetImageSetRequest:
+      type: object
+      properties:
+        datastoreId:
+          allOf:
+          - $ref: '#/components/schemas/DatastoreId'
+          description: The data store identifier.
+        imageSetId:
+          allOf:
+          - $ref: '#/components/schemas/ImageSetId'
+          description: The image set identifier.
+        versionId:
+          allOf:
+          - $ref: '#/components/schemas/ImageSetExternalVersionId'
+          description: The image set version identifier.
+      required:
+      - datastoreId
+      - imageSetId
+    GetImageSetResponse:
+      type: object
+      properties:
+        datastoreId:
+          allOf:
+          - $ref: '#/components/schemas/DatastoreId'
+          description: The data store identifier.
+        imageSetId:
+          allOf:
+          - $ref: '#/components/schemas/ImageSetId'
+          description: The image set identifier.
+        versionId:
+          allOf:
+          - $ref: '#/components/schemas/ImageSetExternalVersionId'
+          description: The image set version identifier.
+        imageSetState:
+          allOf:
+          - $ref: '#/components/schemas/ImageSetState'
+          description: The image set state.
+        imageSetWorkflowStatus:
+          allOf:
+          - $ref: '#/components/schemas/ImageSetWorkflowStatus'
+          description: The image set workflow status.
+        createdAt:
+          allOf:
+          - $ref: '#/components/schemas/Date'
+          description: The timestamp when image set properties were created.
+        updatedAt:
+          allOf:
+          - $ref: '#/components/schemas/Date'
+          description: The timestamp when image set properties were updated.
+        deletedAt:
+          allOf:
+          - $ref: '#/components/schemas/Date'
+          description: The timestamp when the image set properties were deleted.
+        message:
+          allOf:
+          - $ref: '#/components/schemas/Message'
+          description: The error message thrown if an image set action fails.
+        imageSetArn:
+          allOf:
+          - $ref: '#/components/schemas/Arn'
+          description: The Amazon Resource Name (ARN) assigned to the image set.
+        overrides:
+          allOf:
+          - $ref: '#/components/schemas/Overrides'
+          description: This object contains the details of any overrides used while
+            creating a specific image set version. If an image set was copied or updated
+            using the `force` flag, this object will contain the `forced` flag.
+      required:
+      - datastoreId
+      - imageSetId
+      - versionId
+      - imageSetState
     ImageFrameId:
       type: string
       pattern: ^[0-9a-z]{32}$
+    ImageFrameInformation:
+      type: object
+      properties:
+        imageFrameId:
+          allOf:
+          - $ref: '#/components/schemas/ImageFrameId'
+          description: The image frame (pixel data) identifier.
+      required:
+      - imageFrameId
+      description: Information about the image frame (pixel data) identifier.
     ImageSetExternalVersionId:
       type: string
       pattern: ^\d+$
@@ -226,6 +2121,52 @@ components:
     ImageSetMetadataBlob:
       type: string
       format: byte
+    ImageSetProperties:
+      type: object
+      properties:
+        imageSetId:
+          allOf:
+          - $ref: '#/components/schemas/ImageSetId'
+          description: The image set identifier.
+        versionId:
+          allOf:
+          - $ref: '#/components/schemas/ImageSetExternalVersionId'
+          description: The image set version identifier.
+        imageSetState:
+          allOf:
+          - $ref: '#/components/schemas/ImageSetState'
+          description: The image set state.
+        ImageSetWorkflowStatus:
+          allOf:
+          - $ref: '#/components/schemas/ImageSetWorkflowStatus'
+          description: The image set workflow status.
+        createdAt:
+          allOf:
+          - $ref: '#/components/schemas/Date'
+          description: The timestamp when the image set properties were created.
+        updatedAt:
+          allOf:
+          - $ref: '#/components/schemas/Date'
+          description: The timestamp when the image set properties were updated.
+        deletedAt:
+          allOf:
+          - $ref: '#/components/schemas/Date'
+          description: The timestamp when the image set properties were deleted.
+        message:
+          allOf:
+          - $ref: '#/components/schemas/Message'
+          description: The error message thrown if an image set action fails.
+        overrides:
+          allOf:
+          - $ref: '#/components/schemas/Overrides'
+          description: Contains details on overrides used when creating the returned
+            version of an image set. For example, if `forced` exists, the `forced`
+            flag was used when creating the image set.
+      required:
+      - imageSetId
+      - versionId
+      - imageSetState
+      description: The image set properties.
     ImageSetPropertiesList:
       type: array
       items:
@@ -253,6 +2194,41 @@ components:
       type: array
       items:
         $ref: '#/components/schemas/ImageSetsMetadataSummary'
+    ImageSetsMetadataSummary:
+      type: object
+      properties:
+        imageSetId:
+          allOf:
+          - $ref: '#/components/schemas/ImageSetId'
+          description: The image set identifier.
+        version:
+          allOf:
+          - $ref: '#/components/schemas/Integer'
+          description: The image set version.
+        createdAt:
+          allOf:
+          - $ref: '#/components/schemas/Date'
+          description: The time an image set is created. Sample creation date is provided
+            in `1985-04-12T23:20:50.52Z` format.
+        updatedAt:
+          allOf:
+          - $ref: '#/components/schemas/Date'
+          description: The time an image set was last updated.
+        DICOMTags:
+          allOf:
+          - $ref: '#/components/schemas/DICOMTags'
+          description: The DICOM tags associated with the image set.
+      required:
+      - imageSetId
+      description: Summary of the image set metadata.
+    InternalServerException:
+      type: object
+      properties:
+        message:
+          $ref: '#/components/schemas/String'
+      required:
+      - message
+      description: An unexpected error occurred during processing of the request.
     JobId:
       type: string
       pattern: ^[0-9a-z]+$
@@ -275,11 +2251,144 @@ components:
       pattern: ^arn:aws[a-zA-Z-]{0,16}:kms:[a-z]{2}(-[a-z]{1,16}){1,3}-\d{1}:\d{12}:((key/[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12})|(alias/[a-zA-Z0-9:/_-]{1,256}))$
       minLength: 1
       maxLength: 512
+    ListDICOMImportJobsRequest:
+      type: object
+      properties:
+        datastoreId:
+          allOf:
+          - $ref: '#/components/schemas/DatastoreId'
+          description: The data store identifier.
+        jobStatus:
+          allOf:
+          - $ref: '#/components/schemas/JobStatus'
+          description: The filters for listing import jobs based on status.
+        nextToken:
+          allOf:
+          - $ref: '#/components/schemas/NextToken'
+          description: The pagination token used to request the list of import jobs
+            on the next page.
+        maxResults:
+          allOf:
+          - $ref: '#/components/schemas/Integer'
+          description: The max results count. The upper bound is determined by load
+            testing.
+      required:
+      - datastoreId
+    ListDICOMImportJobsResponse:
+      type: object
+      properties:
+        jobSummaries:
+          allOf:
+          - $ref: '#/components/schemas/DICOMImportJobSummaries'
+          description: A list of job summaries.
+        nextToken:
+          allOf:
+          - $ref: '#/components/schemas/NextToken'
+          description: The pagination token used to retrieve the list of import jobs
+            on the next page.
+      required:
+      - jobSummaries
+    ListDatastoresRequest:
+      type: object
+      properties:
+        datastoreStatus:
+          allOf:
+          - $ref: '#/components/schemas/DatastoreStatus'
+          description: The data store status.
+        nextToken:
+          allOf:
+          - $ref: '#/components/schemas/NextToken'
+          description: The pagination token used to request the list of data stores
+            on the next page.
+        maxResults:
+          allOf:
+          - $ref: '#/components/schemas/Integer'
+          description: 'Valid Range: Minimum value of 1. Maximum value of 50.'
+    ListDatastoresResponse:
+      type: object
+      properties:
+        datastoreSummaries:
+          allOf:
+          - $ref: '#/components/schemas/DatastoreSummaries'
+          description: The list of summaries of data stores.
+        nextToken:
+          allOf:
+          - $ref: '#/components/schemas/NextToken'
+          description: The pagination token used to retrieve the list of data stores
+            on the next page.
+    ListImageSetVersionsRequest:
+      type: object
+      properties:
+        datastoreId:
+          allOf:
+          - $ref: '#/components/schemas/DatastoreId'
+          description: The data store identifier.
+        imageSetId:
+          allOf:
+          - $ref: '#/components/schemas/ImageSetId'
+          description: The image set identifier.
+        nextToken:
+          allOf:
+          - $ref: '#/components/schemas/NextToken'
+          description: The pagination token used to request the list of image set
+            versions on the next page.
+        maxResults:
+          allOf:
+          - $ref: '#/components/schemas/Integer'
+          description: The max results count.
+      required:
+      - datastoreId
+      - imageSetId
+    ListImageSetVersionsResponse:
+      type: object
+      properties:
+        imageSetPropertiesList:
+          allOf:
+          - $ref: '#/components/schemas/ImageSetPropertiesList'
+          description: Lists all properties associated with an image set.
+        nextToken:
+          allOf:
+          - $ref: '#/components/schemas/NextToken'
+          description: The pagination token used to retrieve the list of image set
+            versions on the next page.
+      required:
+      - imageSetPropertiesList
+    ListTagsForResourceRequest:
+      type: object
+      properties:
+        resourceArn:
+          allOf:
+          - $ref: '#/components/schemas/Arn'
+          description: The Amazon Resource Name (ARN) of the medical imaging resource
+            to list tags for.
+      required:
+      - resourceArn
+    ListTagsForResourceResponse:
+      type: object
+      properties:
+        tags:
+          allOf:
+          - $ref: '#/components/schemas/TagMap'
+          description: A list of all tags associated with a medical imaging resource.
+      required:
+      - tags
     Message:
       type: string
       pattern: ^[\w -:]+$
       minLength: 1
       maxLength: 2048
+    MetadataCopies:
+      type: object
+      properties:
+        copiableAttributes:
+          allOf:
+          - $ref: '#/components/schemas/CopiableAttributes'
+          description: The JSON string used to specify a subset of SOP Instances to
+            copy from source to destination image set.
+      required:
+      - copiableAttributes
+      description: Contains copiable `Attributes` structure and wraps information
+        related to specific copy use cases. For example, when copying subsets.
     MetadataUpdates:
       allOf:
       - allOf:
@@ -304,9 +2413,27 @@ components:
       enum:
       - EQUAL
       - BETWEEN
+    Overrides:
+      type: object
+      properties:
+        forced:
+          allOf:
+          - $ref: '#/components/schemas/Boolean'
+          description: Setting this flag will force the `CopyImageSet` and `UpdateImageSetMetadata`
+            operations, even if Patient, Study, or Series level metadata are mismatched.
+      description: Specifies the overrides used in image set modification calls to
+        `CopyImageSet` and `UpdateImageSetMetadata`.
     PayloadBlob:
       type: string
       format: byte
+    ResourceNotFoundException:
+      type: object
+      properties:
+        message:
+          $ref: '#/components/schemas/String'
+      required:
+      - message
+      description: The request references a resource which does not exist.
     RoleArn:
       type: string
       pattern: ^arn:aws(-[^:]+)?:iam::[0-9]{12}:role/.+$
@@ -357,10 +2484,101 @@ components:
       type: array
       items:
         $ref: '#/components/schemas/SearchByAttributeValue'
+    SearchCriteria:
+      type: object
+      properties:
+        filters:
+          allOf:
+          - $ref: '#/components/schemas/SearchFilters'
+          description: The filters for the search criteria.
+        sort:
+          allOf:
+          - $ref: '#/components/schemas/Sort'
+          description: The sort input for search criteria.
+      description: The search criteria.
+    SearchFilter:
+      type: object
+      properties:
+        values:
+          allOf:
+          - $ref: '#/components/schemas/SearchByAttributeValues'
+          description: The search filter values.
+        operator:
+          allOf:
+          - $ref: '#/components/schemas/Operator'
+          description: The search filter operator for `imageSetDateTime`.
+      required:
+      - values
+      - operator
+      description: The search filter.
     SearchFilters:
       type: array
       items:
         $ref: '#/components/schemas/SearchFilter'
+    SearchImageSetsRequest:
+      type: object
+      properties:
+        datastoreId:
+          allOf:
+          - $ref: '#/components/schemas/DatastoreId'
+          description: The identifier of the data store where the image sets reside.
+        searchCriteria:
+          allOf:
+          - $ref: '#/components/schemas/SearchCriteria'
+          description: The search criteria that filters by applying a maximum of 1
+            item to `SearchByAttribute`.
+        maxResults:
+          allOf:
+          - $ref: '#/components/schemas/Integer'
+          description: The maximum number of results that can be returned in a search.
+        nextToken:
+          allOf:
+          - $ref: '#/components/schemas/NextToken'
+          description: The token used for pagination of results returned in the response.
+            Use the token returned from the previous request to continue results where
+            the previous request ended.
+      required:
+      - datastoreId
+    SearchImageSetsResponse:
+      type: object
+      properties:
+        imageSetsMetadataSummaries:
+          allOf:
+          - $ref: '#/components/schemas/ImageSetsMetadataSummaries'
+          description: The model containing the image set results.
+        sort:
+          allOf:
+          - $ref: '#/components/schemas/Sort'
+          description: The sort order for image set search results.
+        nextToken:
+          allOf:
+          - $ref: '#/components/schemas/NextToken'
+          description: The token for pagination results.
+      required:
+      - imageSetsMetadataSummaries
+    ServiceQuotaExceededException:
+      type: object
+      properties:
+        message:
+          $ref: '#/components/schemas/String'
+      required:
+      - message
+      description: The request caused a service quota to be exceeded.
+    Sort:
+      type: object
+      properties:
+        sortOrder:
+          allOf:
+          - $ref: '#/components/schemas/SortOrder'
+          description: The sort order for search criteria.
+        sortField:
+          allOf:
+          - $ref: '#/components/schemas/SortField'
+          description: The sort field for search criteria.
+      required:
+      - sortOrder
+      - sortField
+      description: Sort search results.
     SortField:
       type: string
       enum:
@@ -372,6 +2590,70 @@ components:
       enum:
       - ASC
       - DESC
+    StartDICOMImportJobRequest:
+      type: object
+      properties:
+        jobName:
+          allOf:
+          - $ref: '#/components/schemas/JobName'
+          description: The import job name.
+        dataAccessRoleArn:
+          allOf:
+          - $ref: '#/components/schemas/RoleArn'
+          description: The Amazon Resource Name (ARN) of the IAM role that grants
+            permission to access medical imaging resources.
+        clientToken:
+          allOf:
+          - $ref: '#/components/schemas/ClientToken'
+          description: A unique identifier for API idempotency.
+        datastoreId:
+          allOf:
+          - $ref: '#/components/schemas/DatastoreId'
+          description: The data store identifier.
+        inputS3Uri:
+          allOf:
+          - $ref: '#/components/schemas/S3Uri'
+          description: The input prefix path for the S3 bucket that contains the DICOM
+            files to be imported.
+        outputS3Uri:
+          allOf:
+          - $ref: '#/components/schemas/S3Uri'
+          description: The output prefix of the S3 bucket to upload the results of
+            the DICOM import job.
+        inputOwnerAccountId:
+          allOf:
+          - $ref: '#/components/schemas/AwsAccountId'
+          description: The account ID of the source S3 bucket owner.
+      required:
+      - dataAccessRoleArn
+      - clientToken
+      - datastoreId
+      - inputS3Uri
+      - outputS3Uri
+    StartDICOMImportJobResponse:
+      type: object
+      properties:
+        datastoreId:
+          allOf:
+          - $ref: '#/components/schemas/DatastoreId'
+          description: The data store identifier.
+        jobId:
+          allOf:
+          - $ref: '#/components/schemas/JobId'
+          description: The import job identifier.
+        jobStatus:
+          allOf:
+          - $ref: '#/components/schemas/JobStatus'
+          description: The import job status.
+        submittedAt:
+          allOf:
+          - $ref: '#/components/schemas/Date'
+          description: The timestamp when the import job was submitted.
+      required:
+      - datastoreId
+      - jobId
+      - jobStatus
+      - submittedAt
     TagKey:
       type: string
       pattern: ^(?!aws:)[a-zA-Z+-=._:/]+$
@@ -385,7 +2667,134 @@ components:
       type: object
       additionalProperties:
         $ref: '#/components/schemas/TagValue'
+    TagResourceRequest:
+      type: object
+      properties:
+        resourceArn:
+          allOf:
+          - $ref: '#/components/schemas/Arn'
+          description: The Amazon Resource Name (ARN) of the medical imaging resource
+            that tags are being added to.
+        tags:
+          allOf:
+          - $ref: '#/components/schemas/TagMap'
+          description: The user-specified key and value tag pairs added to a medical
+            imaging resource.
+      required:
+      - resourceArn
+      - tags
+    TagResourceResponse:
+      type: object
+      properties: {}
     TagValue:
       type: string
       minLength: 0
       maxLength: 256
+    ThrottlingException:
+      type: object
+      properties:
+        message:
+          $ref: '#/components/schemas/String'
+      required:
+      - message
+      description: The request was denied due to throttling.
+    UntagResourceRequest:
+      type: object
+      properties:
+        resourceArn:
+          allOf:
+          - $ref: '#/components/schemas/Arn'
+          description: The Amazon Resource Name (ARN) of the medical imaging resource
+            that tags are being removed from.
+        tagKeys:
+          allOf:
+          - $ref: '#/components/schemas/TagKeyList'
+          description: The keys for the tags to be removed from the medical imaging
+            resource.
+      required:
+      - resourceArn
+      - tagKeys
+    UntagResourceResponse:
+      type: object
+      properties: {}
+    UpdateImageSetMetadataRequest:
+      type: object
+      properties:
+        datastoreId:
+          allOf:
+          - $ref: '#/components/schemas/DatastoreId'
+          description: The data store identifier.
+        imageSetId:
+          allOf:
+          - $ref: '#/components/schemas/ImageSetId'
+          description: The image set identifier.
+        latestVersionId:
+          allOf:
+          - $ref: '#/components/schemas/ImageSetExternalVersionId'
+          description: The latest image set version identifier.
+        force:
+          allOf:
+          - $ref: '#/components/schemas/Boolean'
+          description: "Setting this flag will force the `UpdateImageSetMetadata`\
+            \ operation for the following attributes:\n\n  * `Tag.StudyInstanceUID`,\
+            \ `Tag.SeriesInstanceUID`, `Tag.SOPInstanceUID`, and `Tag.StudyID`\n\n\
+            \  * Adding, removing, or updating private tags for an individual SOP\
+            \ Instance"
+        updateImageSetMetadataUpdates:
+          allOf:
+          - $ref: '#/components/schemas/MetadataUpdates'
+          description: Update image set metadata updates.
+      required:
+      - datastoreId
+      - imageSetId
+      - latestVersionId
+      - updateImageSetMetadataUpdates
+    UpdateImageSetMetadataResponse:
+      type: object
+      properties:
+        datastoreId:
+          allOf:
+          - $ref: '#/components/schemas/DatastoreId'
+          description: The data store identifier.
+        imageSetId:
+          allOf:
+          - $ref: '#/components/schemas/ImageSetId'
+          description: The image set identifier.
+        latestVersionId:
+          allOf:
+          - $ref: '#/components/schemas/ImageSetExternalVersionId'
+          description: The latest image set version identifier.
+        imageSetState:
+          allOf:
+          - $ref: '#/components/schemas/ImageSetState'
+          description: The image set state.
+        imageSetWorkflowStatus:
+          allOf:
+          - $ref: '#/components/schemas/ImageSetWorkflowStatus'
+          description: The image set workflow status.
+        createdAt:
+          allOf:
+          - $ref: '#/components/schemas/Date'
+          description: The timestamp when image set metadata was created.
+        updatedAt:
+          allOf:
+          - $ref: '#/components/schemas/Date'
+          description: The timestamp when image set metadata was updated.
+        message:
+          allOf:
+          - $ref: '#/components/schemas/Message'
+          description: The error message thrown if an update image set metadata action
+            fails.
+      required:
+      - datastoreId
+      - imageSetId
+      - latestVersionId
+      - imageSetState
+    ValidationException:
+      type: object
+      properties:
+        message:
+          $ref: '#/components/schemas/String'
+      required:
+      - message
+      description: The input fails to satisfy the constraints set by the service.

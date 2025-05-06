@@ -7,7 +7,7 @@ info:
   x-stackql-serviceName: observabilityadmin
   x-aws-serviceName: observabilityadmin
   x-aws-protocol: aws.protocols#restJson1
-  x-dateGenerated: '2025-05-05'
+  x-dateGenerated: '2025-05-07'
   version: '2018-05-10'
   title: CloudWatch Observability Admin Service
   description: |-
@@ -45,9 +45,233 @@ servers:
       - sa-east-1
       - me-south-1
       default: us-east-1
-paths: {}
+paths:
+  /GetTelemetryEvaluationStatus:
+    post:
+      operationId: GetTelemetryEvaluationStatus
+      description: |-
+        Returns the current onboarding status of the telemetry config feature, including the status of the feature and reason the feature failed to start or stop.
+      responses:
+        '200': {}
+        '400':
+          description: |-
+            Indicates you don't have permissions to perform the requested operation. The user or role that is making the request must have at least one IAM permissions policy attached that grants the required permissions. For more information, see [Access management for AWS resources](https://docs.aws.amazon.com/IAM/latest/UserGuide/access.html) in the IAM user guide.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '500':
+          description: |-
+            Indicates the request has failed to process because of an unknown server error, exception, or failure.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerException'
+  /GetTelemetryEvaluationStatusForOrganization:
+    post:
+      operationId: GetTelemetryEvaluationStatusForOrganization
+      description: |-
+        This returns the onboarding status of the telemetry configuration feature for the organization. It can only be called by a Management Account of an AWS Organization or an assigned Delegated Admin Account of AWS CloudWatch telemetry config.
+      responses:
+        '200': {}
+        '400':
+          description: |-
+            Indicates input validation failed. Check your request parameters and retry the request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+        '500':
+          description: |-
+            Indicates the request has failed to process because of an unknown server error, exception, or failure.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerException'
+  /ListResourceTelemetry:
+    post:
+      operationId: ListResourceTelemetry
+      description: |-
+        Returns a list of telemetry configurations for AWS resources supported by telemetry config. For more information, see [Auditing CloudWatch telemetry configurations](https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/telemetry-config-cloudwatch.html).
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                ResourceIdentifierPrefix:
+                  $ref: '#/components/schemas/ResourceIdentifierPrefix'
+                ResourceTypes:
+                  $ref: '#/components/schemas/ResourceTypes'
+                TelemetryConfigurationState:
+                  $ref: '#/components/schemas/TelemetryConfigurationState'
+                ResourceTags:
+                  $ref: '#/components/schemas/TagMapInput'
+                MaxResults:
+                  $ref: '#/components/schemas/ListResourceTelemetryMaxResults'
+                NextToken:
+                  $ref: '#/components/schemas/NextToken'
+      responses:
+        '200': {}
+        '400':
+          description: |-
+            Indicates input validation failed. Check your request parameters and retry the request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+        '500':
+          description: |-
+            Indicates the request has failed to process because of an unknown server error, exception, or failure.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerException'
+  /ListResourceTelemetryForOrganization:
+    post:
+      operationId: ListResourceTelemetryForOrganization
+      description: |-
+        Returns a list of telemetry configurations for AWS resources supported by telemetry config in the organization.
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                AccountIdentifiers:
+                  $ref: '#/components/schemas/AccountIdentifiers'
+                ResourceIdentifierPrefix:
+                  $ref: '#/components/schemas/ResourceIdentifierPrefix'
+                ResourceTypes:
+                  $ref: '#/components/schemas/ResourceTypes'
+                TelemetryConfigurationState:
+                  $ref: '#/components/schemas/TelemetryConfigurationState'
+                ResourceTags:
+                  $ref: '#/components/schemas/TagMapInput'
+                MaxResults:
+                  $ref: '#/components/schemas/ListResourceTelemetryForOrganizationMaxResults'
+                NextToken:
+                  $ref: '#/components/schemas/NextToken'
+      responses:
+        '200': {}
+        '400':
+          description: |-
+            Indicates input validation failed. Check your request parameters and retry the request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+        '500':
+          description: |-
+            Indicates the request has failed to process because of an unknown server error, exception, or failure.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerException'
+  /StartTelemetryEvaluation:
+    post:
+      operationId: StartTelemetryEvaluation
+      description: |-
+        This action begins onboarding onboarding the caller AWS account to the telemetry config feature.
+      responses:
+        '200': {}
+        '400':
+          description: |-
+            Indicates input validation failed. Check your request parameters and retry the request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+        '500':
+          description: |-
+            Indicates the request has failed to process because of an unknown server error, exception, or failure.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerException'
+  /StartTelemetryEvaluationForOrganization:
+    post:
+      operationId: StartTelemetryEvaluationForOrganization
+      description: |-
+        This actions begins onboarding the organization and all member accounts to the telemetry config feature.
+      responses:
+        '200': {}
+        '400':
+          description: |-
+            Indicates input validation failed. Check your request parameters and retry the request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+        '500':
+          description: |-
+            Indicates the request has failed to process because of an unknown server error, exception, or failure.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerException'
+  /StopTelemetryEvaluation:
+    post:
+      operationId: StopTelemetryEvaluation
+      description: |-
+        This action begins offboarding the caller AWS account from the telemetry config feature.
+      responses:
+        '200': {}
+        '400':
+          description: |-
+            Indicates input validation failed. Check your request parameters and retry the request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+        '500':
+          description: |-
+            Indicates the request has failed to process because of an unknown server error, exception, or failure.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerException'
+  /StopTelemetryEvaluationForOrganization:
+    post:
+      operationId: StopTelemetryEvaluationForOrganization
+      description: |-
+        This action offboards the Organization of the caller AWS account from thef telemetry config feature.
+      responses:
+        '200': {}
+        '400':
+          description: |-
+            Indicates input validation failed. Check your request parameters and retry the request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+        '500':
+          description: |-
+            Indicates the request has failed to process because of an unknown server error, exception, or failure.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerException'
 components:
   schemas:
+    AccessDeniedException:
+      type: object
+      properties:
+        Message:
+          $ref: '#/components/schemas/String'
+        amznErrorType:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The name of the exception.
+      description: Indicates you don't have permissions to perform the requested operation.
+        The user or role that is making the request must have at least one IAM permissions
+        policy attached that grants the required permissions. For more information,
+        see [Access management for AWS resources](https://docs.aws.amazon.com/IAM/latest/UserGuide/access.html)
+        in the IAM user guide.
     AccountIdentifier:
       type: string
       pattern: ^[0-9]{12}$
@@ -59,14 +283,152 @@ components:
         $ref: '#/components/schemas/AccountIdentifier'
     FailureReason:
       type: string
+    GetTelemetryEvaluationStatusForOrganizationOutput:
+      type: object
+      properties:
+        Status:
+          allOf:
+          - $ref: '#/components/schemas/Status'
+          description: The onboarding status of the telemetry config feature for the
+            organization.
+        FailureReason:
+          allOf:
+          - $ref: '#/components/schemas/FailureReason'
+          description: This field describes the reason for the failure status. The
+            field will only be populated if `Status` is `FAILED_START` or `FAILED_STOP`.
+    GetTelemetryEvaluationStatusOutput:
+      type: object
+      properties:
+        Status:
+          allOf:
+          - $ref: '#/components/schemas/Status'
+          description: The onboarding status of the telemetry config feature.
+        FailureReason:
+          allOf:
+          - $ref: '#/components/schemas/FailureReason'
+          description: Describes the reason for the failure status. The field will
+            only be populated if `Status` is `FAILED_START` or `FAILED_STOP`.
+    InternalServerException:
+      type: object
+      properties:
+        Message:
+          $ref: '#/components/schemas/String'
+        amznErrorType:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The name of the exception.
+      description: Indicates the request has failed to process because of an unknown
+        server error, exception, or failure.
+    ListResourceTelemetryForOrganizationInput:
+      type: object
+      properties:
+        AccountIdentifiers:
+          allOf:
+          - $ref: '#/components/schemas/AccountIdentifiers'
+          description: A list of AWS account IDs used to filter the resources to those
+            associated with the specified accounts.
+        ResourceIdentifierPrefix:
+          allOf:
+          - $ref: '#/components/schemas/ResourceIdentifierPrefix'
+          description: A string used to filter resources in the organization which
+            have a `ResourceIdentifier` starting with the `ResourceIdentifierPrefix`.
+        ResourceTypes:
+          allOf:
+          - $ref: '#/components/schemas/ResourceTypes'
+          description: A list of resource types used to filter resources in the organization.
+            If this parameter is provided, the resources will be returned in the same
+            order used in the request.
+        TelemetryConfigurationState:
+          allOf:
+          - $ref: '#/components/schemas/TelemetryConfigurationState'
+          description: A key-value pair to filter resources in the organization based
+            on the telemetry type and the state of the telemetry configuration. The
+            key is the telemetry type and the value is the state.
+        ResourceTags:
+          allOf:
+          - $ref: '#/components/schemas/TagMapInput'
+          description: A key-value pair to filter resources in the organization based
+            on tags associated with the resource. Fore more information about tags,
+            see [What are tags?](https://docs.aws.amazon.com/whitepapers/latest/tagging-best-practices/what-are-tags.html)
+        MaxResults:
+          allOf:
+          - $ref: '#/components/schemas/ListResourceTelemetryForOrganizationMaxResults'
+          description: A number field used to limit the number of results within the
+            returned list.
+        NextToken:
+          allOf:
+          - $ref: '#/components/schemas/NextToken'
+          description: The token for the next set of items to return. A previous call
+            provides this token.
     ListResourceTelemetryForOrganizationMaxResults:
       type: integer
       minimum: 1
       maximum: 50
+    ListResourceTelemetryForOrganizationOutput:
+      type: object
+      properties:
+        TelemetryConfigurations:
+          allOf:
+          - $ref: '#/components/schemas/TelemetryConfigurations'
+          description: A list of telemetry configurations for AWS resources supported
+            by telemetry config in the organization.
+        NextToken:
+          allOf:
+          - $ref: '#/components/schemas/NextToken'
+          description: The token for the next set of items to return. A previous call
+            provides this token.
+    ListResourceTelemetryInput:
+      type: object
+      properties:
+        ResourceIdentifierPrefix:
+          allOf:
+          - $ref: '#/components/schemas/ResourceIdentifierPrefix'
+          description: A string used to filter resources which have a `ResourceIdentifier`
+            starting with the `ResourceIdentifierPrefix`.
+        ResourceTypes:
+          allOf:
+          - $ref: '#/components/schemas/ResourceTypes'
+          description: A list of resource types used to filter resources supported
+            by telemetry config. If this parameter is provided, the resources will
+            be returned in the same order used in the request.
+        TelemetryConfigurationState:
+          allOf:
+          - $ref: '#/components/schemas/TelemetryConfigurationState'
+          description: A key-value pair to filter resources based on the telemetry
+            type and the state of the telemetry configuration. The key is the telemetry
+            type and the value is the state.
+        ResourceTags:
+          allOf:
+          - $ref: '#/components/schemas/TagMapInput'
+          description: A key-value pair to filter resources based on tags associated
+            with the resource. For more information about tags, see [What are tags?](https://docs.aws.amazon.com/whitepapers/latest/tagging-best-practices/what-are-tags.html)
+        MaxResults:
+          allOf:
+          - $ref: '#/components/schemas/ListResourceTelemetryMaxResults'
+          description: A number field used to limit the number of results within the
+            returned list.
+        NextToken:
+          allOf:
+          - $ref: '#/components/schemas/NextToken'
+          description: The token for the next set of items to return. A previous call
+            generates this token.
     ListResourceTelemetryMaxResults:
       type: integer
       minimum: 1
       maximum: 50
+    ListResourceTelemetryOutput:
+      type: object
+      properties:
+        TelemetryConfigurations:
+          allOf:
+          - $ref: '#/components/schemas/TelemetryConfigurations'
+          description: A list of telemetry configurations for AWS resources supported
+            by telemetry config in the caller's account.
+        NextToken:
+          allOf:
+          - $ref: '#/components/schemas/NextToken'
+          description: The token for the next set of items to return. A previous call
+            generates this token.
     NextToken:
       type: string
     ResourceIdentifier:
@@ -113,6 +475,39 @@ components:
       pattern: ^([\p{L}\p{Z}\p{N}_.:/=+\-@]*)$
       minLength: 0
       maxLength: 256
+    TelemetryConfiguration:
+      type: object
+      properties:
+        AccountIdentifier:
+          allOf:
+          - $ref: '#/components/schemas/AccountIdentifier'
+          description: The account ID which contains the resource managed in telemetry
+            configuration. An example of a valid account ID is `012345678901`.
+        TelemetryConfigurationState:
+          allOf:
+          - $ref: '#/components/schemas/TelemetryConfigurationState'
+          description: 'The configuration state for the resource, for example `{ Logs:
+            NotApplicable; Metrics: Enabled; Traces: NotApplicable; }`.'
+        ResourceType:
+          allOf:
+          - $ref: '#/components/schemas/ResourceType'
+          description: The type of resource, for example `AWS::EC2::Instance`.
+        ResourceIdentifier:
+          allOf:
+          - $ref: '#/components/schemas/ResourceIdentifier'
+          description: The identifier of the resource, for example `i-0b22a22eec53b9321`.
+        ResourceTags:
+          allOf:
+          - $ref: '#/components/schemas/TagMapOutput'
+          description: 'Tags associated with the resource, for example `{ Name: "ExampleInstance",
+            Environment: "Development" }`.'
+        LastUpdateTimeStamp:
+          allOf:
+          - $ref: '#/components/schemas/Long'
+          description: The timestamp of the last change to the telemetry configuration
+            for the resource. For example, `1728679196318`.
+      description: A model representing the state of a resource within an account
+        according to telemetry config.
     TelemetryConfigurationState:
       type: object
       additionalProperties:
@@ -133,3 +528,10 @@ components:
       - Logs
       - Metrics
       - Traces
+    ValidationException:
+      type: object
+      properties:
+        Message:
+          $ref: '#/components/schemas/String'
+      description: Indicates input validation failed. Check your request parameters
+        and retry the request.

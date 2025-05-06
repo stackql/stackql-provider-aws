@@ -7,7 +7,7 @@ info:
   x-stackql-serviceName: sagemaker_edge
   x-aws-serviceName: sagemakeredge
   x-aws-protocol: aws.protocols#restJson1
-  x-dateGenerated: '2025-05-05'
+  x-dateGenerated: '2025-05-07'
   version: '2020-09-23'
   title: Amazon Sagemaker Edge Manager
   description: |-
@@ -43,13 +43,111 @@ servers:
       - sa-east-1
       - me-south-1
       default: us-east-1
-paths: {}
+paths:
+  /GetDeployments:
+    post:
+      operationId: GetDeployments
+      description: |-
+        Use to get the active deployments from a device.
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                DeviceName:
+                  $ref: '#/components/schemas/DeviceName'
+                DeviceFleetName:
+                  $ref: '#/components/schemas/DeviceFleetName'
+      responses:
+        '200': {}
+        '400':
+          description: |-
+            An internal failure occurred. Try your request again. If the problem persists, contact Amazon Web Services customer support.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServiceException'
+  /GetDeviceRegistration:
+    post:
+      operationId: GetDeviceRegistration
+      description: |-
+        Use to check if a device is registered with SageMaker Edge Manager.
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                DeviceName:
+                  $ref: '#/components/schemas/DeviceName'
+                DeviceFleetName:
+                  $ref: '#/components/schemas/DeviceFleetName'
+      responses:
+        '200': {}
+        '400':
+          description: |-
+            An internal failure occurred. Try your request again. If the problem persists, contact Amazon Web Services customer support.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServiceException'
+  /SendHeartbeat:
+    post:
+      operationId: SendHeartbeat
+      description: |-
+        Use to get the current status of devices registered on SageMaker Edge Manager.
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                AgentMetrics:
+                  $ref: '#/components/schemas/EdgeMetrics'
+                Models:
+                  $ref: '#/components/schemas/Models'
+                AgentVersion:
+                  $ref: '#/components/schemas/Version'
+                DeviceName:
+                  $ref: '#/components/schemas/DeviceName'
+                DeviceFleetName:
+                  $ref: '#/components/schemas/DeviceFleetName'
+                DeploymentResult:
+                  $ref: '#/components/schemas/DeploymentResult'
+      responses:
+        '200': {}
+        '400':
+          description: |-
+            An internal failure occurred. Try your request again. If the problem persists, contact Amazon Web Services customer support.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServiceException'
 components:
   schemas:
     CacheTTLSeconds:
       type: string
       minLength: 1
       maxLength: 1000
+    Checksum:
+      type: object
+      properties:
+        Type:
+          allOf:
+          - $ref: '#/components/schemas/ChecksumType'
+          description: The type of the checksum.
+        Sum:
+          allOf:
+          - $ref: '#/components/schemas/ChecksumString'
+          description: The checksum of the model.
+      description: Information about the checksum of a model deployed on a device.
     ChecksumString:
       type: string
       pattern: ^[a-z0-9](-*[a-z0-9])*$
@@ -59,14 +157,100 @@ components:
       type: string
       enum:
       - SHA1
+    Definition:
+      type: object
+      properties:
+        ModelHandle:
+          allOf:
+          - $ref: '#/components/schemas/EntityName'
+          description: The unique model handle.
+        S3Url:
+          allOf:
+          - $ref: '#/components/schemas/S3Uri'
+          description: The absolute S3 location of the model.
+        Checksum:
+          allOf:
+          - $ref: '#/components/schemas/Checksum'
+          description: The checksum information of the model.
+        State:
+          allOf:
+          - $ref: '#/components/schemas/ModelState'
+          description: The desired state of the model.
+      description: ''
     Definitions:
       type: array
       items:
         $ref: '#/components/schemas/Definition'
+    DeploymentModel:
+      type: object
+      properties:
+        ModelHandle:
+          allOf:
+          - $ref: '#/components/schemas/EntityName'
+          description: The unique handle of the model.
+        ModelName:
+          allOf:
+          - $ref: '#/components/schemas/ModelName'
+          description: The name of the model.
+        ModelVersion:
+          allOf:
+          - $ref: '#/components/schemas/Version'
+          description: The version of the model.
+        DesiredState:
+          allOf:
+          - $ref: '#/components/schemas/ModelState'
+          description: The desired state of the model.
+        State:
+          allOf:
+          - $ref: '#/components/schemas/ModelState'
+          description: Returns the current state of the model.
+        Status:
+          allOf:
+          - $ref: '#/components/schemas/DeploymentStatus'
+          description: Returns the deployment status of the model.
+        StatusReason:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: Returns the error message for the deployment status result.
+        RollbackFailureReason:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: Returns the error message if there is a rollback.
+      description: ''
     DeploymentModels:
       type: array
       items:
         $ref: '#/components/schemas/DeploymentModel'
+    DeploymentResult:
+      type: object
+      properties:
+        DeploymentName:
+          allOf:
+          - $ref: '#/components/schemas/EntityName'
+          description: The name and unique ID of the deployment.
+        DeploymentStatus:
+          allOf:
+          - $ref: '#/components/schemas/EntityName'
+          description: Returns the bucket error code.
+        DeploymentStatusMessage:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: Returns the detailed error message.
+        DeploymentStartTime:
+          allOf:
+          - $ref: '#/components/schemas/Timestamp'
+          description: The timestamp of when the deployment was started on the agent.
+        DeploymentEndTime:
+          allOf:
+          - $ref: '#/components/schemas/Timestamp'
+          description: The timestamp of when the deployment was ended, and the agent
+            got the deployment results.
+        DeploymentModels:
+          allOf:
+          - $ref: '#/components/schemas/DeploymentModels'
+          description: Returns a list of models deployed on the agent.
+      description: Information about the result of a deployment on an edge device
+        that is registered with SageMaker Edge Manager.
     DeploymentStatus:
       type: string
       enum:
@@ -95,10 +279,52 @@ components:
       pattern: ^[a-zA-Z0-9](-*[a-zA-Z0-9\/])*$
       minLength: 1
       maxLength: 1000
+    EdgeDeployment:
+      type: object
+      properties:
+        DeploymentName:
+          allOf:
+          - $ref: '#/components/schemas/EntityName'
+          description: The name and unique ID of the deployment.
+        Type:
+          allOf:
+          - $ref: '#/components/schemas/DeploymentType'
+          description: The type of the deployment.
+        FailureHandlingPolicy:
+          allOf:
+          - $ref: '#/components/schemas/FailureHandlingPolicy'
+          description: Determines whether to rollback to previous configuration if
+            deployment fails.
+        Definitions:
+          allOf:
+          - $ref: '#/components/schemas/Definitions'
+          description: Returns a list of Definition objects.
+      description: Information about a deployment on an edge device that is registered
+        with SageMaker Edge Manager.
     EdgeDeployments:
       type: array
       items:
         $ref: '#/components/schemas/EdgeDeployment'
+    EdgeMetric:
+      type: object
+      properties:
+        Dimension:
+          allOf:
+          - $ref: '#/components/schemas/Dimension'
+          description: The dimension of metrics published.
+        MetricName:
+          allOf:
+          - $ref: '#/components/schemas/Metric'
+          description: Returns the name of the metric.
+        Value:
+          allOf:
+          - $ref: '#/components/schemas/Value'
+          description: Returns the value of the metric.
+        Timestamp:
+          allOf:
+          - $ref: '#/components/schemas/Timestamp'
+          description: Timestamp of when the metric was requested.
+      description: Information required for edge device metrics.
     EdgeMetrics:
       type: array
       items:
@@ -115,11 +341,94 @@ components:
       enum:
       - ROLLBACK_ON_FAILURE
       - DO_NOTHING
+    GetDeploymentsRequest:
+      type: object
+      properties:
+        DeviceName:
+          allOf:
+          - $ref: '#/components/schemas/DeviceName'
+          description: The unique name of the device you want to get the configuration
+            of active deployments from.
+        DeviceFleetName:
+          allOf:
+          - $ref: '#/components/schemas/DeviceFleetName'
+          description: The name of the fleet that the device belongs to.
+      required:
+      - DeviceName
+      - DeviceFleetName
+    GetDeploymentsResult:
+      type: object
+      properties:
+        Deployments:
+          allOf:
+          - $ref: '#/components/schemas/EdgeDeployments'
+          description: Returns a list of the configurations of the active deployments
+            on the device.
+    GetDeviceRegistrationRequest:
+      type: object
+      properties:
+        DeviceName:
+          allOf:
+          - $ref: '#/components/schemas/DeviceName'
+          description: The unique name of the device you want to get the registration
+            status from.
+        DeviceFleetName:
+          allOf:
+          - $ref: '#/components/schemas/DeviceFleetName'
+          description: The name of the fleet that the device belongs to.
+      required:
+      - DeviceName
+      - DeviceFleetName
+    GetDeviceRegistrationResult:
+      type: object
+      properties:
+        DeviceRegistration:
+          allOf:
+          - $ref: '#/components/schemas/DeviceRegistration'
+          description: Describes if the device is currently registered with SageMaker
+            Edge Manager.
+        CacheTTL:
+          allOf:
+          - $ref: '#/components/schemas/CacheTTLSeconds'
+          description: The amount of time, in seconds, that the registration status
+            is stored on the device’s cache before it is refreshed.
+    InternalServiceException:
+      type: object
+      properties:
+        Message:
+          $ref: '#/components/schemas/ErrorMessage'
+      description: An internal failure occurred. Try your request again. If the problem
+        persists, contact Amazon Web Services customer support.
     Metric:
       type: string
       pattern: ^[a-zA-Z0-9](-*[a-zA-Z0-9])*$
       minLength: 4
       maxLength: 100
+    Model:
+      type: object
+      properties:
+        ModelName:
+          allOf:
+          - $ref: '#/components/schemas/ModelName'
+          description: The name of the model.
+        ModelVersion:
+          allOf:
+          - $ref: '#/components/schemas/Version'
+          description: The version of the model.
+        LatestSampleTime:
+          allOf:
+          - $ref: '#/components/schemas/Timestamp'
+          description: The timestamp of the last data sample taken.
+        LatestInference:
+          allOf:
+          - $ref: '#/components/schemas/Timestamp'
+          description: The timestamp of the last inference that was made.
+        ModelMetrics:
+          allOf:
+          - $ref: '#/components/schemas/EdgeMetrics'
+          description: Information required for model metrics.
+      description: Information about a model deployed on an edge device that is registered
+        with SageMaker Edge Manager.
     ModelName:
       type: string
       pattern: ^[a-zA-Z0-9](-*[a-zA-Z0-9])*$
@@ -139,6 +448,38 @@ components:
       pattern: ^s3://([^/]+)/?(.*)$
       minLength: 0
       maxLength: 1024
+    SendHeartbeatRequest:
+      type: object
+      properties:
+        AgentMetrics:
+          allOf:
+          - $ref: '#/components/schemas/EdgeMetrics'
+          description: For internal use. Returns a list of SageMaker Edge Manager
+            agent operating metrics.
+        Models:
+          allOf:
+          - $ref: '#/components/schemas/Models'
+          description: Returns a list of models deployed on the the device.
+        AgentVersion:
+          allOf:
+          - $ref: '#/components/schemas/Version'
+          description: Returns the version of the agent.
+        DeviceName:
+          allOf:
+          - $ref: '#/components/schemas/DeviceName'
+          description: The unique name of the device.
+        DeviceFleetName:
+          allOf:
+          - $ref: '#/components/schemas/DeviceFleetName'
+          description: The name of the fleet that the device belongs to.
+        DeploymentResult:
+          allOf:
+          - $ref: '#/components/schemas/DeploymentResult'
+          description: Returns the result of a deployment on the device.
+      required:
+      - AgentVersion
+      - DeviceName
+      - DeviceFleetName
     String:
       type: string
     Timestamp:

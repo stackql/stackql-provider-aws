@@ -7,7 +7,7 @@ info:
   x-stackql-serviceName: socialmessaging
   x-aws-serviceName: socialmessaging
   x-aws-protocol: aws.protocols#restJson1
-  x-dateGenerated: '2025-05-05'
+  x-dateGenerated: '2025-05-07'
   version: '2024-01-01'
   title: AWS End User Messaging Social
   description: |-
@@ -53,9 +53,643 @@ servers:
       - sa-east-1
       - me-south-1
       default: us-east-1
-paths: {}
+paths:
+  /v1/whatsapp/signup:
+    post:
+      operationId: AssociateWhatsAppBusinessAccount
+      description: |-
+        This is only used through the Amazon Web Services console during sign-up to associate your WhatsApp Business Account to your Amazon Web Services account.
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                signupCallback:
+                  $ref: '#/components/schemas/WhatsAppSignupCallback'
+                setupFinalization:
+                  $ref: '#/components/schemas/WhatsAppSetupFinalization'
+      responses:
+        '200': {}
+        '502':
+          description: |-
+            Thrown when performing an action because a dependency would be broken.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DependencyException'
+        '400':
+          description: |-
+            One or more parameters provided to the action are not valid.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InvalidParametersException'
+        '429':
+          description: |-
+            The request was denied due to request throttling.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThrottledRequestException'
+  /v1/whatsapp/media:
+    delete:
+      operationId: DeleteWhatsAppMessageMedia
+      description: |-
+        Delete a media object from the WhatsApp service. If the object is still in an Amazon S3 bucket you should delete it from there too.
+      parameters:
+      - name: mediaId
+        in: query
+        required: true
+        schema:
+          $ref: '#/components/schemas/WhatsAppMediaId'
+      - name: originationPhoneNumberId
+        in: query
+        required: true
+        schema:
+          $ref: '#/components/schemas/WhatsAppPhoneNumberId'
+      responses:
+        '200': {}
+        '403':
+          description: |-
+            You do not have sufficient access to perform this action.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedByMetaException'
+        '502':
+          description: |-
+            Thrown when performing an action because a dependency would be broken.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DependencyException'
+        '500':
+          description: |-
+            The request processing has failed because of an unknown error, exception, or failure.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServiceException'
+        '400':
+          description: |-
+            One or more parameters provided to the action are not valid.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InvalidParametersException'
+        '404':
+          description: |-
+            The resource was not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+        '429':
+          description: |-
+            The request was denied due to request throttling.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThrottledRequestException'
+    post:
+      operationId: PostWhatsAppMessageMedia
+      description: |-
+        Upload a media file to the WhatsApp service. Only the specified `originationPhoneNumberId` has the permissions to send the media file when using [SendWhatsAppMessage](https://docs.aws.amazon.com/social-messaging/latest/APIReference/API_SendWhatsAppMessage.html). You must use either `sourceS3File` or `sourceS3PresignedUrl` for the source. If both or neither are specified then an `InvalidParameterException` is returned.
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                originationPhoneNumberId:
+                  $ref: '#/components/schemas/WhatsAppPhoneNumberId'
+                sourceS3PresignedUrl:
+                  $ref: '#/components/schemas/S3PresignedUrl'
+                sourceS3File:
+                  $ref: '#/components/schemas/S3File'
+      responses:
+        '200': {}
+        '403':
+          description: |-
+            You do not have sufficient access to perform this action.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedByMetaException'
+        '502':
+          description: |-
+            Thrown when performing an action because a dependency would be broken.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DependencyException'
+        '500':
+          description: |-
+            The request processing has failed because of an unknown error, exception, or failure.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServiceException'
+        '400':
+          description: |-
+            One or more parameters provided to the action are not valid.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InvalidParametersException'
+        '404':
+          description: |-
+            The resource was not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+        '429':
+          description: |-
+            The request was denied due to request throttling.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThrottledRequestException'
+  /v1/whatsapp/waba/disassociate:
+    delete:
+      operationId: DisassociateWhatsAppBusinessAccount
+      description: |-
+        Disassociate a WhatsApp Business Account (WABA) from your Amazon Web Services account.
+      parameters:
+      - name: id
+        in: query
+        required: true
+        schema:
+          $ref: '#/components/schemas/LinkedWhatsAppBusinessAccountId'
+      responses:
+        '200': {}
+        '502':
+          description: |-
+            Thrown when performing an action because a dependency would be broken.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DependencyException'
+        '400':
+          description: |-
+            One or more parameters provided to the action are not valid.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InvalidParametersException'
+        '404':
+          description: |-
+            The resource was not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+        '429':
+          description: |-
+            The request was denied due to request throttling.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThrottledRequestException'
+  /v1/whatsapp/waba/details:
+    get:
+      operationId: GetLinkedWhatsAppBusinessAccount
+      description: |-
+        Get the details of your linked WhatsApp Business Account.
+      parameters:
+      - name: id
+        in: query
+        required: true
+        schema:
+          $ref: '#/components/schemas/LinkedWhatsAppBusinessAccountId'
+      responses:
+        '200': {}
+        '502':
+          description: |-
+            Thrown when performing an action because a dependency would be broken.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DependencyException'
+        '500':
+          description: |-
+            The request processing has failed because of an unknown error, exception, or failure.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServiceException'
+        '400':
+          description: |-
+            One or more parameters provided to the action are not valid.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InvalidParametersException'
+        '404':
+          description: |-
+            The resource was not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+        '429':
+          description: |-
+            The request was denied due to request throttling.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThrottledRequestException'
+  /v1/whatsapp/waba/phone/details:
+    get:
+      operationId: GetLinkedWhatsAppBusinessAccountPhoneNumber
+      description: |-
+        Use your WhatsApp phone number id to get the WABA account id and phone number details.
+      parameters:
+      - name: id
+        in: query
+        required: true
+        schema:
+          $ref: '#/components/schemas/WhatsAppPhoneNumberId'
+      responses:
+        '200': {}
+        '502':
+          description: |-
+            Thrown when performing an action because a dependency would be broken.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DependencyException'
+        '500':
+          description: |-
+            The request processing has failed because of an unknown error, exception, or failure.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServiceException'
+        '400':
+          description: |-
+            One or more parameters provided to the action are not valid.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InvalidParametersException'
+        '404':
+          description: |-
+            The resource was not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+        '429':
+          description: |-
+            The request was denied due to request throttling.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThrottledRequestException'
+  /v1/whatsapp/media/get:
+    post:
+      operationId: GetWhatsAppMessageMedia
+      description: |-
+        Get a media file from the WhatsApp service. On successful completion the media file is retrieved from Meta and stored in the specified Amazon S3 bucket. Use either `destinationS3File` or `destinationS3PresignedUrl` for the destination. If both are used then an `InvalidParameterException` is returned.
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                mediaId:
+                  $ref: '#/components/schemas/WhatsAppMediaId'
+                originationPhoneNumberId:
+                  $ref: '#/components/schemas/WhatsAppPhoneNumberId'
+                metadataOnly:
+                  $ref: '#/components/schemas/Boolean'
+                destinationS3PresignedUrl:
+                  $ref: '#/components/schemas/S3PresignedUrl'
+                destinationS3File:
+                  $ref: '#/components/schemas/S3File'
+      responses:
+        '200': {}
+        '403':
+          description: |-
+            You do not have sufficient access to perform this action.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedByMetaException'
+        '502':
+          description: |-
+            Thrown when performing an action because a dependency would be broken.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DependencyException'
+        '500':
+          description: |-
+            The request processing has failed because of an unknown error, exception, or failure.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServiceException'
+        '400':
+          description: |-
+            One or more parameters provided to the action are not valid.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InvalidParametersException'
+        '404':
+          description: |-
+            The resource was not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+        '429':
+          description: |-
+            The request was denied due to request throttling.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThrottledRequestException'
+  /v1/whatsapp/waba/list:
+    get:
+      operationId: ListLinkedWhatsAppBusinessAccounts
+      description: |-
+        List all WhatsApp Business Accounts linked to your Amazon Web Services account.
+      parameters:
+      - name: nextToken
+        in: query
+        required: false
+        schema:
+          $ref: '#/components/schemas/NextToken'
+      - name: maxResults
+        in: query
+        required: false
+        schema:
+          $ref: '#/components/schemas/MaxResults'
+      responses:
+        '200': {}
+        '500':
+          description: |-
+            The request processing has failed because of an unknown error, exception, or failure.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServiceException'
+        '400':
+          description: |-
+            One or more parameters provided to the action are not valid.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InvalidParametersException'
+        '404':
+          description: |-
+            The resource was not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+        '429':
+          description: |-
+            The request was denied due to request throttling.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThrottledRequestException'
+  /v1/tags/list:
+    get:
+      operationId: ListTagsForResource
+      description: |-
+        List all tags associated with a resource, such as a phone number or WABA.
+      parameters:
+      - name: resourceArn
+        in: query
+        required: true
+        schema:
+          $ref: '#/components/schemas/Arn'
+      responses:
+        '200': {}
+        '500':
+          description: |-
+            The request processing has failed because of an unknown error, exception, or failure.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServiceException'
+        '400':
+          description: |-
+            One or more parameters provided to the action are not valid.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InvalidParametersException'
+        '429':
+          description: |-
+            The request was denied due to request throttling.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThrottledRequestException'
+  /v1/whatsapp/waba/eventdestinations:
+    put:
+      operationId: PutWhatsAppBusinessAccountEventDestinations
+      description: |-
+        Add an event destination to log event data from WhatsApp for a WhatsApp Business Account (WABA). A WABA can only have one event destination at a time. All resources associated with the WABA use the same event destination.
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                id:
+                  $ref: '#/components/schemas/LinkedWhatsAppBusinessAccountId'
+                eventDestinations:
+                  $ref: '#/components/schemas/WhatsAppBusinessAccountEventDestinations'
+      responses:
+        '200': {}
+        '500':
+          description: |-
+            The request processing has failed because of an unknown error, exception, or failure.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServiceException'
+        '400':
+          description: |-
+            One or more parameters provided to the action are not valid.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InvalidParametersException'
+        '429':
+          description: |-
+            The request was denied due to request throttling.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThrottledRequestException'
+  /v1/whatsapp/send:
+    post:
+      operationId: SendWhatsAppMessage
+      description: |-
+        Send a WhatsApp message. For examples of sending a message using the Amazon Web Services CLI, see [Sending messages](https://docs.aws.amazon.com/social-messaging/latest/userguide/send-message.html) in the __Amazon Web Services End User Messaging Social User Guide_ _.
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                originationPhoneNumberId:
+                  $ref: '#/components/schemas/WhatsAppPhoneNumberId'
+                message:
+                  $ref: '#/components/schemas/WhatsAppMessageBlob'
+                metaApiVersion:
+                  $ref: '#/components/schemas/String'
+      responses:
+        '200': {}
+        '502':
+          description: |-
+            Thrown when performing an action because a dependency would be broken.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DependencyException'
+        '500':
+          description: |-
+            The request processing has failed because of an unknown error, exception, or failure.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServiceException'
+        '400':
+          description: |-
+            One or more parameters provided to the action are not valid.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InvalidParametersException'
+        '404':
+          description: |-
+            The resource was not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+        '429':
+          description: |-
+            The request was denied due to request throttling.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThrottledRequestException'
+  /v1/tags/tag-resource:
+    post:
+      operationId: TagResource
+      description: |-
+        Adds or overwrites only the specified tags for the specified resource. When you specify an existing tag key, the value is overwritten with the new value.
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                resourceArn:
+                  $ref: '#/components/schemas/Arn'
+                tags:
+                  $ref: '#/components/schemas/TagList'
+      responses:
+        '200': {}
+        '500':
+          description: |-
+            The request processing has failed because of an unknown error, exception, or failure.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServiceException'
+        '400':
+          description: |-
+            One or more parameters provided to the action are not valid.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InvalidParametersException'
+        '429':
+          description: |-
+            The request was denied due to request throttling.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThrottledRequestException'
+  /v1/tags/untag-resource:
+    post:
+      operationId: UntagResource
+      description: |-
+        Removes the specified tags from a resource.
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                resourceArn:
+                  $ref: '#/components/schemas/Arn'
+                tagKeys:
+                  $ref: '#/components/schemas/StringList'
+      responses:
+        '200': {}
+        '500':
+          description: |-
+            The request processing has failed because of an unknown error, exception, or failure.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServiceException'
+        '400':
+          description: |-
+            One or more parameters provided to the action are not valid.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InvalidParametersException'
+        '429':
+          description: |-
+            The request was denied due to request throttling.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThrottledRequestException'
 components:
   schemas:
+    AccessDeniedByMetaException:
+      type: object
+      properties:
+        message:
+          $ref: '#/components/schemas/ErrorMessage'
+      description: You do not have sufficient access to perform this action.
+    AccessDeniedException:
+      type: object
+      properties:
+        message:
+          $ref: '#/components/schemas/ErrorMessage'
+      description: You do not have sufficient access to perform this action.
     Arn:
       type: string
       pattern: ^arn:.*$
@@ -63,16 +697,180 @@ components:
     AssociateInProgressToken:
       type: string
       maxLength: 50
+    AssociateWhatsAppBusinessAccountInput:
+      type: object
+      properties:
+        signupCallback:
+          allOf:
+          - $ref: '#/components/schemas/WhatsAppSignupCallback'
+          description: Contains the callback access token.
+        setupFinalization:
+          allOf:
+          - $ref: '#/components/schemas/WhatsAppSetupFinalization'
+          description: A JSON object that contains the phone numbers and WhatsApp
+            Business Account to link to your account.
+    AssociateWhatsAppBusinessAccountOutput:
+      type: object
+      properties:
+        signupCallbackResult:
+          allOf:
+          - $ref: '#/components/schemas/WhatsAppSignupCallbackResult'
+          description: Contains your WhatsApp registration status.
+        statusCode:
+          allOf:
+          - $ref: '#/components/schemas/Integer'
+          description: The status code for the response.
+    DeleteWhatsAppMessageMediaInput:
+      type: object
+      properties:
+        mediaId:
+          allOf:
+          - $ref: '#/components/schemas/WhatsAppMediaId'
+          description: The unique identifier of the media file to delete. Use the
+            `mediaId` returned from [PostWhatsAppMessageMedia](https://console.aws.amazon.com/social-messaging/latest/APIReference/API_PostWhatsAppMessageMedia.html).
+        originationPhoneNumberId:
+          allOf:
+          - $ref: '#/components/schemas/WhatsAppPhoneNumberId'
+          description: The unique identifier of the originating phone number associated
+            with the media. Phone number identifiers are formatted as `phone-number-id-01234567890123456789012345678901`.
+            Use [GetLinkedWhatsAppBusinessAccount](https://docs.aws.amazon.com/social-messaging/latest/APIReference/API_GetLinkedWhatsAppBusinessAccountPhoneNumber.html)
+            to find a phone number's id.
+      required:
+      - mediaId
+      - originationPhoneNumberId
+    DeleteWhatsAppMessageMediaOutput:
+      type: object
+      properties:
+        success:
+          allOf:
+          - $ref: '#/components/schemas/Boolean'
+          description: Success indicator for deleting the media file.
+    DependencyException:
+      type: object
+      properties:
+        message:
+          $ref: '#/components/schemas/ErrorMessage'
+      description: Thrown when performing an action because a dependency would be
+        broken.
+    DisassociateWhatsAppBusinessAccountInput:
+      type: object
+      properties:
+        id:
+          allOf:
+          - $ref: '#/components/schemas/LinkedWhatsAppBusinessAccountId'
+          description: The unique identifier of your WhatsApp Business Account. WABA
+            identifiers are formatted as `waba-01234567890123456789012345678901`.
+            Use [ListLinkedWhatsAppBusinessAccounts](https://docs.aws.amazon.com/social-messaging/latest/APIReference/API_ListLinkedWhatsAppBusinessAccounts.html)
+            to list all WABAs and their details.
+      required:
+      - id
+    DisassociateWhatsAppBusinessAccountOutput:
+      type: object
+      properties: {}
     ErrorMessage:
       type: string
     EventDestinationArn:
       type: string
       pattern: ^arn:.*:[a-z-]+([/:](.*))?$
       maxLength: 2048
+    GetLinkedWhatsAppBusinessAccountInput:
+      type: object
+      properties:
+        id:
+          allOf:
+          - $ref: '#/components/schemas/LinkedWhatsAppBusinessAccountId'
+          description: The unique identifier, from Amazon Web Services, of the linked
+            WhatsApp Business Account. WABA identifiers are formatted as `waba-01234567890123456789012345678901`.
+            Use [ListLinkedWhatsAppBusinessAccounts](https://docs.aws.amazon.com/social-messaging/latest/APIReference/API_ListLinkedWhatsAppBusinessAccounts.html)
+            to list all WABAs and their details.
+      required:
+      - id
+    GetLinkedWhatsAppBusinessAccountOutput:
+      type: object
+      properties:
+        account:
+          allOf:
+          - $ref: '#/components/schemas/LinkedWhatsAppBusinessAccount'
+          description: The details of the linked WhatsApp Business Account.
+    GetLinkedWhatsAppBusinessAccountPhoneNumberInput:
+      type: object
+      properties:
+        id:
+          allOf:
+          - $ref: '#/components/schemas/WhatsAppPhoneNumberId'
+          description: The unique identifier of the phone number. Phone number identifiers
+            are formatted as `phone-number-id-01234567890123456789012345678901`. Use
+            [GetLinkedWhatsAppBusinessAccount](https://docs.aws.amazon.com/social-messaging/latest/APIReference/API_GetLinkedWhatsAppBusinessAccountPhoneNumber.html)
+            to find a phone number's id.
+      required:
+      - id
+    GetLinkedWhatsAppBusinessAccountPhoneNumberOutput:
+      type: object
+      properties:
+        phoneNumber:
+          $ref: '#/components/schemas/WhatsAppPhoneNumberDetail'
+        linkedWhatsAppBusinessAccountId:
+          allOf:
+          - $ref: '#/components/schemas/LinkedWhatsAppBusinessAccountId'
+          description: The WABA identifier linked to the phone number, formatted as
+            `waba-01234567890123456789012345678901`.
+    GetWhatsAppMessageMediaInput:
+      type: object
+      properties:
+        mediaId:
+          allOf:
+          - $ref: '#/components/schemas/WhatsAppMediaId'
+          description: The unique identifier for the media file.
+        originationPhoneNumberId:
+          allOf:
+          - $ref: '#/components/schemas/WhatsAppPhoneNumberId'
+          description: The unique identifier of the originating phone number for the
+            WhatsApp message media. The phone number identifiers are formatted as
+            `phone-number-id-01234567890123456789012345678901`. Use [GetLinkedWhatsAppBusinessAccount](https://docs.aws.amazon.com/social-messaging/latest/APIReference/API_GetLinkedWhatsAppBusinessAccountPhoneNumber.html)
+            to find a phone number's id.
+        metadataOnly:
+          allOf:
+          - $ref: '#/components/schemas/Boolean'
+          description: Set to `True` to get only the metadata for the file.
+        destinationS3PresignedUrl:
+          allOf:
+          - $ref: '#/components/schemas/S3PresignedUrl'
+          description: The presign url of the media file.
+        destinationS3File:
+          allOf:
+          - $ref: '#/components/schemas/S3File'
+          description: The `bucketName` and `key` of the S3 media file.
+      required:
+      - mediaId
+      - originationPhoneNumberId
+    GetWhatsAppMessageMediaOutput:
+      type: object
+      properties:
+        mimeType:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The MIME type of the media.
+        fileSize:
+          allOf:
+          - $ref: '#/components/schemas/Long'
+          description: The file size of the media, in KB.
     Headers:
       type: object
       additionalProperties:
         $ref: '#/components/schemas/String'
+    InternalServiceException:
+      type: object
+      properties:
+        message:
+          $ref: '#/components/schemas/ErrorMessage'
+      description: The request processing has failed because of an unknown error,
+        exception, or failure.
+    InvalidParametersException:
+      type: object
+      properties:
+        message:
+          $ref: '#/components/schemas/ErrorMessage'
+      description: One or more parameters provided to the action are not valid.
     IsoCountryCode:
       type: string
       pattern: ^[A-Z]{2}$
@@ -80,6 +878,53 @@ components:
       type: object
       additionalProperties:
         $ref: '#/components/schemas/LinkedWhatsAppBusinessAccountIdMetaData'
+    LinkedWhatsAppBusinessAccount:
+      type: object
+      properties:
+        arn:
+          allOf:
+          - $ref: '#/components/schemas/LinkedWhatsAppBusinessAccountArn'
+          description: The ARN of the linked WhatsApp Business Account.
+        id:
+          allOf:
+          - $ref: '#/components/schemas/LinkedWhatsAppBusinessAccountId'
+          description: The ID of the linked WhatsApp Business Account, formatted as
+            `waba-01234567890123456789012345678901`.
+        wabaId:
+          allOf:
+          - $ref: '#/components/schemas/WhatsAppBusinessAccountId'
+          description: The WhatsApp Business Account ID from meta.
+        registrationStatus:
+          allOf:
+          - $ref: '#/components/schemas/RegistrationStatus'
+          description: The registration status of the linked WhatsApp Business Account.
+        linkDate:
+          allOf:
+          - $ref: '#/components/schemas/WhatsAppBusinessAccountLinkDate'
+          description: The date the WhatsApp Business Account was linked.
+        wabaName:
+          allOf:
+          - $ref: '#/components/schemas/WhatsAppBusinessAccountName'
+          description: The name of the linked WhatsApp Business Account.
+        eventDestinations:
+          allOf:
+          - $ref: '#/components/schemas/WhatsAppBusinessAccountEventDestinations'
+          description: The event destinations for the linked WhatsApp Business Account.
+        phoneNumbers:
+          allOf:
+          - $ref: '#/components/schemas/WhatsAppPhoneNumberSummaryList'
+          description: The phone numbers associated with the Linked WhatsApp Business
+            Account.
+      required:
+      - arn
+      - id
+      - wabaId
+      - registrationStatus
+      - linkDate
+      - wabaName
+      - eventDestinations
+      - phoneNumbers
+      description: The details of your linked WhatsApp Business Account.
     LinkedWhatsAppBusinessAccountArn:
       type: string
       pattern: ^arn:.*:waba/[0-9a-zA-Z]+$
@@ -89,6 +934,69 @@ components:
       pattern: (^waba-.*$)|(^arn:.*:waba/[0-9a-zA-Z]+$)
       minLength: 1
       maxLength: 100
+    LinkedWhatsAppBusinessAccountIdMetaData:
+      type: object
+      properties:
+        accountName:
+          allOf:
+          - $ref: '#/components/schemas/WhatsAppBusinessAccountName'
+          description: The name of your account.
+        registrationStatus:
+          allOf:
+          - $ref: '#/components/schemas/RegistrationStatus'
+          description: The registration status of the linked WhatsApp Business Account.
+        unregisteredWhatsAppPhoneNumbers:
+          allOf:
+          - $ref: '#/components/schemas/WhatsAppPhoneNumberDetailList'
+          description: The details for unregistered WhatsApp phone numbers.
+        wabaId:
+          allOf:
+          - $ref: '#/components/schemas/LinkedWhatsAppBusinessAccountId'
+          description: The Amazon Resource Name (ARN) of the WhatsApp Business Account
+            ID.
+      description: Contains your WhatsApp registration status and details of any unregistered
+        WhatsApp phone number.
+    LinkedWhatsAppBusinessAccountSummary:
+      type: object
+      properties:
+        arn:
+          allOf:
+          - $ref: '#/components/schemas/LinkedWhatsAppBusinessAccountArn'
+          description: The ARN of the linked WhatsApp Business Account.
+        id:
+          allOf:
+          - $ref: '#/components/schemas/LinkedWhatsAppBusinessAccountId'
+          description: The ID of the linked WhatsApp Business Account, formatted as
+            `waba-01234567890123456789012345678901`.
+        wabaId:
+          allOf:
+          - $ref: '#/components/schemas/WhatsAppBusinessAccountId'
+          description: The WhatsApp Business Account ID provided by Meta.
+        registrationStatus:
+          allOf:
+          - $ref: '#/components/schemas/RegistrationStatus'
+          description: The registration status of the linked WhatsApp Business Account.
+        linkDate:
+          allOf:
+          - $ref: '#/components/schemas/WhatsAppBusinessAccountLinkDate'
+          description: The date the WhatsApp Business Account was linked.
+        wabaName:
+          allOf:
+          - $ref: '#/components/schemas/WhatsAppBusinessAccountName'
+          description: The name of the linked WhatsApp Business Account.
+        eventDestinations:
+          allOf:
+          - $ref: '#/components/schemas/WhatsAppBusinessAccountEventDestinations'
+          description: The event destinations for the linked WhatsApp Business Account.
+      required:
+      - arn
+      - id
+      - wabaId
+      - registrationStatus
+      - linkDate
+      - wabaName
+      - eventDestinations
+      description: The details of a linked WhatsApp Business Account.
     LinkedWhatsAppBusinessAccountSummaryList:
       type: array
       items:
@@ -97,6 +1005,50 @@ components:
       type: string
       pattern: ^arn:.*:phone-number-id/[0-9a-zA-Z]+$
       maxLength: 2048
+    ListLinkedWhatsAppBusinessAccountsInput:
+      type: object
+      properties:
+        nextToken:
+          allOf:
+          - $ref: '#/components/schemas/NextToken'
+          description: The next token for pagination.
+        maxResults:
+          allOf:
+          - $ref: '#/components/schemas/MaxResults'
+          description: The maximum number of results to return.
+    ListLinkedWhatsAppBusinessAccountsOutput:
+      type: object
+      properties:
+        linkedAccounts:
+          allOf:
+          - $ref: '#/components/schemas/LinkedWhatsAppBusinessAccountSummaryList'
+          description: A list of WhatsApp Business Accounts linked to your Amazon
+            Web Services account.
+        nextToken:
+          allOf:
+          - $ref: '#/components/schemas/NextToken'
+          description: The next token for pagination.
+    ListTagsForResourceInput:
+      type: object
+      properties:
+        resourceArn:
+          allOf:
+          - $ref: '#/components/schemas/Arn'
+          description: The Amazon Resource Name (ARN) of the resource to retrieve
+            the tags from.
+      required:
+      - resourceArn
+    ListTagsForResourceOutput:
+      type: object
+      properties:
+        statusCode:
+          allOf:
+          - $ref: '#/components/schemas/Integer'
+          description: The status code of the response.
+        tags:
+          allOf:
+          - $ref: '#/components/schemas/TagList'
+          description: The tags for the resource.
     MaxResults:
       type: integer
       minimum: 1
@@ -109,30 +1061,291 @@ components:
       type: string
       minLength: 1
       maxLength: 20
+    PostWhatsAppMessageMediaInput:
+      type: object
+      properties:
+        originationPhoneNumberId:
+          allOf:
+          - $ref: '#/components/schemas/WhatsAppPhoneNumberId'
+          description: The ID of the phone number to associate with the WhatsApp media
+            file. The phone number identifiers are formatted as `phone-number-id-01234567890123456789012345678901`.
+            Use [GetLinkedWhatsAppBusinessAccount](https://docs.aws.amazon.com/social-messaging/latest/APIReference/API_GetLinkedWhatsAppBusinessAccountPhoneNumber.html)
+            to find a phone number's id.
+        sourceS3PresignedUrl:
+          allOf:
+          - $ref: '#/components/schemas/S3PresignedUrl'
+          description: The source presign url of the media file.
+        sourceS3File:
+          allOf:
+          - $ref: '#/components/schemas/S3File'
+          description: The source S3 url for the media file.
+      required:
+      - originationPhoneNumberId
+    PostWhatsAppMessageMediaOutput:
+      type: object
+      properties:
+        mediaId:
+          allOf:
+          - $ref: '#/components/schemas/WhatsAppMediaId'
+          description: The unique identifier of the posted WhatsApp message.
+    PutWhatsAppBusinessAccountEventDestinationsInput:
+      type: object
+      properties:
+        id:
+          allOf:
+          - $ref: '#/components/schemas/LinkedWhatsAppBusinessAccountId'
+          description: The unique identifier of your WhatsApp Business Account. WABA
+            identifiers are formatted as `waba-01234567890123456789012345678901`.
+            Use [ListLinkedWhatsAppBusinessAccounts](https://docs.aws.amazon.com/social-messaging/latest/APIReference/API_ListLinkedWhatsAppBusinessAccounts.html)
+            to list all WABAs and their details.
+        eventDestinations:
+          allOf:
+          - $ref: '#/components/schemas/WhatsAppBusinessAccountEventDestinations'
+          description: An array of `WhatsAppBusinessAccountEventDestination` event
+            destinations.
+      required:
+      - id
+      - eventDestinations
+    PutWhatsAppBusinessAccountEventDestinationsOutput:
+      type: object
+      properties: {}
     RegistrationStatus:
       type: string
       enum:
       - COMPLETE
       - INCOMPLETE
+    ResourceNotFoundException:
+      type: object
+      properties:
+        message:
+          $ref: '#/components/schemas/ErrorMessage'
+      description: The resource was not found.
     RoleArn:
       type: string
       pattern: ^arn:aws:iam::\d{12}:role\/[a-zA-Z0-9+=,.@\-_]+$
+    S3File:
+      type: object
+      properties:
+        bucketName:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The bucket name.
+        key:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The object key of the media file.
+      required:
+      - bucketName
+      - key
+      description: Contains information for the S3 bucket that contains media files.
+    S3PresignedUrl:
+      type: object
+      properties:
+        url:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The presign url to the object.
+        headers:
+          allOf:
+          - $ref: '#/components/schemas/Headers'
+          description: A map of headers and their values. You must specify the `Content-Type`
+            header when using `PostWhatsAppMessageMedia`. For a list of common headers,
+            see [Common Request Headers](https://docs.aws.amazon.com/AmazonS3/latest/API/RESTCommonRequestHeaders.html)
+            in the _Amazon S3 API Reference_
+      required:
+      - url
+      - headers
+      description: You can use presigned URLs to grant time-limited access to objects
+        in Amazon S3 without updating your bucket policy. For more information, see
+        [Working with presigned URLs](https://docs.aws.amazon.com/AmazonS3/latest/userguide/using-presigned-url.html)
+        in the _Amazon S3 User Guide_.
+    SendWhatsAppMessageInput:
+      type: object
+      properties:
+        originationPhoneNumberId:
+          allOf:
+          - $ref: '#/components/schemas/WhatsAppPhoneNumberId'
+          description: The ID of the phone number used to send the WhatsApp message.
+            If you are sending a media file only the `originationPhoneNumberId` used
+            to upload the file can be used. Phone number identifiers are formatted
+            as `phone-number-id-01234567890123456789012345678901`. Use [GetLinkedWhatsAppBusinessAccount](https://docs.aws.amazon.com/social-messaging/latest/APIReference/API_GetLinkedWhatsAppBusinessAccountPhoneNumber.html)
+            to find a phone number's id.
+        message:
+          allOf:
+          - $ref: '#/components/schemas/WhatsAppMessageBlob'
+          description: The message to send through WhatsApp. The length is in KB.
+            The message field passes through a WhatsApp Message object, see [Messages](https://developers.facebook.com/docs/whatsapp/cloud-api/reference/messages)
+            in the _WhatsApp Business Platform Cloud API Reference_.
+        metaApiVersion:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The API version for the request formatted as `v{VersionNumber}`.
+            For a list of supported API versions and Amazon Web Services Regions,
+            see [ _Amazon Web Services End User Messaging Social API_ Service Endpoints](https://docs.aws.amazon.com/general/latest/gr/end-user-messaging.html)
+            in the _Amazon Web Services General Reference_.
+      required:
+      - originationPhoneNumberId
+      - message
+      - metaApiVersion
+    SendWhatsAppMessageOutput:
+      type: object
+      properties:
+        messageId:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The unique identifier of the message.
     StringList:
       type: array
       items:
         type: string
+    Tag:
+      type: object
+      properties:
+        key:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The tag key.
+        value:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The tag value.
+      required:
+      - key
+      description: The tag for a resource.
     TagList:
       type: array
       items:
         $ref: '#/components/schemas/Tag'
+    TagResourceInput:
+      type: object
+      properties:
+        resourceArn:
+          allOf:
+          - $ref: '#/components/schemas/Arn'
+          description: The Amazon Resource Name (ARN) of the resource to tag.
+        tags:
+          allOf:
+          - $ref: '#/components/schemas/TagList'
+          description: The tags to add to the resource.
+      required:
+      - resourceArn
+      - tags
+    TagResourceOutput:
+      type: object
+      properties:
+        statusCode:
+          allOf:
+          - $ref: '#/components/schemas/Integer'
+          description: The status code of the tag resource operation.
+    ThrottledRequestException:
+      type: object
+      properties:
+        message:
+          $ref: '#/components/schemas/ErrorMessage'
+      description: The request was denied due to request throttling.
     TwoFactorPin:
       type: string
       minLength: 1
       maxLength: 6
+    UntagResourceInput:
+      type: object
+      properties:
+        resourceArn:
+          allOf:
+          - $ref: '#/components/schemas/Arn'
+          description: The Amazon Resource Name (ARN) of the resource to remove tags
+            from.
+        tagKeys:
+          allOf:
+          - $ref: '#/components/schemas/StringList'
+          description: The keys of the tags to remove from the resource.
+      required:
+      - resourceArn
+      - tagKeys
+    UntagResourceOutput:
+      type: object
+      properties:
+        statusCode:
+          allOf:
+          - $ref: '#/components/schemas/Integer'
+          description: The status code of the untag resource operation.
+    ValidationException:
+      type: object
+      properties:
+        message:
+          $ref: '#/components/schemas/ErrorMessage'
+      description: The request contains an invalid parameter value.
+    WabaPhoneNumberSetupFinalization:
+      type: object
+      properties:
+        id:
+          allOf:
+          - $ref: '#/components/schemas/WhatsAppPhoneNumber'
+          description: The unique identifier of the originating phone number associated
+            with the media. Phone number identifiers are formatted as `phone-number-id-01234567890123456789012345678901`.
+            Use [GetLinkedWhatsAppBusinessAccount](https://docs.aws.amazon.com/social-messaging/latest/APIReference/API_GetLinkedWhatsAppBusinessAccountPhoneNumber.html)
+            to find a phone number's id.
+        twoFactorPin:
+          allOf:
+          - $ref: '#/components/schemas/TwoFactorPin'
+          description: The PIN to use for two-step verification. To reset your PIN
+            follow the directions in [Updating PIN](https://developers.facebook.com/docs/whatsapp/cloud-api/reference/two-step-verification/#updating-pin)
+            in the _WhatsApp Business Platform Cloud API Reference_.
+        dataLocalizationRegion:
+          allOf:
+          - $ref: '#/components/schemas/IsoCountryCode'
+          description: "The two letter ISO region for the location of where Meta will\
+            \ store data.\n\n**Asia–Pacific (APAC)**\n\n  * Australia **AU**\n\n \
+            \ * Indonesia **ID**\n\n  * India **IN**\n\n  * Japan **JP**\n\n  * Singapore\
+            \ **SG**\n\n  * South Korea **KR**\n\n**Europe**\n\n  * Germany **DE**\n\
+            \n  * Switzerland **CH**\n\n  * United Kingdom **GB**\n\n**Latin America\
+            \ (LATAM)**\n\n  * Brazil **BR**\n\n**Middle East and Africa (MEA)**\n\
+            \n  * Bahrain **BH**\n\n  * South Africa **ZA**\n\n  * United Arab Emirates\
+            \ **AE**\n\n**North America (NORAM)**\n\n  * Canada **CA**"
+        tags:
+          allOf:
+          - $ref: '#/components/schemas/TagList'
+          description: An array of key and value pair tags.
+      required:
+      - id
+      - twoFactorPin
+      description: The registration details for a linked phone number.
     WabaPhoneNumberSetupFinalizationList:
       type: array
       items:
         $ref: '#/components/schemas/WabaPhoneNumberSetupFinalization'
+    WabaSetupFinalization:
+      type: object
+      properties:
+        id:
+          allOf:
+          - $ref: '#/components/schemas/WhatsAppBusinessAccountId'
+          description: The ID of the linked WhatsApp Business Account, formatted as
+            `waba-01234567890123456789012345678901`.
+        eventDestinations:
+          allOf:
+          - $ref: '#/components/schemas/WhatsAppBusinessAccountEventDestinations'
+          description: The event destinations for the linked WhatsApp Business Account.
+        tags:
+          allOf:
+          - $ref: '#/components/schemas/TagList'
+          description: An array of key and value pair tags.
+      description: The registration details for a linked WhatsApp Business Account.
+    WhatsAppBusinessAccountEventDestination:
+      type: object
+      properties:
+        eventDestinationArn:
+          allOf:
+          - $ref: '#/components/schemas/EventDestinationArn'
+          description: The ARN of the event destination.
+        roleArn:
+          allOf:
+          - $ref: '#/components/schemas/RoleArn'
+          description: The Amazon Resource Name (ARN) of an Identity and Access Management
+            role that is able to import phone numbers and write events.
+      required:
+      - eventDestinationArn
+      description: Contains information on the event destination.
     WhatsAppBusinessAccountEventDestinations:
       type: array
       items:
@@ -165,6 +1378,47 @@ components:
       type: string
       minLength: 1
       maxLength: 100
+    WhatsAppPhoneNumberDetail:
+      type: object
+      properties:
+        arn:
+          allOf:
+          - $ref: '#/components/schemas/LinkedWhatsAppPhoneNumberArn'
+          description: The ARN of the WhatsApp phone number.
+        phoneNumber:
+          allOf:
+          - $ref: '#/components/schemas/PhoneNumber'
+          description: The phone number for sending WhatsApp.
+        phoneNumberId:
+          allOf:
+          - $ref: '#/components/schemas/WhatsAppPhoneNumberId'
+          description: The phone number ID. Phone number identifiers are formatted
+            as `phone-number-id-01234567890123456789012345678901`.
+        metaPhoneNumberId:
+          allOf:
+          - $ref: '#/components/schemas/WhatsAppPhoneNumber'
+          description: The phone number ID from Meta.
+        displayPhoneNumberName:
+          allOf:
+          - $ref: '#/components/schemas/WhatsAppPhoneNumberName'
+          description: The display name for this phone number.
+        displayPhoneNumber:
+          allOf:
+          - $ref: '#/components/schemas/WhatsAppDisplayPhoneNumber'
+          description: The phone number that appears in the recipients display.
+        qualityRating:
+          allOf:
+          - $ref: '#/components/schemas/WhatsAppPhoneNumberQualityRating'
+          description: The quality rating of the phone number.
+      required:
+      - arn
+      - phoneNumber
+      - phoneNumberId
+      - metaPhoneNumberId
+      - displayPhoneNumberName
+      - displayPhoneNumber
+      - qualityRating
+      description: The details of your WhatsApp phone number.
     WhatsAppPhoneNumberDetailList:
       type: array
       items:
@@ -180,7 +1434,104 @@ components:
     WhatsAppPhoneNumberQualityRating:
       type: string
       maxLength: 10
+    WhatsAppPhoneNumberSummary:
+      type: object
+      properties:
+        arn:
+          allOf:
+          - $ref: '#/components/schemas/LinkedWhatsAppPhoneNumberArn'
+          description: The full Amazon Resource Name (ARN) for the phone number.
+        phoneNumber:
+          allOf:
+          - $ref: '#/components/schemas/PhoneNumber'
+          description: The phone number associated with the Linked WhatsApp Business
+            Account.
+        phoneNumberId:
+          allOf:
+          - $ref: '#/components/schemas/WhatsAppPhoneNumberId'
+          description: The phone number ID. Phone number identifiers are formatted
+            as `phone-number-id-01234567890123456789012345678901`.
+        metaPhoneNumberId:
+          allOf:
+          - $ref: '#/components/schemas/WhatsAppPhoneNumber'
+          description: The phone number ID from Meta.
+        displayPhoneNumberName:
+          allOf:
+          - $ref: '#/components/schemas/WhatsAppPhoneNumberName'
+          description: The display name for this phone number.
+        displayPhoneNumber:
+          allOf:
+          - $ref: '#/components/schemas/WhatsAppDisplayPhoneNumber'
+          description: The phone number that appears in the recipients display.
+        qualityRating:
+          allOf:
+          - $ref: '#/components/schemas/WhatsAppPhoneNumberQualityRating'
+          description: The quality rating of the phone number. This is from Meta.
+      required:
+      - arn
+      - phoneNumber
+      - phoneNumberId
+      - metaPhoneNumberId
+      - displayPhoneNumberName
+      - displayPhoneNumber
+      - qualityRating
+      description: The details of a linked phone number.
     WhatsAppPhoneNumberSummaryList:
       type: array
       items:
         $ref: '#/components/schemas/WhatsAppPhoneNumberSummary'
+    WhatsAppSetupFinalization:
+      type: object
+      properties:
+        associateInProgressToken:
+          allOf:
+          - $ref: '#/components/schemas/AssociateInProgressToken'
+          description: An Amazon Web Services access token generated by `WhatsAppSignupCallback`
+            and used by `WhatsAppSetupFinalization`.
+        phoneNumbers:
+          allOf:
+          - $ref: '#/components/schemas/WabaPhoneNumberSetupFinalizationList'
+          description: An array of WabaPhoneNumberSetupFinalization objects containing
+            the details of each phone number associated with the WhatsApp Business
+            Account.
+        phoneNumberParent:
+          allOf:
+          - $ref: '#/components/schemas/LinkedWhatsAppBusinessAccountId'
+          description: Used to add a new phone number to an existing WhatsApp Business
+            Account. This field can't be used when the `waba` field is present.
+        waba:
+          allOf:
+          - $ref: '#/components/schemas/WabaSetupFinalization'
+          description: Used to create a new WhatsApp Business Account and add a phone
+            number. This field can't be used when the `phoneNumberParent` field is
+            present.
+      required:
+      - associateInProgressToken
+      - phoneNumbers
+      description: The details of linking a WhatsApp Business Account to your Amazon
+        Web Services account.
+    WhatsAppSignupCallback:
+      type: object
+      properties:
+        accessToken:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The access token for your WhatsApp Business Account. The `accessToken`
+            value is provided by Meta.
+      required:
+      - accessToken
+      description: Contains the `accessToken` provided by Meta during signup.
+    WhatsAppSignupCallbackResult:
+      type: object
+      properties:
+        associateInProgressToken:
+          allOf:
+          - $ref: '#/components/schemas/AssociateInProgressToken'
+          description: An Amazon Web Services access token generated by `WhatsAppSignupCallback`
+            and used by `WhatsAppSetupFinalization`.
+        linkedAccountsWithIncompleteSetup:
+          allOf:
+          - $ref: '#/components/schemas/LinkedAccountWithIncompleteSetup'
+          description: A LinkedWhatsAppBusinessAccountIdMetaData object map containing
+            the details of any WhatsAppBusiness accounts that have incomplete setup.
+      description: Contains the results of WhatsAppSignupCallback.

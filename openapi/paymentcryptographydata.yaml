@@ -7,7 +7,7 @@ info:
   x-stackql-serviceName: payment_cryptography_data
   x-aws-serviceName: paymentcryptographydata
   x-aws-protocol: aws.protocols#restJson1
-  x-dateGenerated: '2025-05-05'
+  x-dateGenerated: '2025-05-07'
   version: '2022-02-03'
   title: Payment Cryptography Data Plane
   description: |-
@@ -45,14 +45,1039 @@ servers:
       - sa-east-1
       - me-south-1
       default: us-east-1
-paths: {}
+paths:
+  /keys/{KeyIdentifier}/decrypt:
+    post:
+      operationId: DecryptData
+      description: |-
+        Decrypts ciphertext data to plaintext using a symmetric (TDES, AES), asymmetric (RSA), or derived (DUKPT or EMV) encryption key scheme. For more information, see [Decrypt data](https://docs.aws.amazon.com/payment-cryptography/latest/userguide/decrypt-data.html) in the _Amazon Web Services Payment Cryptography User Guide_.
+
+        You can use an decryption key generated within Amazon Web Services Payment Cryptography, or you can import your own decryption key by calling [ImportKey](https://docs.aws.amazon.com/payment-cryptography/latest/APIReference/API_ImportKey.html). For this operation, the key must have `KeyModesOfUse` set to `Decrypt`. In asymmetric decryption, Amazon Web Services Payment Cryptography decrypts the ciphertext using the private component of the asymmetric encryption key pair. For data encryption outside of Amazon Web Services Payment Cryptography, you can export the public component of the asymmetric key pair by calling [GetPublicCertificate](https://docs.aws.amazon.com/payment-cryptography/latest/APIReference/API_GetPublicKeyCertificate.html).
+
+        This operation also supports dynamic keys, allowing you to pass a dynamic decryption key as a TR-31 WrappedKeyBlock. This can be used when key material is frequently rotated, such as during every card transaction, and there is need to avoid importing short-lived keys into Amazon Web Services Payment Cryptography. To decrypt using dynamic keys, the `keyARN` is the Key Encryption Key (KEK) of the TR-31 wrapped decryption key material. The incoming wrapped key shall have a key purpose of D0 with a mode of use of B or D. For more information, see [Using Dynamic Keys](https://docs.aws.amazon.com/payment-cryptography/latest/userguide/use-cases-acquirers-dynamickeys.html) in the _Amazon Web Services Payment Cryptography User Guide_.
+
+        For symmetric and DUKPT decryption, Amazon Web Services Payment Cryptography supports `TDES` and `AES` algorithms. For EMV decryption, Amazon Web Services Payment Cryptography supports `TDES` algorithms. For asymmetric decryption, Amazon Web Services Payment Cryptography supports `RSA`.
+
+        When you use TDES or TDES DUKPT, the ciphertext data length must be a multiple of 8 bytes. For AES or AES DUKPT, the ciphertext data length must be a multiple of 16 bytes. For RSA, it sould be equal to the key size unless padding is enabled.
+
+        For information about valid keys for this operation, see [Understanding key attributes](https://docs.aws.amazon.com/payment-cryptography/latest/userguide/keys-validattributes.html) and [Key types for specific data operations](https://docs.aws.amazon.com/payment-cryptography/latest/userguide/crypto-ops-validkeys-ops.html) in the _Amazon Web Services Payment Cryptography User Guide_.
+
+        **Cross-account use** : This operation can't be used across different Amazon Web Services accounts.
+
+        **Related operations:**
+
+          * EncryptData
+
+          * [GetPublicCertificate](https://docs.aws.amazon.com/payment-cryptography/latest/APIReference/API_GetPublicKeyCertificate.html)
+
+          * [ImportKey](https://docs.aws.amazon.com/payment-cryptography/latest/APIReference/API_ImportKey.html)
+      parameters:
+      - name: KeyIdentifier
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/KeyArnOrKeyAliasType'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                CipherText:
+                  $ref: '#/components/schemas/CipherTextType'
+                DecryptionAttributes:
+                  $ref: '#/components/schemas/EncryptionDecryptionAttributes'
+                WrappedKey:
+                  $ref: '#/components/schemas/WrappedKey'
+      responses:
+        '200': {}
+        '403':
+          description: |-
+            You do not have sufficient access to perform this action.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '500':
+          description: |-
+            The request processing has failed because of an unknown error, exception, or failure.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerException'
+        '404':
+          description: |-
+            The request was denied due to an invalid resource error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+        '429':
+          description: |-
+            The request was denied due to request throttling.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThrottlingException'
+        '400':
+          description: |-
+            The request was denied due to an invalid request error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+  /keys/{KeyIdentifier}/encrypt:
+    post:
+      operationId: EncryptData
+      description: |-
+        Encrypts plaintext data to ciphertext using a symmetric (TDES, AES), asymmetric (RSA), or derived (DUKPT or EMV) encryption key scheme. For more information, see [Encrypt data](https://docs.aws.amazon.com/payment-cryptography/latest/userguide/encrypt-data.html) in the _Amazon Web Services Payment Cryptography User Guide_.
+
+        You can generate an encryption key within Amazon Web Services Payment Cryptography by calling [CreateKey](https://docs.aws.amazon.com/payment-cryptography/latest/APIReference/API_CreateKey.html). You can import your own encryption key by calling [ImportKey](https://docs.aws.amazon.com/payment-cryptography/latest/APIReference/API_ImportKey.html).
+
+        For this operation, the key must have `KeyModesOfUse` set to `Encrypt`. In asymmetric encryption, plaintext is encrypted using public component. You can import the public component of an asymmetric key pair created outside Amazon Web Services Payment Cryptography by calling [ImportKey](https://docs.aws.amazon.com/payment-cryptography/latest/APIReference/API_ImportKey.html).
+
+        This operation also supports dynamic keys, allowing you to pass a dynamic encryption key as a TR-31 WrappedKeyBlock. This can be used when key material is frequently rotated, such as during every card transaction, and there is need to avoid importing short-lived keys into Amazon Web Services Payment Cryptography. To encrypt using dynamic keys, the `keyARN` is the Key Encryption Key (KEK) of the TR-31 wrapped encryption key material. The incoming wrapped key shall have a key purpose of D0 with a mode of use of B or D. For more information, see [Using Dynamic Keys](https://docs.aws.amazon.com/payment-cryptography/latest/userguide/use-cases-acquirers-dynamickeys.html) in the _Amazon Web Services Payment Cryptography User Guide_.
+
+        For symmetric and DUKPT encryption, Amazon Web Services Payment Cryptography supports `TDES` and `AES` algorithms. For EMV encryption, Amazon Web Services Payment Cryptography supports `TDES` algorithms.For asymmetric encryption, Amazon Web Services Payment Cryptography supports `RSA`.
+
+        When you use TDES or TDES DUKPT, the plaintext data length must be a multiple of 8 bytes. For AES or AES DUKPT, the plaintext data length must be a multiple of 16 bytes. For RSA, it sould be equal to the key size unless padding is enabled.
+
+        To encrypt using DUKPT, you must already have a BDK (Base Derivation Key) key in your account with `KeyModesOfUse` set to `DeriveKey`, or you can generate a new DUKPT key by calling [CreateKey](https://docs.aws.amazon.com/payment-cryptography/latest/APIReference/API_CreateKey.html). To encrypt using EMV, you must already have an IMK (Issuer Master Key) key in your account with `KeyModesOfUse` set to `DeriveKey`.
+
+        For information about valid keys for this operation, see [Understanding key attributes](https://docs.aws.amazon.com/payment-cryptography/latest/userguide/keys-validattributes.html) and [Key types for specific data operations](https://docs.aws.amazon.com/payment-cryptography/latest/userguide/crypto-ops-validkeys-ops.html) in the _Amazon Web Services Payment Cryptography User Guide_.
+
+        **Cross-account use** : This operation can't be used across different Amazon Web Services accounts.
+
+        **Related operations:**
+
+          * DecryptData
+
+          * [GetPublicCertificate](https://docs.aws.amazon.com/payment-cryptography/latest/APIReference/API_GetPublicKeyCertificate.html)
+
+          * [ImportKey](https://docs.aws.amazon.com/payment-cryptography/latest/APIReference/API_ImportKey.html)
+
+          * ReEncryptData
+      parameters:
+      - name: KeyIdentifier
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/KeyArnOrKeyAliasType'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                PlainText:
+                  $ref: '#/components/schemas/PlainTextType'
+                EncryptionAttributes:
+                  $ref: '#/components/schemas/EncryptionDecryptionAttributes'
+                WrappedKey:
+                  $ref: '#/components/schemas/WrappedKey'
+      responses:
+        '200': {}
+        '403':
+          description: |-
+            You do not have sufficient access to perform this action.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '500':
+          description: |-
+            The request processing has failed because of an unknown error, exception, or failure.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerException'
+        '404':
+          description: |-
+            The request was denied due to an invalid resource error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+        '429':
+          description: |-
+            The request was denied due to request throttling.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThrottlingException'
+        '400':
+          description: |-
+            The request was denied due to an invalid request error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+  /cardvalidationdata/generate:
+    post:
+      operationId: GenerateCardValidationData
+      description: |-
+        Generates card-related validation data using algorithms such as Card Verification Values (CVV/CVV2), Dynamic Card Verification Values (dCVV/dCVV2), or Card Security Codes (CSC). For more information, see [Generate card data](https://docs.aws.amazon.com/payment-cryptography/latest/userguide/generate-card-data.html) in the _Amazon Web Services Payment Cryptography User Guide_.
+
+        This operation generates a CVV or CSC value that is printed on a payment credit or debit card during card production. The CVV or CSC, PAN (Primary Account Number) and expiration date of the card are required to check its validity during transaction processing. To begin this operation, a CVK (Card Verification Key) encryption key is required. You can use [CreateKey](https://docs.aws.amazon.com/payment-cryptography/latest/APIReference/API_CreateKey.html) or [ImportKey](https://docs.aws.amazon.com/payment-cryptography/latest/APIReference/API_ImportKey.html) to establish a CVK within Amazon Web Services Payment Cryptography. The `KeyModesOfUse` should be set to `Generate` and `Verify` for a CVK encryption key.
+
+        For information about valid keys for this operation, see [Understanding key attributes](https://docs.aws.amazon.com/payment-cryptography/latest/userguide/keys-validattributes.html) and [Key types for specific data operations](https://docs.aws.amazon.com/payment-cryptography/latest/userguide/crypto-ops-validkeys-ops.html) in the _Amazon Web Services Payment Cryptography User Guide_.
+
+        **Cross-account use** : This operation can't be used across different Amazon Web Services accounts.
+
+        **Related operations:**
+
+          * [ImportKey](https://docs.aws.amazon.com/payment-cryptography/latest/APIReference/API_ImportKey.html)
+
+          * VerifyCardValidationData
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                KeyIdentifier:
+                  $ref: '#/components/schemas/KeyArnOrKeyAliasType'
+                PrimaryAccountNumber:
+                  $ref: '#/components/schemas/PrimaryAccountNumberType'
+                GenerationAttributes:
+                  $ref: '#/components/schemas/CardGenerationAttributes'
+                ValidationDataLength:
+                  $ref: '#/components/schemas/IntegerRangeBetween3And5Type'
+      responses:
+        '200': {}
+        '403':
+          description: |-
+            You do not have sufficient access to perform this action.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '500':
+          description: |-
+            The request processing has failed because of an unknown error, exception, or failure.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerException'
+        '404':
+          description: |-
+            The request was denied due to an invalid resource error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+        '429':
+          description: |-
+            The request was denied due to request throttling.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThrottlingException'
+        '400':
+          description: |-
+            The request was denied due to an invalid request error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+  /mac/generate:
+    post:
+      operationId: GenerateMac
+      description: |-
+        Generates a Message Authentication Code (MAC) cryptogram within Amazon Web Services Payment Cryptography.
+
+        You can use this operation to authenticate card-related data by using known data values to generate MAC for data validation between the sending and receiving parties. This operation uses message data, a secret encryption key and MAC algorithm to generate a unique MAC value for transmission. The receiving party of the MAC must use the same message data, secret encryption key and MAC algorithm to reproduce another MAC value for comparision.
+
+        You can use this operation to generate a DUPKT, CMAC, HMAC or EMV MAC by setting generation attributes and algorithm to the associated values. The MAC generation encryption key must have valid values for `KeyUsage` such as `TR31_M7_HMAC_KEY` for HMAC generation, and they key must have `KeyModesOfUse` set to `Generate` and `Verify`.
+
+        For information about valid keys for this operation, see [Understanding key attributes](https://docs.aws.amazon.com/payment-cryptography/latest/userguide/keys-validattributes.html) and [Key types for specific data operations](https://docs.aws.amazon.com/payment-cryptography/latest/userguide/crypto-ops-validkeys-ops.html) in the _Amazon Web Services Payment Cryptography User Guide_.
+
+        **Cross-account use** : This operation can't be used across different Amazon Web Services accounts.
+
+        **Related operations:**
+
+          * VerifyMac
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                KeyIdentifier:
+                  $ref: '#/components/schemas/KeyArnOrKeyAliasType'
+                MessageData:
+                  $ref: '#/components/schemas/MessageDataType'
+                GenerationAttributes:
+                  $ref: '#/components/schemas/MacAttributes'
+                MacLength:
+                  $ref: '#/components/schemas/IntegerRangeBetween4And16'
+      responses:
+        '200': {}
+        '403':
+          description: |-
+            You do not have sufficient access to perform this action.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '500':
+          description: |-
+            The request processing has failed because of an unknown error, exception, or failure.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerException'
+        '404':
+          description: |-
+            The request was denied due to an invalid resource error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+        '429':
+          description: |-
+            The request was denied due to request throttling.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThrottlingException'
+        '400':
+          description: |-
+            The request was denied due to an invalid request error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+  /macemvpinchange/generate:
+    post:
+      operationId: GenerateMacEmvPinChange
+      description: |-
+        Generates an issuer script mac for EMV payment cards that use offline PINs as the cardholder verification method (CVM).
+
+        This operation generates an authenticated issuer script response by appending the incoming message data (APDU command) with the target encrypted PIN block in ISO2 format. The command structure and method to send the issuer script update to the card is not defined by this operation and is typically determined by the applicable payment card scheme.
+
+        The primary inputs to this operation include the incoming new encrypted pinblock, PIN encryption key (PEK), issuer master key (IMK), primary account number (PAN), and the payment card derivation method.
+
+        The operation uses two issuer master keys - secure messaging for confidentiality (IMK-SMC) and secure messaging for integrity (IMK-SMI). The SMC key is used to internally derive a key to secure the pin, while SMI key is used to internally derive a key to authenticate the script reponse as per the [EMV 4.4 - Book 2 - Security and Key Management](https://www.emvco.com/specifications/) specification.
+
+        This operation supports Amex, EMV2000, EMVCommon, Mastercard and Visa derivation methods, each requiring specific input parameters. Users must follow the specific derivation method and input parameters defined by the respective payment card scheme.
+
+        Use GenerateMac operation when sending a script update to an EMV card that does not involve PIN change. When assigning IAM permissions, it is important to understand that EncryptData using EMV keys and GenerateMac perform similar functions to this command.
+
+        **Cross-account use** : This operation can't be used across different Amazon Web Services accounts.
+
+        **Related operations:**
+
+          * EncryptData
+
+          * GenerateMac
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                NewPinPekIdentifier:
+                  $ref: '#/components/schemas/KeyArnOrKeyAliasType'
+                NewEncryptedPinBlock:
+                  $ref: '#/components/schemas/PinBlockLengthEquals16'
+                PinBlockFormat:
+                  $ref: '#/components/schemas/PinBlockFormatForEmvPinChange'
+                SecureMessagingIntegrityKeyIdentifier:
+                  $ref: '#/components/schemas/KeyArnOrKeyAliasType'
+                SecureMessagingConfidentialityKeyIdentifier:
+                  $ref: '#/components/schemas/KeyArnOrKeyAliasType'
+                MessageData:
+                  $ref: '#/components/schemas/CommandMessageDataType'
+                DerivationMethodAttributes:
+                  $ref: '#/components/schemas/DerivationMethodAttributes'
+      responses:
+        '200': {}
+        '403':
+          description: |-
+            You do not have sufficient access to perform this action.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '500':
+          description: |-
+            The request processing has failed because of an unknown error, exception, or failure.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerException'
+        '404':
+          description: |-
+            The request was denied due to an invalid resource error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+        '429':
+          description: |-
+            The request was denied due to request throttling.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThrottlingException'
+        '400':
+          description: |-
+            The request was denied due to an invalid request error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+  /pindata/generate:
+    post:
+      operationId: GeneratePinData
+      description: |-
+        Generates pin-related data such as PIN, PIN Verification Value (PVV), PIN Block, and PIN Offset during new card issuance or reissuance. For more information, see [Generate PIN data](https://docs.aws.amazon.com/payment-cryptography/latest/userguide/generate-pin-data.html) in the _Amazon Web Services Payment Cryptography User Guide_.
+
+        PIN data is never transmitted in clear to or from Amazon Web Services Payment Cryptography. This operation generates PIN, PVV, or PIN Offset and then encrypts it using Pin Encryption Key (PEK) to create an `EncryptedPinBlock` for transmission from Amazon Web Services Payment Cryptography. This operation uses a separate Pin Verification Key (PVK) for VISA PVV generation.
+
+        Using ECDH key exchange, you can receive cardholder selectable PINs into Amazon Web Services Payment Cryptography. The ECDH derived key protects the incoming PIN block. You can also use it for reveal PIN, wherein the generated PIN block is protected by the ECDH derived key before transmission from Amazon Web Services Payment Cryptography. For more information on establishing ECDH derived keys, see the [Generating keys](https://docs.aws.amazon.com/payment-cryptography/latest/userguide/create-keys.html) in the _Amazon Web Services Payment Cryptography User Guide_.
+
+        For information about valid keys for this operation, see [Understanding key attributes](https://docs.aws.amazon.com/payment-cryptography/latest/userguide/keys-validattributes.html) and [Key types for specific data operations](https://docs.aws.amazon.com/payment-cryptography/latest/userguide/crypto-ops-validkeys-ops.html) in the _Amazon Web Services Payment Cryptography User Guide_.
+
+        **Cross-account use** : This operation can't be used across different Amazon Web Services accounts.
+
+        **Related operations:**
+
+          * GenerateCardValidationData
+
+          * TranslatePinData
+
+          * VerifyPinData
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                GenerationKeyIdentifier:
+                  $ref: '#/components/schemas/KeyArnOrKeyAliasType'
+                EncryptionKeyIdentifier:
+                  $ref: '#/components/schemas/KeyArnOrKeyAliasType'
+                GenerationAttributes:
+                  $ref: '#/components/schemas/PinGenerationAttributes'
+                PinDataLength:
+                  $ref: '#/components/schemas/IntegerRangeBetween4And12'
+                PrimaryAccountNumber:
+                  $ref: '#/components/schemas/PrimaryAccountNumberType'
+                PinBlockFormat:
+                  $ref: '#/components/schemas/PinBlockFormatForPinData'
+                EncryptionWrappedKey:
+                  $ref: '#/components/schemas/WrappedKey'
+      responses:
+        '200': {}
+        '403':
+          description: |-
+            You do not have sufficient access to perform this action.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '500':
+          description: |-
+            The request processing has failed because of an unknown error, exception, or failure.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerException'
+        '404':
+          description: |-
+            The request was denied due to an invalid resource error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+        '429':
+          description: |-
+            The request was denied due to request throttling.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThrottlingException'
+        '400':
+          description: |-
+            The request was denied due to an invalid request error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+  /keys/{IncomingKeyIdentifier}/reencrypt:
+    post:
+      operationId: ReEncryptData
+      description: |-
+        Re-encrypt ciphertext using DUKPT or Symmetric data encryption keys.
+
+        You can either generate an encryption key within Amazon Web Services Payment Cryptography by calling [CreateKey](https://docs.aws.amazon.com/payment-cryptography/latest/APIReference/API_CreateKey.html) or import your own encryption key by calling [ImportKey](https://docs.aws.amazon.com/payment-cryptography/latest/APIReference/API_ImportKey.html). The `KeyArn` for use with this operation must be in a compatible key state with `KeyModesOfUse` set to `Encrypt`.
+
+        This operation also supports dynamic keys, allowing you to pass a dynamic encryption key as a TR-31 WrappedKeyBlock. This can be used when key material is frequently rotated, such as during every card transaction, and there is need to avoid importing short-lived keys into Amazon Web Services Payment Cryptography. To re-encrypt using dynamic keys, the `keyARN` is the Key Encryption Key (KEK) of the TR-31 wrapped encryption key material. The incoming wrapped key shall have a key purpose of D0 with a mode of use of B or D. For more information, see [Using Dynamic Keys](https://docs.aws.amazon.com/payment-cryptography/latest/userguide/use-cases-acquirers-dynamickeys.html) in the _Amazon Web Services Payment Cryptography User Guide_.
+
+        For symmetric and DUKPT encryption, Amazon Web Services Payment Cryptography supports `TDES` and `AES` algorithms. To encrypt using DUKPT, a DUKPT key must already exist within your account with `KeyModesOfUse` set to `DeriveKey` or a new DUKPT can be generated by calling [CreateKey](https://docs.aws.amazon.com/payment-cryptography/latest/APIReference/API_CreateKey.html).
+
+        For information about valid keys for this operation, see [Understanding key attributes](https://docs.aws.amazon.com/payment-cryptography/latest/userguide/keys-validattributes.html) and [Key types for specific data operations](https://docs.aws.amazon.com/payment-cryptography/latest/userguide/crypto-ops-validkeys-ops.html) in the _Amazon Web Services Payment Cryptography User Guide_.
+
+        **Cross-account use** : This operation can't be used across different Amazon Web Services accounts.
+
+        **Related operations:**
+
+          * DecryptData
+
+          * EncryptData
+
+          * [GetPublicCertificate](https://docs.aws.amazon.com/payment-cryptography/latest/APIReference/API_GetPublicKeyCertificate.html)
+
+          * [ImportKey](https://docs.aws.amazon.com/payment-cryptography/latest/APIReference/API_ImportKey.html)
+      parameters:
+      - name: IncomingKeyIdentifier
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/KeyArnOrKeyAliasType'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                OutgoingKeyIdentifier:
+                  $ref: '#/components/schemas/KeyArnOrKeyAliasType'
+                CipherText:
+                  $ref: '#/components/schemas/CipherTextType'
+                IncomingEncryptionAttributes:
+                  $ref: '#/components/schemas/ReEncryptionAttributes'
+                OutgoingEncryptionAttributes:
+                  $ref: '#/components/schemas/ReEncryptionAttributes'
+                IncomingWrappedKey:
+                  $ref: '#/components/schemas/WrappedKey'
+                OutgoingWrappedKey:
+                  $ref: '#/components/schemas/WrappedKey'
+      responses:
+        '200': {}
+        '403':
+          description: |-
+            You do not have sufficient access to perform this action.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '500':
+          description: |-
+            The request processing has failed because of an unknown error, exception, or failure.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerException'
+        '404':
+          description: |-
+            The request was denied due to an invalid resource error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+        '429':
+          description: |-
+            The request was denied due to request throttling.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThrottlingException'
+        '400':
+          description: |-
+            The request was denied due to an invalid request error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+  /pindata/translate:
+    post:
+      operationId: TranslatePinData
+      description: |-
+        Translates encrypted PIN block from and to ISO 9564 formats 0,1,3,4. For more information, see [Translate PIN data](https://docs.aws.amazon.com/payment-cryptography/latest/userguide/translate-pin-data.html) in the _Amazon Web Services Payment Cryptography User Guide_.
+
+        PIN block translation involves changing a PIN block from one encryption key to another and optionally change its format. PIN block translation occurs entirely within the HSM boundary and PIN data never enters or leaves Amazon Web Services Payment Cryptography in clear text. The encryption key transformation can be from PEK (Pin Encryption Key) to BDK (Base Derivation Key) for DUKPT or from BDK for DUKPT to PEK.
+
+        Amazon Web Services Payment Cryptography also supports use of dynamic keys and ECDH (Elliptic Curve Diffie-Hellman) based key exchange for this operation.
+
+        Dynamic keys allow you to pass a PEK as a TR-31 WrappedKeyBlock. They can be used when key material is frequently rotated, such as during every card transaction, and there is need to avoid importing short-lived keys into Amazon Web Services Payment Cryptography. To translate PIN block using dynamic keys, the `keyARN` is the Key Encryption Key (KEK) of the TR-31 wrapped PEK. The incoming wrapped key shall have a key purpose of P0 with a mode of use of B or D. For more information, see [Using Dynamic Keys](https://docs.aws.amazon.com/payment-cryptography/latest/userguide/use-cases-acquirers-dynamickeys.html) in the _Amazon Web Services Payment Cryptography User Guide_.
+
+        Using ECDH key exchange, you can receive cardholder selectable PINs into Amazon Web Services Payment Cryptography. The ECDH derived key protects the incoming PIN block, which is translated to a PEK encrypted PIN block for use within the service. You can also use ECDH for reveal PIN, wherein the service translates the PIN block from PEK to a ECDH derived encryption key. For more information on establishing ECDH derived keys, see the [Generating keys](https://docs.aws.amazon.com/payment-cryptography/latest/userguide/create-keys.html) in the _Amazon Web Services Payment Cryptography User Guide_.
+
+        The allowed combinations of PIN block format translations are guided by PCI. It is important to note that not all encrypted PIN block formats (example, format 1) require PAN (Primary Account Number) as input. And as such, PIN block format that requires PAN (example, formats 0,3,4) cannot be translated to a format (format 1) that does not require a PAN for generation.
+
+        For information about valid keys for this operation, see [Understanding key attributes](https://docs.aws.amazon.com/payment-cryptography/latest/userguide/keys-validattributes.html) and [Key types for specific data operations](https://docs.aws.amazon.com/payment-cryptography/latest/userguide/crypto-ops-validkeys-ops.html) in the _Amazon Web Services Payment Cryptography User Guide_.
+
+        Amazon Web Services Payment Cryptography currently supports ISO PIN block 4 translation for PIN block built using legacy PAN length. That is, PAN is the right most 12 digits excluding the check digits.
+
+        **Cross-account use** : This operation can't be used across different Amazon Web Services accounts.
+
+        **Related operations:**
+
+          * GeneratePinData
+
+          * VerifyPinData
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                IncomingKeyIdentifier:
+                  $ref: '#/components/schemas/KeyArnOrKeyAliasType'
+                OutgoingKeyIdentifier:
+                  $ref: '#/components/schemas/KeyArnOrKeyAliasType'
+                IncomingTranslationAttributes:
+                  $ref: '#/components/schemas/TranslationIsoFormats'
+                OutgoingTranslationAttributes:
+                  $ref: '#/components/schemas/TranslationIsoFormats'
+                EncryptedPinBlock:
+                  $ref: '#/components/schemas/HexEvenLengthBetween16And32'
+                IncomingDukptAttributes:
+                  $ref: '#/components/schemas/DukptDerivationAttributes'
+                OutgoingDukptAttributes:
+                  $ref: '#/components/schemas/DukptDerivationAttributes'
+                IncomingWrappedKey:
+                  $ref: '#/components/schemas/WrappedKey'
+                OutgoingWrappedKey:
+                  $ref: '#/components/schemas/WrappedKey'
+      responses:
+        '200': {}
+        '403':
+          description: |-
+            You do not have sufficient access to perform this action.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '500':
+          description: |-
+            The request processing has failed because of an unknown error, exception, or failure.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerException'
+        '404':
+          description: |-
+            The request was denied due to an invalid resource error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+        '429':
+          description: |-
+            The request was denied due to request throttling.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThrottlingException'
+        '400':
+          description: |-
+            The request was denied due to an invalid request error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+  /cryptogram/verify:
+    post:
+      operationId: VerifyAuthRequestCryptogram
+      description: |-
+        Verifies Authorization Request Cryptogram (ARQC) for a EMV chip payment card authorization. For more information, see [Verify auth request cryptogram](https://docs.aws.amazon.com/payment-cryptography/latest/userguide/data-operations.verifyauthrequestcryptogram.html) in the _Amazon Web Services Payment Cryptography User Guide_.
+
+        ARQC generation is done outside of Amazon Web Services Payment Cryptography and is typically generated on a point of sale terminal for an EMV chip card to obtain payment authorization during transaction time. For ARQC verification, you must first import the ARQC generated outside of Amazon Web Services Payment Cryptography by calling [ImportKey](https://docs.aws.amazon.com/payment-cryptography/latest/APIReference/API_ImportKey.html). This operation uses the imported ARQC and an major encryption key (DUKPT) created by calling [CreateKey](https://docs.aws.amazon.com/payment-cryptography/latest/APIReference/API_CreateKey.html) to either provide a boolean ARQC verification result or provide an APRC (Authorization Response Cryptogram) response using Method 1 or Method 2. The `ARPC_METHOD_1` uses `AuthResponseCode` to generate ARPC and `ARPC_METHOD_2` uses `CardStatusUpdate` to generate ARPC.
+
+        For information about valid keys for this operation, see [Understanding key attributes](https://docs.aws.amazon.com/payment-cryptography/latest/userguide/keys-validattributes.html) and [Key types for specific data operations](https://docs.aws.amazon.com/payment-cryptography/latest/userguide/crypto-ops-validkeys-ops.html) in the _Amazon Web Services Payment Cryptography User Guide_.
+
+        **Cross-account use** : This operation can't be used across different Amazon Web Services accounts.
+
+        **Related operations:**
+
+          * VerifyCardValidationData
+
+          * VerifyPinData
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                KeyIdentifier:
+                  $ref: '#/components/schemas/KeyArnOrKeyAliasType'
+                TransactionData:
+                  $ref: '#/components/schemas/TransactionDataType'
+                AuthRequestCryptogram:
+                  $ref: '#/components/schemas/AuthRequestCryptogramType'
+                MajorKeyDerivationMode:
+                  $ref: '#/components/schemas/MajorKeyDerivationMode'
+                SessionKeyDerivationAttributes:
+                  $ref: '#/components/schemas/SessionKeyDerivation'
+                AuthResponseAttributes:
+                  $ref: '#/components/schemas/CryptogramAuthResponse'
+      responses:
+        '200': {}
+        '403':
+          description: |-
+            You do not have sufficient access to perform this action.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '500':
+          description: |-
+            The request processing has failed because of an unknown error, exception, or failure.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerException'
+        '404':
+          description: |-
+            The request was denied due to an invalid resource error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+        '429':
+          description: |-
+            The request was denied due to request throttling.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThrottlingException'
+        '400':
+          description: |-
+            This request failed verification.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VerificationFailedException'
+  /cardvalidationdata/verify:
+    post:
+      operationId: VerifyCardValidationData
+      description: |-
+        Verifies card-related validation data using algorithms such as Card Verification Values (CVV/CVV2), Dynamic Card Verification Values (dCVV/dCVV2) and Card Security Codes (CSC). For more information, see [Verify card data](https://docs.aws.amazon.com/payment-cryptography/latest/userguide/verify-card-data.html) in the _Amazon Web Services Payment Cryptography User Guide_.
+
+        This operation validates the CVV or CSC codes that is printed on a payment credit or debit card during card payment transaction. The input values are typically provided as part of an inbound transaction to an issuer or supporting platform partner. Amazon Web Services Payment Cryptography uses CVV or CSC, PAN (Primary Account Number) and expiration date of the card to check its validity during transaction processing. In this operation, the CVK (Card Verification Key) encryption key for use with card data verification is same as the one in used for GenerateCardValidationData.
+
+        For information about valid keys for this operation, see [Understanding key attributes](https://docs.aws.amazon.com/payment-cryptography/latest/userguide/keys-validattributes.html) and [Key types for specific data operations](https://docs.aws.amazon.com/payment-cryptography/latest/userguide/crypto-ops-validkeys-ops.html) in the _Amazon Web Services Payment Cryptography User Guide_.
+
+        **Cross-account use** : This operation can't be used across different Amazon Web Services accounts.
+
+        **Related operations:**
+
+          * GenerateCardValidationData
+
+          * VerifyAuthRequestCryptogram
+
+          * VerifyPinData
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                KeyIdentifier:
+                  $ref: '#/components/schemas/KeyArnOrKeyAliasType'
+                PrimaryAccountNumber:
+                  $ref: '#/components/schemas/PrimaryAccountNumberType'
+                VerificationAttributes:
+                  $ref: '#/components/schemas/CardVerificationAttributes'
+                ValidationData:
+                  $ref: '#/components/schemas/ValidationDataType'
+      responses:
+        '200': {}
+        '403':
+          description: |-
+            You do not have sufficient access to perform this action.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '500':
+          description: |-
+            The request processing has failed because of an unknown error, exception, or failure.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerException'
+        '404':
+          description: |-
+            The request was denied due to an invalid resource error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+        '429':
+          description: |-
+            The request was denied due to request throttling.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThrottlingException'
+        '400':
+          description: |-
+            This request failed verification.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VerificationFailedException'
+  /mac/verify:
+    post:
+      operationId: VerifyMac
+      description: |-
+        Verifies a Message Authentication Code (MAC).
+
+        You can use this operation to verify MAC for message data authentication such as . In this operation, you must use the same message data, secret encryption key and MAC algorithm that was used to generate MAC. You can use this operation to verify a DUPKT, CMAC, HMAC or EMV MAC by setting generation attributes and algorithm to the associated values.
+
+        For information about valid keys for this operation, see [Understanding key attributes](https://docs.aws.amazon.com/payment-cryptography/latest/userguide/keys-validattributes.html) and [Key types for specific data operations](https://docs.aws.amazon.com/payment-cryptography/latest/userguide/crypto-ops-validkeys-ops.html) in the _Amazon Web Services Payment Cryptography User Guide_.
+
+        **Cross-account use** : This operation can't be used across different Amazon Web Services accounts.
+
+        **Related operations:**
+
+          * GenerateMac
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                KeyIdentifier:
+                  $ref: '#/components/schemas/KeyArnOrKeyAliasType'
+                MessageData:
+                  $ref: '#/components/schemas/MessageDataType'
+                Mac:
+                  $ref: '#/components/schemas/MacType'
+                VerificationAttributes:
+                  $ref: '#/components/schemas/MacAttributes'
+                MacLength:
+                  $ref: '#/components/schemas/IntegerRangeBetween4And16'
+      responses:
+        '200': {}
+        '403':
+          description: |-
+            You do not have sufficient access to perform this action.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '500':
+          description: |-
+            The request processing has failed because of an unknown error, exception, or failure.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerException'
+        '404':
+          description: |-
+            The request was denied due to an invalid resource error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+        '429':
+          description: |-
+            The request was denied due to request throttling.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThrottlingException'
+        '400':
+          description: |-
+            This request failed verification.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VerificationFailedException'
+  /pindata/verify:
+    post:
+      operationId: VerifyPinData
+      description: |-
+        Verifies pin-related data such as PIN and PIN Offset using algorithms including VISA PVV and IBM3624. For more information, see [Verify PIN data](https://docs.aws.amazon.com/payment-cryptography/latest/userguide/verify-pin-data.html) in the _Amazon Web Services Payment Cryptography User Guide_.
+
+        This operation verifies PIN data for user payment card. A card holder PIN data is never transmitted in clear to or from Amazon Web Services Payment Cryptography. This operation uses PIN Verification Key (PVK) for PIN or PIN Offset generation and then encrypts it using PIN Encryption Key (PEK) to create an `EncryptedPinBlock` for transmission from Amazon Web Services Payment Cryptography.
+
+        For information about valid keys for this operation, see [Understanding key attributes](https://docs.aws.amazon.com/payment-cryptography/latest/userguide/keys-validattributes.html) and [Key types for specific data operations](https://docs.aws.amazon.com/payment-cryptography/latest/userguide/crypto-ops-validkeys-ops.html) in the _Amazon Web Services Payment Cryptography User Guide_.
+
+        **Cross-account use** : This operation can't be used across different Amazon Web Services accounts.
+
+        **Related operations:**
+
+          * GeneratePinData
+
+          * TranslatePinData
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                VerificationKeyIdentifier:
+                  $ref: '#/components/schemas/KeyArnOrKeyAliasType'
+                EncryptionKeyIdentifier:
+                  $ref: '#/components/schemas/KeyArnOrKeyAliasType'
+                VerificationAttributes:
+                  $ref: '#/components/schemas/PinVerificationAttributes'
+                EncryptedPinBlock:
+                  $ref: '#/components/schemas/EncryptedPinBlockType'
+                PrimaryAccountNumber:
+                  $ref: '#/components/schemas/PrimaryAccountNumberType'
+                PinBlockFormat:
+                  $ref: '#/components/schemas/PinBlockFormatForPinData'
+                PinDataLength:
+                  $ref: '#/components/schemas/IntegerRangeBetween4And12'
+                DukptAttributes:
+                  $ref: '#/components/schemas/DukptAttributes'
+                EncryptionWrappedKey:
+                  $ref: '#/components/schemas/WrappedKey'
+      responses:
+        '200': {}
+        '403':
+          description: |-
+            You do not have sufficient access to perform this action.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '500':
+          description: |-
+            The request processing has failed because of an unknown error, exception, or failure.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerException'
+        '404':
+          description: |-
+            The request was denied due to an invalid resource error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+        '429':
+          description: |-
+            The request was denied due to request throttling.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThrottlingException'
+        '400':
+          description: |-
+            This request failed verification.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VerificationFailedException'
 components:
   schemas:
+    AccessDeniedException:
+      type: object
+      properties:
+        Message:
+          $ref: '#/components/schemas/String'
+      description: You do not have sufficient access to perform this action.
+    AmexAttributes:
+      type: object
+      properties:
+        MajorKeyDerivationMode:
+          allOf:
+          - $ref: '#/components/schemas/MajorKeyDerivationMode'
+          description: The method to use when deriving the master key for a payment
+            card using Amex derivation.
+        PrimaryAccountNumber:
+          allOf:
+          - $ref: '#/components/schemas/PrimaryAccountNumberType'
+          description: The Primary Account Number (PAN) of the cardholder.
+        PanSequenceNumber:
+          allOf:
+          - $ref: '#/components/schemas/NumberLengthEquals2'
+          description: A number that identifies and differentiates payment cards with
+            the same Primary Account Number (PAN). Typically 00 is used, if no value
+            is provided by the terminal.
+        ApplicationTransactionCounter:
+          allOf:
+          - $ref: '#/components/schemas/HexLengthEquals4'
+          description: The transaction counter of the current transaction that is
+            provided by the terminal during transaction processing.
+        AuthorizationRequestKeyIdentifier:
+          allOf:
+          - $ref: '#/components/schemas/KeyArnOrKeyAliasType'
+          description: The `keyArn` of the issuer master key for cryptogram (IMK-AC)
+            for the payment card.
+        CurrentPinAttributes:
+          allOf:
+          - $ref: '#/components/schemas/CurrentPinAttributes'
+          description: The encrypted pinblock of the old pin stored on the chip card.
+      required:
+      - MajorKeyDerivationMode
+      - PrimaryAccountNumber
+      - PanSequenceNumber
+      - ApplicationTransactionCounter
+      - AuthorizationRequestKeyIdentifier
+      description: Parameters to derive the confidentiality and integrity keys for
+        a payment card using Amex derivation method.
+    AmexCardSecurityCodeVersion1:
+      type: object
+      properties:
+        CardExpiryDate:
+          allOf:
+          - $ref: '#/components/schemas/CardExpiryDateType'
+          description: The expiry date of a payment card.
+      required:
+      - CardExpiryDate
+      description: Card data parameters that are required to generate a Card Security
+        Code (CSC2) for an AMEX payment card.
+    AmexCardSecurityCodeVersion2:
+      type: object
+      properties:
+        CardExpiryDate:
+          allOf:
+          - $ref: '#/components/schemas/CardExpiryDateType'
+          description: The expiry date of a payment card.
+        ServiceCode:
+          allOf:
+          - $ref: '#/components/schemas/ServiceCodeType'
+          description: The service code of the AMEX payment card. This is different
+            from the Card Security Code (CSC).
+      required:
+      - CardExpiryDate
+      - ServiceCode
+      description: Card data parameters that are required to generate a Card Security
+        Code (CSC2) for an AMEX payment card.
     ApplicationCryptogramType:
       type: string
       pattern: ^[0-9a-fA-F]+$
       minLength: 16
       maxLength: 16
+    AsymmetricEncryptionAttributes:
+      type: object
+      properties:
+        PaddingType:
+          allOf:
+          - $ref: '#/components/schemas/PaddingType'
+          description: The padding to be included with the data.
+      description: Parameters for plaintext encryption using asymmetric keys.
     AuthRequestCryptogramType:
       type: string
       pattern: ^[0-9a-fA-F]+$
@@ -98,6 +1123,29 @@ components:
           Card data parameters that are required to generate CDynamic Card Verification Value (dCVV) for the payment card.
       description: |-
         Card data parameters that are required to generate Card Verification Values (CVV/CVV2), Dynamic Card Verification Values (dCVV/dCVV2), or Card Security Codes (CSC).
+    CardHolderVerificationValue:
+      type: object
+      properties:
+        UnpredictableNumber:
+          allOf:
+          - $ref: '#/components/schemas/HexLengthBetween2And8'
+          description: A random number generated by the issuer.
+        PanSequenceNumber:
+          allOf:
+          - $ref: '#/components/schemas/NumberLengthEquals2'
+          description: A number that identifies and differentiates payment cards with
+            the same Primary Account Number (PAN).
+        ApplicationTransactionCounter:
+          allOf:
+          - $ref: '#/components/schemas/HexLengthBetween2And4'
+          description: The transaction counter value that comes from a point of sale
+            terminal.
+      required:
+      - UnpredictableNumber
+      - PanSequenceNumber
+      - ApplicationTransactionCounter
+      description: Card data parameters that are required to generate a cardholder
+        verification value for the payment card.
     CardVerificationAttributes:
       allOf:
       - allOf:
@@ -132,6 +1180,34 @@ components:
           Card data parameters that are required to verify CDynamic Card Verification Code (dCVC) for the payment card.
       description: |-
         Card data parameters that are requried to verify Card Verification Values (CVV/CVV2), Dynamic Card Verification Values (dCVV/dCVV2), or Card Security Codes (CSC).
+    CardVerificationValue1:
+      type: object
+      properties:
+        CardExpiryDate:
+          allOf:
+          - $ref: '#/components/schemas/CardExpiryDateType'
+          description: The expiry date of a payment card.
+        ServiceCode:
+          allOf:
+          - $ref: '#/components/schemas/ServiceCodeType'
+          description: The service code of the payment card. This is different from
+            Card Security Code (CSC).
+      required:
+      - CardExpiryDate
+      - ServiceCode
+      description: Card data parameters that are required to verify CVV (Card Verification
+        Value) for the payment card.
+    CardVerificationValue2:
+      type: object
+      properties:
+        CardExpiryDate:
+          allOf:
+          - $ref: '#/components/schemas/CardExpiryDateType'
+          description: The expiry date of a payment card.
+      required:
+      - CardExpiryDate
+      description: Card data parameters that are required to verify Card Verification
+        Value (CVV2) for the payment card.
     CertificateType:
       type: string
       pattern: ^[^\[;\]<>]+$
@@ -159,11 +1235,114 @@ components:
           Parameters that are required for ARPC response generation using method2 after ARQC verification is successful.
       description: |-
         Parameters that are required for Authorization Response Cryptogram (ARPC) generation after Authorization Request Cryptogram (ARQC) verification is successful.
+    CryptogramVerificationArpcMethod1:
+      type: object
+      properties:
+        AuthResponseCode:
+          allOf:
+          - $ref: '#/components/schemas/HexLengthEquals4'
+          description: The auth code used to calculate APRC after ARQC verification
+            is successful. This is the same auth code used for ARQC generation outside
+            of Amazon Web Services Payment Cryptography.
+      required:
+      - AuthResponseCode
+      description: Parameters that are required for ARPC response generation using
+        method1 after ARQC verification is successful.
+    CryptogramVerificationArpcMethod2:
+      type: object
+      properties:
+        CardStatusUpdate:
+          allOf:
+          - $ref: '#/components/schemas/HexLengthEquals8'
+          description: The data indicating whether the issuer approves or declines
+            an online transaction using an EMV chip card.
+        ProprietaryAuthenticationData:
+          allOf:
+          - $ref: '#/components/schemas/ProprietaryAuthenticationDataType'
+          description: The proprietary authentication data used by issuer for communication
+            during online transaction using an EMV chip card.
+      required:
+      - CardStatusUpdate
+      description: Parameters that are required for ARPC response generation using
+        method2 after ARQC verification is successful.
+    CurrentPinAttributes:
+      type: object
+      properties:
+        CurrentPinPekIdentifier:
+          allOf:
+          - $ref: '#/components/schemas/KeyArnOrKeyAliasType'
+          description: The `keyArn` of the current PIN PEK.
+        CurrentEncryptedPinBlock:
+          allOf:
+          - $ref: '#/components/schemas/PinBlockLengthEquals16'
+          description: The encrypted pinblock of the current pin stored on the chip
+            card.
+      required:
+      - CurrentPinPekIdentifier
+      - CurrentEncryptedPinBlock
+      description: The parameter values of the current PIN to be changed on the EMV
+        chip card.
     DecimalizationTableType:
       type: string
       pattern: ^[0-9]+$
       minLength: 16
       maxLength: 16
+    DecryptDataInput:
+      type: object
+      properties:
+        KeyIdentifier:
+          allOf:
+          - $ref: '#/components/schemas/KeyArnOrKeyAliasType'
+          description: 'The `keyARN` of the encryption key that Amazon Web Services
+            Payment Cryptography uses for ciphertext decryption.
+
+
+            When a WrappedKeyBlock is provided, this value will be the identifier
+            to the key wrapping key. Otherwise, it is the key identifier used to perform
+            the operation.'
+        CipherText:
+          allOf:
+          - $ref: '#/components/schemas/CipherTextType'
+          description: The ciphertext to decrypt.
+        DecryptionAttributes:
+          allOf:
+          - $ref: '#/components/schemas/EncryptionDecryptionAttributes'
+          description: The encryption key type and attributes for ciphertext decryption.
+        WrappedKey:
+          allOf:
+          - $ref: '#/components/schemas/WrappedKey'
+          description: The WrappedKeyBlock containing the encryption key for ciphertext
+            decryption.
+      required:
+      - KeyIdentifier
+      - CipherText
+      - DecryptionAttributes
+    DecryptDataOutput:
+      type: object
+      properties:
+        KeyArn:
+          allOf:
+          - $ref: '#/components/schemas/KeyArn'
+          description: The `keyARN` of the encryption key that Amazon Web Services
+            Payment Cryptography uses for ciphertext decryption.
+        KeyCheckValue:
+          allOf:
+          - $ref: '#/components/schemas/KeyCheckValue'
+          description: 'The key check value (KCV) of the encryption key. The KCV is
+            used to check if all parties holding a given key have the same key or
+            to detect that a key has changed.
+
+
+            Amazon Web Services Payment Cryptography computes the KCV according to
+            the CMAC specification.'
+        PlainText:
+          allOf:
+          - $ref: '#/components/schemas/PlainTextOutputType'
+          description: The decrypted plaintext data in hexBinary format.
+      required:
+      - KeyArn
+      - KeyCheckValue
+      - PlainText
     DerivationMethodAttributes:
       allOf:
       - allOf:
@@ -188,6 +1367,75 @@ components:
           Parameters to derive the confidentiality and integrity keys for a payment card using Mastercard derivation method.
       description: |-
         Parameters to derive the payment card specific confidentiality and integrity keys.
+    DiscoverDynamicCardVerificationCode:
+      type: object
+      properties:
+        CardExpiryDate:
+          allOf:
+          - $ref: '#/components/schemas/CardExpiryDateType'
+          description: The expiry date of a payment card.
+        UnpredictableNumber:
+          allOf:
+          - $ref: '#/components/schemas/HexLengthBetween2And8'
+          description: A random number that is generated by the issuer.
+        ApplicationTransactionCounter:
+          allOf:
+          - $ref: '#/components/schemas/HexLengthBetween2And4'
+          description: The transaction counter value that comes from the terminal.
+      required:
+      - CardExpiryDate
+      - UnpredictableNumber
+      - ApplicationTransactionCounter
+      description: Parameters that are required to generate or verify dCVC (Dynamic
+        Card Verification Code).
+    DukptAttributes:
+      type: object
+      properties:
+        KeySerialNumber:
+          allOf:
+          - $ref: '#/components/schemas/HexLengthBetween10And24'
+          description: The unique identifier known as Key Serial Number (KSN) that
+            comes from an encrypting device using DUKPT encryption method. The KSN
+            is derived from the encrypting device unique identifier and an internal
+            transaction counter.
+        DukptDerivationType:
+          allOf:
+          - $ref: '#/components/schemas/DukptDerivationType'
+          description: The key type derived using DUKPT from a Base Derivation Key
+            (BDK) and Key Serial Number (KSN). This must be less than or equal to
+            the strength of the BDK. For example, you can't use `AES_128` as a derivation
+            type for a BDK of `AES_128` or `TDES_2KEY`.
+      required:
+      - KeySerialNumber
+      - DukptDerivationType
+      description: Parameters that are used for Derived Unique Key Per Transaction
+        (DUKPT) derivation algorithm.
+    DukptDerivationAttributes:
+      type: object
+      properties:
+        KeySerialNumber:
+          allOf:
+          - $ref: '#/components/schemas/HexLengthBetween10And24'
+          description: The unique identifier known as Key Serial Number (KSN) that
+            comes from an encrypting device using DUKPT encryption method. The KSN
+            is derived from the encrypting device unique identifier and an internal
+            transaction counter.
+        DukptKeyDerivationType:
+          allOf:
+          - $ref: '#/components/schemas/DukptDerivationType'
+          description: The key type derived using DUKPT from a Base Derivation Key
+            (BDK) and Key Serial Number (KSN). This must be less than or equal to
+            the strength of the BDK. For example, you can't use `AES_128` as a derivation
+            type for a BDK of `AES_128` or `TDES_2KEY`
+        DukptKeyVariant:
+          allOf:
+          - $ref: '#/components/schemas/DukptKeyVariant'
+          description: The type of use of DUKPT, which can be for incoming data decryption,
+            outgoing data encryption, or both.
+      required:
+      - KeySerialNumber
+      description: Parameters required for encryption or decryption of data using
+        DUKPT.
     DukptDerivationType:
       type: string
       enum:
@@ -196,6 +1444,43 @@ components:
       - AES_128
       - AES_192
       - AES_256
+    DukptEncryptionAttributes:
+      type: object
+      properties:
+        KeySerialNumber:
+          allOf:
+          - $ref: '#/components/schemas/HexLengthBetween10And24'
+          description: The unique identifier known as Key Serial Number (KSN) that
+            comes from an encrypting device using DUKPT encryption method. The KSN
+            is derived from the encrypting device unique identifier and an internal
+            transaction counter.
+        Mode:
+          allOf:
+          - $ref: '#/components/schemas/DukptEncryptionMode'
+          description: 'The block cipher method to use for encryption.
+
+
+            The default is CBC.'
+        DukptKeyDerivationType:
+          allOf:
+          - $ref: '#/components/schemas/DukptDerivationType'
+          description: The key type encrypted using DUKPT from a Base Derivation Key
+            (BDK) and Key Serial Number (KSN). This must be less than or equal to
+            the strength of the BDK. For example, you can't use `AES_128` as a derivation
+            type for a BDK of `AES_128` or `TDES_2KEY`
+        DukptKeyVariant:
+          allOf:
+          - $ref: '#/components/schemas/DukptKeyVariant'
+          description: The type of use of DUKPT, which can be incoming data decryption,
+            outgoing data encryption, or both.
+        InitializationVector:
+          allOf:
+          - $ref: '#/components/schemas/InitializationVectorType'
+          description: An input used to provide the intial state. If no value is provided,
+            Amazon Web Services Payment Cryptography defaults it to zero.
+      required:
+      - KeySerialNumber
+      description: Parameters that are required to encrypt plaintext data using DUKPT.
     DukptEncryptionMode:
       type: string
       enum:
@@ -207,6 +1492,234 @@ components:
       - BIDIRECTIONAL
       - REQUEST
       - RESPONSE
+    DynamicCardVerificationCode:
+      type: object
+      properties:
+        UnpredictableNumber:
+          allOf:
+          - $ref: '#/components/schemas/HexLengthBetween2And8'
+          description: A random number generated by the issuer.
+        PanSequenceNumber:
+          allOf:
+          - $ref: '#/components/schemas/NumberLengthEquals2'
+          description: A number that identifies and differentiates payment cards with
+            the same Primary Account Number (PAN).
+        ApplicationTransactionCounter:
+          allOf:
+          - $ref: '#/components/schemas/HexLengthBetween2And4'
+          description: The transaction counter value that comes from the terminal.
+        TrackData:
+          allOf:
+          - $ref: '#/components/schemas/TrackDataType'
+          description: The data on the two tracks of magnetic cards used for financial
+            transactions. This includes the cardholder name, PAN, expiration date,
+            bank ID (BIN) and several other numbers the issuing bank uses to validate
+            the data received.
+      required:
+      - UnpredictableNumber
+      - PanSequenceNumber
+      - ApplicationTransactionCounter
+      - TrackData
+      description: Parameters that are required to generate or verify Dynamic Card
+        Verification Value (dCVV).
+    DynamicCardVerificationValue:
+      type: object
+      properties:
+        PanSequenceNumber:
+          allOf:
+          - $ref: '#/components/schemas/NumberLengthEquals2'
+          description: A number that identifies and differentiates payment cards with
+            the same Primary Account Number (PAN).
+        CardExpiryDate:
+          allOf:
+          - $ref: '#/components/schemas/CardExpiryDateType'
+          description: The expiry date of a payment card.
+        ServiceCode:
+          allOf:
+          - $ref: '#/components/schemas/ServiceCodeType'
+          description: The service code of the payment card. This is different from
+            Card Security Code (CSC).
+        ApplicationTransactionCounter:
+          allOf:
+          - $ref: '#/components/schemas/HexLengthBetween2And4'
+          description: The transaction counter value that comes from the terminal.
+      required:
+      - PanSequenceNumber
+      - CardExpiryDate
+      - ServiceCode
+      - ApplicationTransactionCounter
+      description: Parameters that are required to generate or verify Dynamic Card
+        Verification Value (dCVV).
+    EcdhDerivationAttributes:
+      type: object
+      properties:
+        CertificateAuthorityPublicKeyIdentifier:
+          allOf:
+          - $ref: '#/components/schemas/KeyArnOrKeyAliasType'
+          description: The `keyArn` of the certificate that signed the client's `PublicKeyCertificate`.
+        PublicKeyCertificate:
+          allOf:
+          - $ref: '#/components/schemas/CertificateType'
+          description: The client's public key certificate in PEM format (base64 encoded)
+            to use for ECDH key derivation.
+        KeyAlgorithm:
+          allOf:
+          - $ref: '#/components/schemas/SymmetricKeyAlgorithm'
+          description: The key algorithm of the derived ECDH key.
+        KeyDerivationFunction:
+          allOf:
+          - $ref: '#/components/schemas/KeyDerivationFunction'
+          description: The key derivation function to use for deriving a key using
+            ECDH.
+        KeyDerivationHashAlgorithm:
+          allOf:
+          - $ref: '#/components/schemas/KeyDerivationHashAlgorithm'
+          description: The hash type to use for deriving a key using ECDH.
+        SharedInformation:
+          allOf:
+          - $ref: '#/components/schemas/SharedInformation'
+          description: 'A byte string containing information that binds the ECDH derived
+            key to the two parties involved or to the context of the key.
+
+
+            It may include details like identities of the two parties deriving the
+            key, context of the operation, session IDs, and optionally a nonce. It
+            must not contain zero bytes, and re-using shared information for multiple
+            ECDH key derivations is not recommended.'
+      required:
+      - CertificateAuthorityPublicKeyIdentifier
+      - PublicKeyCertificate
+      - KeyAlgorithm
+      - KeyDerivationFunction
+      - KeyDerivationHashAlgorithm
+      - SharedInformation
+      description: Parameters required to establish ECDH based key exchange.
+    Emv2000Attributes:
+      type: object
+      properties:
+        MajorKeyDerivationMode:
+          allOf:
+          - $ref: '#/components/schemas/MajorKeyDerivationMode'
+          description: The method to use when deriving the master key for the payment
+            card.
+        PrimaryAccountNumber:
+          allOf:
+          - $ref: '#/components/schemas/PrimaryAccountNumberType'
+          description: The Primary Account Number (PAN) of the cardholder.
+        PanSequenceNumber:
+          allOf:
+          - $ref: '#/components/schemas/NumberLengthEquals2'
+          description: A number that identifies and differentiates payment cards with
+            the same Primary Account Number (PAN). Typically 00 is used, if no value
+            is provided by the terminal.
+        ApplicationTransactionCounter:
+          allOf:
+          - $ref: '#/components/schemas/HexLengthEquals4'
+          description: The transaction counter of the current transaction that is
+            provided by the terminal during transaction processing.
+      required:
+      - MajorKeyDerivationMode
+      - PrimaryAccountNumber
+      - PanSequenceNumber
+      - ApplicationTransactionCounter
+      description: Parameters to derive the confidentiality and integrity keys for
+        a payment card using EMV2000 deruv.
+    EmvCommonAttributes:
+      type: object
+      properties:
+        MajorKeyDerivationMode:
+          allOf:
+          - $ref: '#/components/schemas/MajorKeyDerivationMode'
+          description: The method to use when deriving the master key for the payment
+            card.
+        PrimaryAccountNumber:
+          allOf:
+          - $ref: '#/components/schemas/PrimaryAccountNumberType'
+          description: The Primary Account Number (PAN) of the cardholder.
+        PanSequenceNumber:
+          allOf:
+          - $ref: '#/components/schemas/NumberLengthEquals2'
+          description: A number that identifies and differentiates payment cards with
+            the same Primary Account Number (PAN). Typically 00 is used, if no value
+            is provided by the terminal.
+        ApplicationCryptogram:
+          allOf:
+          - $ref: '#/components/schemas/ApplicationCryptogramType'
+          description: The application cryptogram for the current transaction that
+            is provided by the terminal during transaction processing.
+        Mode:
+          allOf:
+          - $ref: '#/components/schemas/EmvEncryptionMode'
+          description: The block cipher method to use for encryption.
+        PinBlockPaddingType:
+          allOf:
+          - $ref: '#/components/schemas/PinBlockPaddingType'
+          description: 'The padding to be added to the PIN block prior to encryption.
+
+
+            Padding type should be `ISO_IEC_7816_4`, if `PinBlockLengthPosition` is
+            set to `FRONT_OF_PIN_BLOCK`. No padding is required, if `PinBlockLengthPosition`
+            is set to `NONE`.'
+        PinBlockLengthPosition:
+          allOf:
+          - $ref: '#/components/schemas/PinBlockLengthPosition'
+          description: 'Specifies if PIN block length should be added to front of
+            the pin block.
+
+
+            If value is set to `FRONT_OF_PIN_BLOCK`, then PIN block padding type should
+            be `ISO_IEC_7816_4`.'
+      required:
+      - MajorKeyDerivationMode
+      - PrimaryAccountNumber
+      - PanSequenceNumber
+      - ApplicationCryptogram
+      - Mode
+      - PinBlockPaddingType
+      - PinBlockLengthPosition
+      description: Parameters to derive the confidentiality and integrity keys for
+        an Emv common payment card.
+    EmvEncryptionAttributes:
+      type: object
+      properties:
+        MajorKeyDerivationMode:
+          allOf:
+          - $ref: '#/components/schemas/EmvMajorKeyDerivationMode'
+          description: The EMV derivation mode to use for ICC master key derivation
+            as per EMV version 4.3 book 2.
+        PrimaryAccountNumber:
+          allOf:
+          - $ref: '#/components/schemas/PrimaryAccountNumberType'
+          description: The Primary Account Number (PAN), a unique identifier for a
+            payment credit or debit card and associates the card to a specific account
+            holder.
+        PanSequenceNumber:
+          allOf:
+          - $ref: '#/components/schemas/NumberLengthEquals2'
+          description: A number that identifies and differentiates payment cards with
+            the same Primary Account Number (PAN). Typically 00 is used, if no value
+            is provided by the terminal.
+        SessionDerivationData:
+          allOf:
+          - $ref: '#/components/schemas/SessionDerivationDataType'
+          description: The derivation value used to derive the ICC session key. It
+            is typically the application transaction counter value padded with zeros
+            or previous ARQC value padded with zeros as per EMV version 4.3 book 2.
+        Mode:
+          allOf:
+          - $ref: '#/components/schemas/EmvEncryptionMode'
+          description: The block cipher method to use for encryption.
+        InitializationVector:
+          allOf:
+          - $ref: '#/components/schemas/InitializationVectorType'
+          description: An input used to provide the intial state. If no value is provided,
+            Amazon Web Services Payment Cryptography defaults it to zero.
+      required:
+      - MajorKeyDerivationMode
+      - PrimaryAccountNumber
+      - PanSequenceNumber
+      - SessionDerivationData
+      description: Parameters for plaintext encryption using EMV keys.
     EmvEncryptionMode:
       type: string
       enum:
@@ -217,6 +1730,68 @@ components:
       enum:
       - EMV_OPTION_A
       - EMV_OPTION_B
+    EncryptDataInput:
+      type: object
+      properties:
+        KeyIdentifier:
+          allOf:
+          - $ref: '#/components/schemas/KeyArnOrKeyAliasType'
+          description: 'The `keyARN` of the encryption key that Amazon Web Services
+            Payment Cryptography uses for plaintext encryption.
+
+
+            When a WrappedKeyBlock is provided, this value will be the identifier
+            to the key wrapping key. Otherwise, it is the key identifier used to perform
+            the operation.'
+        PlainText:
+          allOf:
+          - $ref: '#/components/schemas/PlainTextType'
+          description: 'The plaintext to be encrypted.
+
+
+            For encryption using asymmetric keys, plaintext data length is constrained
+            by encryption key strength that you define in `KeyAlgorithm` and padding
+            type that you define in `AsymmetricEncryptionAttributes`. For more information,
+            see [Encrypt data](https://docs.aws.amazon.com/payment-cryptography/latest/userguide/encrypt-data.html)
+            in the _Amazon Web Services Payment Cryptography User Guide_.'
+        EncryptionAttributes:
+          allOf:
+          - $ref: '#/components/schemas/EncryptionDecryptionAttributes'
+          description: The encryption key type and attributes for plaintext encryption.
+        WrappedKey:
+          allOf:
+          - $ref: '#/components/schemas/WrappedKey'
+          description: The WrappedKeyBlock containing the encryption key for plaintext
+            encryption.
+      required:
+      - KeyIdentifier
+      - PlainText
+      - EncryptionAttributes
+    EncryptDataOutput:
+      type: object
+      properties:
+        KeyArn:
+          allOf:
+          - $ref: '#/components/schemas/KeyArn'
+          description: The `keyARN` of the encryption key that Amazon Web Services
+            Payment Cryptography uses for plaintext encryption.
+        KeyCheckValue:
+          allOf:
+          - $ref: '#/components/schemas/KeyCheckValue'
+          description: 'The key check value (KCV) of the encryption key. The KCV is
+            used to check if all parties holding a given key have the same key or
+            to detect that a key has changed.
+
+
+            Amazon Web Services Payment Cryptography computes the KCV according to
+            the CMAC specification.'
+        CipherText:
+          allOf:
+          - $ref: '#/components/schemas/CipherTextType'
+          description: The encrypted ciphertext.
+      required:
+      - KeyArn
+      - CipherText
     EncryptedPinBlockType:
       type: string
       pattern: ^[0-9a-fA-F]+$
@@ -249,6 +1824,318 @@ components:
       - CFB64
       - CFB128
       - OFB
+    GenerateCardValidationDataInput:
+      type: object
+      properties:
+        KeyIdentifier:
+          allOf:
+          - $ref: '#/components/schemas/KeyArnOrKeyAliasType'
+          description: The `keyARN` of the CVK encryption key that Amazon Web Services
+            Payment Cryptography uses to generate card data.
+        PrimaryAccountNumber:
+          allOf:
+          - $ref: '#/components/schemas/PrimaryAccountNumberType'
+          description: The Primary Account Number (PAN), a unique identifier for a
+            payment credit or debit card that associates the card with a specific
+            account holder.
+        GenerationAttributes:
+          allOf:
+          - $ref: '#/components/schemas/CardGenerationAttributes'
+          description: The algorithm for generating CVV or CSC values for the card
+            within Amazon Web Services Payment Cryptography.
+        ValidationDataLength:
+          allOf:
+          - $ref: '#/components/schemas/IntegerRangeBetween3And5Type'
+          description: The length of the CVV or CSC to be generated. The default value
+            is 3.
+      required:
+      - KeyIdentifier
+      - PrimaryAccountNumber
+      - GenerationAttributes
+    GenerateCardValidationDataOutput:
+      type: object
+      properties:
+        KeyArn:
+          allOf:
+          - $ref: '#/components/schemas/KeyArn'
+          description: The `keyARN` of the CVK encryption key that Amazon Web Services
+            Payment Cryptography uses to generate CVV or CSC.
+        KeyCheckValue:
+          allOf:
+          - $ref: '#/components/schemas/KeyCheckValue'
+          description: 'The key check value (KCV) of the encryption key. The KCV is
+            used to check if all parties holding a given key have the same key or
+            to detect that a key has changed.
+
+
+            Amazon Web Services Payment Cryptography computes the KCV according to
+            the CMAC specification.'
+        ValidationData:
+          allOf:
+          - $ref: '#/components/schemas/ValidationDataType'
+          description: The CVV or CSC value that Amazon Web Services Payment Cryptography
+            generates for the card.
+      required:
+      - KeyArn
+      - KeyCheckValue
+      - ValidationData
+    GenerateMacEmvPinChangeInput:
+      type: object
+      properties:
+        NewPinPekIdentifier:
+          allOf:
+          - $ref: '#/components/schemas/KeyArnOrKeyAliasType'
+          description: The `keyARN` of the PEK protecting the incoming new encrypted
+            PIN block.
+        NewEncryptedPinBlock:
+          allOf:
+          - $ref: '#/components/schemas/PinBlockLengthEquals16'
+          description: The incoming new encrypted PIN block data for offline pin change
+            on an EMV card.
+        PinBlockFormat:
+          allOf:
+          - $ref: '#/components/schemas/PinBlockFormatForEmvPinChange'
+          description: The PIN encoding format of the incoming new encrypted PIN block
+            as specified in ISO 9564.
+        SecureMessagingIntegrityKeyIdentifier:
+          allOf:
+          - $ref: '#/components/schemas/KeyArnOrKeyAliasType'
+          description: The `keyARN` of the issuer master key (IMK-SMI) used to authenticate
+            the issuer script response.
+        SecureMessagingConfidentialityKeyIdentifier:
+          allOf:
+          - $ref: '#/components/schemas/KeyArnOrKeyAliasType'
+          description: The `keyARN` of the issuer master key (IMK-SMC) used to protect
+            the PIN block data in the issuer script response.
+        MessageData:
+          allOf:
+          - $ref: '#/components/schemas/CommandMessageDataType'
+          description: The message data is the APDU command from the card reader or
+            terminal. The target encrypted PIN block, after translation to ISO2 format,
+            is appended to this message data to generate an issuer script response.
+        DerivationMethodAttributes:
+          allOf:
+          - $ref: '#/components/schemas/DerivationMethodAttributes'
+          description: The attributes and data values to derive payment card specific
+            confidentiality and integrity keys.
+      required:
+      - NewPinPekIdentifier
+      - NewEncryptedPinBlock
+      - PinBlockFormat
+      - SecureMessagingIntegrityKeyIdentifier
+      - SecureMessagingConfidentialityKeyIdentifier
+      - MessageData
+      - DerivationMethodAttributes
+    GenerateMacEmvPinChangeOutput:
+      type: object
+      properties:
+        NewPinPekArn:
+          allOf:
+          - $ref: '#/components/schemas/KeyArn'
+          description: Returns the `keyArn` of the PEK protecting the incoming new
+            encrypted PIN block.
+        SecureMessagingIntegrityKeyArn:
+          allOf:
+          - $ref: '#/components/schemas/KeyArn'
+          description: Returns the `keyArn` of the IMK-SMI used by the operation.
+        SecureMessagingConfidentialityKeyArn:
+          allOf:
+          - $ref: '#/components/schemas/KeyArn'
+          description: Returns the `keyArn` of the IMK-SMC used by the operation.
+        Mac:
+          allOf:
+          - $ref: '#/components/schemas/PinChangeMacOutputType'
+          description: Returns the mac of the issuer script containing message data
+            and appended target encrypted pin block in ISO2 format.
+        EncryptedPinBlock:
+          allOf:
+          - $ref: '#/components/schemas/EncryptedPinBlockType'
+          description: Returns the incoming new encrpted PIN block.
+        NewPinPekKeyCheckValue:
+          allOf:
+          - $ref: '#/components/schemas/KeyCheckValue'
+          description: The key check value (KCV) of the PEK uprotecting the incoming
+            new encrypted PIN block.
+        SecureMessagingIntegrityKeyCheckValue:
+          allOf:
+          - $ref: '#/components/schemas/KeyCheckValue'
+          description: The key check value (KCV) of the SMI issuer master key used
+            by the operation.
+        SecureMessagingConfidentialityKeyCheckValue:
+          allOf:
+          - $ref: '#/components/schemas/KeyCheckValue'
+          description: The key check value (KCV) of the SMC issuer master key used
+            by the operation.
+        VisaAmexDerivationOutputs:
+          allOf:
+          - $ref: '#/components/schemas/VisaAmexDerivationOutputs'
+          description: The attribute values used for Amex and Visa derivation methods.
+      required:
+      - NewPinPekArn
+      - SecureMessagingIntegrityKeyArn
+      - SecureMessagingConfidentialityKeyArn
+      - Mac
+      - EncryptedPinBlock
+      - NewPinPekKeyCheckValue
+      - SecureMessagingIntegrityKeyCheckValue
+      - SecureMessagingConfidentialityKeyCheckValue
+    GenerateMacInput:
+      type: object
+      properties:
+        KeyIdentifier:
+          allOf:
+          - $ref: '#/components/schemas/KeyArnOrKeyAliasType'
+          description: The `keyARN` of the MAC generation encryption key.
+        MessageData:
+          allOf:
+          - $ref: '#/components/schemas/MessageDataType'
+          description: The data for which a MAC is under generation. This value must
+            be hexBinary.
+        GenerationAttributes:
+          allOf:
+          - $ref: '#/components/schemas/MacAttributes'
+          description: The attributes and data values to use for MAC generation within
+            Amazon Web Services Payment Cryptography.
+        MacLength:
+          allOf:
+          - $ref: '#/components/schemas/IntegerRangeBetween4And16'
+          description: The length of a MAC under generation.
+      required:
+      - KeyIdentifier
+      - MessageData
+      - GenerationAttributes
+    GenerateMacOutput:
+      type: object
+      properties:
+        KeyArn:
+          allOf:
+          - $ref: '#/components/schemas/KeyArn'
+          description: The `keyARN` of the encryption key that Amazon Web Services
+            Payment Cryptography uses for MAC generation.
+        KeyCheckValue:
+          allOf:
+          - $ref: '#/components/schemas/KeyCheckValue'
+          description: 'The key check value (KCV) of the encryption key. The KCV is
+            used to check if all parties holding a given key have the same key or
+            to detect that a key has changed.
+
+
+            Amazon Web Services Payment Cryptography computes the KCV according to
+            the CMAC specification.'
+        Mac:
+          allOf:
+          - $ref: '#/components/schemas/MacOutputType'
+          description: The MAC cryptogram generated within Amazon Web Services Payment
+            Cryptography.
+      required:
+      - KeyArn
+      - KeyCheckValue
+      - Mac
+    GeneratePinDataInput:
+      type: object
+      properties:
+        GenerationKeyIdentifier:
+          allOf:
+          - $ref: '#/components/schemas/KeyArnOrKeyAliasType'
+          description: The `keyARN` of the PEK that Amazon Web Services Payment Cryptography
+            uses for pin data generation.
+        EncryptionKeyIdentifier:
+          allOf:
+          - $ref: '#/components/schemas/KeyArnOrKeyAliasType'
+          description: The `keyARN` of the PEK that Amazon Web Services Payment Cryptography
+            uses to encrypt the PIN Block. For ECDH, it is the `keyARN` of the asymmetric
+            ECC key.
+        GenerationAttributes:
+          allOf:
+          - $ref: '#/components/schemas/PinGenerationAttributes'
+          description: The attributes and values to use for PIN, PVV, or PIN Offset
+            generation.
+        PinDataLength:
+          allOf:
+          - $ref: '#/components/schemas/IntegerRangeBetween4And12'
+          description: The length of PIN under generation.
+        PrimaryAccountNumber:
+          allOf:
+          - $ref: '#/components/schemas/PrimaryAccountNumberType'
+          description: The Primary Account Number (PAN), a unique identifier for a
+            payment credit or debit card that associates the card with a specific
+            account holder.
+        PinBlockFormat:
+          allOf:
+          - $ref: '#/components/schemas/PinBlockFormatForPinData'
+          description: 'The PIN encoding format for pin data generation as specified
+            in ISO 9564. Amazon Web Services Payment Cryptography supports `ISO_Format_0`
+            and `ISO_Format_3`.
+
+
+            The `ISO_Format_0` PIN block format is equivalent to the ANSI X9.8, VISA-1,
+            and ECI-1 PIN block formats. It is similar to a VISA-4 PIN block format.
+            It supports a PIN from 4 to 12 digits in length.
+
+
+            The `ISO_Format_3` PIN block format is the same as `ISO_Format_0` except
+            that the fill digits are random values from 10 to 15.'
+        EncryptionWrappedKey:
+          $ref: '#/components/schemas/WrappedKey'
+      required:
+      - GenerationKeyIdentifier
+      - EncryptionKeyIdentifier
+      - GenerationAttributes
+      - PrimaryAccountNumber
+      - PinBlockFormat
+    GeneratePinDataOutput:
+      type: object
+      properties:
+        GenerationKeyArn:
+          allOf:
+          - $ref: '#/components/schemas/KeyArn'
+          description: The `keyARN` of the pin data generation key that Amazon Web
+            Services Payment Cryptography uses for PIN, PVV or PIN Offset generation.
+        GenerationKeyCheckValue:
+          allOf:
+          - $ref: '#/components/schemas/KeyCheckValue'
+          description: 'The key check value (KCV) of the encryption key. The KCV is
+            used to check if all parties holding a given key have the same key or
+            to detect that a key has changed.
+
+
+            Amazon Web Services Payment Cryptography computes the KCV according to
+            the CMAC specification.'
+        EncryptionKeyArn:
+          allOf:
+          - $ref: '#/components/schemas/KeyArn'
+          description: The `keyARN` of the PEK that Amazon Web Services Payment Cryptography
+            uses for encrypted pin block generation. For ECDH, it is the `keyARN`
+            of the asymmetric ECC key.
+        EncryptionKeyCheckValue:
+          allOf:
+          - $ref: '#/components/schemas/KeyCheckValue'
+          description: 'The key check value (KCV) of the encryption key. The KCV is
+            used to check if all parties holding a given key have the same key or
+            to detect that a key has changed.
+
+
+            Amazon Web Services Payment Cryptography computes the KCV according to
+            the CMAC specification.'
+        EncryptedPinBlock:
+          allOf:
+          - $ref: '#/components/schemas/EncryptedPinBlockType'
+          description: The PIN block encrypted under PEK from Amazon Web Services
+            Payment Cryptography. The encrypted PIN block is a composite of PAN (Primary
+            Account Number) and PIN (Personal Identification Number), generated in
+            accordance with ISO 9564 standard.
+        PinData:
+          allOf:
+          - $ref: '#/components/schemas/PinData'
+          description: The attributes and values Amazon Web Services Payment Cryptography
+            uses for pin data generation.
+      required:
+      - GenerationKeyArn
+      - GenerationKeyCheckValue
+      - EncryptionKeyArn
+      - EncryptionKeyCheckValue
+      - EncryptedPinBlock
+      - PinData
     HexEvenLengthBetween16And32:
       type: string
       pattern: ^(?:[0-9a-fA-F][0-9a-fA-F])+$
@@ -284,6 +2171,138 @@ components:
       pattern: ^[0-9a-fA-F]+$
       minLength: 8
       maxLength: 8
+    Ibm3624NaturalPin:
+      type: object
+      properties:
+        DecimalizationTable:
+          allOf:
+          - $ref: '#/components/schemas/DecimalizationTableType'
+          description: The decimalization table to use for IBM 3624 PIN algorithm.
+            The table is used to convert the algorithm intermediate result from hexadecimal
+            characters to decimal.
+        PinValidationDataPadCharacter:
+          allOf:
+          - $ref: '#/components/schemas/HexLengthEquals1'
+          description: The padding character for validation data.
+        PinValidationData:
+          allOf:
+          - $ref: '#/components/schemas/PinValidationDataType'
+          description: The unique data for cardholder identification.
+      required:
+      - DecimalizationTable
+      - PinValidationDataPadCharacter
+      - PinValidationData
+      description: Parameters that are required to generate or verify Ibm3624 natural
+        PIN.
+    Ibm3624PinFromOffset:
+      type: object
+      properties:
+        DecimalizationTable:
+          allOf:
+          - $ref: '#/components/schemas/DecimalizationTableType'
+          description: The decimalization table to use for IBM 3624 PIN algorithm.
+            The table is used to convert the algorithm intermediate result from hexadecimal
+            characters to decimal.
+        PinValidationDataPadCharacter:
+          allOf:
+          - $ref: '#/components/schemas/HexLengthEquals1'
+          description: The padding character for validation data.
+        PinValidationData:
+          allOf:
+          - $ref: '#/components/schemas/PinValidationDataType'
+          description: The unique data for cardholder identification.
+        PinOffset:
+          allOf:
+          - $ref: '#/components/schemas/PinOffsetType'
+          description: The PIN offset value.
+      required:
+      - DecimalizationTable
+      - PinValidationDataPadCharacter
+      - PinValidationData
+      - PinOffset
+      description: Parameters that are required to generate or verify Ibm3624 PIN
+        from offset PIN.
+    Ibm3624PinOffset:
+      type: object
+      properties:
+        EncryptedPinBlock:
+          allOf:
+          - $ref: '#/components/schemas/EncryptedPinBlockType'
+          description: The encrypted PIN block data. According to ISO 9564 standard,
+            a PIN Block is an encoded representation of a payment card Personal Account
+            Number (PAN) and the cardholder Personal Identification Number (PIN).
+        DecimalizationTable:
+          allOf:
+          - $ref: '#/components/schemas/DecimalizationTableType'
+          description: The decimalization table to use for IBM 3624 PIN algorithm.
+            The table is used to convert the algorithm intermediate result from hexadecimal
+            characters to decimal.
+        PinValidationDataPadCharacter:
+          allOf:
+          - $ref: '#/components/schemas/HexLengthEquals1'
+          description: The padding character for validation data.
+        PinValidationData:
+          allOf:
+          - $ref: '#/components/schemas/PinValidationDataType'
+          description: The unique data for cardholder identification.
+      required:
+      - EncryptedPinBlock
+      - DecimalizationTable
+      - PinValidationDataPadCharacter
+      - PinValidationData
+      description: Pparameters that are required to generate or verify Ibm3624 PIN
+        offset PIN.
+    Ibm3624PinVerification:
+      type: object
+      properties:
+        DecimalizationTable:
+          allOf:
+          - $ref: '#/components/schemas/DecimalizationTableType'
+          description: The decimalization table to use for IBM 3624 PIN algorithm.
+            The table is used to convert the algorithm intermediate result from hexadecimal
+            characters to decimal.
+        PinValidationDataPadCharacter:
+          allOf:
+          - $ref: '#/components/schemas/HexLengthEquals1'
+          description: The padding character for validation data.
+        PinValidationData:
+          allOf:
+          - $ref: '#/components/schemas/PinValidationDataType'
+          description: The unique data for cardholder identification.
+        PinOffset:
+          allOf:
+          - $ref: '#/components/schemas/PinOffsetType'
+          description: The PIN offset value.
+      required:
+      - DecimalizationTable
+      - PinValidationDataPadCharacter
+      - PinValidationData
+      - PinOffset
+      description: Parameters that are required to generate or verify Ibm3624 PIN
+        verification PIN.
+    Ibm3624RandomPin:
+      type: object
+      properties:
+        DecimalizationTable:
+          allOf:
+          - $ref: '#/components/schemas/DecimalizationTableType'
+          description: The decimalization table to use for IBM 3624 PIN algorithm.
+            The table is used to convert the algorithm intermediate result from hexadecimal
+            characters to decimal.
+        PinValidationDataPadCharacter:
+          allOf:
+          - $ref: '#/components/schemas/HexLengthEquals1'
+          description: The padding character for validation data.
+        PinValidationData:
+          allOf:
+          - $ref: '#/components/schemas/PinValidationDataType'
+          description: The unique data for cardholder identification.
+      required:
+      - DecimalizationTable
+      - PinValidationDataPadCharacter
+      - PinValidationData
+      description: Parameters that are required to generate or verify Ibm3624 random
+        PIN.
     InitializationVectorType:
       type: string
       pattern: ^(?:[0-9a-fA-F]{16}|[0-9a-fA-F]{32})$
@@ -305,6 +2324,13 @@ components:
       type: integer
       minimum: 4
       maximum: 16
+    InternalServerException:
+      type: object
+      properties:
+        Message:
+          $ref: '#/components/schemas/String'
+      description: The request processing has failed because of an unknown error,
+        exception, or failure.
     KeyArn:
       type: string
       pattern: ^arn:aws:payment-cryptography:[a-z]{2}-[a-z]{1,16}-[0-9]+:[0-9]{12}:key/[0-9a-zA-Z]{16,64}$
@@ -346,6 +2372,68 @@ components:
       - HMAC_SHA256
       - HMAC_SHA384
       - HMAC_SHA512
+    MacAlgorithmDukpt:
+      type: object
+      properties:
+        KeySerialNumber:
+          allOf:
+          - $ref: '#/components/schemas/HexLengthBetween10And24'
+          description: The unique identifier known as Key Serial Number (KSN) that
+            comes from an encrypting device using DUKPT encryption method. The KSN
+            is derived from the encrypting device unique identifier and an internal
+            transaction counter.
+        DukptKeyVariant:
+          allOf:
+          - $ref: '#/components/schemas/DukptKeyVariant'
+          description: The type of use of DUKPT, which can be MAC generation, MAC
+            verification, or both.
+        DukptDerivationType:
+          allOf:
+          - $ref: '#/components/schemas/DukptDerivationType'
+          description: The key type derived using DUKPT from a Base Derivation Key
+            (BDK) and Key Serial Number (KSN). This must be less than or equal to
+            the strength of the BDK. For example, you can't use `AES_128` as a derivation
+            type for a BDK of `AES_128` or `TDES_2KEY`.
+      required:
+      - KeySerialNumber
+      - DukptKeyVariant
+      description: Parameters required for DUKPT MAC generation and verification.
+    MacAlgorithmEmv:
+      type: object
+      properties:
+        MajorKeyDerivationMode:
+          allOf:
+          - $ref: '#/components/schemas/MajorKeyDerivationMode'
+          description: The method to use when deriving the master key for EMV MAC
+            generation or verification.
+        PrimaryAccountNumber:
+          allOf:
+          - $ref: '#/components/schemas/PrimaryAccountNumberType'
+          description: The Primary Account Number (PAN), a unique identifier for a
+            payment credit or debit card and associates the card to a specific account
+            holder.
+        PanSequenceNumber:
+          allOf:
+          - $ref: '#/components/schemas/NumberLengthEquals2'
+          description: A number that identifies and differentiates payment cards with
+            the same Primary Account Number (PAN).
+        SessionKeyDerivationMode:
+          allOf:
+          - $ref: '#/components/schemas/SessionKeyDerivationMode'
+          description: The method of deriving a session key for EMV MAC generation
+            or verification.
+        SessionKeyDerivationValue:
+          allOf:
+          - $ref: '#/components/schemas/SessionKeyDerivationValue'
+          description: Parameters that are required to generate session key for EMV
+            generation and verification.
+      required:
+      - MajorKeyDerivationMode
+      - PrimaryAccountNumber
+      - PanSequenceNumber
+      - SessionKeyDerivationMode
+      - SessionKeyDerivationValue
+      description: Parameters that are required for EMV MAC generation and verification.
     MacAttributes:
       allOf:
       - allOf:
@@ -385,6 +2473,36 @@ components:
       enum:
       - EMV_OPTION_A
       - EMV_OPTION_B
+    MasterCardAttributes:
+      type: object
+      properties:
+        MajorKeyDerivationMode:
+          allOf:
+          - $ref: '#/components/schemas/MajorKeyDerivationMode'
+          description: The method to use when deriving the master key for the payment
+            card.
+        PrimaryAccountNumber:
+          allOf:
+          - $ref: '#/components/schemas/PrimaryAccountNumberType'
+          description: The Primary Account Number (PAN) of the cardholder.
+        PanSequenceNumber:
+          allOf:
+          - $ref: '#/components/schemas/NumberLengthEquals2'
+          description: A number that identifies and differentiates payment cards with
+            the same Primary Account Number (PAN). Typically 00 is used, if no value
+            is provided by the terminal.
+        ApplicationCryptogram:
+          allOf:
+          - $ref: '#/components/schemas/ApplicationCryptogramType'
+          description: The application cryptogram for the current transaction that
+            is provided by the terminal during transaction processing.
+      required:
+      - MajorKeyDerivationMode
+      - PrimaryAccountNumber
+      - PanSequenceNumber
+      - ApplicationCryptogram
+      description: Parameters to derive the confidentiality and integrity keys for
+        a Mastercard payment card.
     MessageDataType:
       type: string
       pattern: ^(?:[0-9a-fA-F][0-9a-fA-F])+$
@@ -516,6 +2634,80 @@ components:
       pattern: ^[0-9a-fA-F]+$
       minLength: 1
       maxLength: 16
+    ReEncryptDataInput:
+      type: object
+      properties:
+        IncomingKeyIdentifier:
+          allOf:
+          - $ref: '#/components/schemas/KeyArnOrKeyAliasType'
+          description: 'The `keyARN` of the encryption key of incoming ciphertext
+            data.
+
+
+            When a WrappedKeyBlock is provided, this value will be the identifier
+            to the key wrapping key. Otherwise, it is the key identifier used to perform
+            the operation.'
+        OutgoingKeyIdentifier:
+          allOf:
+          - $ref: '#/components/schemas/KeyArnOrKeyAliasType'
+          description: The `keyARN` of the encryption key of outgoing ciphertext data
+            after encryption by Amazon Web Services Payment Cryptography.
+        CipherText:
+          allOf:
+          - $ref: '#/components/schemas/CipherTextType'
+          description: Ciphertext to be encrypted. The minimum allowed length is 16
+            bytes and maximum allowed length is 4096 bytes.
+        IncomingEncryptionAttributes:
+          allOf:
+          - $ref: '#/components/schemas/ReEncryptionAttributes'
+          description: The attributes and values for incoming ciphertext.
+        OutgoingEncryptionAttributes:
+          allOf:
+          - $ref: '#/components/schemas/ReEncryptionAttributes'
+          description: The attributes and values for outgoing ciphertext data after
+            encryption by Amazon Web Services Payment Cryptography.
+        IncomingWrappedKey:
+          allOf:
+          - $ref: '#/components/schemas/WrappedKey'
+          description: The WrappedKeyBlock containing the encryption key of incoming
+            ciphertext data.
+        OutgoingWrappedKey:
+          allOf:
+          - $ref: '#/components/schemas/WrappedKey'
+          description: The WrappedKeyBlock containing the encryption key of outgoing
+            ciphertext data after encryption by Amazon Web Services Payment Cryptography.
+      required:
+      - IncomingKeyIdentifier
+      - OutgoingKeyIdentifier
+      - CipherText
+      - IncomingEncryptionAttributes
+      - OutgoingEncryptionAttributes
+    ReEncryptDataOutput:
+      type: object
+      properties:
+        KeyArn:
+          allOf:
+          - $ref: '#/components/schemas/KeyArn'
+          description: The keyARN (Amazon Resource Name) of the encryption key that
+            Amazon Web Services Payment Cryptography uses for plaintext encryption.
+        KeyCheckValue:
+          allOf:
+          - $ref: '#/components/schemas/KeyCheckValue'
+          description: 'The key check value (KCV) of the encryption key. The KCV is
+            used to check if all parties holding a given key have the same key or
+            to detect that a key has changed.
+
+
+            Amazon Web Services Payment Cryptography computes the KCV according to
+            the CMAC specification.'
+        CipherText:
+          allOf:
+          - $ref: '#/components/schemas/CipherTextType'
+          description: The encrypted ciphertext.
+      required:
+      - KeyArn
+      - KeyCheckValue
+      - CipherText
     ReEncryptionAttributes:
       allOf:
       - allOf:
@@ -526,6 +2718,14 @@ components:
         - $ref: '#/components/schemas/DukptEncryptionAttributes'
       description: |-
         Parameters that are required to perform reencryption operation.
+    ResourceNotFoundException:
+      type: object
+      properties:
+        ResourceId:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The resource that is missing.
+      description: The request was denied due to an invalid resource error.
     ServiceCodeType:
       type: string
       pattern: ^[0-9]+$
@@ -536,6 +2736,24 @@ components:
       pattern: ^[0-9a-fA-F]+$
       minLength: 16
       maxLength: 16
+    SessionKeyAmex:
+      type: object
+      properties:
+        PrimaryAccountNumber:
+          allOf:
+          - $ref: '#/components/schemas/PrimaryAccountNumberType'
+          description: The Primary Account Number (PAN) of the cardholder. A PAN is
+            a unique identifier for a payment credit or debit card and associates
+            the card to a specific account holder.
+        PanSequenceNumber:
+          allOf:
+          - $ref: '#/components/schemas/NumberLengthEquals2'
+          description: A number that identifies and differentiates payment cards with
+            the same Primary Account Number (PAN).
+      required:
+      - PrimaryAccountNumber
+      - PanSequenceNumber
+      description: Parameters to derive session key for an Amex payment card.
     SessionKeyDerivation:
       allOf:
       - allOf:
@@ -580,11 +2798,129 @@ components:
           The transaction counter that is provided by the terminal during transaction processing.
       description: |-
         Parameters to derive session key value using a MAC EMV algorithm.
+    SessionKeyEmv2000:
+      type: object
+      properties:
+        PrimaryAccountNumber:
+          allOf:
+          - $ref: '#/components/schemas/PrimaryAccountNumberType'
+          description: The Primary Account Number (PAN) of the cardholder. A PAN is
+            a unique identifier for a payment credit or debit card and associates
+            the card to a specific account holder.
+        PanSequenceNumber:
+          allOf:
+          - $ref: '#/components/schemas/NumberLengthEquals2'
+          description: A number that identifies and differentiates payment cards with
+            the same Primary Account Number (PAN).
+        ApplicationTransactionCounter:
+          allOf:
+          - $ref: '#/components/schemas/HexLengthEquals4'
+          description: The transaction counter that is provided by the terminal during
+            transaction processing.
+      required:
+      - PrimaryAccountNumber
+      - PanSequenceNumber
+      - ApplicationTransactionCounter
+      description: Parameters to derive session key for an Emv2000 payment card for
+        ARQC verification.
+    SessionKeyEmvCommon:
+      type: object
+      properties:
+        PrimaryAccountNumber:
+          allOf:
+          - $ref: '#/components/schemas/PrimaryAccountNumberType'
+          description: The Primary Account Number (PAN) of the cardholder. A PAN is
+            a unique identifier for a payment credit or debit card and associates
+            the card to a specific account holder.
+        PanSequenceNumber:
+          allOf:
+          - $ref: '#/components/schemas/NumberLengthEquals2'
+          description: A number that identifies and differentiates payment cards with
+            the same Primary Account Number (PAN).
+        ApplicationTransactionCounter:
+          allOf:
+          - $ref: '#/components/schemas/HexLengthEquals4'
+          description: The transaction counter that is provided by the terminal during
+            transaction processing.
+      required:
+      - PrimaryAccountNumber
+      - PanSequenceNumber
+      - ApplicationTransactionCounter
+      description: Parameters to derive session key for an Emv common payment card
+        for ARQC verification.
+    SessionKeyMastercard:
+      type: object
+      properties:
+        PrimaryAccountNumber:
+          allOf:
+          - $ref: '#/components/schemas/PrimaryAccountNumberType'
+          description: The Primary Account Number (PAN) of the cardholder. A PAN is
+            a unique identifier for a payment credit or debit card and associates
+            the card to a specific account holder.
+        PanSequenceNumber:
+          allOf:
+          - $ref: '#/components/schemas/NumberLengthEquals2'
+          description: A number that identifies and differentiates payment cards with
+            the same Primary Account Number (PAN).
+        ApplicationTransactionCounter:
+          allOf:
+          - $ref: '#/components/schemas/HexLengthEquals4'
+          description: The transaction counter that is provided by the terminal during
+            transaction processing.
+        UnpredictableNumber:
+          allOf:
+          - $ref: '#/components/schemas/HexLengthBetween2And8'
+          description: A random number generated by the issuer.
+      required:
+      - PrimaryAccountNumber
+      - PanSequenceNumber
+      - ApplicationTransactionCounter
+      - UnpredictableNumber
+      description: Parameters to derive session key for Mastercard payment card for
+        ARQC verification.
+    SessionKeyVisa:
+      type: object
+      properties:
+        PrimaryAccountNumber:
+          allOf:
+          - $ref: '#/components/schemas/PrimaryAccountNumberType'
+          description: The Primary Account Number (PAN) of the cardholder. A PAN is
+            a unique identifier for a payment credit or debit card and associates
+            the card to a specific account holder.
+        PanSequenceNumber:
+          allOf:
+          - $ref: '#/components/schemas/NumberLengthEquals2'
+          description: A number that identifies and differentiates payment cards with
+            the same Primary Account Number (PAN).
+      required:
+      - PrimaryAccountNumber
+      - PanSequenceNumber
+      description: Parameters to derive session key for Visa payment card for ARQC
+        verification.
     SharedInformation:
       type: string
       pattern: ^(?:[0-9a-fA-F][0-9a-fA-F])+$
       minLength: 2
       maxLength: 2048
+    SymmetricEncryptionAttributes:
+      type: object
+      properties:
+        Mode:
+          allOf:
+          - $ref: '#/components/schemas/EncryptionMode'
+          description: The block cipher method to use for encryption.
+        InitializationVector:
+          allOf:
+          - $ref: '#/components/schemas/InitializationVectorType'
+          description: An input used to provide the intial state. If no value is provided,
+            Amazon Web Services Payment Cryptography defaults it to zero.
+        PaddingType:
+          allOf:
+          - $ref: '#/components/schemas/PaddingType'
+          description: The padding to be included with the data.
+      required:
+      - Mode
+      description: Parameters requried to encrypt plaintext data using symmetric keys.
     SymmetricKeyAlgorithm:
       type: string
       enum:
@@ -593,6 +2929,12 @@ components:
       - AES_128
       - AES_192
       - AES_256
+    ThrottlingException:
+      type: object
+      properties:
+        Message:
+          $ref: '#/components/schemas/String'
+      description: The request was denied due to request throttling.
     Tr31WrappedKeyBlock:
       type: string
       pattern: ^[0-9A-Z]+$
@@ -608,6 +2950,93 @@ components:
       pattern: ^[0-9a-fA-F]+$
       minLength: 2
       maxLength: 1024
+    TranslatePinDataInput:
+      type: object
+      properties:
+        IncomingKeyIdentifier:
+          allOf:
+          - $ref: '#/components/schemas/KeyArnOrKeyAliasType'
+          description: 'The `keyARN` of the encryption key under which incoming PIN
+            block data is encrypted. This key type can be PEK or BDK.
+
+
+            For dynamic keys, it is the `keyARN` of KEK of the TR-31 wrapped PEK.
+            For ECDH, it is the `keyARN` of the asymmetric ECC key.'
+        OutgoingKeyIdentifier:
+          allOf:
+          - $ref: '#/components/schemas/KeyArnOrKeyAliasType'
+          description: 'The `keyARN` of the encryption key for encrypting outgoing
+            PIN block data. This key type can be PEK or BDK.
+
+
+            For ECDH, it is the `keyARN` of the asymmetric ECC key.'
+        IncomingTranslationAttributes:
+          allOf:
+          - $ref: '#/components/schemas/TranslationIsoFormats'
+          description: The format of the incoming PIN block data for translation within
+            Amazon Web Services Payment Cryptography.
+        OutgoingTranslationAttributes:
+          allOf:
+          - $ref: '#/components/schemas/TranslationIsoFormats'
+          description: The format of the outgoing PIN block data after translation
+            by Amazon Web Services Payment Cryptography.
+        EncryptedPinBlock:
+          allOf:
+          - $ref: '#/components/schemas/HexEvenLengthBetween16And32'
+          description: The encrypted PIN block data that Amazon Web Services Payment
+            Cryptography translates.
+        IncomingDukptAttributes:
+          allOf:
+          - $ref: '#/components/schemas/DukptDerivationAttributes'
+          description: The attributes and values to use for incoming DUKPT encryption
+            key for PIN block translation.
+        OutgoingDukptAttributes:
+          allOf:
+          - $ref: '#/components/schemas/DukptDerivationAttributes'
+          description: The attributes and values to use for outgoing DUKPT encryption
+            key after PIN block translation.
+        IncomingWrappedKey:
+          allOf:
+          - $ref: '#/components/schemas/WrappedKey'
+          description: The WrappedKeyBlock containing the encryption key under which
+            incoming PIN block data is encrypted.
+        OutgoingWrappedKey:
+          allOf:
+          - $ref: '#/components/schemas/WrappedKey'
+          description: The WrappedKeyBlock containing the encryption key for encrypting
+            outgoing PIN block data.
+      required:
+      - IncomingKeyIdentifier
+      - OutgoingKeyIdentifier
+      - IncomingTranslationAttributes
+      - OutgoingTranslationAttributes
+      - EncryptedPinBlock
+    TranslatePinDataOutput:
+      type: object
+      properties:
+        PinBlock:
+          allOf:
+          - $ref: '#/components/schemas/EncryptedPinBlockType'
+          description: The outgoing encrypted PIN block data after translation.
+        KeyArn:
+          allOf:
+          - $ref: '#/components/schemas/KeyArn'
+          description: The `keyARN` of the encryption key that Amazon Web Services
+            Payment Cryptography uses to encrypt outgoing PIN block data after translation.
+        KeyCheckValue:
+          allOf:
+          - $ref: '#/components/schemas/KeyCheckValue'
+          description: 'The key check value (KCV) of the encryption key. The KCV is
+            used to check if all parties holding a given key have the same key or
+            to detect that a key has changed.
+
+
+            Amazon Web Services Payment Cryptography computes the KCV according to
+            the CMAC specification.'
+      required:
+      - PinBlock
+      - KeyArn
+      - KeyCheckValue
     TranslationIsoFormats:
       allOf:
       - allOf:
@@ -628,15 +3057,72 @@ components:
           Parameters that are required for ISO9564 PIN format 4 tranlation.
       description: |-
         Parameters that are required for translation between ISO9564 PIN block formats 0,1,3,4.
+    TranslationPinDataIsoFormat034:
+      type: object
+      properties:
+        PrimaryAccountNumber:
+          allOf:
+          - $ref: '#/components/schemas/PrimaryAccountNumberType'
+          description: The Primary Account Number (PAN) of the cardholder. A PAN is
+            a unique identifier for a payment credit or debit card and associates
+            the card to a specific account holder.
+      required:
+      - PrimaryAccountNumber
+      description: Parameters that are required for tranlation between ISO9564 PIN
+        format 0,3,4 tranlation.
+    TranslationPinDataIsoFormat1:
+      type: object
+      properties: {}
+      description: Parameters that are required for ISO9564 PIN format 1 tranlation.
     ValidationDataType:
       type: string
       pattern: ^[0-9]+$
       minLength: 3
       maxLength: 5
+    ValidationException:
+      type: object
+      properties:
+        message:
+          $ref: '#/components/schemas/String'
+        fieldList:
+          allOf:
+          - $ref: '#/components/schemas/ValidationExceptionFieldList'
+          description: The request was denied due to an invalid request error.
+      required:
+      - message
+      description: The request was denied due to an invalid request error.
+    ValidationExceptionField:
+      type: object
+      properties:
+        path:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The request was denied due to an invalid request error.
+        message:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The request was denied due to an invalid request error.
+      required:
+      - path
+      - message
+      description: The request was denied due to an invalid request error.
     ValidationExceptionFieldList:
       type: array
       items:
         $ref: '#/components/schemas/ValidationExceptionField'
+    VerificationFailedException:
+      type: object
+      properties:
+        Reason:
+          allOf:
+          - $ref: '#/components/schemas/VerificationFailedReason'
+          description: The reason for the exception.
+        Message:
+          $ref: '#/components/schemas/String'
+      required:
+      - Reason
+      - Message
+      description: This request failed verification.
     VerificationFailedReason:
       type: string
       enum:
@@ -649,6 +3135,412 @@ components:
       pattern: ^[0-9]+$
       minLength: 4
       maxLength: 12
+    VerifyAuthRequestCryptogramInput:
+      type: object
+      properties:
+        KeyIdentifier:
+          allOf:
+          - $ref: '#/components/schemas/KeyArnOrKeyAliasType'
+          description: The `keyARN` of the major encryption key that Amazon Web Services
+            Payment Cryptography uses for ARQC verification.
+        TransactionData:
+          allOf:
+          - $ref: '#/components/schemas/TransactionDataType'
+          description: The transaction data that Amazon Web Services Payment Cryptography
+            uses for ARQC verification. The same transaction is used for ARQC generation
+            outside of Amazon Web Services Payment Cryptography.
+        AuthRequestCryptogram:
+          allOf:
+          - $ref: '#/components/schemas/AuthRequestCryptogramType'
+          description: The auth request cryptogram imported into Amazon Web Services
+            Payment Cryptography for ARQC verification using a major encryption key
+            and transaction data.
+        MajorKeyDerivationMode:
+          allOf:
+          - $ref: '#/components/schemas/MajorKeyDerivationMode'
+          description: The method to use when deriving the major encryption key for
+            ARQC verification within Amazon Web Services Payment Cryptography. The
+            same key derivation mode was used for ARQC generation outside of Amazon
+            Web Services Payment Cryptography.
+        SessionKeyDerivationAttributes:
+          allOf:
+          - $ref: '#/components/schemas/SessionKeyDerivation'
+          description: The attributes and values to use for deriving a session key
+            for ARQC verification within Amazon Web Services Payment Cryptography.
+            The same attributes were used for ARQC generation outside of Amazon Web
+            Services Payment Cryptography.
+        AuthResponseAttributes:
+          allOf:
+          - $ref: '#/components/schemas/CryptogramAuthResponse'
+          description: The attributes and values for auth request cryptogram verification.
+            These parameters are required in case using ARPC Method 1 or Method 2
+            for ARQC verification.
+      required:
+      - KeyIdentifier
+      - TransactionData
+      - AuthRequestCryptogram
+      - MajorKeyDerivationMode
+      - SessionKeyDerivationAttributes
+    VerifyAuthRequestCryptogramOutput:
+      type: object
+      properties:
+        KeyArn:
+          allOf:
+          - $ref: '#/components/schemas/KeyArn'
+          description: The `keyARN` of the major encryption key that Amazon Web Services
+            Payment Cryptography uses for ARQC verification.
+        KeyCheckValue:
+          allOf:
+          - $ref: '#/components/schemas/KeyCheckValue'
+          description: 'The key check value (KCV) of the encryption key. The KCV is
+            used to check if all parties holding a given key have the same key or
+            to detect that a key has changed.
+
+
+            Amazon Web Services Payment Cryptography computes the KCV according to
+            the CMAC specification.'
+        AuthResponseValue:
+          allOf:
+          - $ref: '#/components/schemas/AuthResponseValueType'
+          description: The result for ARQC verification or ARPC generation within
+            Amazon Web Services Payment Cryptography.
+      required:
+      - KeyArn
+      - KeyCheckValue
+    VerifyCardValidationDataInput:
+      type: object
+      properties:
+        KeyIdentifier:
+          allOf:
+          - $ref: '#/components/schemas/KeyArnOrKeyAliasType'
+          description: The `keyARN` of the CVK encryption key that Amazon Web Services
+            Payment Cryptography uses to verify card data.
+        PrimaryAccountNumber:
+          allOf:
+          - $ref: '#/components/schemas/PrimaryAccountNumberType'
+          description: The Primary Account Number (PAN), a unique identifier for a
+            payment credit or debit card that associates the card with a specific
+            account holder.
+        VerificationAttributes:
+          allOf:
+          - $ref: '#/components/schemas/CardVerificationAttributes'
+          description: The algorithm to use for verification of card data within Amazon
+            Web Services Payment Cryptography.
+        ValidationData:
+          allOf:
+          - $ref: '#/components/schemas/ValidationDataType'
+          description: The CVV or CSC value for use for card data verification within
+            Amazon Web Services Payment Cryptography.
+      required:
+      - KeyIdentifier
+      - PrimaryAccountNumber
+      - VerificationAttributes
+      - ValidationData
+    VerifyCardValidationDataOutput:
+      type: object
+      properties:
+        KeyArn:
+          allOf:
+          - $ref: '#/components/schemas/KeyArn'
+          description: The `keyARN` of the CVK encryption key that Amazon Web Services
+            Payment Cryptography uses to verify CVV or CSC.
+        KeyCheckValue:
+          allOf:
+          - $ref: '#/components/schemas/KeyCheckValue'
+          description: 'The key check value (KCV) of the encryption key. The KCV is
+            used to check if all parties holding a given key have the same key or
+            to detect that a key has changed.
+
+
+            Amazon Web Services Payment Cryptography computes the KCV according to
+            the CMAC specification.'
+      required:
+      - KeyArn
+      - KeyCheckValue
+    VerifyMacInput:
+      type: object
+      properties:
+        KeyIdentifier:
+          allOf:
+          - $ref: '#/components/schemas/KeyArnOrKeyAliasType'
+          description: The `keyARN` of the encryption key that Amazon Web Services
+            Payment Cryptography uses to verify MAC data.
+        MessageData:
+          allOf:
+          - $ref: '#/components/schemas/MessageDataType'
+          description: The data on for which MAC is under verification. This value
+            must be hexBinary.
+        Mac:
+          allOf:
+          - $ref: '#/components/schemas/MacType'
+          description: The MAC being verified.
+        VerificationAttributes:
+          allOf:
+          - $ref: '#/components/schemas/MacAttributes'
+          description: The attributes and data values to use for MAC verification
+            within Amazon Web Services Payment Cryptography.
+        MacLength:
+          allOf:
+          - $ref: '#/components/schemas/IntegerRangeBetween4And16'
+          description: The length of the MAC.
+      required:
+      - KeyIdentifier
+      - MessageData
+      - Mac
+      - VerificationAttributes
+    VerifyMacOutput:
+      type: object
+      properties:
+        KeyArn:
+          allOf:
+          - $ref: '#/components/schemas/KeyArn'
+          description: The `keyARN` of the encryption key that Amazon Web Services
+            Payment Cryptography uses for MAC verification.
+        KeyCheckValue:
+          allOf:
+          - $ref: '#/components/schemas/KeyCheckValue'
+          description: 'The key check value (KCV) of the encryption key. The KCV is
+            used to check if all parties holding a given key have the same key or
+            to detect that a key has changed.
+
+
+            Amazon Web Services Payment Cryptography computes the KCV according to
+            the CMAC specification.'
+      required:
+      - KeyArn
+      - KeyCheckValue
+    VerifyPinDataInput:
+      type: object
+      properties:
+        VerificationKeyIdentifier:
+          allOf:
+          - $ref: '#/components/schemas/KeyArnOrKeyAliasType'
+          description: The `keyARN` of the PIN verification key.
+        EncryptionKeyIdentifier:
+          allOf:
+          - $ref: '#/components/schemas/KeyArnOrKeyAliasType'
+          description: The `keyARN` of the encryption key under which the PIN block
+            data is encrypted. This key type can be PEK or BDK.
+        VerificationAttributes:
+          allOf:
+          - $ref: '#/components/schemas/PinVerificationAttributes'
+          description: The attributes and values for PIN data verification.
+        EncryptedPinBlock:
+          allOf:
+          - $ref: '#/components/schemas/EncryptedPinBlockType'
+          description: The encrypted PIN block data that Amazon Web Services Payment
+            Cryptography verifies.
+        PrimaryAccountNumber:
+          allOf:
+          - $ref: '#/components/schemas/PrimaryAccountNumberType'
+          description: The Primary Account Number (PAN), a unique identifier for a
+            payment credit or debit card that associates the card with a specific
+            account holder.
+        PinBlockFormat:
+          allOf:
+          - $ref: '#/components/schemas/PinBlockFormatForPinData'
+          description: 'The PIN encoding format for pin data generation as specified
+            in ISO 9564. Amazon Web Services Payment Cryptography supports `ISO_Format_0`
+            and `ISO_Format_3`.
+
+
+            The `ISO_Format_0` PIN block format is equivalent to the ANSI X9.8, VISA-1,
+            and ECI-1 PIN block formats. It is similar to a VISA-4 PIN block format.
+            It supports a PIN from 4 to 12 digits in length.
+
+
+            The `ISO_Format_3` PIN block format is the same as `ISO_Format_0` except
+            that the fill digits are random values from 10 to 15.'
+        PinDataLength:
+          allOf:
+          - $ref: '#/components/schemas/IntegerRangeBetween4And12'
+          description: The length of PIN being verified.
+        DukptAttributes:
+          allOf:
+          - $ref: '#/components/schemas/DukptAttributes'
+          description: The attributes and values for the DUKPT encrypted PIN block
+            data.
+        EncryptionWrappedKey:
+          $ref: '#/components/schemas/WrappedKey'
+      required:
+      - VerificationKeyIdentifier
+      - EncryptionKeyIdentifier
+      - VerificationAttributes
+      - EncryptedPinBlock
+      - PrimaryAccountNumber
+      - PinBlockFormat
+    VerifyPinDataOutput:
+      type: object
+      properties:
+        VerificationKeyArn:
+          allOf:
+          - $ref: '#/components/schemas/KeyArn'
+          description: The `keyARN` of the PIN encryption key that Amazon Web Services
+            Payment Cryptography uses for PIN or PIN Offset verification.
+        VerificationKeyCheckValue:
+          allOf:
+          - $ref: '#/components/schemas/KeyCheckValue'
+          description: 'The key check value (KCV) of the encryption key. The KCV is
+            used to check if all parties holding a given key have the same key or
+            to detect that a key has changed.
+
+
+            Amazon Web Services Payment Cryptography computes the KCV according to
+            the CMAC specification.'
+        EncryptionKeyArn:
+          allOf:
+          - $ref: '#/components/schemas/KeyArn'
+          description: The `keyARN` of the PEK that Amazon Web Services Payment Cryptography
+            uses for encrypted pin block generation.
+        EncryptionKeyCheckValue:
+          allOf:
+          - $ref: '#/components/schemas/KeyCheckValue'
+          description: 'The key check value (KCV) of the encryption key. The KCV is
+            used to check if all parties holding a given key have the same key or
+            to detect that a key has changed.
+
+
+            Amazon Web Services Payment Cryptography computes the KCV according to
+            the CMAC specification.'
+      required:
+      - VerificationKeyArn
+      - VerificationKeyCheckValue
+      - EncryptionKeyArn
+      - EncryptionKeyCheckValue
+    VisaAmexDerivationOutputs:
+      type: object
+      properties:
+        AuthorizationRequestKeyArn:
+          allOf:
+          - $ref: '#/components/schemas/KeyArn'
+          description: The `keyArn` of the issuer master key for cryptogram (IMK-AC)
+            used by the operation.
+        AuthorizationRequestKeyCheckValue:
+          allOf:
+          - $ref: '#/components/schemas/KeyCheckValue'
+          description: The key check value (KCV) of the issuer master key for cryptogram
+            (IMK-AC) used by the operation.
+        CurrentPinPekArn:
+          allOf:
+          - $ref: '#/components/schemas/KeyArn'
+          description: The `keyArn` of the current PIN PEK.
+        CurrentPinPekKeyCheckValue:
+          allOf:
+          - $ref: '#/components/schemas/KeyCheckValue'
+          description: The key check value (KCV) of the current PIN PEK.
+      required:
+      - AuthorizationRequestKeyArn
+      - AuthorizationRequestKeyCheckValue
+      description: The attributes values used for Amex and Visa derivation methods.
+    VisaAttributes:
+      type: object
+      properties:
+        MajorKeyDerivationMode:
+          allOf:
+          - $ref: '#/components/schemas/MajorKeyDerivationMode'
+          description: The method to use when deriving the master key for the payment
+            card.
+        PrimaryAccountNumber:
+          allOf:
+          - $ref: '#/components/schemas/PrimaryAccountNumberType'
+          description: The Primary Account Number (PAN) of the cardholder.
+        PanSequenceNumber:
+          allOf:
+          - $ref: '#/components/schemas/NumberLengthEquals2'
+          description: A number that identifies and differentiates payment cards with
+            the same Primary Account Number (PAN). Typically 00 is used, if no value
+            is provided by the terminal.
+        ApplicationTransactionCounter:
+          allOf:
+          - $ref: '#/components/schemas/HexLengthEquals4'
+          description: The transaction counter of the current transaction that is
+            provided by the terminal during transaction processing.
+        AuthorizationRequestKeyIdentifier:
+          allOf:
+          - $ref: '#/components/schemas/KeyArnOrKeyAliasType'
+          description: The `keyArn` of the issuer master key for cryptogram (IMK-AC)
+            for the payment card.
+        CurrentPinAttributes:
+          allOf:
+          - $ref: '#/components/schemas/CurrentPinAttributes'
+          description: The encrypted pinblock of the old pin stored on the chip card.
+      required:
+      - MajorKeyDerivationMode
+      - PrimaryAccountNumber
+      - PanSequenceNumber
+      - ApplicationTransactionCounter
+      - AuthorizationRequestKeyIdentifier
+      description: Parameters to derive the confidentiality and integrity keys for
+        a Visa payment card.
+    VisaPin:
+      type: object
+      properties:
+        PinVerificationKeyIndex:
+          allOf:
+          - $ref: '#/components/schemas/IntegerRangeBetween0And6'
+          description: The value for PIN verification index. It is used in the Visa
+            PIN algorithm to calculate the PVV (PIN Verification Value).
+      required:
+      - PinVerificationKeyIndex
+      description: Parameters that are required to generate or verify Visa PIN.
+    VisaPinVerification:
+      type: object
+      properties:
+        PinVerificationKeyIndex:
+          allOf:
+          - $ref: '#/components/schemas/IntegerRangeBetween0And6'
+          description: The value for PIN verification index. It is used in the Visa
+            PIN algorithm to calculate the PVV (PIN Verification Value).
+        VerificationValue:
+          allOf:
+          - $ref: '#/components/schemas/VerificationValueType'
+          description: Parameters that are required to generate or verify Visa PVV
+            (PIN Verification Value).
+      required:
+      - PinVerificationKeyIndex
+      - VerificationValue
+      description: Parameters that are required to generate or verify Visa PIN.
+    VisaPinVerificationValue:
+      type: object
+      properties:
+        EncryptedPinBlock:
+          allOf:
+          - $ref: '#/components/schemas/EncryptedPinBlockType'
+          description: The encrypted PIN block data to verify.
+        PinVerificationKeyIndex:
+          allOf:
+          - $ref: '#/components/schemas/IntegerRangeBetween0And6'
+          description: The value for PIN verification index. It is used in the Visa
+            PIN algorithm to calculate the PVV (PIN Verification Value).
+      required:
+      - EncryptedPinBlock
+      - PinVerificationKeyIndex
+      description: Parameters that are required to generate or verify Visa PVV (PIN
+        Verification Value).
+    WrappedKey:
+      type: object
+      properties:
+        WrappedKeyMaterial:
+          allOf:
+          - $ref: '#/components/schemas/WrappedKeyMaterial'
+          description: Parameter information of a WrappedKeyBlock for encryption key
+            exchange.
+        KeyCheckValueAlgorithm:
+          allOf:
+          - $ref: '#/components/schemas/KeyCheckValueAlgorithm'
+          description: 'The algorithm that Amazon Web Services Payment Cryptography
+            uses to calculate the key check value (KCV). It is used to validate the
+            key integrity.
+
+
+            For TDES keys, the KCV is computed by encrypting 8 bytes, each with value
+            of zero, with the key to be checked and retaining the 3 highest order
+            bytes of the encrypted result. For AES keys, the KCV is computed using
+            a CMAC algorithm where the input data is 16 bytes of zero and retaining
+            the 3 highest order bytes of the encrypted result.'
+      required:
+      - WrappedKeyMaterial
+      description: Parameter information of a WrappedKeyBlock for encryption key exchange.
     WrappedKeyMaterial:
       allOf:
       - allOf:

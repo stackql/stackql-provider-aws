@@ -7,7 +7,7 @@ info:
   x-stackql-serviceName: rum
   x-aws-serviceName: rum
   x-aws-protocol: aws.protocols#restJson1
-  x-dateGenerated: '2025-05-05'
+  x-dateGenerated: '2025-05-07'
   version: '2018-05-10'
   title: CloudWatch RUM
   description: |-
@@ -45,13 +45,1437 @@ servers:
       - sa-east-1
       - me-south-1
       default: us-east-1
-paths: {}
+paths:
+  /rummetrics/{AppMonitorName}/metrics:
+    post:
+      operationId: BatchCreateRumMetricDefinitions
+      description: "Specifies the extended metrics and custom metrics that you want\
+        \ a CloudWatch RUM app monitor to send to a destination. Valid destinations\
+        \ include CloudWatch and Evidently.\n\nBy default, RUM app monitors send some\
+        \ metrics to CloudWatch. These default metrics are listed in [CloudWatch metrics\
+        \ that you can collect with CloudWatch RUM](https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/CloudWatch-RUM-metrics.html).\n\
+        \nIn addition to these default metrics, you can choose to send extended metrics,\
+        \ custom metrics, or both.\n\n  * Extended metrics let you send metrics with\
+        \ additional dimensions that aren't included in the default metrics. You can\
+        \ also send extended metrics to both Evidently and CloudWatch. The valid dimension\
+        \ names for the additional dimensions for extended metrics are `BrowserName`,\
+        \ `CountryCode`, `DeviceType`, `FileType`, `OSName`, and `PageId`. For more\
+        \ information, see [ Extended metrics that you can send to CloudWatch and\
+        \ CloudWatch Evidently](https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/CloudWatch-RUM-vended-metrics.html).\n\
+        \n  * Custom metrics are metrics that you define. You can send custom metrics\
+        \ to CloudWatch. CloudWatch Evidently, or both. With custom metrics, you can\
+        \ use any metric name and namespace. To derive the metrics, you can use any\
+        \ custom events, built-in events, custom attributes, or default attributes.\
+        \ \n\nYou can't send custom metrics to the `AWS/RUM` namespace. You must send\
+        \ custom metrics to a custom namespace that you define. The namespace that\
+        \ you use can't start with `AWS/`. CloudWatch RUM prepends `RUM/CustomMetrics/`\
+        \ to the custom namespace that you define, so the final namespace for your\
+        \ metrics in CloudWatch is `RUM/CustomMetrics/_your-custom-namespace_ `.\n\
+        \nThe maximum number of metric definitions that you can specify in one `BatchCreateRumMetricDefinitions`\
+        \ operation is 200.\n\nThe maximum number of metric definitions that one destination\
+        \ can contain is 2000.\n\nExtended metrics sent to CloudWatch and RUM custom\
+        \ metrics are charged as CloudWatch custom metrics. Each combination of additional\
+        \ dimension name and dimension value counts as a custom metric. For more information,\
+        \ see [Amazon CloudWatch Pricing](https://aws.amazon.com/cloudwatch/pricing/).\n\
+        \nYou must have already created a destination for the metrics before you send\
+        \ them. For more information, see [PutRumMetricsDestination](https://docs.aws.amazon.com/cloudwatchrum/latest/APIReference/API_PutRumMetricsDestination.html).\n\
+        \nIf some metric definitions specified in a `BatchCreateRumMetricDefinitions`\
+        \ operations are not valid, those metric definitions fail and return errors,\
+        \ but all valid metric definitions in the same operation still succeed."
+      parameters:
+      - name: AppMonitorName
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/AppMonitorName'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                Destination:
+                  $ref: '#/components/schemas/MetricDestination'
+                DestinationArn:
+                  $ref: '#/components/schemas/DestinationArn'
+                MetricDefinitions:
+                  $ref: '#/components/schemas/MetricDefinitionsRequest'
+      responses:
+        '200': {}
+        '403':
+          description: |-
+            You don't have sufficient permissions to perform this action.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '409':
+          description: |-
+            This operation attempted to create a resource that already exists.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConflictException'
+        '500':
+          description: |-
+            Internal service exception.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerException'
+        '404':
+          description: |-
+            Resource not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+        '402':
+          description: |-
+            This request exceeds a service quota.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServiceQuotaExceededException'
+        '429':
+          description: |-
+            The request was throttled because of quota limits.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThrottlingException'
+        '400':
+          description: |-
+            One of the arguments for the request is not valid.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+    delete:
+      operationId: BatchDeleteRumMetricDefinitions
+      description: |-
+        Removes the specified metrics from being sent to an extended metrics destination.
+
+        If some metric definition IDs specified in a `BatchDeleteRumMetricDefinitions` operations are not valid, those metric definitions fail and return errors, but all valid metric definition IDs in the same operation are still deleted.
+
+        The maximum number of metric definitions that you can specify in one `BatchDeleteRumMetricDefinitions` operation is 200.
+      parameters:
+      - name: AppMonitorName
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/AppMonitorName'
+      - name: destination
+        in: query
+        required: true
+        schema:
+          $ref: '#/components/schemas/MetricDestination'
+      - name: destinationArn
+        in: query
+        required: false
+        schema:
+          $ref: '#/components/schemas/DestinationArn'
+      - name: metricDefinitionIds
+        in: query
+        required: true
+        schema:
+          $ref: '#/components/schemas/MetricDefinitionIds'
+      responses:
+        '200': {}
+        '403':
+          description: |-
+            You don't have sufficient permissions to perform this action.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '409':
+          description: |-
+            This operation attempted to create a resource that already exists.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConflictException'
+        '500':
+          description: |-
+            Internal service exception.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerException'
+        '404':
+          description: |-
+            Resource not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+        '429':
+          description: |-
+            The request was throttled because of quota limits.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThrottlingException'
+        '400':
+          description: |-
+            One of the arguments for the request is not valid.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+    get:
+      operationId: BatchGetRumMetricDefinitions
+      description: |-
+        Retrieves the list of metrics and dimensions that a RUM app monitor is sending to a single destination.
+      parameters:
+      - name: AppMonitorName
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/AppMonitorName'
+      - name: destination
+        in: query
+        required: true
+        schema:
+          $ref: '#/components/schemas/MetricDestination'
+      - name: destinationArn
+        in: query
+        required: false
+        schema:
+          $ref: '#/components/schemas/DestinationArn'
+      - name: maxResults
+        in: query
+        required: false
+        schema:
+          $ref: '#/components/schemas/MaxResultsInteger'
+      - name: nextToken
+        in: query
+        required: false
+        schema:
+          $ref: '#/components/schemas/String'
+      responses:
+        '200': {}
+        '403':
+          description: |-
+            You don't have sufficient permissions to perform this action.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '500':
+          description: |-
+            Internal service exception.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerException'
+        '404':
+          description: |-
+            Resource not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+        '400':
+          description: |-
+            One of the arguments for the request is not valid.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+    patch:
+      operationId: UpdateRumMetricDefinition
+      description: |-
+        Modifies one existing metric definition for CloudWatch RUM extended metrics. For more information about extended metrics, see [BatchCreateRumMetricsDefinitions](https://docs.aws.amazon.com/cloudwatchrum/latest/APIReference/API_BatchCreateRumMetricsDefinitions.html).
+      parameters:
+      - name: AppMonitorName
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/AppMonitorName'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                Destination:
+                  $ref: '#/components/schemas/MetricDestination'
+                DestinationArn:
+                  $ref: '#/components/schemas/DestinationArn'
+                MetricDefinition:
+                  $ref: '#/components/schemas/MetricDefinitionRequest'
+                MetricDefinitionId:
+                  $ref: '#/components/schemas/MetricDefinitionId'
+      responses:
+        '200': {}
+        '403':
+          description: |-
+            You don't have sufficient permissions to perform this action.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '409':
+          description: |-
+            This operation attempted to create a resource that already exists.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConflictException'
+        '500':
+          description: |-
+            Internal service exception.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerException'
+        '404':
+          description: |-
+            Resource not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+        '402':
+          description: |-
+            This request exceeds a service quota.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServiceQuotaExceededException'
+        '429':
+          description: |-
+            The request was throttled because of quota limits.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThrottlingException'
+        '400':
+          description: |-
+            One of the arguments for the request is not valid.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+  /appmonitor:
+    post:
+      operationId: CreateAppMonitor
+      description: |-
+        Creates a Amazon CloudWatch RUM app monitor, which collects telemetry data from your application and sends that data to RUM. The data includes performance and reliability information such as page load time, client-side errors, and user behavior.
+
+        You use this operation only to create a new app monitor. To update an existing app monitor, use [UpdateAppMonitor](https://docs.aws.amazon.com/cloudwatchrum/latest/APIReference/API_UpdateAppMonitor.html) instead.
+
+        After you create an app monitor, sign in to the CloudWatch RUM console to get the JavaScript code snippet to add to your web application. For more information, see [How do I find a code snippet that I've already generated?](https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/CloudWatch-RUM-find-code-snippet.html)
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                Name:
+                  $ref: '#/components/schemas/AppMonitorName'
+                Domain:
+                  $ref: '#/components/schemas/AppMonitorDomain'
+                DomainList:
+                  $ref: '#/components/schemas/AppMonitorDomainList'
+                Tags:
+                  $ref: '#/components/schemas/TagMap'
+                AppMonitorConfiguration:
+                  $ref: '#/components/schemas/AppMonitorConfiguration'
+                CwLogEnabled:
+                  $ref: '#/components/schemas/Boolean'
+                CustomEvents:
+                  $ref: '#/components/schemas/CustomEvents'
+                DeobfuscationConfiguration:
+                  $ref: '#/components/schemas/DeobfuscationConfiguration'
+      responses:
+        '200': {}
+        '403':
+          description: |-
+            You don't have sufficient permissions to perform this action.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '409':
+          description: |-
+            This operation attempted to create a resource that already exists.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConflictException'
+        '500':
+          description: |-
+            Internal service exception.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerException'
+        '404':
+          description: |-
+            Resource not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+        '402':
+          description: |-
+            This request exceeds a service quota.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServiceQuotaExceededException'
+        '429':
+          description: |-
+            The request was throttled because of quota limits.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThrottlingException'
+        '400':
+          description: |-
+            One of the arguments for the request is not valid.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+  /appmonitor/{Name}:
+    delete:
+      operationId: DeleteAppMonitor
+      description: |-
+        Deletes an existing app monitor. This immediately stops the collection of data.
+      parameters:
+      - name: Name
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/AppMonitorName'
+      responses:
+        '200': {}
+        '403':
+          description: |-
+            You don't have sufficient permissions to perform this action.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '409':
+          description: |-
+            This operation attempted to create a resource that already exists.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConflictException'
+        '500':
+          description: |-
+            Internal service exception.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerException'
+        '404':
+          description: |-
+            Resource not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+        '429':
+          description: |-
+            The request was throttled because of quota limits.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThrottlingException'
+        '400':
+          description: |-
+            One of the arguments for the request is not valid.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+    get:
+      operationId: GetAppMonitor
+      description: |-
+        Retrieves the complete configuration information for one app monitor.
+      parameters:
+      - name: Name
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/AppMonitorName'
+      responses:
+        '200': {}
+        '403':
+          description: |-
+            You don't have sufficient permissions to perform this action.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '500':
+          description: |-
+            Internal service exception.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerException'
+        '404':
+          description: |-
+            Resource not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+        '429':
+          description: |-
+            The request was throttled because of quota limits.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThrottlingException'
+        '400':
+          description: |-
+            One of the arguments for the request is not valid.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+    patch:
+      operationId: UpdateAppMonitor
+      description: |-
+        Updates the configuration of an existing app monitor. When you use this operation, only the parts of the app monitor configuration that you specify in this operation are changed. For any parameters that you omit, the existing values are kept.
+
+        You can't use this operation to change the tags of an existing app monitor. To change the tags of an existing app monitor, use [TagResource](https://docs.aws.amazon.com/cloudwatchrum/latest/APIReference/API_TagResource.html).
+
+        To create a new app monitor, use [CreateAppMonitor](https://docs.aws.amazon.com/cloudwatchrum/latest/APIReference/API_CreateAppMonitor.html).
+
+        After you update an app monitor, sign in to the CloudWatch RUM console to get the updated JavaScript code snippet to add to your web application. For more information, see [How do I find a code snippet that I've already generated?](https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/CloudWatch-RUM-find-code-snippet.html)
+      parameters:
+      - name: Name
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/AppMonitorName'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                Domain:
+                  $ref: '#/components/schemas/AppMonitorDomain'
+                DomainList:
+                  $ref: '#/components/schemas/AppMonitorDomainList'
+                AppMonitorConfiguration:
+                  $ref: '#/components/schemas/AppMonitorConfiguration'
+                CwLogEnabled:
+                  $ref: '#/components/schemas/Boolean'
+                CustomEvents:
+                  $ref: '#/components/schemas/CustomEvents'
+                DeobfuscationConfiguration:
+                  $ref: '#/components/schemas/DeobfuscationConfiguration'
+      responses:
+        '200': {}
+        '403':
+          description: |-
+            You don't have sufficient permissions to perform this action.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '409':
+          description: |-
+            This operation attempted to create a resource that already exists.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConflictException'
+        '500':
+          description: |-
+            Internal service exception.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerException'
+        '404':
+          description: |-
+            Resource not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+        '429':
+          description: |-
+            The request was throttled because of quota limits.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThrottlingException'
+        '400':
+          description: |-
+            One of the arguments for the request is not valid.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+  /appmonitor/{Name}/policy:
+    delete:
+      operationId: DeleteResourcePolicy
+      description: |-
+        Removes the association of a resource-based policy from an app monitor.
+      parameters:
+      - name: Name
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/AppMonitorName'
+      - name: policyRevisionId
+        in: query
+        required: false
+        schema:
+          $ref: '#/components/schemas/PolicyRevisionId'
+      responses:
+        '200': {}
+        '403':
+          description: |-
+            You don't have sufficient permissions to perform this action.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '409':
+          description: |-
+            This operation attempted to create a resource that already exists.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConflictException'
+        '500':
+          description: |-
+            Internal service exception.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerException'
+        '400':
+          description: |-
+            One of the arguments for the request is not valid.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+        '404':
+          description: |-
+            Resource not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+        '429':
+          description: |-
+            The request was throttled because of quota limits.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThrottlingException'
+    get:
+      operationId: GetResourcePolicy
+      description: |-
+        Use this operation to retrieve information about a resource-based policy that is attached to an app monitor.
+      parameters:
+      - name: Name
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/AppMonitorName'
+      responses:
+        '200': {}
+        '403':
+          description: |-
+            You don't have sufficient permissions to perform this action.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '409':
+          description: |-
+            This operation attempted to create a resource that already exists.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConflictException'
+        '500':
+          description: |-
+            Internal service exception.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerException'
+        '404':
+          description: |-
+            Resource not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+        '429':
+          description: |-
+            The request was throttled because of quota limits.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThrottlingException'
+        '400':
+          description: |-
+            One of the arguments for the request is not valid.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+    put:
+      operationId: PutResourcePolicy
+      description: |-
+        Use this operation to assign a resource-based policy to a CloudWatch RUM app monitor to control access to it. Each app monitor can have one resource-based policy. The maximum size of the policy is 4 KB. To learn more about using resource policies with RUM, see [Using resource-based policies with CloudWatch RUM](https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/CloudWatch-RUM-resource-policies.html).
+      parameters:
+      - name: Name
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/AppMonitorName'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                PolicyDocument:
+                  $ref: '#/components/schemas/String'
+                PolicyRevisionId:
+                  $ref: '#/components/schemas/PolicyRevisionId'
+      responses:
+        '200': {}
+        '403':
+          description: |-
+            You don't have sufficient permissions to perform this action.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '409':
+          description: |-
+            This operation attempted to create a resource that already exists.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConflictException'
+        '500':
+          description: |-
+            Internal service exception.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerException'
+        '400':
+          description: |-
+            One of the arguments for the request is not valid.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+        '404':
+          description: |-
+            Resource not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+        '429':
+          description: |-
+            The request was throttled because of quota limits.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThrottlingException'
+  /rummetrics/{AppMonitorName}/metricsdestination:
+    delete:
+      operationId: DeleteRumMetricsDestination
+      description: |-
+        Deletes a destination for CloudWatch RUM extended metrics, so that the specified app monitor stops sending extended metrics to that destination.
+      parameters:
+      - name: AppMonitorName
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/AppMonitorName'
+      - name: destination
+        in: query
+        required: true
+        schema:
+          $ref: '#/components/schemas/MetricDestination'
+      - name: destinationArn
+        in: query
+        required: false
+        schema:
+          $ref: '#/components/schemas/DestinationArn'
+      responses:
+        '200': {}
+        '403':
+          description: |-
+            You don't have sufficient permissions to perform this action.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '409':
+          description: |-
+            This operation attempted to create a resource that already exists.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConflictException'
+        '500':
+          description: |-
+            Internal service exception.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerException'
+        '404':
+          description: |-
+            Resource not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+        '429':
+          description: |-
+            The request was throttled because of quota limits.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThrottlingException'
+        '400':
+          description: |-
+            One of the arguments for the request is not valid.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+    get:
+      operationId: ListRumMetricsDestinations
+      description: |-
+        Returns a list of destinations that you have created to receive RUM extended metrics, for the specified app monitor.
+
+        For more information about extended metrics, see [AddRumMetrics](https://docs.aws.amazon.com/cloudwatchrum/latest/APIReference/API_AddRumMetrcs.html).
+      parameters:
+      - name: AppMonitorName
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/AppMonitorName'
+      - name: maxResults
+        in: query
+        required: false
+        schema:
+          $ref: '#/components/schemas/MaxResultsInteger'
+      - name: nextToken
+        in: query
+        required: false
+        schema:
+          $ref: '#/components/schemas/String'
+      responses:
+        '200': {}
+        '403':
+          description: |-
+            You don't have sufficient permissions to perform this action.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '500':
+          description: |-
+            Internal service exception.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerException'
+        '404':
+          description: |-
+            Resource not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+        '400':
+          description: |-
+            One of the arguments for the request is not valid.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+    post:
+      operationId: PutRumMetricsDestination
+      description: |-
+        Creates or updates a destination to receive extended metrics from CloudWatch RUM. You can send extended metrics to CloudWatch or to a CloudWatch Evidently experiment.
+
+        For more information about extended metrics, see [BatchCreateRumMetricDefinitions](https://docs.aws.amazon.com/cloudwatchrum/latest/APIReference/API_BatchCreateRumMetricDefinitions.html).
+      parameters:
+      - name: AppMonitorName
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/AppMonitorName'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                Destination:
+                  $ref: '#/components/schemas/MetricDestination'
+                DestinationArn:
+                  $ref: '#/components/schemas/DestinationArn'
+                IamRoleArn:
+                  $ref: '#/components/schemas/IamRoleArn'
+      responses:
+        '200': {}
+        '403':
+          description: |-
+            You don't have sufficient permissions to perform this action.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '409':
+          description: |-
+            This operation attempted to create a resource that already exists.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConflictException'
+        '500':
+          description: |-
+            Internal service exception.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerException'
+        '404':
+          description: |-
+            Resource not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+        '429':
+          description: |-
+            The request was throttled because of quota limits.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThrottlingException'
+        '400':
+          description: |-
+            One of the arguments for the request is not valid.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+  /appmonitor/{Name}/data:
+    post:
+      operationId: GetAppMonitorData
+      description: |-
+        Retrieves the raw performance events that RUM has collected from your web application, so that you can do your own processing or analysis of this data.
+      parameters:
+      - name: Name
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/AppMonitorName'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                TimeRange:
+                  $ref: '#/components/schemas/TimeRange'
+                Filters:
+                  $ref: '#/components/schemas/QueryFilters'
+                MaxResults:
+                  $ref: '#/components/schemas/MaxQueryResults'
+                NextToken:
+                  $ref: '#/components/schemas/Token'
+      responses:
+        '200': {}
+        '403':
+          description: |-
+            You don't have sufficient permissions to perform this action.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '500':
+          description: |-
+            Internal service exception.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerException'
+        '404':
+          description: |-
+            Resource not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+        '429':
+          description: |-
+            The request was throttled because of quota limits.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThrottlingException'
+        '400':
+          description: |-
+            One of the arguments for the request is not valid.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+  /appmonitors:
+    post:
+      operationId: ListAppMonitors
+      description: |-
+        Returns a list of the Amazon CloudWatch RUM app monitors in the account.
+      parameters:
+      - name: maxResults
+        in: query
+        required: false
+        schema:
+          $ref: '#/components/schemas/MaxResultsInteger'
+      - name: nextToken
+        in: query
+        required: false
+        schema:
+          $ref: '#/components/schemas/String'
+      responses:
+        '200': {}
+        '403':
+          description: |-
+            You don't have sufficient permissions to perform this action.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '500':
+          description: |-
+            Internal service exception.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerException'
+        '429':
+          description: |-
+            The request was throttled because of quota limits.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThrottlingException'
+        '400':
+          description: |-
+            One of the arguments for the request is not valid.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+  /tags/{ResourceArn}:
+    get:
+      operationId: ListTagsForResource
+      description: |-
+        Displays the tags associated with a CloudWatch RUM resource.
+      parameters:
+      - name: ResourceArn
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/Arn'
+      responses:
+        '200': {}
+        '500':
+          description: |-
+            Internal service exception.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerException'
+        '404':
+          description: |-
+            Resource not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+        '400':
+          description: |-
+            One of the arguments for the request is not valid.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+    post:
+      operationId: TagResource
+      description: |-
+        Assigns one or more tags (key-value pairs) to the specified CloudWatch RUM resource. Currently, the only resources that can be tagged app monitors.
+
+        Tags can help you organize and categorize your resources. You can also use them to scope user permissions by granting a user permission to access or change only resources with certain tag values.
+
+        Tags don't have any semantic meaning to Amazon Web Services and are interpreted strictly as strings of characters.
+
+        You can use the `TagResource` action with a resource that already has tags. If you specify a new tag key for the resource, this tag is appended to the list of tags associated with the alarm. If you specify a tag key that is already associated with the resource, the new tag value that you specify replaces the previous value for that tag.
+
+        You can associate as many as 50 tags with a resource.
+
+        For more information, see [Tagging Amazon Web Services resources](https://docs.aws.amazon.com/general/latest/gr/aws_tagging.html).
+      parameters:
+      - name: ResourceArn
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/Arn'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                Tags:
+                  $ref: '#/components/schemas/TagMap'
+      responses:
+        '200': {}
+        '500':
+          description: |-
+            Internal service exception.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerException'
+        '404':
+          description: |-
+            Resource not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+        '400':
+          description: |-
+            One of the arguments for the request is not valid.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+    delete:
+      operationId: UntagResource
+      description: |-
+        Removes one or more tags from the specified resource.
+      parameters:
+      - name: ResourceArn
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/Arn'
+      - name: tagKeys
+        in: query
+        required: true
+        schema:
+          $ref: '#/components/schemas/TagKeyList'
+      responses:
+        '200': {}
+        '500':
+          description: |-
+            Internal service exception.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerException'
+        '404':
+          description: |-
+            Resource not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+        '400':
+          description: |-
+            One of the arguments for the request is not valid.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+  /appmonitors/{Id}/:
+    post:
+      operationId: PutRumEvents
+      description: |-
+        Sends telemetry events about your application performance and user behavior to CloudWatch RUM. The code snippet that RUM generates for you to add to your application includes `PutRumEvents` operations to send this data to RUM.
+
+        Each `PutRumEvents` operation can send a batch of events from one user session.
+      parameters:
+      - name: Id
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/AppMonitorId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                BatchId:
+                  $ref: '#/components/schemas/String'
+                AppMonitorDetails:
+                  $ref: '#/components/schemas/AppMonitorDetails'
+                UserDetails:
+                  $ref: '#/components/schemas/UserDetails'
+                RumEvents:
+                  $ref: '#/components/schemas/RumEventList'
+                Alias:
+                  $ref: '#/components/schemas/Alias'
+      responses:
+        '200': {}
+        '403':
+          description: |-
+            You don't have sufficient permissions to perform this action.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '500':
+          description: |-
+            Internal service exception.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerException'
+        '404':
+          description: |-
+            Resource not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+        '429':
+          description: |-
+            The request was throttled because of quota limits.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThrottlingException'
+        '400':
+          description: |-
+            One of the arguments for the request is not valid.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
 components:
   schemas:
+    AccessDeniedException:
+      type: object
+      properties:
+        message:
+          $ref: '#/components/schemas/String'
+      required:
+      - message
+      description: You don't have sufficient permissions to perform this action.
     Alias:
       type: string
       minLength: 1
       maxLength: 255
+    AppMonitor:
+      type: object
+      properties:
+        Name:
+          allOf:
+          - $ref: '#/components/schemas/AppMonitorName'
+          description: The name of the app monitor.
+        Domain:
+          allOf:
+          - $ref: '#/components/schemas/AppMonitorDomain'
+          description: The top-level internet domain name for which your application
+            has administrative authority.
+        DomainList:
+          allOf:
+          - $ref: '#/components/schemas/AppMonitorDomainList'
+          description: List the domain names for which your application has administrative
+            authority.
+        Id:
+          allOf:
+          - $ref: '#/components/schemas/AppMonitorId'
+          description: The unique ID of this app monitor.
+        Created:
+          allOf:
+          - $ref: '#/components/schemas/ISOTimestampString'
+          description: The date and time that this app monitor was created.
+        LastModified:
+          allOf:
+          - $ref: '#/components/schemas/ISOTimestampString'
+          description: The date and time of the most recent changes to this app monitor's
+            configuration.
+        Tags:
+          allOf:
+          - $ref: '#/components/schemas/TagMap'
+          description: The list of tag keys and values associated with this app monitor.
+        State:
+          allOf:
+          - $ref: '#/components/schemas/StateEnum'
+          description: The current state of the app monitor.
+        AppMonitorConfiguration:
+          allOf:
+          - $ref: '#/components/schemas/AppMonitorConfiguration'
+          description: A structure that contains much of the configuration data for
+            the app monitor.
+        DataStorage:
+          allOf:
+          - $ref: '#/components/schemas/DataStorage'
+          description: A structure that contains information about whether this app
+            monitor stores a copy of the telemetry data that RUM collects using CloudWatch
+            Logs.
+        CustomEvents:
+          allOf:
+          - $ref: '#/components/schemas/CustomEvents'
+          description: 'Specifies whether this app monitor allows the web client to
+            define and send custom events.
+
+
+            For more information about custom events, see [Send custom events](https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/CloudWatch-RUM-custom-events.html).'
+        DeobfuscationConfiguration:
+          allOf:
+          - $ref: '#/components/schemas/DeobfuscationConfiguration'
+          description: A structure that contains the configuration for how an app
+            monitor can deobfuscate stack traces.
+      description: A RUM app monitor collects telemetry data from your application
+        and sends that data to RUM. The data includes performance and reliability
+        information such as page load time, client-side errors, and user behavior.
+    AppMonitorConfiguration:
+      type: object
+      properties:
+        IdentityPoolId:
+          allOf:
+          - $ref: '#/components/schemas/IdentityPoolId'
+          description: The ID of the Amazon Cognito identity pool that is used to
+            authorize the sending of data to RUM.
+        ExcludedPages:
+          allOf:
+          - $ref: '#/components/schemas/Pages'
+          description: 'A list of URLs in your website or application to exclude from
+            RUM data collection.
+
+
+            You can''t include both `ExcludedPages` and `IncludedPages` in the same
+            operation.'
+        IncludedPages:
+          allOf:
+          - $ref: '#/components/schemas/Pages'
+          description: 'If this app monitor is to collect data from only certain pages
+            in your application, this structure lists those pages.
+
+
+            You can''t include both `ExcludedPages` and `IncludedPages` in the same
+            operation.'
+        FavoritePages:
+          allOf:
+          - $ref: '#/components/schemas/FavoritePages'
+          description: A list of pages in your application that are to be displayed
+            with a "favorite" icon in the CloudWatch RUM console.
+        SessionSampleRate:
+          allOf:
+          - $ref: '#/components/schemas/SessionSampleRate'
+          description: 'Specifies the portion of user sessions to use for RUM data
+            collection. Choosing a higher portion gives you more data but also incurs
+            more costs.
+
+
+            The range for this value is 0 to 1 inclusive. Setting this to 1 means
+            that 100% of user sessions are sampled, and setting it to 0.1 means that
+            10% of user sessions are sampled.
+
+
+            If you omit this parameter, the default of 0.1 is used, and 10% of sessions
+            will be sampled.'
+        GuestRoleArn:
+          allOf:
+          - $ref: '#/components/schemas/Arn'
+          description: "The ARN of the guest IAM role that is attached to the Amazon\
+            \ Cognito identity pool that is used to authorize the sending of data\
+            \ to RUM.\n\nIt is possible that an app monitor does not have a value\
+            \ for `GuestRoleArn`. For example, this can happen when you use the console\
+            \ to create an app monitor and you allow CloudWatch RUM to create a new\
+            \ identity pool for Authorization. In this case, `GuestRoleArn` is not\
+            \ present in the [GetAppMonitor](https://docs.aws.amazon.com/cloudwatchrum/latest/APIReference/API_GetAppMonitor.html)\
+            \ response because it is not stored by the service.\n\nIf this issue affects\
+            \ you, you can take one of the following steps:\n\n  * Use the Cloud Development\
+            \ Kit (CDK) to create an identity pool and the associated IAM role, and\
+            \ use that for your app monitor.\n\n  * Make a separate [GetIdentityPoolRoles](https://docs.aws.amazon.com/cognitoidentity/latest/APIReference/API_GetIdentityPoolRoles.html)\
+            \ call to Amazon Cognito to retrieve the `GuestRoleArn`."
+        AllowCookies:
+          allOf:
+          - $ref: '#/components/schemas/Boolean'
+          description: If you set this to `true`, the RUM web client sets two cookies,
+            a session cookie and a user cookie. The cookies allow the RUM web client
+            to collect data relating to the number of users an application has and
+            the behavior of the application across a sequence of events. Cookies are
+            stored in the top-level domain of the current page.
+        Telemetries:
+          allOf:
+          - $ref: '#/components/schemas/Telemetries'
+          description: "An array that lists the types of telemetry data that this\
+            \ app monitor is to collect.\n\n  * `errors` indicates that RUM collects\
+            \ data about unhandled JavaScript errors raised by your application.\n\
+            \n  * `performance` indicates that RUM collects performance data about\
+            \ how your application and its resources are loaded and rendered. This\
+            \ includes Core Web Vitals.\n\n  * `http` indicates that RUM collects\
+            \ data about HTTP errors thrown by your application."
+        EnableXRay:
+          allOf:
+          - $ref: '#/components/schemas/Boolean'
+          description: If you set this to `true`, RUM enables X-Ray tracing for the
+            user sessions that RUM samples. RUM adds an X-Ray trace header to allowed
+            HTTP requests. It also records an X-Ray segment for allowed HTTP requests.
+            You can see traces and segments from these user sessions in the X-Ray
+            console and the CloudWatch ServiceLens console. For more information,
+            see [What is X-Ray?](https://docs.aws.amazon.com/xray/latest/devguide/aws-xray.html)
+      description: This structure contains much of the configuration data for the
+        app monitor.
+    AppMonitorDetails:
+      type: object
+      properties:
+        name:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The name of the app monitor.
+        id:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The unique ID of the app monitor.
+        version:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The version of the app monitor.
+      description: A structure that contains information about the RUM app monitor.
     AppMonitorDomain:
       type: string
       pattern: ^(localhost)$|^((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$|(?=^[a-zA-Z0-9\.\*-]{4,253}$)(?!.*\.-)(?!.*-\.)(?!.*\.\.)(?!.*[^\.]{64,})^(\*\.)?(?![-\.\*])[^\*]{1,}\.(\*|(?!.*--)(?=.*[a-zA-Z])[^\*]{1,}[^\*-])$
@@ -71,6 +1495,32 @@ components:
       pattern: ^(?!\.)[\.\-_#A-Za-z0-9]+$
       minLength: 1
       maxLength: 255
+    AppMonitorSummary:
+      type: object
+      properties:
+        Name:
+          allOf:
+          - $ref: '#/components/schemas/AppMonitorName'
+          description: The name of this app monitor.
+        Id:
+          allOf:
+          - $ref: '#/components/schemas/AppMonitorId'
+          description: The unique ID of this app monitor.
+        Created:
+          allOf:
+          - $ref: '#/components/schemas/ISOTimestampString'
+          description: The date and time that the app monitor was created.
+        LastModified:
+          allOf:
+          - $ref: '#/components/schemas/ISOTimestampString'
+          description: The date and time of the most recent changes to this app monitor's
+            configuration.
+        State:
+          allOf:
+          - $ref: '#/components/schemas/StateEnum'
+          description: The current state of this app monitor.
+      description: A structure that includes some data about app monitors and their
+        settings.
     AppMonitorSummaryList:
       type: array
       items:
@@ -78,19 +1528,419 @@ components:
     Arn:
       type: string
       pattern: arn:[^:]*:[^:]*:[^:]*:[^:]*:.*
+    BatchCreateRumMetricDefinitionsError:
+      type: object
+      properties:
+        MetricDefinition:
+          allOf:
+          - $ref: '#/components/schemas/MetricDefinitionRequest'
+          description: The metric definition that caused this error.
+        ErrorCode:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The error code.
+        ErrorMessage:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The error message for this metric definition.
+      required:
+      - MetricDefinition
+      - ErrorCode
+      - ErrorMessage
+      description: A structure that defines one error caused by a [BatchCreateRumMetricsDefinitions](https://docs.aws.amazon.com/cloudwatchrum/latest/APIReference/API_BatchCreateRumMetricsDefinitions.html)
+        operation.
     BatchCreateRumMetricDefinitionsErrors:
       type: array
       items:
         $ref: '#/components/schemas/BatchCreateRumMetricDefinitionsError'
+    BatchCreateRumMetricDefinitionsRequest:
+      type: object
+      properties:
+        AppMonitorName:
+          allOf:
+          - $ref: '#/components/schemas/AppMonitorName'
+          description: The name of the CloudWatch RUM app monitor that is to send
+            the metrics.
+        Destination:
+          allOf:
+          - $ref: '#/components/schemas/MetricDestination'
+          description: The destination to send the metrics to. Valid values are `CloudWatch`
+            and `Evidently`. If you specify `Evidently`, you must also specify the
+            Amazon Resource Name (ARN) of the CloudWatchEvidently experiment that
+            will receive the metrics and an IAM role that has permission to write
+            to the experiment.
+        DestinationArn:
+          allOf:
+          - $ref: '#/components/schemas/DestinationArn'
+          description: 'This parameter is required if `Destination` is `Evidently`.
+            If `Destination` is `CloudWatch`, do not use this parameter.
+
+
+            This parameter specifies the ARN of the Evidently experiment that is to
+            receive the metrics. You must have already defined this experiment as
+            a valid destination. For more information, see [PutRumMetricsDestination](https://docs.aws.amazon.com/cloudwatchrum/latest/APIReference/API_PutRumMetricsDestination.html).'
+        MetricDefinitions:
+          allOf:
+          - $ref: '#/components/schemas/MetricDefinitionsRequest'
+          description: An array of structures which define the metrics that you want
+            to send.
+      required:
+      - AppMonitorName
+      - Destination
+      - MetricDefinitions
+    BatchCreateRumMetricDefinitionsResponse:
+      type: object
+      properties:
+        Errors:
+          allOf:
+          - $ref: '#/components/schemas/BatchCreateRumMetricDefinitionsErrors'
+          description: An array of error objects, if the operation caused any errors.
+        MetricDefinitions:
+          allOf:
+          - $ref: '#/components/schemas/MetricDefinitions'
+          description: An array of structures that define the extended metrics.
+      required:
+      - Errors
+    BatchDeleteRumMetricDefinitionsError:
+      type: object
+      properties:
+        MetricDefinitionId:
+          allOf:
+          - $ref: '#/components/schemas/MetricDefinitionId'
+          description: The ID of the metric definition that caused this error.
+        ErrorCode:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The error code.
+        ErrorMessage:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The error message for this metric definition.
+      required:
+      - MetricDefinitionId
+      - ErrorCode
+      - ErrorMessage
+      description: A structure that defines one error caused by a [BatchCreateRumMetricsDefinitions](https://docs.aws.amazon.com/cloudwatchrum/latest/APIReference/API_BatchDeleteRumMetricsDefinitions.html)
+        operation.
     BatchDeleteRumMetricDefinitionsErrors:
       type: array
       items:
         $ref: '#/components/schemas/BatchDeleteRumMetricDefinitionsError'
+    BatchDeleteRumMetricDefinitionsRequest:
+      type: object
+      properties:
+        AppMonitorName:
+          allOf:
+          - $ref: '#/components/schemas/AppMonitorName'
+          description: The name of the CloudWatch RUM app monitor that is sending
+            these metrics.
+        Destination:
+          allOf:
+          - $ref: '#/components/schemas/MetricDestination'
+          description: Defines the destination where you want to stop sending the
+            specified metrics. Valid values are `CloudWatch` and `Evidently`. If you
+            specify `Evidently`, you must also specify the ARN of the CloudWatchEvidently
+            experiment that is to be the destination and an IAM role that has permission
+            to write to the experiment.
+        DestinationArn:
+          allOf:
+          - $ref: '#/components/schemas/DestinationArn'
+          description: 'This parameter is required if `Destination` is `Evidently`.
+            If `Destination` is `CloudWatch`, do not use this parameter.
+
+
+            This parameter specifies the ARN of the Evidently experiment that was
+            receiving the metrics that are being deleted.'
+        MetricDefinitionIds:
+          allOf:
+          - $ref: '#/components/schemas/MetricDefinitionIds'
+          description: An array of structures which define the metrics that you want
+            to stop sending.
+      required:
+      - AppMonitorName
+      - Destination
+      - MetricDefinitionIds
+    BatchDeleteRumMetricDefinitionsResponse:
+      type: object
+      properties:
+        Errors:
+          allOf:
+          - $ref: '#/components/schemas/BatchDeleteRumMetricDefinitionsErrors'
+          description: An array of error objects, if the operation caused any errors.
+        MetricDefinitionIds:
+          allOf:
+          - $ref: '#/components/schemas/MetricDefinitionIds'
+          description: The IDs of the metric definitions that were deleted.
+      required:
+      - Errors
+    BatchGetRumMetricDefinitionsRequest:
+      type: object
+      properties:
+        AppMonitorName:
+          allOf:
+          - $ref: '#/components/schemas/AppMonitorName'
+          description: The name of the CloudWatch RUM app monitor that is sending
+            the metrics.
+        Destination:
+          allOf:
+          - $ref: '#/components/schemas/MetricDestination'
+          description: The type of destination that you want to view metrics for.
+            Valid values are `CloudWatch` and `Evidently`.
+        DestinationArn:
+          allOf:
+          - $ref: '#/components/schemas/DestinationArn'
+          description: 'This parameter is required if `Destination` is `Evidently`.
+            If `Destination` is `CloudWatch`, do not use this parameter.
+
+
+            This parameter specifies the ARN of the Evidently experiment that corresponds
+            to the destination.'
+        MaxResults:
+          allOf:
+          - $ref: '#/components/schemas/MaxResultsInteger'
+          description: 'The maximum number of results to return in one operation.
+            The default is 50. The maximum that you can specify is 100.
+
+
+            To retrieve the remaining results, make another call with the returned
+            `NextToken` value.'
+        NextToken:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: Use the token returned by the previous operation to request
+            the next page of results.
+      required:
+      - AppMonitorName
+      - Destination
+    BatchGetRumMetricDefinitionsResponse:
+      type: object
+      properties:
+        MetricDefinitions:
+          allOf:
+          - $ref: '#/components/schemas/MetricDefinitions'
+          description: An array of structures that display information about the metrics
+            that are sent by the specified app monitor to the specified destination.
+        NextToken:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: A token that you can use in a subsequent operation to retrieve
+            the next set of results.
+    ConflictException:
+      type: object
+      properties:
+        message:
+          $ref: '#/components/schemas/String'
+        resourceName:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The name of the resource that is associated with the error.
+        resourceType:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The type of the resource that is associated with the error.
+      required:
+      - message
+      - resourceName
+      description: This operation attempted to create a resource that already exists.
+    CreateAppMonitorRequest:
+      type: object
+      properties:
+        Name:
+          allOf:
+          - $ref: '#/components/schemas/AppMonitorName'
+          description: A name for the app monitor.
+        Domain:
+          allOf:
+          - $ref: '#/components/schemas/AppMonitorDomain'
+          description: The top-level internet domain name for which your application
+            has administrative authority.
+        DomainList:
+          allOf:
+          - $ref: '#/components/schemas/AppMonitorDomainList'
+          description: List the domain names for which your application has administrative
+            authority. The `CreateAppMonitor` requires either the domain or the domain
+            list.
+        Tags:
+          allOf:
+          - $ref: '#/components/schemas/TagMap'
+          description: 'Assigns one or more tags (key-value pairs) to the app monitor.
+
+
+            Tags can help you organize and categorize your resources. You can also
+            use them to scope user permissions by granting a user permission to access
+            or change only resources with certain tag values.
+
+
+            Tags don''t have any semantic meaning to Amazon Web Services and are interpreted
+            strictly as strings of characters.
+
+
+            You can associate as many as 50 tags with an app monitor.
+
+
+            For more information, see [Tagging Amazon Web Services resources](https://docs.aws.amazon.com/general/latest/gr/aws_tagging.html).'
+        AppMonitorConfiguration:
+          allOf:
+          - $ref: '#/components/schemas/AppMonitorConfiguration'
+          description: 'A structure that contains much of the configuration data for
+            the app monitor. If you are using Amazon Cognito for authorization, you
+            must include this structure in your request, and it must include the ID
+            of the Amazon Cognito identity pool to use for authorization. If you don''t
+            include `AppMonitorConfiguration`, you must set up your own authorization
+            method. For more information, see [Authorize your application to send
+            data to Amazon Web Services](https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/CloudWatch-RUM-get-started-authorization.html).
+
+
+            If you omit this argument, the sample rate used for RUM is set to 10%
+            of the user sessions.'
+        CwLogEnabled:
+          allOf:
+          - $ref: '#/components/schemas/Boolean'
+          description: 'Data collected by RUM is kept by RUM for 30 days and then
+            deleted. This parameter specifies whether RUM sends a copy of this telemetry
+            data to Amazon CloudWatch Logs in your account. This enables you to keep
+            the telemetry data for more than 30 days, but it does incur Amazon CloudWatch
+            Logs charges.
+
+
+            If you omit this parameter, the default is `false`.'
+        CustomEvents:
+          allOf:
+          - $ref: '#/components/schemas/CustomEvents'
+          description: 'Specifies whether this app monitor allows the web client to
+            define and send custom events. If you omit this parameter, custom events
+            are `DISABLED`.
+
+
+            For more information about custom events, see [Send custom events](https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/CloudWatch-RUM-custom-events.html).'
+        DeobfuscationConfiguration:
+          allOf:
+          - $ref: '#/components/schemas/DeobfuscationConfiguration'
+          description: A structure that contains the configuration for how an app
+            monitor can deobfuscate stack traces.
+      required:
+      - Name
+    CreateAppMonitorResponse:
+      type: object
+      properties:
+        Id:
+          allOf:
+          - $ref: '#/components/schemas/AppMonitorId'
+          description: The unique ID of the new app monitor.
+    CustomEvents:
+      type: object
+      properties:
+        Status:
+          allOf:
+          - $ref: '#/components/schemas/CustomEventsStatus'
+          description: Specifies whether this app monitor allows the web client to
+            define and send custom events. The default is for custom events to be
+            `DISABLED`.
+      description: A structure that contains information about custom events for this
+        app monitor.
     CustomEventsStatus:
       type: string
       enum:
       - ENABLED
       - DISABLED
+    CwLog:
+      type: object
+      properties:
+        CwLogEnabled:
+          allOf:
+          - $ref: '#/components/schemas/Boolean'
+          description: Indicated whether the app monitor stores copies of the data
+            that RUM collects in CloudWatch Logs.
+        CwLogGroup:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The name of the log group where the copies are stored.
+      description: A structure that contains the information about whether the app
+        monitor stores copies of the data that RUM collects in CloudWatch Logs. If
+        it does, this structure also contains the name of the log group.
+    DataStorage:
+      type: object
+      properties:
+        CwLog:
+          allOf:
+          - $ref: '#/components/schemas/CwLog'
+          description: A structure that contains the information about whether the
+            app monitor stores copies of the data that RUM collects in CloudWatch
+            Logs. If it does, this structure also contains the name of the log group.
+      description: A structure that contains information about whether this app monitor
+        stores a copy of the telemetry data that RUM collects using CloudWatch Logs.
+    DeleteAppMonitorRequest:
+      type: object
+      properties:
+        Name:
+          allOf:
+          - $ref: '#/components/schemas/AppMonitorName'
+          description: The name of the app monitor to delete.
+      required:
+      - Name
+    DeleteAppMonitorResponse:
+      type: object
+      properties: {}
+    DeleteResourcePolicyRequest:
+      type: object
+      properties:
+        Name:
+          allOf:
+          - $ref: '#/components/schemas/AppMonitorName'
+          description: The app monitor that you want to remove the resource policy
+            from.
+        PolicyRevisionId:
+          allOf:
+          - $ref: '#/components/schemas/PolicyRevisionId'
+          description: Specifies a specific policy revision to delete. Provide a `PolicyRevisionId`
+            to ensure an atomic delete operation. If the revision ID that you provide
+            doesn't match the latest policy revision ID, the request will be rejected
+            with an `InvalidPolicyRevisionIdException` error.
+      required:
+      - Name
+    DeleteResourcePolicyResponse:
+      type: object
+      properties:
+        PolicyRevisionId:
+          allOf:
+          - $ref: '#/components/schemas/PolicyRevisionId'
+          description: The revision ID of the policy that was removed, if it had one.
+    DeleteRumMetricsDestinationRequest:
+      type: object
+      properties:
+        AppMonitorName:
+          allOf:
+          - $ref: '#/components/schemas/AppMonitorName'
+          description: The name of the app monitor that is sending metrics to the
+            destination that you want to delete.
+        Destination:
+          allOf:
+          - $ref: '#/components/schemas/MetricDestination'
+          description: The type of destination to delete. Valid values are `CloudWatch`
+            and `Evidently`.
+        DestinationArn:
+          allOf:
+          - $ref: '#/components/schemas/DestinationArn'
+          description: This parameter is required if `Destination` is `Evidently`.
+            If `Destination` is `CloudWatch`, do not use this parameter. This parameter
+            specifies the ARN of the Evidently experiment that corresponds to the
+            destination to delete.
+      required:
+      - AppMonitorName
+      - Destination
+    DeleteRumMetricsDestinationResponse:
+      type: object
+      properties: {}
+    DeobfuscationConfiguration:
+      type: object
+      properties:
+        JavaScriptSourceMaps:
+          allOf:
+          - $ref: '#/components/schemas/JavaScriptSourceMaps'
+          description: A structure that contains the configuration for how an app
+            monitor can unminify JavaScript error stack traces using source maps.
+      description: A structure that contains the configuration for how an app monitor
+        can deobfuscate stack traces.
     DeobfuscationS3Uri:
       type: string
       pattern: ^s3://[a-z0-9][-.a-z0-9]{1,61}(?:/[-!_*'().a-z0-9A-Z]+(?:/[-!_*'().a-z0-9A-Z]+)*)?/?$
@@ -133,6 +1983,87 @@ components:
       type: array
       items:
         type: string
+    GetAppMonitorDataRequest:
+      type: object
+      properties:
+        Name:
+          allOf:
+          - $ref: '#/components/schemas/AppMonitorName'
+          description: The name of the app monitor that collected the data that you
+            want to retrieve.
+        TimeRange:
+          allOf:
+          - $ref: '#/components/schemas/TimeRange'
+          description: A structure that defines the time range that you want to retrieve
+            results from.
+        Filters:
+          allOf:
+          - $ref: '#/components/schemas/QueryFilters'
+          description: An array of structures that you can use to filter the results
+            to those that match one or more sets of key-value pairs that you specify.
+        MaxResults:
+          allOf:
+          - $ref: '#/components/schemas/MaxQueryResults'
+          description: The maximum number of results to return in one operation.
+        NextToken:
+          allOf:
+          - $ref: '#/components/schemas/Token'
+          description: Use the token returned by the previous operation to request
+            the next page of results.
+      required:
+      - Name
+      - TimeRange
+    GetAppMonitorDataResponse:
+      type: object
+      properties:
+        Events:
+          allOf:
+          - $ref: '#/components/schemas/EventDataList'
+          description: The events that RUM collected that match your request.
+        NextToken:
+          allOf:
+          - $ref: '#/components/schemas/Token'
+          description: A token that you can use in a subsequent operation to retrieve
+            the next set of results.
+    GetAppMonitorRequest:
+      type: object
+      properties:
+        Name:
+          allOf:
+          - $ref: '#/components/schemas/AppMonitorName'
+          description: The app monitor to retrieve information for.
+      required:
+      - Name
+    GetAppMonitorResponse:
+      type: object
+      properties:
+        AppMonitor:
+          allOf:
+          - $ref: '#/components/schemas/AppMonitor'
+          description: A structure containing all the configuration information for
+            the app monitor.
+    GetResourcePolicyRequest:
+      type: object
+      properties:
+        Name:
+          allOf:
+          - $ref: '#/components/schemas/AppMonitorName'
+          description: The name of the app monitor that is associated with the resource-based
+            policy that you want to view.
+      required:
+      - Name
+    GetResourcePolicyResponse:
+      type: object
+      properties:
+        PolicyDocument:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The JSON policy document that you requested.
+        PolicyRevisionId:
+          allOf:
+          - $ref: '#/components/schemas/PolicyRevisionId'
+          description: The revision ID information for this version of the policy
+            document that you requested.
     ISOTimestampString:
       type: string
       minLength: 19
@@ -145,8 +2076,142 @@ components:
       pattern: '[\w-]+:[0-9a-f-]+'
       minLength: 1
       maxLength: 55
+    InternalServerException:
+      type: object
+      properties:
+        message:
+          $ref: '#/components/schemas/String'
+        retryAfterSeconds:
+          allOf:
+          - $ref: '#/components/schemas/Integer'
+          description: The value of a parameter in the request caused an error.
+      required:
+      - message
+      description: Internal service exception.
+    InvalidPolicyRevisionIdException:
+      type: object
+      properties:
+        message:
+          $ref: '#/components/schemas/String'
+      required:
+      - message
+      description: The policy revision ID that you provided doeesn't match the latest
+        policy revision ID.
+    JavaScriptSourceMaps:
+      type: object
+      properties:
+        Status:
+          allOf:
+          - $ref: '#/components/schemas/DeobfuscationStatus'
+          description: Specifies whether JavaScript error stack traces should be unminified
+            for this app monitor. The default is for JavaScript error stack trace
+            unminification to be `DISABLED`.
+        S3Uri:
+          allOf:
+          - $ref: '#/components/schemas/DeobfuscationS3Uri'
+          description: The S3Uri of the bucket or folder that stores the source map
+            files. It is required if status is ENABLED.
+      required:
+      - Status
+      description: A structure that contains the configuration for how an app monitor
+        can unminify JavaScript error stack traces using source maps.
     JsonValue:
       type: string
+    ListAppMonitorsRequest:
+      type: object
+      properties:
+        MaxResults:
+          allOf:
+          - $ref: '#/components/schemas/MaxResultsInteger'
+          description: The maximum number of results to return in one operation. The
+            default is 50. The maximum that you can specify is 100.
+        NextToken:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: Use the token returned by the previous operation to request
+            the next page of results.
+    ListAppMonitorsResponse:
+      type: object
+      properties:
+        NextToken:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: A token that you can use in a subsequent operation to retrieve
+            the next set of results.
+        AppMonitorSummaries:
+          allOf:
+          - $ref: '#/components/schemas/AppMonitorSummaryList'
+          description: An array of structures that contain information about the returned
+            app monitors.
+    ListRumMetricsDestinationsRequest:
+      type: object
+      properties:
+        AppMonitorName:
+          allOf:
+          - $ref: '#/components/schemas/AppMonitorName'
+          description: The name of the app monitor associated with the destinations
+            that you want to retrieve.
+        MaxResults:
+          allOf:
+          - $ref: '#/components/schemas/MaxResultsInteger'
+          description: 'The maximum number of results to return in one operation.
+            The default is 50. The maximum that you can specify is 100.
+
+
+            To retrieve the remaining results, make another call with the returned
+            `NextToken` value.'
+        NextToken:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: Use the token returned by the previous operation to request
+            the next page of results.
+      required:
+      - AppMonitorName
+    ListRumMetricsDestinationsResponse:
+      type: object
+      properties:
+        Destinations:
+          allOf:
+          - $ref: '#/components/schemas/MetricDestinationSummaryList'
+          description: The list of CloudWatch RUM extended metrics destinations associated
+            with the app monitor that you specified.
+        NextToken:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: A token that you can use in a subsequent operation to retrieve
+            the next set of results.
+    ListTagsForResourceRequest:
+      type: object
+      properties:
+        ResourceArn:
+          allOf:
+          - $ref: '#/components/schemas/Arn'
+          description: The ARN of the resource that you want to see the tags of.
+      required:
+      - ResourceArn
+    ListTagsForResourceResponse:
+      type: object
+      properties:
+        ResourceArn:
+          allOf:
+          - $ref: '#/components/schemas/Arn'
+          description: The ARN of the resource that you are viewing.
+        Tags:
+          allOf:
+          - $ref: '#/components/schemas/TagMap'
+          description: The list of tag keys and values associated with the resource
+            you specified.
+      required:
+      - ResourceArn
+      - Tags
+    MalformedPolicyDocumentException:
+      type: object
+      properties:
+        message:
+          $ref: '#/components/schemas/String'
+      required:
+      - message
+      description: The policy document that you specified is not formatted correctly.
     MaxQueryResults:
       type: integer
       default: 0
@@ -156,6 +2221,58 @@ components:
       type: integer
       minimum: 1
       maximum: 100
+    MetricDefinition:
+      type: object
+      properties:
+        MetricDefinitionId:
+          allOf:
+          - $ref: '#/components/schemas/MetricDefinitionId'
+          description: The ID of this metric definition.
+        Name:
+          allOf:
+          - $ref: '#/components/schemas/MetricName'
+          description: The name of the metric that is defined in this structure.
+        ValueKey:
+          allOf:
+          - $ref: '#/components/schemas/ValueKey'
+          description: The field within the event object that the metric value is
+            sourced from.
+        UnitLabel:
+          allOf:
+          - $ref: '#/components/schemas/UnitLabel'
+          description: Use this field only if you are sending this metric to CloudWatch.
+            It defines the CloudWatch metric unit that this metric is measured in.
+        DimensionKeys:
+          allOf:
+          - $ref: '#/components/schemas/DimensionKeysMap'
+          description: This field is a map of field paths to dimension names. It defines
+            the dimensions to associate with this metric in CloudWatch The value of
+            this field is used only if the metric destination is `CloudWatch`. If
+            the metric destination is `Evidently`, the value of `DimensionKeys` is
+            ignored.
+        EventPattern:
+          allOf:
+          - $ref: '#/components/schemas/EventPattern'
+          description: 'The pattern that defines the metric. RUM checks events that
+            happen in a user''s session against the pattern, and events that match
+            the pattern are sent to the metric destination.
+
+
+            If the metrics destination is `CloudWatch` and the event also matches
+            a value in `DimensionKeys`, then the metric is published with the specified
+            dimensions.'
+        Namespace:
+          allOf:
+          - $ref: '#/components/schemas/Namespace'
+          description: If this metric definition is for a custom metric instead of
+            an extended metric, this field displays the metric namespace that the
+            custom metric is published to.
+      required:
+      - MetricDefinitionId
+      - Name
+      description: A structure that displays the definition of one extended metric
+        that RUM sends to CloudWatch or CloudWatch Evidently. For more information,
+        see [ Additional metrics that you can send to CloudWatch and CloudWatch Evidently](https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/CloudWatch-RUM-vended-metrics.html).
     MetricDefinitionId:
       type: string
       minLength: 1
@@ -164,6 +2281,150 @@ components:
       type: array
       items:
         $ref: '#/components/schemas/MetricDefinitionId'
+    MetricDefinitionRequest:
+      type: object
+      properties:
+        Name:
+          allOf:
+          - $ref: '#/components/schemas/MetricName'
+          description: "The name for the metric that is defined in this structure.\
+            \ For custom metrics, you can specify any name that you like. For extended\
+            \ metrics, valid values are the following:\n\n  * `PerformanceNavigationDuration`\n\
+            \n  * `PerformanceResourceDuration `\n\n  * `NavigationSatisfiedTransaction`\n\
+            \n  * `NavigationToleratedTransaction`\n\n  * `NavigationFrustratedTransaction`\n\
+            \n  * `WebVitalsCumulativeLayoutShift`\n\n  * `WebVitalsFirstInputDelay`\n\
+            \n  * `WebVitalsLargestContentfulPaint`\n\n  * `JsErrorCount`\n\n  * `HttpErrorCount`\n\
+            \n  * `SessionCount`"
+        ValueKey:
+          allOf:
+          - $ref: '#/components/schemas/ValueKey'
+          description: 'The field within the event object that the metric value is
+            sourced from.
+
+
+            If you omit this field, a hardcoded value of 1 is pushed as the metric
+            value. This is useful if you want to count the number of events that the
+            filter catches.
+
+
+            If this metric is sent to CloudWatch Evidently, this field will be passed
+            to Evidently raw. Evidently will handle data extraction from the event.'
+        UnitLabel:
+          allOf:
+          - $ref: '#/components/schemas/UnitLabel'
+          description: The CloudWatch metric unit to use for this metric. If you omit
+            this field, the metric is recorded with no unit.
+        DimensionKeys:
+          allOf:
+          - $ref: '#/components/schemas/DimensionKeysMap'
+          description: "Use this field only if you are sending the metric to CloudWatch.\n\
+            \nThis field is a map of field paths to dimension names. It defines the\
+            \ dimensions to associate with this metric in CloudWatch. For extended\
+            \ metrics, valid values for the entries in this field are the following:\n\
+            \n  * `\"metadata.pageId\": \"PageId\"`\n\n  * `\"metadata.browserName\"\
+            : \"BrowserName\"`\n\n  * `\"metadata.deviceType\": \"DeviceType\"`\n\n\
+            \  * `\"metadata.osName\": \"OSName\"`\n\n  * `\"metadata.countryCode\"\
+            : \"CountryCode\"`\n\n  * `\"event_details.fileType\": \"FileType\"`\n\
+            \nFor both extended metrics and custom metrics, all dimensions listed\
+            \ in this field must also be included in `EventPattern`."
+        EventPattern:
+          allOf:
+          - $ref: '#/components/schemas/EventPattern'
+          description: "The pattern that defines the metric, specified as a JSON object.\
+            \ RUM checks events that happen in a user's session against the pattern,\
+            \ and events that match the pattern are sent to the metric destination.\n\
+            \nWhen you define extended metrics, the metric definition is not valid\
+            \ if `EventPattern` is omitted.\n\nExample event patterns:\n\n  * `'{\
+            \ \"event_type\": [\"com.amazon.rum.js_error_event\"], \"metadata\": {\
+            \ \"browserName\": [ \"Chrome\", \"Safari\" ], } }'`\n\n  * `'{ \"event_type\"\
+            : [\"com.amazon.rum.performance_navigation_event\"], \"metadata\": { \"\
+            browserName\": [ \"Chrome\", \"Firefox\" ] }, \"event_details\": { \"\
+            duration\": [{ \"numeric\": [ \"<\", 2000 ] }] } }'`\n\n  * `'{ \"event_type\"\
+            : [\"com.amazon.rum.performance_navigation_event\"], \"metadata\": { \"\
+            browserName\": [ \"Chrome\", \"Safari\" ], \"countryCode\": [ \"US\" ]\
+            \ }, \"event_details\": { \"duration\": [{ \"numeric\": [ \">=\", 2000,\
+            \ \"<\", 8000 ] }] } }'`\n\nIf the metrics destination is `CloudWatch`\
+            \ and the event also matches a value in `DimensionKeys`, then the metric\
+            \ is published with the specified dimensions."
+        Namespace:
+          allOf:
+          - $ref: '#/components/schemas/Namespace'
+          description: 'If this structure is for a custom metric instead of an extended
+            metrics, use this parameter to define the metric namespace for that custom
+            metric. Do not specify this parameter if this structure is for an extended
+            metric.
+
+
+            You cannot use any string that starts with `AWS/` for your namespace.'
+      required:
+      - Name
+      description: "Use this structure to define one extended metric or custom metric\
+        \ that RUM will send to CloudWatch or CloudWatch Evidently. For more information,\
+        \ see [ Custom metrics and extended metrics that you can send to CloudWatch\
+        \ and CloudWatch Evidently](https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/CloudWatch-RUM-custom-and-extended-metrics.html).\n\
+        \nThis structure is validated differently for extended metrics and custom\
+        \ metrics. For extended metrics that are sent to the `AWS/RUM` namespace,\
+        \ the following validations apply:\n\n  * The `Namespace` parameter must be\
+        \ omitted or set to `AWS/RUM`.\n\n  * Only certain combinations of values\
+        \ for `Name`, `ValueKey`, and `EventPattern` are valid. In addition to what\
+        \ is displayed in the following list, the `EventPattern` can also include\
+        \ information used by the `DimensionKeys` field.\n\n    * If `Name` is `PerformanceNavigationDuration`,\
+        \ then `ValueKey`must be `event_details.duration` and the `EventPattern` must\
+        \ include `{\"event_type\":[\"com.amazon.rum.performance_navigation_event\"\
+        ]}`\n\n    * If `Name` is `PerformanceResourceDuration`, then `ValueKey`must\
+        \ be `event_details.duration` and the `EventPattern` must include `{\"event_type\"\
+        :[\"com.amazon.rum.performance_resource_event\"]}`\n\n    * If `Name` is `NavigationSatisfiedTransaction`,\
+        \ then `ValueKey`must be null and the `EventPattern` must include `{ \"event_type\"\
+        : [\"com.amazon.rum.performance_navigation_event\"], \"event_details\": {\
+        \ \"duration\": [{ \"numeric\": [\">\",2000] }] } }`\n\n    * If `Name` is\
+        \ `NavigationToleratedTransaction`, then `ValueKey`must be null and the `EventPattern`\
+        \ must include `{ \"event_type\": [\"com.amazon.rum.performance_navigation_event\"\
+        ], \"event_details\": { \"duration\": [{ \"numeric\": [\">=\",2000,\"<\"8000]\
+        \ }] } }`\n\n    * If `Name` is `NavigationFrustratedTransaction`, then `ValueKey`must\
+        \ be null and the `EventPattern` must include `{ \"event_type\": [\"com.amazon.rum.performance_navigation_event\"\
+        ], \"event_details\": { \"duration\": [{ \"numeric\": [\">=\",8000] }] } }`\n\
+        \n    * If `Name` is `WebVitalsCumulativeLayoutShift`, then `ValueKey`must\
+        \ be `event_details.value` and the `EventPattern` must include `{\"event_type\"\
+        :[\"com.amazon.rum.cumulative_layout_shift_event\"]}`\n\n    * If `Name` is\
+        \ `WebVitalsFirstInputDelay`, then `ValueKey`must be `event_details.value`\
+        \ and the `EventPattern` must include `{\"event_type\":[\"com.amazon.rum.first_input_delay_event\"\
+        ]}`\n\n    * If `Name` is `WebVitalsLargestContentfulPaint`, then `ValueKey`must\
+        \ be `event_details.value` and the `EventPattern` must include `{\"event_type\"\
+        :[\"com.amazon.rum.largest_contentful_paint_event\"]}`\n\n    * If `Name`\
+        \ is `JsErrorCount`, then `ValueKey`must be null and the `EventPattern` must\
+        \ include `{\"event_type\":[\"com.amazon.rum.js_error_event\"]}`\n\n    *\
+        \ If `Name` is `HttpErrorCount`, then `ValueKey`must be null and the `EventPattern`\
+        \ must include `{\"event_type\":[\"com.amazon.rum.http_event\"]}`\n\n    *\
+        \ If `Name` is `SessionCount`, then `ValueKey`must be null and the `EventPattern`\
+        \ must include `{\"event_type\":[\"com.amazon.rum.session_start_event\"]}`\n\
+        \n    * If `Name` is `PageViewCount`, then `ValueKey`must be null and the\
+        \ `EventPattern` must include `{\"event_type\":[\"com.amazon.rum.page_view_event\"\
+        ]}`\n\n    * If `Name` is `Http4xxCount`, then `ValueKey`must be null and\
+        \ the `EventPattern` must include `{\"event_type\": [\"com.amazon.rum.http_event\"\
+        ],\"event_details\":{\"response\":{\"status\":[{\"numeric\":[\">=\",400,\"\
+        <\",500]}]}}} }`\n\n    * If `Name` is `Http5xxCount`, then `ValueKey`must\
+        \ be null and the `EventPattern` must include `{\"event_type\": [\"com.amazon.rum.http_event\"\
+        ],\"event_details\":{\"response\":{\"status\":[{\"numeric\":[\">=\",500,\"\
+        <=\",599]}]}}} }`\n\nFor custom metrics, the following validation rules apply:\n\
+        \n  * The namespace can't be omitted and can't be `AWS/RUM`. You can use the\
+        \ `AWS/RUM` namespace only for extended metrics.\n\n  * All dimensions listed\
+        \ in the `DimensionKeys` field must be present in the value of `EventPattern`.\n\
+        \n  * The values that you specify for `ValueKey`, `EventPattern`, and `DimensionKeys`\
+        \ must be fields in RUM events, so all first-level keys in these fields must\
+        \ be one of the keys in the list later in this section.\n\n  * If you set\
+        \ a value for `EventPattern`, it must be a JSON object.\n\n  * For every non-empty\
+        \ `event_details`, there must be a non-empty `event_type`.\n\n  * If `EventPattern`\
+        \ contains an `event_details` field, it must also contain an `event_type`.\
+        \ For every built-in `event_type` that you use, you must use a value for `event_details`\
+        \ that corresponds to that `event_type`. For information about event details\
+        \ that correspond to event types, see [ RUM event details](https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/CloudWatch-RUM-datacollected.html#CloudWatch-RUM-datacollected-eventDetails).\n\
+        \n  * In `EventPattern`, any JSON array must contain only one value.\n\nValid\
+        \ key values for first-level keys in the `ValueKey`, `EventPattern`, and `DimensionKeys`\
+        \ fields:\n\n  * `account_id`\n\n  * `application_Id`\n\n  * `application_version`\n\
+        \n  * `application_name`\n\n  * `batch_id`\n\n  * `event_details`\n\n  * `event_id`\n\
+        \n  * `event_interaction`\n\n  * `event_timestamp`\n\n  * `event_type`\n\n\
+        \  * `event_version`\n\n  * `log_stream`\n\n  * `metadata`\n\n  * `sessionId`\n\
+        \n  * `user_details`\n\n  * `userId`"
     MetricDefinitions:
       type: array
       items:
@@ -177,6 +2438,26 @@ components:
       enum:
       - CloudWatch
       - Evidently
+    MetricDestinationSummary:
+      type: object
+      properties:
+        Destination:
+          allOf:
+          - $ref: '#/components/schemas/MetricDestination'
+          description: Specifies whether the destination is `CloudWatch` or `Evidently`.
+        DestinationArn:
+          allOf:
+          - $ref: '#/components/schemas/DestinationArn'
+          description: If the destination is `Evidently`, this specifies the ARN of
+            the Evidently experiment that receives the metrics.
+        IamRoleArn:
+          allOf:
+          - $ref: '#/components/schemas/IamRoleArn'
+          description: This field appears only when the destination is `Evidently`.
+            It specifies the ARN of the IAM role that is used to write to the Evidently
+            experiment that receives the metrics.
+      description: A structure that displays information about one destination that
+        CloudWatch RUM sends extended metrics to.
     MetricDestinationSummaryList:
       type: array
       items:
@@ -194,10 +2475,182 @@ components:
       type: array
       items:
         $ref: '#/components/schemas/Url'
+    PolicyNotFoundException:
+      type: object
+      properties:
+        message:
+          $ref: '#/components/schemas/String'
+      required:
+      - message
+      description: The resource-based policy doesn't exist on this app monitor.
     PolicyRevisionId:
       type: string
       minLength: 1
       maxLength: 255
+    PolicySizeLimitExceededException:
+      type: object
+      properties:
+        message:
+          $ref: '#/components/schemas/String'
+      required:
+      - message
+      description: The policy document is too large. The limit is 4 KB.
+    PutResourcePolicyRequest:
+      type: object
+      properties:
+        Name:
+          allOf:
+          - $ref: '#/components/schemas/AppMonitorName'
+          description: The name of the app monitor that you want to apply this resource-based
+            policy to. To find the names of your app monitors, you can use the [ListAppMonitors](https://docs.aws.amazon.com/cloudwatchrum/latest/APIReference/API_ListAppMonitors.html)
+            operation.
+        PolicyDocument:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The JSON to use as the resource policy. The document can be
+            up to 4 KB in size. For more information about the contents and syntax
+            for this policy, see [Using resource-based policies with CloudWatch RUM](https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/CloudWatch-RUM-resource-policies.html).
+        PolicyRevisionId:
+          allOf:
+          - $ref: '#/components/schemas/PolicyRevisionId'
+          description: 'A string value that you can use to conditionally update your
+            policy. You can provide the revision ID of your existing policy to make
+            mutating requests against that policy.
+
+
+            When you assign a policy revision ID, then later requests about that policy
+            will be rejected with an `InvalidPolicyRevisionIdException` error if they
+            don''t provide the correct current revision ID.'
+      required:
+      - Name
+      - PolicyDocument
+    PutResourcePolicyResponse:
+      type: object
+      properties:
+        PolicyDocument:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The JSON policy document that you specified.
+        PolicyRevisionId:
+          allOf:
+          - $ref: '#/components/schemas/PolicyRevisionId'
+          description: The policy revision ID information that you specified.
+    PutRumEventsRequest:
+      type: object
+      properties:
+        Id:
+          allOf:
+          - $ref: '#/components/schemas/AppMonitorId'
+          description: The ID of the app monitor that is sending this data.
+        BatchId:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: A unique identifier for this batch of RUM event data.
+        AppMonitorDetails:
+          allOf:
+          - $ref: '#/components/schemas/AppMonitorDetails'
+          description: A structure that contains information about the app monitor
+            that collected this telemetry information.
+        UserDetails:
+          allOf:
+          - $ref: '#/components/schemas/UserDetails'
+          description: A structure that contains information about the user session
+            that this batch of events was collected from.
+        RumEvents:
+          allOf:
+          - $ref: '#/components/schemas/RumEventList'
+          description: An array of structures that contain the telemetry event data.
+        Alias:
+          allOf:
+          - $ref: '#/components/schemas/Alias'
+          description: If the app monitor uses a resource-based policy that requires
+            `PutRumEvents` requests to specify a certain alias, specify that alias
+            here. This alias will be compared to the `rum:alias` context key in the
+            resource-based policy. For more information, see [Using resource-based
+            policies with CloudWatch RUM](https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/CloudWatch-RUM-resource-policies.html).
+      required:
+      - Id
+      - BatchId
+      - AppMonitorDetails
+      - UserDetails
+      - RumEvents
+    PutRumEventsResponse:
+      type: object
+      properties: {}
+    PutRumMetricsDestinationRequest:
+      type: object
+      properties:
+        AppMonitorName:
+          allOf:
+          - $ref: '#/components/schemas/AppMonitorName'
+          description: The name of the CloudWatch RUM app monitor that will send the
+            metrics.
+        Destination:
+          allOf:
+          - $ref: '#/components/schemas/MetricDestination'
+          description: Defines the destination to send the metrics to. Valid values
+            are `CloudWatch` and `Evidently`. If you specify `Evidently`, you must
+            also specify the ARN of the CloudWatchEvidently experiment that is to
+            be the destination and an IAM role that has permission to write to the
+            experiment.
+        DestinationArn:
+          allOf:
+          - $ref: '#/components/schemas/DestinationArn'
+          description: Use this parameter only if `Destination` is `Evidently`. This
+            parameter specifies the ARN of the Evidently experiment that will receive
+            the extended metrics.
+        IamRoleArn:
+          allOf:
+          - $ref: '#/components/schemas/IamRoleArn'
+          description: 'This parameter is required if `Destination` is `Evidently`.
+            If `Destination` is `CloudWatch`, don''t use this parameter.
+
+
+            This parameter specifies the ARN of an IAM role that RUM will assume to
+            write to the Evidently experiment that you are sending metrics to. This
+            role must have permission to write to that experiment.
+
+
+            If you specify this parameter, you must be signed on to a role that has
+            [PassRole](https://docs.aws.amazon.com/IAM/latest/UserGuide/id_roles_use_passrole.html)
+            permissions attached to it, to allow the role to be passed. The [ CloudWatchAmazonCloudWatchRUMFullAccess](https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/auth-and-access-control-cw.html#managed-policies-cloudwatch-RUM)
+            policy doesn''t include `PassRole` permissions.'
+      required:
+      - AppMonitorName
+      - Destination
+    PutRumMetricsDestinationResponse:
+      type: object
+      properties: {}
+    QueryFilter:
+      type: object
+      properties:
+        Name:
+          allOf:
+          - $ref: '#/components/schemas/QueryFilterKey'
+          description: 'The name of a key to search for. The filter returns only the
+            events that match the `Name` and `Values` that you specify.
+
+
+            Valid values for `Name` are `Browser` | `Device` | `Country` | `Page`
+            | `OS` | `EventType` | `Invert`'
+        Values:
+          allOf:
+          - $ref: '#/components/schemas/QueryFilterValueList'
+          description: The values of the `Name` that are to be be included in the
+            returned results.
+      description: 'A structure that defines a key and values that you can use to
+        filter the results. The only performance events that are returned are those
+        that have values matching the ones that you specify in one of your `QueryFilter`
+        structures.
+
+
+        For example, you could specify `Browser` as the `Name` and specify `Chrome,Firefox`
+        as the `Values` to return events generated only from those browsers.
+
+
+        Specifying `Invert` as the `Name` works as a "not equal to" filter. For example,
+        specify `Invert` as the `Name` and specify `Chrome` as the value to return
+        all events except events from user sessions with the Chrome browser.'
     QueryFilterKey:
       type: string
     QueryFilterValue:
@@ -214,10 +2667,69 @@ components:
       type: integer
       format: int64
       default: 0
+    ResourceNotFoundException:
+      type: object
+      properties:
+        message:
+          $ref: '#/components/schemas/String'
+        resourceName:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The name of the resource that is associated with the error.
+        resourceType:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The type of the resource that is associated with the error.
+      required:
+      - message
+      - resourceName
+      description: Resource not found.
+    RumEvent:
+      type: object
+      properties:
+        id:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: A unique ID for this event.
+        timestamp:
+          allOf:
+          - $ref: '#/components/schemas/Timestamp'
+          description: The exact time that this event occurred.
+        type:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The JSON schema that denotes the type of event this is, such
+            as a page load or a new session.
+        metadata:
+          allOf:
+          - $ref: '#/components/schemas/JsonValue'
+          description: Metadata about this event, which contains a JSON serialization
+            of the identity of the user for this session. The user information comes
+            from information such as the HTTP user-agent request header and document
+            interface.
+        details:
+          allOf:
+          - $ref: '#/components/schemas/JsonValue'
+          description: A string containing details about the event.
+      required:
+      - id
+      - timestamp
+      - type
+      - details
+      description: A structure that contains the information for one performance event
+        that RUM collects from a user session with your application.
     RumEventList:
       type: array
       items:
         $ref: '#/components/schemas/RumEvent'
+    ServiceQuotaExceededException:
+      type: object
+      properties:
+        message:
+          $ref: '#/components/schemas/String'
+      required:
+      - message
+      description: This request exceeds a service quota.
     SessionSampleRate:
       type: number
       format: double
@@ -243,6 +2755,24 @@ components:
       type: object
       additionalProperties:
         $ref: '#/components/schemas/TagValue'
+    TagResourceRequest:
+      type: object
+      properties:
+        ResourceArn:
+          allOf:
+          - $ref: '#/components/schemas/Arn'
+          description: The ARN of the CloudWatch RUM resource that you're adding tags
+            to.
+        Tags:
+          allOf:
+          - $ref: '#/components/schemas/TagMap'
+          description: The list of key-value pairs to associate with the resource.
+      required:
+      - ResourceArn
+      - Tags
+    TagResourceResponse:
+      type: object
+      properties: {}
     TagValue:
       type: string
       minLength: 0
@@ -257,17 +2787,193 @@ components:
       - errors
       - performance
       - http
+    ThrottlingException:
+      type: object
+      properties:
+        message:
+          $ref: '#/components/schemas/String'
+        serviceCode:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The ID of the service that is associated with the error.
+        quotaCode:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The ID of the service quota that was exceeded.
+        retryAfterSeconds:
+          allOf:
+          - $ref: '#/components/schemas/Integer'
+          description: The value of a parameter in the request caused an error.
+      required:
+      - message
+      description: The request was throttled because of quota limits.
+    TimeRange:
+      type: object
+      properties:
+        After:
+          allOf:
+          - $ref: '#/components/schemas/QueryTimestamp'
+          description: The beginning of the time range to retrieve performance events
+            from.
+        Before:
+          allOf:
+          - $ref: '#/components/schemas/QueryTimestamp'
+          description: The end of the time range to retrieve performance events from.
+            If you omit this, the time range extends to the time that this operation
+            is performed.
+      required:
+      - After
+      description: A structure that defines the time range that you want to retrieve
+        results from.
     Token:
       type: string
     UnitLabel:
       type: string
       minLength: 1
       maxLength: 256
+    UntagResourceRequest:
+      type: object
+      properties:
+        ResourceArn:
+          allOf:
+          - $ref: '#/components/schemas/Arn'
+          description: The ARN of the CloudWatch RUM resource that you're removing
+            tags from.
+        TagKeys:
+          allOf:
+          - $ref: '#/components/schemas/TagKeyList'
+          description: The list of tag keys to remove from the resource.
+      required:
+      - ResourceArn
+      - TagKeys
+    UntagResourceResponse:
+      type: object
+      properties: {}
+    UpdateAppMonitorRequest:
+      type: object
+      properties:
+        Name:
+          allOf:
+          - $ref: '#/components/schemas/AppMonitorName'
+          description: The name of the app monitor to update.
+        Domain:
+          allOf:
+          - $ref: '#/components/schemas/AppMonitorDomain'
+          description: The top-level internet domain name for which your application
+            has administrative authority.
+        DomainList:
+          allOf:
+          - $ref: '#/components/schemas/AppMonitorDomainList'
+          description: List the domain names for which your application has administrative
+            authority. The `UpdateAppMonitor` allows either the domain or the domain
+            list.
+        AppMonitorConfiguration:
+          allOf:
+          - $ref: '#/components/schemas/AppMonitorConfiguration'
+          description: A structure that contains much of the configuration data for
+            the app monitor. If you are using Amazon Cognito for authorization, you
+            must include this structure in your request, and it must include the ID
+            of the Amazon Cognito identity pool to use for authorization. If you don't
+            include `AppMonitorConfiguration`, you must set up your own authorization
+            method. For more information, see [Authorize your application to send
+            data to Amazon Web Services](https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/CloudWatch-RUM-get-started-authorization.html).
+        CwLogEnabled:
+          allOf:
+          - $ref: '#/components/schemas/Boolean'
+          description: Data collected by RUM is kept by RUM for 30 days and then deleted.
+            This parameter specifies whether RUM sends a copy of this telemetry data
+            to Amazon CloudWatch Logs in your account. This enables you to keep the
+            telemetry data for more than 30 days, but it does incur Amazon CloudWatch
+            Logs charges.
+        CustomEvents:
+          allOf:
+          - $ref: '#/components/schemas/CustomEvents'
+          description: 'Specifies whether this app monitor allows the web client to
+            define and send custom events. The default is for custom events to be
+            `DISABLED`.
+
+
+            For more information about custom events, see [Send custom events](https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/CloudWatch-RUM-custom-events.html).'
+        DeobfuscationConfiguration:
+          allOf:
+          - $ref: '#/components/schemas/DeobfuscationConfiguration'
+          description: A structure that contains the configuration for how an app
+            monitor can deobfuscate stack traces.
+      required:
+      - Name
+    UpdateAppMonitorResponse:
+      type: object
+      properties: {}
+    UpdateRumMetricDefinitionRequest:
+      type: object
+      properties:
+        AppMonitorName:
+          allOf:
+          - $ref: '#/components/schemas/AppMonitorName'
+          description: The name of the CloudWatch RUM app monitor that sends these
+            metrics.
+        Destination:
+          allOf:
+          - $ref: '#/components/schemas/MetricDestination'
+          description: The destination to send the metrics to. Valid values are `CloudWatch`
+            and `Evidently`. If you specify `Evidently`, you must also specify the
+            ARN of the CloudWatchEvidently experiment that will receive the metrics
+            and an IAM role that has permission to write to the experiment.
+        DestinationArn:
+          allOf:
+          - $ref: '#/components/schemas/DestinationArn'
+          description: 'This parameter is required if `Destination` is `Evidently`.
+            If `Destination` is `CloudWatch`, do not use this parameter.
+
+
+            This parameter specifies the ARN of the Evidently experiment that is to
+            receive the metrics. You must have already defined this experiment as
+            a valid destination. For more information, see [PutRumMetricsDestination](https://docs.aws.amazon.com/cloudwatchrum/latest/APIReference/API_PutRumMetricsDestination.html).'
+        MetricDefinition:
+          allOf:
+          - $ref: '#/components/schemas/MetricDefinitionRequest'
+          description: A structure that contains the new definition that you want
+            to use for this metric.
+        MetricDefinitionId:
+          allOf:
+          - $ref: '#/components/schemas/MetricDefinitionId'
+          description: The ID of the metric definition to update.
+      required:
+      - AppMonitorName
+      - Destination
+      - MetricDefinition
+      - MetricDefinitionId
+    UpdateRumMetricDefinitionResponse:
+      type: object
+      properties: {}
     Url:
       type: string
       pattern: https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&*//=]*)
       minLength: 1
       maxLength: 1260
+    UserDetails:
+      type: object
+      properties:
+        userId:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The ID of the user for this user session. This ID is generated
+            by RUM and does not include any personally identifiable information about
+            the user.
+        sessionId:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The session ID that the performance events are from.
+      description: A structure that contains information about the user session that
+        this batch of events was collected from.
+    ValidationException:
+      type: object
+      properties:
+        message:
+          $ref: '#/components/schemas/String'
+      required:
+      - message
+      description: One of the arguments for the request is not valid.
     ValueKey:
       type: string
       minLength: 1

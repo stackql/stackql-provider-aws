@@ -7,7 +7,7 @@ info:
   x-stackql-serviceName: sagemaker_a2i_runtime
   x-aws-serviceName: sagemakera2iruntime
   x-aws-protocol: aws.protocols#restJson1
-  x-dateGenerated: '2025-05-05'
+  x-dateGenerated: '2025-05-07'
   version: '2019-11-07'
   title: Amazon Augmented AI Runtime
   description: |-
@@ -53,9 +53,268 @@ servers:
       - sa-east-1
       - me-south-1
       default: us-east-1
-paths: {}
+paths:
+  /human-loops/{HumanLoopName}:
+    delete:
+      operationId: DeleteHumanLoop
+      description: |-
+        Deletes the specified human loop for a flow definition.
+
+        If the human loop was deleted, this operation will return a `ResourceNotFoundException`.
+      parameters:
+      - name: HumanLoopName
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/HumanLoopName'
+      responses:
+        '200': {}
+        '500':
+          description: |-
+            We couldn't process your request because of an issue with the server. Try again later.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerException'
+        '404':
+          description: |-
+            We couldn't find the requested resource. Check that your resources exists and were created in the same AWS Region as your request, and try your request again.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+        '429':
+          description: |-
+            You exceeded the maximum number of requests.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThrottlingException'
+        '400':
+          description: |-
+            The request isn't valid. Check the syntax and try again.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+    get:
+      operationId: DescribeHumanLoop
+      description: |-
+        Returns information about the specified human loop. If the human loop was deleted, this operation will return a `ResourceNotFoundException` error.
+      parameters:
+      - name: HumanLoopName
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/HumanLoopName'
+      responses:
+        '200': {}
+        '500':
+          description: |-
+            We couldn't process your request because of an issue with the server. Try again later.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerException'
+        '404':
+          description: |-
+            We couldn't find the requested resource. Check that your resources exists and were created in the same AWS Region as your request, and try your request again.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+        '429':
+          description: |-
+            You exceeded the maximum number of requests.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThrottlingException'
+        '400':
+          description: |-
+            The request isn't valid. Check the syntax and try again.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+  /human-loops:
+    get:
+      operationId: ListHumanLoops
+      description: |-
+        Returns information about human loops, given the specified parameters. If a human loop was deleted, it will not be included.
+      parameters:
+      - name: CreationTimeAfter
+        in: query
+        required: false
+        schema:
+          $ref: '#/components/schemas/Timestamp'
+      - name: CreationTimeBefore
+        in: query
+        required: false
+        schema:
+          $ref: '#/components/schemas/Timestamp'
+      - name: FlowDefinitionArn
+        in: query
+        required: true
+        schema:
+          $ref: '#/components/schemas/FlowDefinitionArn'
+      - name: SortOrder
+        in: query
+        required: false
+        schema:
+          $ref: '#/components/schemas/SortOrder'
+      - name: NextToken
+        in: query
+        required: false
+        schema:
+          $ref: '#/components/schemas/NextToken'
+      - name: MaxResults
+        in: query
+        required: false
+        schema:
+          $ref: '#/components/schemas/MaxResults'
+      responses:
+        '200': {}
+        '500':
+          description: |-
+            We couldn't process your request because of an issue with the server. Try again later.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerException'
+        '404':
+          description: |-
+            We couldn't find the requested resource. Check that your resources exists and were created in the same AWS Region as your request, and try your request again.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+        '429':
+          description: |-
+            You exceeded the maximum number of requests.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThrottlingException'
+        '400':
+          description: |-
+            The request isn't valid. Check the syntax and try again.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+    post:
+      operationId: StartHumanLoop
+      description: |-
+        Starts a human loop, provided that at least one activation condition is met.
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                HumanLoopName:
+                  $ref: '#/components/schemas/HumanLoopName'
+                FlowDefinitionArn:
+                  $ref: '#/components/schemas/FlowDefinitionArn'
+                HumanLoopInput:
+                  $ref: '#/components/schemas/HumanLoopInput'
+                DataAttributes:
+                  $ref: '#/components/schemas/HumanLoopDataAttributes'
+      responses:
+        '200': {}
+        '409':
+          description: |-
+            Your request has the same name as another active human loop but has different input data. You cannot start two human loops with the same name and different input data.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConflictException'
+        '500':
+          description: |-
+            We couldn't process your request because of an issue with the server. Try again later.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerException'
+        '402':
+          description: |-
+            You exceeded your service quota. Service quotas, also referred to as limits, are the maximum number of service resources or operations for your AWS account. For a list of Amazon A2I service quotes, see [Amazon Augmented AI Service Quotes](https://docs.aws.amazon.com/general/latest/gr/a2i.html). Delete some resources or request an increase in your service quota. You can request a quota increase using Service Quotas or the AWS Support Center. To request an increase, see [AWS Service Quotas](https://docs.aws.amazon.com/general/latest/gr/aws_service_limits.html) in the _AWS General Reference_.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServiceQuotaExceededException'
+        '429':
+          description: |-
+            You exceeded the maximum number of requests.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThrottlingException'
+        '400':
+          description: |-
+            The request isn't valid. Check the syntax and try again.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+  /human-loops/stop:
+    post:
+      operationId: StopHumanLoop
+      description: |-
+        Stops the specified human loop.
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                HumanLoopName:
+                  $ref: '#/components/schemas/HumanLoopName'
+      responses:
+        '200': {}
+        '500':
+          description: |-
+            We couldn't process your request because of an issue with the server. Try again later.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerException'
+        '404':
+          description: |-
+            We couldn't find the requested resource. Check that your resources exists and were created in the same AWS Region as your request, and try your request again.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+        '429':
+          description: |-
+            You exceeded the maximum number of requests.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThrottlingException'
+        '400':
+          description: |-
+            The request isn't valid. Check the syntax and try again.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
 components:
   schemas:
+    ConflictException:
+      type: object
+      properties:
+        Message:
+          $ref: '#/components/schemas/FailureReason'
+      description: Your request has the same name as another active human loop but
+        has different input data. You cannot start two human loops with the same name
+        and different input data.
     ContentClassifier:
       type: string
       enum:
@@ -65,6 +324,76 @@ components:
       type: array
       items:
         $ref: '#/components/schemas/ContentClassifier'
+    DeleteHumanLoopRequest:
+      type: object
+      properties:
+        HumanLoopName:
+          allOf:
+          - $ref: '#/components/schemas/HumanLoopName'
+          description: The name of the human loop that you want to delete.
+      required:
+      - HumanLoopName
+    DeleteHumanLoopResponse:
+      type: object
+      properties: {}
+    DescribeHumanLoopRequest:
+      type: object
+      properties:
+        HumanLoopName:
+          allOf:
+          - $ref: '#/components/schemas/HumanLoopName'
+          description: The name of the human loop that you want information about.
+      required:
+      - HumanLoopName
+    DescribeHumanLoopResponse:
+      type: object
+      properties:
+        CreationTime:
+          allOf:
+          - $ref: '#/components/schemas/Timestamp'
+          description: The creation time when Amazon Augmented AI created the human
+            loop.
+        FailureReason:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The reason why a human loop failed. The failure reason is returned
+            when the status of the human loop is `Failed`.
+        FailureCode:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: 'A failure code that identifies the type of failure.
+
+
+            Possible values: `ValidationError`, `Expired`, `InternalError`'
+        HumanLoopStatus:
+          allOf:
+          - $ref: '#/components/schemas/HumanLoopStatus'
+          description: The status of the human loop.
+        HumanLoopName:
+          allOf:
+          - $ref: '#/components/schemas/HumanLoopName'
+          description: 'The name of the human loop. The name must be lowercase, unique
+            within the Region in your account, and can have up to 63 characters. Valid
+            characters: a-z, 0-9, and - (hyphen).'
+        HumanLoopArn:
+          allOf:
+          - $ref: '#/components/schemas/HumanLoopArn'
+          description: The Amazon Resource Name (ARN) of the human loop.
+        FlowDefinitionArn:
+          allOf:
+          - $ref: '#/components/schemas/FlowDefinitionArn'
+          description: The Amazon Resource Name (ARN) of the flow definition.
+        HumanLoopOutput:
+          allOf:
+          - $ref: '#/components/schemas/HumanLoopOutput'
+          description: An object that contains information about the output of the
+            human loop.
+      required:
+      - CreationTime
+      - HumanLoopStatus
+      - HumanLoopName
+      - HumanLoopArn
+      - FlowDefinitionArn
     FailureReason:
       type: string
       minLength: 0
@@ -79,11 +408,49 @@ components:
       pattern: ^arn:aws[a-z\-]*:sagemaker:[a-z0-9\-]*:[0-9]{12}:human-loop/
       minLength: 0
       maxLength: 1024
+    HumanLoopDataAttributes:
+      type: object
+      properties:
+        ContentClassifiers:
+          allOf:
+          - $ref: '#/components/schemas/ContentClassifiers'
+          description: 'Declares that your content is free of personally identifiable
+            information or adult content.
+
+
+            Amazon SageMaker can restrict the Amazon Mechanical Turk workers who can
+            view your task based on this information.'
+      required:
+      - ContentClassifiers
+      description: Attributes of the data specified by the customer. Use these to
+        describe the data to be labeled.
+    HumanLoopInput:
+      type: object
+      properties:
+        InputContent:
+          allOf:
+          - $ref: '#/components/schemas/InputContent'
+          description: Serialized input from the human loop. The input must be a string
+            representation of a file in JSON format.
+      required:
+      - InputContent
+      description: An object containing the human loop input in JSON format.
     HumanLoopName:
       type: string
       pattern: ^[a-z0-9](-*[a-z0-9])*$
       minLength: 1
       maxLength: 63
+    HumanLoopOutput:
+      type: object
+      properties:
+        OutputS3Uri:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The location of the Amazon S3 object where Amazon Augmented
+            AI stores your human loop output.
+      required:
+      - OutputS3Uri
+      description: Information about where the human output will be stored.
     HumanLoopStatus:
       type: string
       enum:
@@ -96,10 +463,92 @@ components:
       type: array
       items:
         $ref: '#/components/schemas/HumanLoopSummary'
+    HumanLoopSummary:
+      type: object
+      properties:
+        HumanLoopName:
+          allOf:
+          - $ref: '#/components/schemas/HumanLoopName'
+          description: The name of the human loop.
+        HumanLoopStatus:
+          allOf:
+          - $ref: '#/components/schemas/HumanLoopStatus'
+          description: The status of the human loop.
+        CreationTime:
+          allOf:
+          - $ref: '#/components/schemas/Timestamp'
+          description: When Amazon Augmented AI created the human loop.
+        FailureReason:
+          allOf:
+          - $ref: '#/components/schemas/FailureReason'
+          description: The reason why the human loop failed. A failure reason is returned
+            when the status of the human loop is `Failed`.
+        FlowDefinitionArn:
+          allOf:
+          - $ref: '#/components/schemas/FlowDefinitionArn'
+          description: The Amazon Resource Name (ARN) of the flow definition used
+            to configure the human loop.
+      description: Summary information about the human loop.
     InputContent:
       type: string
       minLength: 0
       maxLength: 3145728
+    InternalServerException:
+      type: object
+      properties:
+        Message:
+          $ref: '#/components/schemas/FailureReason'
+      description: We couldn't process your request because of an issue with the server.
+        Try again later.
+    ListHumanLoopsRequest:
+      type: object
+      properties:
+        CreationTimeAfter:
+          allOf:
+          - $ref: '#/components/schemas/Timestamp'
+          description: (Optional) The timestamp of the date when you want the human
+            loops to begin in ISO 8601 format. For example, `2020-02-24`.
+        CreationTimeBefore:
+          allOf:
+          - $ref: '#/components/schemas/Timestamp'
+          description: (Optional) The timestamp of the date before which you want
+            the human loops to begin in ISO 8601 format. For example, `2020-02-24`.
+        FlowDefinitionArn:
+          allOf:
+          - $ref: '#/components/schemas/FlowDefinitionArn'
+          description: The Amazon Resource Name (ARN) of a flow definition.
+        SortOrder:
+          allOf:
+          - $ref: '#/components/schemas/SortOrder'
+          description: 'Optional. The order for displaying results. Valid values:
+            `Ascending` and `Descending`.'
+        NextToken:
+          allOf:
+          - $ref: '#/components/schemas/NextToken'
+          description: A token to display the next page of results.
+        MaxResults:
+          allOf:
+          - $ref: '#/components/schemas/MaxResults'
+          description: The total number of items to return. If the total number of
+            available items is more than the value specified in `MaxResults`, then
+            a `NextToken` is returned in the output. You can use this token to display
+            the next page of results.
+      required:
+      - FlowDefinitionArn
+    ListHumanLoopsResponse:
+      type: object
+      properties:
+        HumanLoopSummaries:
+          allOf:
+          - $ref: '#/components/schemas/HumanLoopSummaries'
+          description: An array of objects that contain information about the human
+            loops.
+        NextToken:
+          allOf:
+          - $ref: '#/components/schemas/NextToken'
+          description: A token to display the next page of results.
+      required:
+      - HumanLoopSummaries
     MaxResults:
       type: integer
       minimum: 1
@@ -109,13 +558,91 @@ components:
       pattern: .*
       minLength: 0
       maxLength: 8192
+    ResourceNotFoundException:
+      type: object
+      properties:
+        Message:
+          $ref: '#/components/schemas/FailureReason'
+      description: We couldn't find the requested resource. Check that your resources
+        exists and were created in the same AWS Region as your request, and try your
+        request again.
+    ServiceQuotaExceededException:
+      type: object
+      properties:
+        Message:
+          $ref: '#/components/schemas/FailureReason'
+      description: You exceeded your service quota. Service quotas, also referred
+        to as limits, are the maximum number of service resources or operations for
+        your AWS account. For a list of Amazon A2I service quotes, see [Amazon Augmented
+        AI Service Quotes](https://docs.aws.amazon.com/general/latest/gr/a2i.html).
+        Delete some resources or request an increase in your service quota. You can
+        request a quota increase using Service Quotas or the AWS Support Center. To
+        request an increase, see [AWS Service Quotas](https://docs.aws.amazon.com/general/latest/gr/aws_service_limits.html)
+        in the _AWS General Reference_.
     SortOrder:
       type: string
       enum:
       - Ascending
       - Descending
+    StartHumanLoopRequest:
+      type: object
+      properties:
+        HumanLoopName:
+          allOf:
+          - $ref: '#/components/schemas/HumanLoopName'
+          description: The name of the human loop.
+        FlowDefinitionArn:
+          allOf:
+          - $ref: '#/components/schemas/FlowDefinitionArn'
+          description: The Amazon Resource Name (ARN) of the flow definition associated
+            with this human loop.
+        HumanLoopInput:
+          allOf:
+          - $ref: '#/components/schemas/HumanLoopInput'
+          description: An object that contains information about the human loop.
+        DataAttributes:
+          allOf:
+          - $ref: '#/components/schemas/HumanLoopDataAttributes'
+          description: Attributes of the specified data. Use `DataAttributes` to specify
+            if your data is free of personally identifiable information and/or free
+            of adult content.
+      required:
+      - HumanLoopName
+      - FlowDefinitionArn
+      - HumanLoopInput
+    StartHumanLoopResponse:
+      type: object
+      properties:
+        HumanLoopArn:
+          allOf:
+          - $ref: '#/components/schemas/HumanLoopArn'
+          description: The Amazon Resource Name (ARN) of the human loop.
+    StopHumanLoopRequest:
+      type: object
+      properties:
+        HumanLoopName:
+          allOf:
+          - $ref: '#/components/schemas/HumanLoopName'
+          description: The name of the human loop that you want to stop.
+      required:
+      - HumanLoopName
+    StopHumanLoopResponse:
+      type: object
+      properties: {}
     String:
       type: string
+    ThrottlingException:
+      type: object
+      properties:
+        Message:
+          $ref: '#/components/schemas/FailureReason'
+      description: You exceeded the maximum number of requests.
     Timestamp:
       type: string
       format: date-time
+    ValidationException:
+      type: object
+      properties:
+        Message:
+          $ref: '#/components/schemas/FailureReason'
+      description: The request isn't valid. Check the syntax and try again.

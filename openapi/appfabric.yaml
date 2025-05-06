@@ -7,7 +7,7 @@ info:
   x-stackql-serviceName: appfabric
   x-aws-serviceName: appfabric
   x-aws-protocol: aws.protocols#restJson1
-  x-dateGenerated: '2025-05-05'
+  x-dateGenerated: '2025-05-07'
   version: '2023-05-19'
   title: AppFabric
   description: |-
@@ -43,9 +43,1624 @@ servers:
       - sa-east-1
       - me-south-1
       default: us-east-1
-paths: {}
+paths:
+  /useraccess/batchget:
+    post:
+      operationId: BatchGetUserAccessTasks
+      description: |-
+        Gets user access details in a batch request.
+
+        This action polls data from the tasks that are kicked off by the `StartUserAccessTasks` action.
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                appBundleIdentifier:
+                  $ref: '#/components/schemas/Identifier'
+                taskIdList:
+                  $ref: '#/components/schemas/TaskIdList'
+      responses:
+        '200': {}
+        '403':
+          description: |-
+            You are not authorized to perform this operation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '500':
+          description: |-
+            The request processing has failed because of an unknown error, exception, or failure with an internal server.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerException'
+        '404':
+          description: |-
+            The specified resource does not exist.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+        '429':
+          description: |-
+            The request rate exceeds the limit.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThrottlingException'
+        '400':
+          description: |-
+            The request has invalid or missing parameters.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+  /appbundles/{appBundleIdentifier}/appauthorizations/{appAuthorizationIdentifier}/connect:
+    post:
+      operationId: ConnectAppAuthorization
+      description: |-
+        Establishes a connection between Amazon Web Services AppFabric and an application, which allows AppFabric to call the APIs of the application.
+      parameters:
+      - name: appBundleIdentifier
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/Identifier'
+      - name: appAuthorizationIdentifier
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/Identifier'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                authRequest:
+                  $ref: '#/components/schemas/AuthRequest'
+      responses:
+        '200': {}
+        '403':
+          description: |-
+            You are not authorized to perform this operation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '500':
+          description: |-
+            The request processing has failed because of an unknown error, exception, or failure with an internal server.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerException'
+        '404':
+          description: |-
+            The specified resource does not exist.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+        '429':
+          description: |-
+            The request rate exceeds the limit.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThrottlingException'
+        '400':
+          description: |-
+            The request has invalid or missing parameters.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+  /appbundles/{appBundleIdentifier}/appauthorizations:
+    post:
+      operationId: CreateAppAuthorization
+      description: |-
+        Creates an app authorization within an app bundle, which allows AppFabric to connect to an application.
+      parameters:
+      - name: appBundleIdentifier
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/Identifier'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                app:
+                  $ref: '#/components/schemas/String255'
+                credential:
+                  $ref: '#/components/schemas/Credential'
+                tenant:
+                  $ref: '#/components/schemas/Tenant'
+                authType:
+                  $ref: '#/components/schemas/AuthType'
+                clientToken:
+                  $ref: '#/components/schemas/UUID'
+                tags:
+                  $ref: '#/components/schemas/TagList'
+      responses:
+        '201': {}
+        '403':
+          description: |-
+            You are not authorized to perform this operation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '409':
+          description: |-
+            The request has created a conflict. Check the request parameters and try again.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConflictException'
+        '500':
+          description: |-
+            The request processing has failed because of an unknown error, exception, or failure with an internal server.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerException'
+        '404':
+          description: |-
+            The specified resource does not exist.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+        '402':
+          description: |-
+            The request exceeds a service quota.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServiceQuotaExceededException'
+        '429':
+          description: |-
+            The request rate exceeds the limit.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThrottlingException'
+        '400':
+          description: |-
+            The request has invalid or missing parameters.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+    get:
+      operationId: ListAppAuthorizations
+      description: |-
+        Returns a list of all app authorizations configured for an app bundle.
+      parameters:
+      - name: appBundleIdentifier
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/Identifier'
+      - name: maxResults
+        in: query
+        required: false
+        schema:
+          $ref: '#/components/schemas/MaxResults'
+      - name: nextToken
+        in: query
+        required: false
+        schema:
+          $ref: '#/components/schemas/String2048'
+      responses:
+        '200': {}
+        '403':
+          description: |-
+            You are not authorized to perform this operation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '500':
+          description: |-
+            The request processing has failed because of an unknown error, exception, or failure with an internal server.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerException'
+        '404':
+          description: |-
+            The specified resource does not exist.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+        '429':
+          description: |-
+            The request rate exceeds the limit.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThrottlingException'
+        '400':
+          description: |-
+            The request has invalid or missing parameters.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+  /appbundles:
+    post:
+      operationId: CreateAppBundle
+      description: |-
+        Creates an app bundle to collect data from an application using AppFabric.
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                clientToken:
+                  $ref: '#/components/schemas/UUID'
+                customerManagedKeyIdentifier:
+                  $ref: '#/components/schemas/Identifier'
+                tags:
+                  $ref: '#/components/schemas/TagList'
+      responses:
+        '201': {}
+        '403':
+          description: |-
+            You are not authorized to perform this operation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '409':
+          description: |-
+            The request has created a conflict. Check the request parameters and try again.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConflictException'
+        '500':
+          description: |-
+            The request processing has failed because of an unknown error, exception, or failure with an internal server.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerException'
+        '402':
+          description: |-
+            The request exceeds a service quota.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServiceQuotaExceededException'
+        '429':
+          description: |-
+            The request rate exceeds the limit.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThrottlingException'
+        '400':
+          description: |-
+            The request has invalid or missing parameters.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+    get:
+      operationId: ListAppBundles
+      description: |-
+        Returns a list of app bundles.
+      parameters:
+      - name: maxResults
+        in: query
+        required: false
+        schema:
+          $ref: '#/components/schemas/MaxResults'
+      - name: nextToken
+        in: query
+        required: false
+        schema:
+          $ref: '#/components/schemas/String2048'
+      responses:
+        '200': {}
+        '403':
+          description: |-
+            You are not authorized to perform this operation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '500':
+          description: |-
+            The request processing has failed because of an unknown error, exception, or failure with an internal server.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerException'
+        '429':
+          description: |-
+            The request rate exceeds the limit.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThrottlingException'
+        '400':
+          description: |-
+            The request has invalid or missing parameters.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+  /appbundles/{appBundleIdentifier}/ingestions:
+    post:
+      operationId: CreateIngestion
+      description: |-
+        Creates a data ingestion for an application.
+      parameters:
+      - name: appBundleIdentifier
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/Identifier'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                app:
+                  $ref: '#/components/schemas/String255'
+                tenantId:
+                  $ref: '#/components/schemas/TenantIdentifier'
+                ingestionType:
+                  $ref: '#/components/schemas/IngestionType'
+                clientToken:
+                  $ref: '#/components/schemas/UUID'
+                tags:
+                  $ref: '#/components/schemas/TagList'
+      responses:
+        '201': {}
+        '403':
+          description: |-
+            You are not authorized to perform this operation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '409':
+          description: |-
+            The request has created a conflict. Check the request parameters and try again.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConflictException'
+        '500':
+          description: |-
+            The request processing has failed because of an unknown error, exception, or failure with an internal server.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerException'
+        '402':
+          description: |-
+            The request exceeds a service quota.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServiceQuotaExceededException'
+        '429':
+          description: |-
+            The request rate exceeds the limit.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThrottlingException'
+        '400':
+          description: |-
+            The request has invalid or missing parameters.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+    get:
+      operationId: ListIngestions
+      description: |-
+        Returns a list of all ingestions configured for an app bundle.
+      parameters:
+      - name: appBundleIdentifier
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/Identifier'
+      - name: maxResults
+        in: query
+        required: false
+        schema:
+          $ref: '#/components/schemas/MaxResults'
+      - name: nextToken
+        in: query
+        required: false
+        schema:
+          $ref: '#/components/schemas/String'
+      responses:
+        '200': {}
+        '403':
+          description: |-
+            You are not authorized to perform this operation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '500':
+          description: |-
+            The request processing has failed because of an unknown error, exception, or failure with an internal server.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerException'
+        '404':
+          description: |-
+            The specified resource does not exist.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+        '429':
+          description: |-
+            The request rate exceeds the limit.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThrottlingException'
+        '400':
+          description: |-
+            The request has invalid or missing parameters.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+  /appbundles/{appBundleIdentifier}/ingestions/{ingestionIdentifier}/ingestiondestinations:
+    post:
+      operationId: CreateIngestionDestination
+      description: |-
+        Creates an ingestion destination, which specifies how an application's ingested data is processed by Amazon Web Services AppFabric and where it's delivered.
+      parameters:
+      - name: appBundleIdentifier
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/Identifier'
+      - name: ingestionIdentifier
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/Identifier'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                processingConfiguration:
+                  $ref: '#/components/schemas/ProcessingConfiguration'
+                destinationConfiguration:
+                  $ref: '#/components/schemas/DestinationConfiguration'
+                clientToken:
+                  $ref: '#/components/schemas/UUID'
+                tags:
+                  $ref: '#/components/schemas/TagList'
+      responses:
+        '201': {}
+        '403':
+          description: |-
+            You are not authorized to perform this operation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '409':
+          description: |-
+            The request has created a conflict. Check the request parameters and try again.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConflictException'
+        '500':
+          description: |-
+            The request processing has failed because of an unknown error, exception, or failure with an internal server.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerException'
+        '402':
+          description: |-
+            The request exceeds a service quota.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServiceQuotaExceededException'
+        '429':
+          description: |-
+            The request rate exceeds the limit.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThrottlingException'
+        '400':
+          description: |-
+            The request has invalid or missing parameters.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+    get:
+      operationId: ListIngestionDestinations
+      description: |-
+        Returns a list of all ingestion destinations configured for an ingestion.
+      parameters:
+      - name: appBundleIdentifier
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/Identifier'
+      - name: ingestionIdentifier
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/Identifier'
+      - name: maxResults
+        in: query
+        required: false
+        schema:
+          $ref: '#/components/schemas/MaxResults'
+      - name: nextToken
+        in: query
+        required: false
+        schema:
+          $ref: '#/components/schemas/String'
+      responses:
+        '200': {}
+        '403':
+          description: |-
+            You are not authorized to perform this operation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '500':
+          description: |-
+            The request processing has failed because of an unknown error, exception, or failure with an internal server.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerException'
+        '404':
+          description: |-
+            The specified resource does not exist.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+        '429':
+          description: |-
+            The request rate exceeds the limit.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThrottlingException'
+        '400':
+          description: |-
+            The request has invalid or missing parameters.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+  /appbundles/{appBundleIdentifier}/appauthorizations/{appAuthorizationIdentifier}:
+    delete:
+      operationId: DeleteAppAuthorization
+      description: |-
+        Deletes an app authorization. You must delete the associated ingestion before you can delete an app authorization.
+      parameters:
+      - name: appBundleIdentifier
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/Identifier'
+      - name: appAuthorizationIdentifier
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/Identifier'
+      responses:
+        '204': {}
+        '403':
+          description: |-
+            You are not authorized to perform this operation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '500':
+          description: |-
+            The request processing has failed because of an unknown error, exception, or failure with an internal server.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerException'
+        '404':
+          description: |-
+            The specified resource does not exist.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+        '429':
+          description: |-
+            The request rate exceeds the limit.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThrottlingException'
+        '400':
+          description: |-
+            The request has invalid or missing parameters.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+    get:
+      operationId: GetAppAuthorization
+      description: |-
+        Returns information about an app authorization.
+      parameters:
+      - name: appBundleIdentifier
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/Identifier'
+      - name: appAuthorizationIdentifier
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/Identifier'
+      responses:
+        '200': {}
+        '403':
+          description: |-
+            You are not authorized to perform this operation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '500':
+          description: |-
+            The request processing has failed because of an unknown error, exception, or failure with an internal server.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerException'
+        '404':
+          description: |-
+            The specified resource does not exist.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+        '429':
+          description: |-
+            The request rate exceeds the limit.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThrottlingException'
+        '400':
+          description: |-
+            The request has invalid or missing parameters.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+    patch:
+      operationId: UpdateAppAuthorization
+      description: |-
+        Updates an app authorization within an app bundle, which allows AppFabric to connect to an application.
+
+        If the app authorization was in a `connected` state, updating the app authorization will set it back to a `PendingConnect` state.
+      parameters:
+      - name: appBundleIdentifier
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/Identifier'
+      - name: appAuthorizationIdentifier
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/Identifier'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                credential:
+                  $ref: '#/components/schemas/Credential'
+                tenant:
+                  $ref: '#/components/schemas/Tenant'
+      responses:
+        '200': {}
+        '403':
+          description: |-
+            You are not authorized to perform this operation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '500':
+          description: |-
+            The request processing has failed because of an unknown error, exception, or failure with an internal server.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerException'
+        '404':
+          description: |-
+            The specified resource does not exist.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+        '429':
+          description: |-
+            The request rate exceeds the limit.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThrottlingException'
+        '400':
+          description: |-
+            The request has invalid or missing parameters.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+  /appbundles/{appBundleIdentifier}:
+    delete:
+      operationId: DeleteAppBundle
+      description: |-
+        Deletes an app bundle. You must delete all associated app authorizations before you can delete an app bundle.
+      parameters:
+      - name: appBundleIdentifier
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/Identifier'
+      responses:
+        '204': {}
+        '403':
+          description: |-
+            You are not authorized to perform this operation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '409':
+          description: |-
+            The request has created a conflict. Check the request parameters and try again.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConflictException'
+        '500':
+          description: |-
+            The request processing has failed because of an unknown error, exception, or failure with an internal server.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerException'
+        '429':
+          description: |-
+            The request rate exceeds the limit.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThrottlingException'
+        '400':
+          description: |-
+            The request has invalid or missing parameters.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+    get:
+      operationId: GetAppBundle
+      description: |-
+        Returns information about an app bundle.
+      parameters:
+      - name: appBundleIdentifier
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/Identifier'
+      responses:
+        '200': {}
+        '403':
+          description: |-
+            You are not authorized to perform this operation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '500':
+          description: |-
+            The request processing has failed because of an unknown error, exception, or failure with an internal server.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerException'
+        '404':
+          description: |-
+            The specified resource does not exist.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+        '429':
+          description: |-
+            The request rate exceeds the limit.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThrottlingException'
+        '400':
+          description: |-
+            The request has invalid or missing parameters.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+  /appbundles/{appBundleIdentifier}/ingestions/{ingestionIdentifier}:
+    delete:
+      operationId: DeleteIngestion
+      description: |-
+        Deletes an ingestion. You must stop (disable) the ingestion and you must delete all associated ingestion destinations before you can delete an app ingestion.
+      parameters:
+      - name: appBundleIdentifier
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/Identifier'
+      - name: ingestionIdentifier
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/Identifier'
+      responses:
+        '204': {}
+        '403':
+          description: |-
+            You are not authorized to perform this operation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '500':
+          description: |-
+            The request processing has failed because of an unknown error, exception, or failure with an internal server.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerException'
+        '404':
+          description: |-
+            The specified resource does not exist.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+        '429':
+          description: |-
+            The request rate exceeds the limit.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThrottlingException'
+        '400':
+          description: |-
+            The request has invalid or missing parameters.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+    get:
+      operationId: GetIngestion
+      description: |-
+        Returns information about an ingestion.
+      parameters:
+      - name: appBundleIdentifier
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/Identifier'
+      - name: ingestionIdentifier
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/Identifier'
+      responses:
+        '200': {}
+        '403':
+          description: |-
+            You are not authorized to perform this operation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '500':
+          description: |-
+            The request processing has failed because of an unknown error, exception, or failure with an internal server.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerException'
+        '404':
+          description: |-
+            The specified resource does not exist.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+        '429':
+          description: |-
+            The request rate exceeds the limit.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThrottlingException'
+        '400':
+          description: |-
+            The request has invalid or missing parameters.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+  /appbundles/{appBundleIdentifier}/ingestions/{ingestionIdentifier}/ingestiondestinations/{ingestionDestinationIdentifier}:
+    delete:
+      operationId: DeleteIngestionDestination
+      description: |-
+        Deletes an ingestion destination.
+
+        This deletes the association between an ingestion and it's destination. It doesn't delete previously ingested data or the storage destination, such as the Amazon S3 bucket where the data is delivered. If the ingestion destination is deleted while the associated ingestion is enabled, the ingestion will fail and is eventually disabled.
+      parameters:
+      - name: appBundleIdentifier
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/Identifier'
+      - name: ingestionIdentifier
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/Identifier'
+      - name: ingestionDestinationIdentifier
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/Identifier'
+      responses:
+        '204': {}
+        '403':
+          description: |-
+            You are not authorized to perform this operation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '500':
+          description: |-
+            The request processing has failed because of an unknown error, exception, or failure with an internal server.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerException'
+        '404':
+          description: |-
+            The specified resource does not exist.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+        '429':
+          description: |-
+            The request rate exceeds the limit.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThrottlingException'
+        '400':
+          description: |-
+            The request has invalid or missing parameters.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+    get:
+      operationId: GetIngestionDestination
+      description: |-
+        Returns information about an ingestion destination.
+      parameters:
+      - name: appBundleIdentifier
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/Identifier'
+      - name: ingestionIdentifier
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/Identifier'
+      - name: ingestionDestinationIdentifier
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/Identifier'
+      responses:
+        '200': {}
+        '403':
+          description: |-
+            You are not authorized to perform this operation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '500':
+          description: |-
+            The request processing has failed because of an unknown error, exception, or failure with an internal server.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerException'
+        '404':
+          description: |-
+            The specified resource does not exist.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+        '429':
+          description: |-
+            The request rate exceeds the limit.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThrottlingException'
+        '400':
+          description: |-
+            The request has invalid or missing parameters.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+    patch:
+      operationId: UpdateIngestionDestination
+      description: |-
+        Updates an ingestion destination, which specifies how an application's ingested data is processed by Amazon Web Services AppFabric and where it's delivered.
+      parameters:
+      - name: appBundleIdentifier
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/Identifier'
+      - name: ingestionIdentifier
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/Identifier'
+      - name: ingestionDestinationIdentifier
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/Identifier'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                destinationConfiguration:
+                  $ref: '#/components/schemas/DestinationConfiguration'
+      responses:
+        '200': {}
+        '403':
+          description: |-
+            You are not authorized to perform this operation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '409':
+          description: |-
+            The request has created a conflict. Check the request parameters and try again.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConflictException'
+        '500':
+          description: |-
+            The request processing has failed because of an unknown error, exception, or failure with an internal server.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerException'
+        '404':
+          description: |-
+            The specified resource does not exist.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+        '402':
+          description: |-
+            The request exceeds a service quota.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServiceQuotaExceededException'
+        '429':
+          description: |-
+            The request rate exceeds the limit.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThrottlingException'
+        '400':
+          description: |-
+            The request has invalid or missing parameters.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+  /tags/{resourceArn}:
+    get:
+      operationId: ListTagsForResource
+      description: |-
+        Returns a list of tags for a resource.
+      parameters:
+      - name: resourceArn
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/Arn'
+      responses:
+        '200': {}
+        '403':
+          description: |-
+            You are not authorized to perform this operation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '500':
+          description: |-
+            The request processing has failed because of an unknown error, exception, or failure with an internal server.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerException'
+        '404':
+          description: |-
+            The specified resource does not exist.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+        '429':
+          description: |-
+            The request rate exceeds the limit.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThrottlingException'
+        '400':
+          description: |-
+            The request has invalid or missing parameters.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+    post:
+      operationId: TagResource
+      description: |-
+        Assigns one or more tags (key-value pairs) to the specified resource.
+      parameters:
+      - name: resourceArn
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/Arn'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                tags:
+                  $ref: '#/components/schemas/TagList'
+      responses:
+        '200': {}
+        '403':
+          description: |-
+            You are not authorized to perform this operation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '500':
+          description: |-
+            The request processing has failed because of an unknown error, exception, or failure with an internal server.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerException'
+        '404':
+          description: |-
+            The specified resource does not exist.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+        '429':
+          description: |-
+            The request rate exceeds the limit.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThrottlingException'
+        '400':
+          description: |-
+            The request has invalid or missing parameters.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+    delete:
+      operationId: UntagResource
+      description: |-
+        Removes a tag or tags from a resource.
+      parameters:
+      - name: resourceArn
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/Arn'
+      - name: tagKeys
+        in: query
+        required: true
+        schema:
+          $ref: '#/components/schemas/TagKeyList'
+      responses:
+        '200': {}
+        '403':
+          description: |-
+            You are not authorized to perform this operation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '500':
+          description: |-
+            The request processing has failed because of an unknown error, exception, or failure with an internal server.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerException'
+        '404':
+          description: |-
+            The specified resource does not exist.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+        '429':
+          description: |-
+            The request rate exceeds the limit.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThrottlingException'
+        '400':
+          description: |-
+            The request has invalid or missing parameters.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+  /appbundles/{appBundleIdentifier}/ingestions/{ingestionIdentifier}/start:
+    post:
+      operationId: StartIngestion
+      description: |-
+        Starts (enables) an ingestion, which collects data from an application.
+      parameters:
+      - name: ingestionIdentifier
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/Identifier'
+      - name: appBundleIdentifier
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/Identifier'
+      responses:
+        '200': {}
+        '403':
+          description: |-
+            You are not authorized to perform this operation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '409':
+          description: |-
+            The request has created a conflict. Check the request parameters and try again.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConflictException'
+        '500':
+          description: |-
+            The request processing has failed because of an unknown error, exception, or failure with an internal server.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerException'
+        '404':
+          description: |-
+            The specified resource does not exist.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+        '429':
+          description: |-
+            The request rate exceeds the limit.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThrottlingException'
+        '400':
+          description: |-
+            The request has invalid or missing parameters.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+  /useraccess/start:
+    post:
+      operationId: StartUserAccessTasks
+      description: |-
+        Starts the tasks to search user access status for a specific email address.
+
+        The tasks are stopped when the user access status data is found. The tasks are terminated when the API calls to the application time out.
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                appBundleIdentifier:
+                  $ref: '#/components/schemas/Identifier'
+                email:
+                  $ref: '#/components/schemas/Email'
+      responses:
+        '201': {}
+        '403':
+          description: |-
+            You are not authorized to perform this operation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '500':
+          description: |-
+            The request processing has failed because of an unknown error, exception, or failure with an internal server.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerException'
+        '404':
+          description: |-
+            The specified resource does not exist.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+        '429':
+          description: |-
+            The request rate exceeds the limit.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThrottlingException'
+        '400':
+          description: |-
+            The request has invalid or missing parameters.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+  /appbundles/{appBundleIdentifier}/ingestions/{ingestionIdentifier}/stop:
+    post:
+      operationId: StopIngestion
+      description: |-
+        Stops (disables) an ingestion.
+      parameters:
+      - name: ingestionIdentifier
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/Identifier'
+      - name: appBundleIdentifier
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/Identifier'
+      responses:
+        '200': {}
+        '403':
+          description: |-
+            You are not authorized to perform this operation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '409':
+          description: |-
+            The request has created a conflict. Check the request parameters and try again.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConflictException'
+        '500':
+          description: |-
+            The request processing has failed because of an unknown error, exception, or failure with an internal server.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerException'
+        '404':
+          description: |-
+            The specified resource does not exist.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+        '429':
+          description: |-
+            The request rate exceeds the limit.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThrottlingException'
+        '400':
+          description: |-
+            The request has invalid or missing parameters.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
 components:
   schemas:
+    AccessDeniedException:
+      type: object
+      properties:
+        message:
+          $ref: '#/components/schemas/String'
+      required:
+      - message
+      description: You are not authorized to perform this operation.
+    ApiKeyCredential:
+      type: object
+      properties:
+        apiKey:
+          allOf:
+          - $ref: '#/components/schemas/SensitiveString2048'
+          description: An API key for an application.
+      required:
+      - apiKey
+      description: Contains API key credential information.
+    AppAuthorization:
+      type: object
+      properties:
+        appAuthorizationArn:
+          allOf:
+          - $ref: '#/components/schemas/Arn'
+          description: The Amazon Resource Name (ARN) of the app authorization.
+        appBundleArn:
+          allOf:
+          - $ref: '#/components/schemas/Arn'
+          description: The Amazon Resource Name (ARN) of the app bundle for the app
+            authorization.
+        app:
+          allOf:
+          - $ref: '#/components/schemas/String255'
+          description: The name of the application.
+        tenant:
+          allOf:
+          - $ref: '#/components/schemas/Tenant'
+          description: Contains information about an application tenant, such as the
+            application display name and identifier.
+        authType:
+          allOf:
+          - $ref: '#/components/schemas/AuthType'
+          description: The authorization type.
+        status:
+          allOf:
+          - $ref: '#/components/schemas/AppAuthorizationStatus'
+          description: "The state of the app authorization.\n\nThe following states\
+            \ are possible:\n\n  * `PendingConnect`: The initial state of the app\
+            \ authorization. The app authorization is created but not yet connected.\n\
+            \n  * `Connected`: The app authorization is connected to the application,\
+            \ and is ready to be used.\n\n  * `ConnectionValidationFailed`: The app\
+            \ authorization received a validation exception when trying to connect\
+            \ to the application. If the app authorization is in this state, you should\
+            \ verify the configured credentials and try to connect the app authorization\
+            \ again.\n\n  * `TokenAutoRotationFailed`: AppFabric failed to refresh\
+            \ the access token. If the app authorization is in this state, you should\
+            \ try to reconnect the app authorization."
+        createdAt:
+          allOf:
+          - $ref: '#/components/schemas/DateTime'
+          description: The timestamp of when the app authorization was created.
+        updatedAt:
+          allOf:
+          - $ref: '#/components/schemas/DateTime'
+          description: The timestamp of when the app authorization was last updated.
+        persona:
+          allOf:
+          - $ref: '#/components/schemas/Persona'
+          description: 'The user persona of the app authorization.
+
+
+            This field should always be `admin`.'
+        authUrl:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The application URL for the OAuth flow.
+      required:
+      - appAuthorizationArn
+      - appBundleArn
+      - app
+      - tenant
+      - authType
+      - status
+      - createdAt
+      - updatedAt
+      description: Contains information about an app authorization.
     AppAuthorizationStatus:
       type: string
       enum:
@@ -53,10 +1668,82 @@ components:
       - Connected
       - ConnectionValidationFailed
       - TokenAutoRotationFailed
+    AppAuthorizationSummary:
+      type: object
+      properties:
+        appAuthorizationArn:
+          allOf:
+          - $ref: '#/components/schemas/Arn'
+          description: The Amazon Resource Name (ARN) of the app authorization.
+        appBundleArn:
+          allOf:
+          - $ref: '#/components/schemas/Arn'
+          description: The Amazon Resource Name (ARN) of the app bundle for the app
+            authorization.
+        app:
+          allOf:
+          - $ref: '#/components/schemas/String255'
+          description: The name of the application.
+        tenant:
+          allOf:
+          - $ref: '#/components/schemas/Tenant'
+          description: Contains information about an application tenant, such as the
+            application display name and identifier.
+        status:
+          allOf:
+          - $ref: '#/components/schemas/AppAuthorizationStatus'
+          description: "The state of the app authorization.\n\nThe following states\
+            \ are possible:\n\n  * `PendingConnect`: The initial state of the app\
+            \ authorization. The app authorization is created but not yet connected.\n\
+            \n  * `Connected`: The app authorization is connected to the application,\
+            \ and is ready to be used.\n\n  * `ConnectionValidationFailed`: The app\
+            \ authorization received a validation exception when trying to connect\
+            \ to the application. If the app authorization is in this state, you should\
+            \ verify the configured credentials and try to connect the app authorization\
+            \ again.\n\n  * `TokenAutoRotationFailed`: AppFabric failed to refresh\
+            \ the access token. If the app authorization is in this state, you should\
+            \ try to reconnect the app authorization."
+        updatedAt:
+          allOf:
+          - $ref: '#/components/schemas/DateTime'
+          description: Timestamp for when the app authorization was last updated.
+      required:
+      - appAuthorizationArn
+      - appBundleArn
+      - app
+      - tenant
+      - status
+      - updatedAt
+      description: Contains a summary of an app authorization.
     AppAuthorizationSummaryList:
       type: array
       items:
         $ref: '#/components/schemas/AppAuthorizationSummary'
+    AppBundle:
+      type: object
+      properties:
+        arn:
+          allOf:
+          - $ref: '#/components/schemas/Arn'
+          description: The Amazon Resource Name (ARN) of the app bundle.
+        customerManagedKeyArn:
+          allOf:
+          - $ref: '#/components/schemas/Arn'
+          description: The Amazon Resource Name (ARN) of the Key Management Service
+            (KMS) key used to encrypt the application data.
+      required:
+      - arn
+      description: Contains information about an app bundle.
+    AppBundleSummary:
+      type: object
+      properties:
+        arn:
+          allOf:
+          - $ref: '#/components/schemas/Arn'
+          description: The Amazon Resource Name (ARN) of the app bundle.
+      required:
+      - arn
+      description: Contains a summary of an app bundle.
     AppBundleSummaryList:
       type: array
       items:
@@ -66,11 +1753,356 @@ components:
       pattern: ^arn:.+$
       minLength: 1
       maxLength: 1011
+    AuditLogDestinationConfiguration:
+      type: object
+      properties:
+        destination:
+          allOf:
+          - $ref: '#/components/schemas/Destination'
+          description: Contains information about an audit log destination.
+      required:
+      - destination
+      description: Contains information about an audit log destination configuration.
+    AuditLogProcessingConfiguration:
+      type: object
+      properties:
+        schema:
+          allOf:
+          - $ref: '#/components/schemas/Schema'
+          description: The event schema in which the audit logs need to be formatted.
+        format:
+          allOf:
+          - $ref: '#/components/schemas/Format'
+          description: The format in which the audit logs need to be formatted.
+      required:
+      - schema
+      - format
+      description: Contains information about an audit log processing configuration.
+    AuthRequest:
+      type: object
+      properties:
+        redirectUri:
+          allOf:
+          - $ref: '#/components/schemas/RedirectUri'
+          description: The redirect URL that is specified in the AuthURL and the application
+            client.
+        code:
+          allOf:
+          - $ref: '#/components/schemas/SensitiveString2048'
+          description: The authorization code returned by the application after permission
+            is granted in the application OAuth page (after clicking on the AuthURL).
+      required:
+      - redirectUri
+      - code
+      description: Contains authorization request information, which is required for
+        Amazon Web Services AppFabric to get the OAuth2 access token for an application.
     AuthType:
       type: string
       enum:
       - oauth2
       - apiKey
+    BatchGetUserAccessTasksRequest:
+      type: object
+      properties:
+        appBundleIdentifier:
+          allOf:
+          - $ref: '#/components/schemas/Identifier'
+          description: The Amazon Resource Name (ARN) or Universal Unique Identifier
+            (UUID) of the app bundle to use for the request.
+        taskIdList:
+          allOf:
+          - $ref: '#/components/schemas/TaskIdList'
+          description: The tasks IDs to use for the request.
+      required:
+      - appBundleIdentifier
+      - taskIdList
+    BatchGetUserAccessTasksResponse:
+      type: object
+      properties:
+        userAccessResultsList:
+          allOf:
+          - $ref: '#/components/schemas/UserAccessResultsList'
+          description: Contains a list of user access results.
+    ConflictException:
+      type: object
+      properties:
+        message:
+          $ref: '#/components/schemas/String'
+        resourceId:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The resource ID.
+        resourceType:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The resource type.
+      required:
+      - message
+      - resourceId
+      - resourceType
+      description: The request has created a conflict. Check the request parameters
+        and try again.
+    ConnectAppAuthorizationRequest:
+      type: object
+      properties:
+        appBundleIdentifier:
+          allOf:
+          - $ref: '#/components/schemas/Identifier'
+          description: The Amazon Resource Name (ARN) or Universal Unique Identifier
+            (UUID) of the app bundle that contains the app authorization to use for
+            the request.
+        appAuthorizationIdentifier:
+          allOf:
+          - $ref: '#/components/schemas/Identifier'
+          description: The Amazon Resource Name (ARN) or Universal Unique Identifier
+            (UUID) of the app authorization to use for the request.
+        authRequest:
+          allOf:
+          - $ref: '#/components/schemas/AuthRequest'
+          description: 'Contains OAuth2 authorization information.
+
+
+            This is required if the app authorization for the request is configured
+            with an OAuth2 (`oauth2`) authorization type.'
+      required:
+      - appBundleIdentifier
+      - appAuthorizationIdentifier
+    ConnectAppAuthorizationResponse:
+      type: object
+      properties:
+        appAuthorizationSummary:
+          allOf:
+          - $ref: '#/components/schemas/AppAuthorizationSummary'
+          description: Contains a summary of the app authorization.
+      required:
+      - appAuthorizationSummary
+    CreateAppAuthorizationRequest:
+      type: object
+      properties:
+        appBundleIdentifier:
+          allOf:
+          - $ref: '#/components/schemas/Identifier'
+          description: The Amazon Resource Name (ARN) or Universal Unique Identifier
+            (UUID) of the app bundle to use for the request.
+        app:
+          allOf:
+          - $ref: '#/components/schemas/String255'
+          description: "The name of the application.\n\nValid values are:\n\n  * `SLACK`\n\
+            \n  * `ASANA`\n\n  * `JIRA`\n\n  * `M365`\n\n  * `M365AUDITLOGS`\n\n \
+            \ * `ZOOM`\n\n  * `ZENDESK`\n\n  * `OKTA`\n\n  * `GOOGLE`\n\n  * `DROPBOX`\n\
+            \n  * `SMARTSHEET`\n\n  * `CISCO`"
+        credential:
+          allOf:
+          - $ref: '#/components/schemas/Credential'
+          description: 'Contains credentials for the application, such as an API key
+            or OAuth2 client ID and secret.
+
+
+            Specify credentials that match the authorization type for your request.
+            For example, if the authorization type for your request is OAuth2 (`oauth2`),
+            then you should provide only the OAuth2 credentials.'
+        tenant:
+          allOf:
+          - $ref: '#/components/schemas/Tenant'
+          description: Contains information about an application tenant, such as the
+            application display name and identifier.
+        authType:
+          allOf:
+          - $ref: '#/components/schemas/AuthType'
+          description: The authorization type for the app authorization.
+        clientToken:
+          allOf:
+          - $ref: '#/components/schemas/UUID'
+          description: 'Specifies a unique, case-sensitive identifier that you provide
+            to ensure the idempotency of the request. This lets you safely retry the
+            request without accidentally performing the same operation a second time.
+            Passing the same value to a later call to an operation requires that you
+            also pass the same value for all other parameters. We recommend that you
+            use a [UUID type of value](https://wikipedia.org/wiki/Universally_unique_identifier).
+
+
+            If you don''t provide this value, then Amazon Web Services generates a
+            random one for you.
+
+
+            If you retry the operation with the same `ClientToken`, but with different
+            parameters, the retry fails with an `IdempotentParameterMismatch` error.'
+        tags:
+          allOf:
+          - $ref: '#/components/schemas/TagList'
+          description: A map of the key-value pairs of the tag or tags to assign to
+            the resource.
+      required:
+      - appBundleIdentifier
+      - app
+      - credential
+      - tenant
+      - authType
+    CreateAppAuthorizationResponse:
+      type: object
+      properties:
+        appAuthorization:
+          allOf:
+          - $ref: '#/components/schemas/AppAuthorization'
+          description: Contains information about an app authorization.
+      required:
+      - appAuthorization
+    CreateAppBundleRequest:
+      type: object
+      properties:
+        clientToken:
+          allOf:
+          - $ref: '#/components/schemas/UUID'
+          description: 'Specifies a unique, case-sensitive identifier that you provide
+            to ensure the idempotency of the request. This lets you safely retry the
+            request without accidentally performing the same operation a second time.
+            Passing the same value to a later call to an operation requires that you
+            also pass the same value for all other parameters. We recommend that you
+            use a [UUID type of value](https://wikipedia.org/wiki/Universally_unique_identifier).
+
+
+            If you don''t provide this value, then Amazon Web Services generates a
+            random one for you.
+
+
+            If you retry the operation with the same `ClientToken`, but with different
+            parameters, the retry fails with an `IdempotentParameterMismatch` error.'
+        customerManagedKeyIdentifier:
+          allOf:
+          - $ref: '#/components/schemas/Identifier'
+          description: The Amazon Resource Name (ARN) of the Key Management Service
+            (KMS) key to use to encrypt the application data. If this is not specified,
+            an Amazon Web Services owned key is used for encryption.
+        tags:
+          allOf:
+          - $ref: '#/components/schemas/TagList'
+          description: A map of the key-value pairs of the tag or tags to assign to
+            the resource.
+    CreateAppBundleResponse:
+      type: object
+      properties:
+        appBundle:
+          allOf:
+          - $ref: '#/components/schemas/AppBundle'
+          description: Contains information about an app bundle.
+      required:
+      - appBundle
+    CreateIngestionDestinationRequest:
+      type: object
+      properties:
+        appBundleIdentifier:
+          allOf:
+          - $ref: '#/components/schemas/Identifier'
+          description: The Amazon Resource Name (ARN) or Universal Unique Identifier
+            (UUID) of the app bundle to use for the request.
+        ingestionIdentifier:
+          allOf:
+          - $ref: '#/components/schemas/Identifier'
+          description: The Amazon Resource Name (ARN) or Universal Unique Identifier
+            (UUID) of the ingestion to use for the request.
+        processingConfiguration:
+          allOf:
+          - $ref: '#/components/schemas/ProcessingConfiguration'
+          description: Contains information about how ingested data is processed.
+        destinationConfiguration:
+          allOf:
+          - $ref: '#/components/schemas/DestinationConfiguration'
+          description: Contains information about the destination of ingested data.
+        clientToken:
+          allOf:
+          - $ref: '#/components/schemas/UUID'
+          description: 'Specifies a unique, case-sensitive identifier that you provide
+            to ensure the idempotency of the request. This lets you safely retry the
+            request without accidentally performing the same operation a second time.
+            Passing the same value to a later call to an operation requires that you
+            also pass the same value for all other parameters. We recommend that you
+            use a [UUID type of value](https://wikipedia.org/wiki/Universally_unique_identifier).
+
+
+            If you don''t provide this value, then Amazon Web Services generates a
+            random one for you.
+
+
+            If you retry the operation with the same `ClientToken`, but with different
+            parameters, the retry fails with an `IdempotentParameterMismatch` error.'
+        tags:
+          allOf:
+          - $ref: '#/components/schemas/TagList'
+          description: A map of the key-value pairs of the tag or tags to assign to
+            the resource.
+      required:
+      - appBundleIdentifier
+      - ingestionIdentifier
+      - processingConfiguration
+      - destinationConfiguration
+    CreateIngestionDestinationResponse:
+      type: object
+      properties:
+        ingestionDestination:
+          allOf:
+          - $ref: '#/components/schemas/IngestionDestination'
+          description: Contains information about an ingestion destination.
+      required:
+      - ingestionDestination
+    CreateIngestionRequest:
+      type: object
+      properties:
+        appBundleIdentifier:
+          allOf:
+          - $ref: '#/components/schemas/Identifier'
+          description: The Amazon Resource Name (ARN) or Universal Unique Identifier
+            (UUID) of the app bundle to use for the request.
+        app:
+          allOf:
+          - $ref: '#/components/schemas/String255'
+          description: "The name of the application.\n\nValid values are:\n\n  * `SLACK`\n\
+            \n  * `ASANA`\n\n  * `JIRA`\n\n  * `M365`\n\n  * `M365AUDITLOGS`\n\n \
+            \ * `ZOOM`\n\n  * `ZENDESK`\n\n  * `OKTA`\n\n  * `GOOGLE`\n\n  * `DROPBOX`\n\
+            \n  * `SMARTSHEET`\n\n  * `CISCO`"
+        tenantId:
+          allOf:
+          - $ref: '#/components/schemas/TenantIdentifier'
+          description: The ID of the application tenant.
+        ingestionType:
+          allOf:
+          - $ref: '#/components/schemas/IngestionType'
+          description: The ingestion type.
+        clientToken:
+          allOf:
+          - $ref: '#/components/schemas/UUID'
+          description: 'Specifies a unique, case-sensitive identifier that you provide
+            to ensure the idempotency of the request. This lets you safely retry the
+            request without accidentally performing the same operation a second time.
+            Passing the same value to a later call to an operation requires that you
+            also pass the same value for all other parameters. We recommend that you
+            use a [UUID type of value](https://wikipedia.org/wiki/Universally_unique_identifier).
+
+
+            If you don''t provide this value, then Amazon Web Services generates a
+            random one for you.
+
+
+            If you retry the operation with the same `ClientToken`, but with different
+            parameters, the retry fails with an `IdempotentParameterMismatch` error.'
+        tags:
+          allOf:
+          - $ref: '#/components/schemas/TagList'
+          description: A map of the key-value pairs of the tag or tags to assign to
+            the resource.
+      required:
+      - appBundleIdentifier
+      - app
+      - tenantId
+      - ingestionType
+    CreateIngestionResponse:
+      type: object
+      properties:
+        ingestion:
+          allOf:
+          - $ref: '#/components/schemas/Ingestion'
+          description: Contains information about an ingestion.
+      required:
+      - ingestion
     Credential:
       allOf:
       - allOf:
@@ -86,6 +2118,82 @@ components:
     DateTime:
       type: string
       format: date-time
+    DeleteAppAuthorizationRequest:
+      type: object
+      properties:
+        appBundleIdentifier:
+          allOf:
+          - $ref: '#/components/schemas/Identifier'
+          description: The Amazon Resource Name (ARN) or Universal Unique Identifier
+            (UUID) of the app bundle to use for the request.
+        appAuthorizationIdentifier:
+          allOf:
+          - $ref: '#/components/schemas/Identifier'
+          description: The Amazon Resource Name (ARN) or Universal Unique Identifier
+            (UUID) of the app authorization to use for the request.
+      required:
+      - appBundleIdentifier
+      - appAuthorizationIdentifier
+    DeleteAppAuthorizationResponse:
+      type: object
+      properties: {}
+    DeleteAppBundleRequest:
+      type: object
+      properties:
+        appBundleIdentifier:
+          allOf:
+          - $ref: '#/components/schemas/Identifier'
+          description: The ID or Amazon Resource Name (ARN) of the app bundle that
+            needs to be deleted.
+      required:
+      - appBundleIdentifier
+    DeleteAppBundleResponse:
+      type: object
+      properties: {}
+    DeleteIngestionDestinationRequest:
+      type: object
+      properties:
+        appBundleIdentifier:
+          allOf:
+          - $ref: '#/components/schemas/Identifier'
+          description: The Amazon Resource Name (ARN) or Universal Unique Identifier
+            (UUID) of the app bundle to use for the request.
+        ingestionIdentifier:
+          allOf:
+          - $ref: '#/components/schemas/Identifier'
+          description: The Amazon Resource Name (ARN) or Universal Unique Identifier
+            (UUID) of the ingestion to use for the request.
+        ingestionDestinationIdentifier:
+          allOf:
+          - $ref: '#/components/schemas/Identifier'
+          description: The Amazon Resource Name (ARN) or Universal Unique Identifier
+            (UUID) of the ingestion destination to use for the request.
+      required:
+      - appBundleIdentifier
+      - ingestionIdentifier
+      - ingestionDestinationIdentifier
+    DeleteIngestionDestinationResponse:
+      type: object
+      properties: {}
+    DeleteIngestionRequest:
+      type: object
+      properties:
+        appBundleIdentifier:
+          allOf:
+          - $ref: '#/components/schemas/Identifier'
+          description: The Amazon Resource Name (ARN) or Universal Unique Identifier
+            (UUID) of the app bundle to use for the request.
+        ingestionIdentifier:
+          allOf:
+          - $ref: '#/components/schemas/Identifier'
+          description: The Amazon Resource Name (ARN) or Universal Unique Identifier
+            (UUID) of the ingestion to use for the request.
+      required:
+      - appBundleIdentifier
+      - ingestionIdentifier
+    DeleteIngestionResponse:
+      type: object
+      properties: {}
     Destination:
       allOf:
       - allOf:
@@ -110,16 +2218,220 @@ components:
       type: string
       pattern: ^[a-zA-Z0-9.!#$%&’*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$
       maxLength: 320
+    FirehoseStream:
+      type: object
+      properties:
+        streamName:
+          allOf:
+          - $ref: '#/components/schemas/String64'
+          description: The name of the Amazon Kinesis Data Firehose delivery stream.
+      required:
+      - streamName
+      description: Contains information about an Amazon Kinesis Data Firehose delivery
+        stream.
     Format:
       type: string
       enum:
       - json
       - parquet
+    GetAppAuthorizationRequest:
+      type: object
+      properties:
+        appBundleIdentifier:
+          allOf:
+          - $ref: '#/components/schemas/Identifier'
+          description: The Amazon Resource Name (ARN) or Universal Unique Identifier
+            (UUID) of the app bundle to use for the request.
+        appAuthorizationIdentifier:
+          allOf:
+          - $ref: '#/components/schemas/Identifier'
+          description: The Amazon Resource Name (ARN) or Universal Unique Identifier
+            (UUID) of the app authorization to use for the request.
+      required:
+      - appBundleIdentifier
+      - appAuthorizationIdentifier
+    GetAppAuthorizationResponse:
+      type: object
+      properties:
+        appAuthorization:
+          allOf:
+          - $ref: '#/components/schemas/AppAuthorization'
+          description: Contains information about an app authorization.
+      required:
+      - appAuthorization
+    GetAppBundleRequest:
+      type: object
+      properties:
+        appBundleIdentifier:
+          allOf:
+          - $ref: '#/components/schemas/Identifier'
+          description: The Amazon Resource Name (ARN) or Universal Unique Identifier
+            (UUID) of the app bundle to use for the request.
+      required:
+      - appBundleIdentifier
+    GetAppBundleResponse:
+      type: object
+      properties:
+        appBundle:
+          allOf:
+          - $ref: '#/components/schemas/AppBundle'
+          description: Contains information about an app bundle.
+      required:
+      - appBundle
+    GetIngestionDestinationRequest:
+      type: object
+      properties:
+        appBundleIdentifier:
+          allOf:
+          - $ref: '#/components/schemas/Identifier'
+          description: The Amazon Resource Name (ARN) or Universal Unique Identifier
+            (UUID) of the app bundle to use for the request.
+        ingestionIdentifier:
+          allOf:
+          - $ref: '#/components/schemas/Identifier'
+          description: The Amazon Resource Name (ARN) or Universal Unique Identifier
+            (UUID) of the ingestion to use for the request.
+        ingestionDestinationIdentifier:
+          allOf:
+          - $ref: '#/components/schemas/Identifier'
+          description: The Amazon Resource Name (ARN) or Universal Unique Identifier
+            (UUID) of the ingestion destination to use for the request.
+      required:
+      - appBundleIdentifier
+      - ingestionIdentifier
+      - ingestionDestinationIdentifier
+    GetIngestionDestinationResponse:
+      type: object
+      properties:
+        ingestionDestination:
+          allOf:
+          - $ref: '#/components/schemas/IngestionDestination'
+          description: Contains information about an ingestion destination.
+      required:
+      - ingestionDestination
+    GetIngestionRequest:
+      type: object
+      properties:
+        appBundleIdentifier:
+          allOf:
+          - $ref: '#/components/schemas/Identifier'
+          description: The Amazon Resource Name (ARN) or Universal Unique Identifier
+            (UUID) of the app bundle to use for the request.
+        ingestionIdentifier:
+          allOf:
+          - $ref: '#/components/schemas/Identifier'
+          description: The Amazon Resource Name (ARN) or Universal Unique Identifier
+            (UUID) of the ingestion to use for the request.
+      required:
+      - appBundleIdentifier
+      - ingestionIdentifier
+    GetIngestionResponse:
+      type: object
+      properties:
+        ingestion:
+          allOf:
+          - $ref: '#/components/schemas/Ingestion'
+          description: Contains information about an ingestion.
+      required:
+      - ingestion
     Identifier:
       type: string
       pattern: ^arn:.+$|^[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$
       minLength: 1
       maxLength: 1011
+    Ingestion:
+      type: object
+      properties:
+        arn:
+          allOf:
+          - $ref: '#/components/schemas/Arn'
+          description: The Amazon Resource Name (ARN) of the ingestion.
+        appBundleArn:
+          allOf:
+          - $ref: '#/components/schemas/Arn'
+          description: The Amazon Resource Name (ARN) of the app bundle for the ingestion.
+        app:
+          allOf:
+          - $ref: '#/components/schemas/String255'
+          description: The name of the application.
+        tenantId:
+          allOf:
+          - $ref: '#/components/schemas/TenantIdentifier'
+          description: The ID of the application tenant.
+        createdAt:
+          allOf:
+          - $ref: '#/components/schemas/DateTime'
+          description: The timestamp of when the ingestion was created.
+        updatedAt:
+          allOf:
+          - $ref: '#/components/schemas/DateTime'
+          description: The timestamp of when the ingestion was last updated.
+        state:
+          allOf:
+          - $ref: '#/components/schemas/IngestionState'
+          description: The status of the ingestion.
+        ingestionType:
+          allOf:
+          - $ref: '#/components/schemas/IngestionType'
+          description: The type of the ingestion.
+      required:
+      - arn
+      - appBundleArn
+      - app
+      - tenantId
+      - createdAt
+      - updatedAt
+      - state
+      - ingestionType
+      description: Contains information about an ingestion.
+    IngestionDestination:
+      type: object
+      properties:
+        arn:
+          allOf:
+          - $ref: '#/components/schemas/Arn'
+          description: The Amazon Resource Name (ARN) of the ingestion destination.
+        ingestionArn:
+          allOf:
+          - $ref: '#/components/schemas/Arn'
+          description: The Amazon Resource Name (ARN) of the ingestion.
+        processingConfiguration:
+          allOf:
+          - $ref: '#/components/schemas/ProcessingConfiguration'
+          description: Contains information about how ingested data is processed.
+        destinationConfiguration:
+          allOf:
+          - $ref: '#/components/schemas/DestinationConfiguration'
+          description: Contains information about the destination of ingested data.
+        status:
+          allOf:
+          - $ref: '#/components/schemas/IngestionDestinationStatus'
+          description: "The state of the ingestion destination.\n\nThe following states\
+            \ are possible:\n\n  * `Active`: The ingestion destination is active and\
+            \ is ready to be used.\n\n  * `Failed`: The ingestion destination has\
+            \ failed. If the ingestion destination is in this state, you should verify\
+            \ the ingestion destination configuration and try again."
+        statusReason:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: 'The reason for the current status of the ingestion destination.
+
+
+            Only present when the `status` of ingestion destination is `Failed`.'
+        createdAt:
+          allOf:
+          - $ref: '#/components/schemas/DateTime'
+          description: The timestamp of when the ingestion destination was created.
+        updatedAt:
+          allOf:
+          - $ref: '#/components/schemas/DateTime'
+          description: The timestamp of when the ingestion destination was last updated.
+      required:
+      - arn
+      - ingestionArn
+      - processingConfiguration
+      - destinationConfiguration
+      description: Contains information about an ingestion destination.
     IngestionDestinationList:
       type: array
       items:
@@ -129,6 +2441,16 @@ components:
       enum:
       - Active
       - Failed
+    IngestionDestinationSummary:
+      type: object
+      properties:
+        arn:
+          allOf:
+          - $ref: '#/components/schemas/Arn'
+          description: The Amazon Resource Name (ARN) of the ingestion destination.
+      required:
+      - arn
+      description: Contains a summary of an ingestion destination.
     IngestionList:
       type: array
       items:
@@ -138,16 +2460,270 @@ components:
       enum:
       - enabled
       - disabled
+    IngestionSummary:
+      type: object
+      properties:
+        arn:
+          allOf:
+          - $ref: '#/components/schemas/Arn'
+          description: The Amazon Resource Name (ARN) of the ingestion.
+        app:
+          allOf:
+          - $ref: '#/components/schemas/String255'
+          description: The name of the application.
+        tenantId:
+          allOf:
+          - $ref: '#/components/schemas/TenantIdentifier'
+          description: The ID of the application tenant.
+        state:
+          allOf:
+          - $ref: '#/components/schemas/IngestionState'
+          description: The status of the ingestion.
+      required:
+      - arn
+      - app
+      - tenantId
+      - state
+      description: Contains a summary of an ingestion.
     IngestionType:
       type: string
       enum:
       - auditLog
     Integer:
       type: integer
+    InternalServerException:
+      type: object
+      properties:
+        message:
+          $ref: '#/components/schemas/String'
+        retryAfterSeconds:
+          allOf:
+          - $ref: '#/components/schemas/Integer'
+          description: The period of time after which you should retry your request.
+      required:
+      - message
+      description: The request processing has failed because of an unknown error,
+        exception, or failure with an internal server.
+    ListAppAuthorizationsRequest:
+      type: object
+      properties:
+        appBundleIdentifier:
+          allOf:
+          - $ref: '#/components/schemas/Identifier'
+          description: The Amazon Resource Name (ARN) or Universal Unique Identifier
+            (UUID) of the app bundle to use for the request.
+        maxResults:
+          allOf:
+          - $ref: '#/components/schemas/MaxResults'
+          description: 'The maximum number of results that are returned per call.
+            You can use `nextToken` to obtain further pages of results.
+
+
+            This is only an upper limit. The actual number of results returned per
+            call might be fewer than the specified maximum.'
+        nextToken:
+          allOf:
+          - $ref: '#/components/schemas/String2048'
+          description: If `nextToken` is returned, there are more results available.
+            The value of `nextToken` is a unique pagination token for each page. Make
+            the call again using the returned token to retrieve the next page. Keep
+            all other arguments unchanged. Each pagination token expires after 24
+            hours. Using an expired pagination token will return an _HTTP 400 InvalidToken
+            error_.
+      required:
+      - appBundleIdentifier
+    ListAppAuthorizationsResponse:
+      type: object
+      properties:
+        appAuthorizationSummaryList:
+          allOf:
+          - $ref: '#/components/schemas/AppAuthorizationSummaryList'
+          description: Contains a list of app authorization summaries.
+        nextToken:
+          allOf:
+          - $ref: '#/components/schemas/String2048'
+          description: If `nextToken` is returned, there are more results available.
+            The value of `nextToken` is a unique pagination token for each page. Make
+            the call again using the returned token to retrieve the next page. Keep
+            all other arguments unchanged. Each pagination token expires after 24
+            hours. Using an expired pagination token will return an _HTTP 400 InvalidToken
+            error_.
+      required:
+      - appAuthorizationSummaryList
+    ListAppBundlesRequest:
+      type: object
+      properties:
+        maxResults:
+          allOf:
+          - $ref: '#/components/schemas/MaxResults'
+          description: 'The maximum number of results that are returned per call.
+            You can use `nextToken` to obtain further pages of results.
+
+
+            This is only an upper limit. The actual number of results returned per
+            call might be fewer than the specified maximum.'
+        nextToken:
+          allOf:
+          - $ref: '#/components/schemas/String2048'
+          description: If `nextToken` is returned, there are more results available.
+            The value of `nextToken` is a unique pagination token for each page. Make
+            the call again using the returned token to retrieve the next page. Keep
+            all other arguments unchanged. Each pagination token expires after 24
+            hours. Using an expired pagination token will return an _HTTP 400 InvalidToken
+            error_.
+    ListAppBundlesResponse:
+      type: object
+      properties:
+        appBundleSummaryList:
+          allOf:
+          - $ref: '#/components/schemas/AppBundleSummaryList'
+          description: Contains a list of app bundle summaries.
+        nextToken:
+          allOf:
+          - $ref: '#/components/schemas/String2048'
+          description: If `nextToken` is returned, there are more results available.
+            The value of `nextToken` is a unique pagination token for each page. Make
+            the call again using the returned token to retrieve the next page. Keep
+            all other arguments unchanged. Each pagination token expires after 24
+            hours. Using an expired pagination token will return an _HTTP 400 InvalidToken
+            error_.
+      required:
+      - appBundleSummaryList
+    ListIngestionDestinationsRequest:
+      type: object
+      properties:
+        appBundleIdentifier:
+          allOf:
+          - $ref: '#/components/schemas/Identifier'
+          description: The Amazon Resource Name (ARN) or Universal Unique Identifier
+            (UUID) of the app bundle to use for the request.
+        ingestionIdentifier:
+          allOf:
+          - $ref: '#/components/schemas/Identifier'
+          description: The Amazon Resource Name (ARN) or Universal Unique Identifier
+            (UUID) of the ingestion to use for the request.
+        maxResults:
+          allOf:
+          - $ref: '#/components/schemas/MaxResults'
+          description: 'The maximum number of results that are returned per call.
+            You can use `nextToken` to obtain further pages of results.
+
+
+            This is only an upper limit. The actual number of results returned per
+            call might be fewer than the specified maximum.'
+        nextToken:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: If `nextToken` is returned, there are more results available.
+            The value of `nextToken` is a unique pagination token for each page. Make
+            the call again using the returned token to retrieve the next page. Keep
+            all other arguments unchanged. Each pagination token expires after 24
+            hours. Using an expired pagination token will return an _HTTP 400 InvalidToken
+            error_.
+      required:
+      - appBundleIdentifier
+      - ingestionIdentifier
+    ListIngestionDestinationsResponse:
+      type: object
+      properties:
+        ingestionDestinations:
+          allOf:
+          - $ref: '#/components/schemas/IngestionDestinationList'
+          description: Contains a list of ingestion destination summaries.
+        nextToken:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: If `nextToken` is returned, there are more results available.
+            The value of `nextToken` is a unique pagination token for each page. Make
+            the call again using the returned token to retrieve the next page. Keep
+            all other arguments unchanged. Each pagination token expires after 24
+            hours. Using an expired pagination token will return an _HTTP 400 InvalidToken
+            error_.
+      required:
+      - ingestionDestinations
+    ListIngestionsRequest:
+      type: object
+      properties:
+        appBundleIdentifier:
+          allOf:
+          - $ref: '#/components/schemas/Identifier'
+          description: The Amazon Resource Name (ARN) or Universal Unique Identifier
+            (UUID) of the app bundle to use for the request.
+        maxResults:
+          allOf:
+          - $ref: '#/components/schemas/MaxResults'
+          description: 'The maximum number of results that are returned per call.
+            You can use `nextToken` to obtain further pages of results.
+
+
+            This is only an upper limit. The actual number of results returned per
+            call might be fewer than the specified maximum.'
+        nextToken:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: If `nextToken` is returned, there are more results available.
+            The value of `nextToken` is a unique pagination token for each page. Make
+            the call again using the returned token to retrieve the next page. Keep
+            all other arguments unchanged. Each pagination token expires after 24
+            hours. Using an expired pagination token will return an _HTTP 400 InvalidToken
+            error_.
+      required:
+      - appBundleIdentifier
+    ListIngestionsResponse:
+      type: object
+      properties:
+        ingestions:
+          allOf:
+          - $ref: '#/components/schemas/IngestionList'
+          description: Contains a list of ingestion summaries.
+        nextToken:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: If `nextToken` is returned, there are more results available.
+            The value of `nextToken` is a unique pagination token for each page. Make
+            the call again using the returned token to retrieve the next page. Keep
+            all other arguments unchanged. Each pagination token expires after 24
+            hours. Using an expired pagination token will return an _HTTP 400 InvalidToken
+            error_.
+      required:
+      - ingestions
+    ListTagsForResourceRequest:
+      type: object
+      properties:
+        resourceArn:
+          allOf:
+          - $ref: '#/components/schemas/Arn'
+          description: The Amazon Resource Name (ARN) of the resource for which you
+            want to retrieve tags.
+      required:
+      - resourceArn
+    ListTagsForResourceResponse:
+      type: object
+      properties:
+        tags:
+          allOf:
+          - $ref: '#/components/schemas/TagList'
+          description: A map of the key-value pairs for the tag or tags assigned to
+            the specified resource.
     MaxResults:
       type: integer
       minimum: 1
       maximum: 100
+    Oauth2Credential:
+      type: object
+      properties:
+        clientId:
+          allOf:
+          - $ref: '#/components/schemas/String2048'
+          description: The client ID of the client application.
+        clientSecret:
+          allOf:
+          - $ref: '#/components/schemas/SensitiveString2048'
+          description: The client secret of the client application.
+      required:
+      - clientId
+      - clientSecret
+      description: Contains OAuth2 client credential information.
     Persona:
       type: string
       enum:
@@ -165,6 +2741,24 @@ components:
       type: string
       pattern: ^https://[-a-zA-Z0-9-._~:/?#@!$&'()*+,;=]+$
       maxLength: 1024
+    ResourceNotFoundException:
+      type: object
+      properties:
+        message:
+          $ref: '#/components/schemas/String'
+        resourceId:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The resource ID.
+        resourceType:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The resource type.
+      required:
+      - message
+      - resourceId
+      - resourceType
+      description: The specified resource does not exist.
     ResultStatus:
       type: string
       enum:
@@ -172,6 +2766,20 @@ components:
       - COMPLETED
       - FAILED
       - EXPIRED
+    S3Bucket:
+      type: object
+      properties:
+        bucketName:
+          allOf:
+          - $ref: '#/components/schemas/String63'
+          description: The name of the Amazon S3 bucket.
+        prefix:
+          allOf:
+          - $ref: '#/components/schemas/String120'
+          description: The object key to use.
+      required:
+      - bucketName
+      description: Contains information about an Amazon S3 bucket.
     Schema:
       type: string
       enum:
@@ -181,6 +2789,94 @@ components:
       type: string
       minLength: 1
       maxLength: 2048
+    ServiceQuotaExceededException:
+      type: object
+      properties:
+        message:
+          $ref: '#/components/schemas/String'
+        resourceId:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The resource ID.
+        resourceType:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The resource type.
+        serviceCode:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The code of the service.
+        quotaCode:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The code for the quota exceeded.
+      required:
+      - message
+      - resourceId
+      - resourceType
+      - serviceCode
+      - quotaCode
+      description: The request exceeds a service quota.
+    StartIngestionRequest:
+      type: object
+      properties:
+        ingestionIdentifier:
+          allOf:
+          - $ref: '#/components/schemas/Identifier'
+          description: The Amazon Resource Name (ARN) or Universal Unique Identifier
+            (UUID) of the ingestion to use for the request.
+        appBundleIdentifier:
+          allOf:
+          - $ref: '#/components/schemas/Identifier'
+          description: The Amazon Resource Name (ARN) or Universal Unique Identifier
+            (UUID) of the app bundle to use for the request.
+      required:
+      - ingestionIdentifier
+      - appBundleIdentifier
+    StartIngestionResponse:
+      type: object
+      properties: {}
+    StartUserAccessTasksRequest:
+      type: object
+      properties:
+        appBundleIdentifier:
+          allOf:
+          - $ref: '#/components/schemas/Identifier'
+          description: The Amazon Resource Name (ARN) or Universal Unique Identifier
+            (UUID) of the app bundle to use for the request.
+        email:
+          allOf:
+          - $ref: '#/components/schemas/Email'
+          description: The email address of the target user.
+      required:
+      - appBundleIdentifier
+      - email
+    StartUserAccessTasksResponse:
+      type: object
+      properties:
+        userAccessTasksList:
+          allOf:
+          - $ref: '#/components/schemas/UserAccessTasksList'
+          description: Contains a list of user access task information.
+    StopIngestionRequest:
+      type: object
+      properties:
+        ingestionIdentifier:
+          allOf:
+          - $ref: '#/components/schemas/Identifier'
+          description: The Amazon Resource Name (ARN) or Universal Unique Identifier
+            (UUID) of the ingestion to use for the request.
+        appBundleIdentifier:
+          allOf:
+          - $ref: '#/components/schemas/Identifier'
+          description: The Amazon Resource Name (ARN) or Universal Unique Identifier
+            (UUID) of the app bundle to use for the request.
+      required:
+      - ingestionIdentifier
+      - appBundleIdentifier
+    StopIngestionResponse:
+      type: object
+      properties: {}
     String120:
       type: string
       minLength: 1
@@ -201,6 +2897,22 @@ components:
       type: string
       minLength: 3
       maxLength: 64
+    Tag:
+      type: object
+      properties:
+        key:
+          allOf:
+          - $ref: '#/components/schemas/TagKey'
+          description: Tag key.
+        value:
+          allOf:
+          - $ref: '#/components/schemas/TagValue'
+          description: Tag value.
+      required:
+      - key
+      - value
+      description: The key or keys of the key-value pairs for the tag or tags assigned
+        to a resource.
     TagKey:
       type: string
       minLength: 1
@@ -213,29 +2925,304 @@ components:
       type: array
       items:
         $ref: '#/components/schemas/Tag'
+    TagResourceRequest:
+      type: object
+      properties:
+        resourceArn:
+          allOf:
+          - $ref: '#/components/schemas/Arn'
+          description: The Amazon Resource Name (ARN) of the resource that you want
+            to tag.
+        tags:
+          allOf:
+          - $ref: '#/components/schemas/TagList'
+          description: A map of the key-value pairs of the tag or tags to assign to
+            the resource.
+      required:
+      - resourceArn
+      - tags
+    TagResourceResponse:
+      type: object
+      properties: {}
     TagValue:
       type: string
       minLength: 0
       maxLength: 256
+    TaskError:
+      type: object
+      properties:
+        errorCode:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The code of the error.
+        errorMessage:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The message of the error.
+      description: Contains information about an error returned from a user access
+        task.
     TaskIdList:
       type: array
       items:
         $ref: '#/components/schemas/UUID'
+    Tenant:
+      type: object
+      properties:
+        tenantIdentifier:
+          allOf:
+          - $ref: '#/components/schemas/TenantIdentifier'
+          description: The ID of the application tenant.
+        tenantDisplayName:
+          allOf:
+          - $ref: '#/components/schemas/String2048'
+          description: The display name of the tenant.
+      required:
+      - tenantIdentifier
+      - tenantDisplayName
+      description: Contains information about an application tenant.
     TenantIdentifier:
       type: string
       minLength: 1
       maxLength: 1024
+    ThrottlingException:
+      type: object
+      properties:
+        message:
+          $ref: '#/components/schemas/String'
+        serviceCode:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The code of the service.
+        quotaCode:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The code for the quota exceeded.
+        retryAfterSeconds:
+          allOf:
+          - $ref: '#/components/schemas/Integer'
+          description: The period of time after which you should retry your request.
+      required:
+      - message
+      description: The request rate exceeds the limit.
     UUID:
       type: string
       pattern: ^[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$
+    UntagResourceRequest:
+      type: object
+      properties:
+        resourceArn:
+          allOf:
+          - $ref: '#/components/schemas/Arn'
+          description: The Amazon Resource Name (ARN) of the resource that you want
+            to untag.
+        tagKeys:
+          allOf:
+          - $ref: '#/components/schemas/TagKeyList'
+          description: The keys of the key-value pairs for the tag or tags you want
+            to remove from the specified resource.
+      required:
+      - resourceArn
+      - tagKeys
+    UntagResourceResponse:
+      type: object
+      properties: {}
+    UpdateAppAuthorizationRequest:
+      type: object
+      properties:
+        appBundleIdentifier:
+          allOf:
+          - $ref: '#/components/schemas/Identifier'
+          description: The Amazon Resource Name (ARN) or Universal Unique Identifier
+            (UUID) of the app bundle to use for the request.
+        appAuthorizationIdentifier:
+          allOf:
+          - $ref: '#/components/schemas/Identifier'
+          description: The Amazon Resource Name (ARN) or Universal Unique Identifier
+            (UUID) of the app authorization to use for the request.
+        credential:
+          allOf:
+          - $ref: '#/components/schemas/Credential'
+          description: 'Contains credentials for the application, such as an API key
+            or OAuth2 client ID and secret.
+
+
+            Specify credentials that match the authorization type of the app authorization
+            to update. For example, if the authorization type of the app authorization
+            is OAuth2 (`oauth2`), then you should provide only the OAuth2 credentials.'
+        tenant:
+          allOf:
+          - $ref: '#/components/schemas/Tenant'
+          description: Contains information about an application tenant, such as the
+            application display name and identifier.
+      required:
+      - appBundleIdentifier
+      - appAuthorizationIdentifier
+    UpdateAppAuthorizationResponse:
+      type: object
+      properties:
+        appAuthorization:
+          allOf:
+          - $ref: '#/components/schemas/AppAuthorization'
+          description: Contains information about an app authorization.
+      required:
+      - appAuthorization
+    UpdateIngestionDestinationRequest:
+      type: object
+      properties:
+        appBundleIdentifier:
+          allOf:
+          - $ref: '#/components/schemas/Identifier'
+          description: The Amazon Resource Name (ARN) or Universal Unique Identifier
+            (UUID) of the app bundle to use for the request.
+        ingestionIdentifier:
+          allOf:
+          - $ref: '#/components/schemas/Identifier'
+          description: The Amazon Resource Name (ARN) or Universal Unique Identifier
+            (UUID) of the ingestion to use for the request.
+        ingestionDestinationIdentifier:
+          allOf:
+          - $ref: '#/components/schemas/Identifier'
+          description: The Amazon Resource Name (ARN) or Universal Unique Identifier
+            (UUID) of the ingestion destination to use for the request.
+        destinationConfiguration:
+          allOf:
+          - $ref: '#/components/schemas/DestinationConfiguration'
+          description: Contains information about the destination of ingested data.
+      required:
+      - appBundleIdentifier
+      - ingestionIdentifier
+      - ingestionDestinationIdentifier
+      - destinationConfiguration
+    UpdateIngestionDestinationResponse:
+      type: object
+      properties:
+        ingestionDestination:
+          allOf:
+          - $ref: '#/components/schemas/IngestionDestination'
+          description: Contains information about an ingestion destination.
+      required:
+      - ingestionDestination
+    UserAccessResultItem:
+      type: object
+      properties:
+        app:
+          allOf:
+          - $ref: '#/components/schemas/String255'
+          description: The name of the application.
+        tenantId:
+          allOf:
+          - $ref: '#/components/schemas/TenantIdentifier'
+          description: The ID of the application tenant.
+        tenantDisplayName:
+          allOf:
+          - $ref: '#/components/schemas/String2048'
+          description: The display name of the tenant.
+        taskId:
+          allOf:
+          - $ref: '#/components/schemas/UUID'
+          description: The unique ID of the task.
+        resultStatus:
+          allOf:
+          - $ref: '#/components/schemas/ResultStatus'
+          description: "The status of the user access result item.\n\nThe following\
+            \ states are possible:\n\n  * `IN_PROGRESS`: The user access task is in\
+            \ progress.\n\n  * `COMPLETED`: The user access task completed successfully.\n\
+            \n  * `FAILED`: The user access task failed.\n\n  * `EXPIRED`: The user\
+            \ access task expired."
+        email:
+          allOf:
+          - $ref: '#/components/schemas/Email'
+          description: The email address of the target user.
+        userId:
+          allOf:
+          - $ref: '#/components/schemas/SensitiveString2048'
+          description: The unique ID of user.
+        userFullName:
+          allOf:
+          - $ref: '#/components/schemas/SensitiveString2048'
+          description: The full name of the user.
+        userFirstName:
+          allOf:
+          - $ref: '#/components/schemas/SensitiveString2048'
+          description: The first name of the user.
+        userLastName:
+          allOf:
+          - $ref: '#/components/schemas/SensitiveString2048'
+          description: The last name of the user.
+        userStatus:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The status of the user returned by the application.
+        taskError:
+          allOf:
+          - $ref: '#/components/schemas/TaskError'
+          description: Contains information about an error returned from a user access
+            task.
+      description: Contains information about a user's access to an application.
     UserAccessResultsList:
       type: array
       items:
         $ref: '#/components/schemas/UserAccessResultItem'
+    UserAccessTaskItem:
+      type: object
+      properties:
+        app:
+          allOf:
+          - $ref: '#/components/schemas/String255'
+          description: The name of the application.
+        tenantId:
+          allOf:
+          - $ref: '#/components/schemas/TenantIdentifier'
+          description: The ID of the application tenant.
+        taskId:
+          allOf:
+          - $ref: '#/components/schemas/UUID'
+          description: The unique ID of the task.
+        error:
+          allOf:
+          - $ref: '#/components/schemas/TaskError'
+          description: Error from the task, if any.
+      required:
+      - app
+      - tenantId
+      description: Contains information about a user access task.
     UserAccessTasksList:
       type: array
       items:
         $ref: '#/components/schemas/UserAccessTaskItem'
+    ValidationException:
+      type: object
+      properties:
+        message:
+          $ref: '#/components/schemas/String'
+        reason:
+          allOf:
+          - $ref: '#/components/schemas/ValidationExceptionReason'
+          description: The reason for the exception.
+        fieldList:
+          allOf:
+          - $ref: '#/components/schemas/ValidationExceptionFieldList'
+          description: The field list.
+      required:
+      - message
+      - reason
+      description: The request has invalid or missing parameters.
+    ValidationExceptionField:
+      type: object
+      properties:
+        name:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The field name where the invalid entry was detected.
+        message:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: A message about the validation exception.
+      required:
+      - name
+      - message
+      description: The input failed to meet the constraints specified by the Amazon
+        Web Services service in a specified field.
     ValidationExceptionFieldList:
       type: array
       items:

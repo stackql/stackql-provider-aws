@@ -7,7 +7,7 @@ info:
   x-stackql-serviceName: kinesis_video_media
   x-aws-serviceName: kinesisvideomedia
   x-aws-protocol: aws.protocols#restJson1
-  x-dateGenerated: '2025-05-05'
+  x-dateGenerated: '2025-05-07'
   version: '2017-09-30'
   title: Amazon Kinesis Video Streams Media
   description: ""
@@ -42,9 +42,89 @@ servers:
       - sa-east-1
       - me-south-1
       default: us-east-1
-paths: {}
+paths:
+  /getMedia:
+    post:
+      operationId: GetMedia
+      description: "Use this API to retrieve media content from a Kinesis video stream.\
+        \ In the request, you identify the stream name or stream Amazon Resource Name\
+        \ (ARN), and the starting chunk. Kinesis Video Streams then returns a stream\
+        \ of chunks in order by fragment number.\n\nYou must first call the `GetDataEndpoint`\
+        \ API to get an endpoint. Then send the `GetMedia` requests to this endpoint\
+        \ using the [\\--endpoint-url parameter](https://docs.aws.amazon.com/cli/latest/reference/).\n\
+        \nWhen you put media data (fragments) on a stream, Kinesis Video Streams stores\
+        \ each incoming fragment and related metadata in what is called a \"chunk.\"\
+        \ For more information, see [PutMedia](https://docs.aws.amazon.com/kinesisvideostreams/latest/dg/API_dataplane_PutMedia.html).\
+        \ The `GetMedia` API returns a stream of these chunks starting from the chunk\
+        \ that you specify in the request.\n\nThe following limits apply when using\
+        \ the `GetMedia` API:\n\n  * A client can call `GetMedia` up to five times\
+        \ per second per stream. \n\n  * Kinesis Video Streams sends media data at\
+        \ a rate of up to 25 megabytes per second (or 200 megabits per second) during\
+        \ a `GetMedia` session. \n\nIf an error is thrown after invoking a Kinesis\
+        \ Video Streams media API, in addition to the HTTP status code and the response\
+        \ body, it includes the following pieces of information:\n\n  * `x-amz-ErrorType`\
+        \ HTTP header – contains a more specific error type in addition to what the\
+        \ HTTP status code provides. \n\n  * `x-amz-RequestId` HTTP header – if you\
+        \ want to report an issue to AWS, the support team can better diagnose the\
+        \ problem if given the Request Id.\n\nBoth the HTTP status code and the ErrorType\
+        \ header can be utilized to make programmatic decisions about whether errors\
+        \ are retry-able and under what conditions, as well as provide information\
+        \ on what actions the client programmer might need to take in order to successfully\
+        \ try again.\n\nFor more information, see the **Errors** section at the bottom\
+        \ of this topic, as well as [Common Errors](https://docs.aws.amazon.com/kinesisvideostreams/latest/dg/CommonErrors.html)."
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                StreamName:
+                  $ref: '#/components/schemas/StreamName'
+                StreamARN:
+                  $ref: '#/components/schemas/ResourceARN'
+                StartSelector:
+                  $ref: '#/components/schemas/StartSelector'
+      responses:
+        '200': {}
+        '400':
+          description: |-
+            Status Code: 400, Caller used wrong endpoint to write data to a stream. On receiving such an exception, the user must call `GetDataEndpoint` with `AccessMode` set to "READ" and use the endpoint Kinesis Video returns in the next `GetMedia` call.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InvalidEndpointException'
+        '401':
+          description: |-
+            Status Code: 403, The caller is not authorized to perform an operation on the given stream, or the token has expired.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotAuthorizedException'
+        '404':
+          description: |-
+            Status Code: 404, The stream with the given name does not exist.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
 components:
   schemas:
+    ClientLimitExceededException:
+      type: object
+      properties:
+        Message:
+          $ref: '#/components/schemas/ErrorMessage'
+      description: Kinesis Video Streams has throttled the request because you have
+        exceeded the limit of allowed client calls. Try making the call later.
+    ConnectionLimitExceededException:
+      type: object
+      properties:
+        Message:
+          $ref: '#/components/schemas/ErrorMessage'
+      description: Kinesis Video Streams has throttled the request because you have
+        exceeded the limit of allowed client connections.
     ContentType:
       type: string
       pattern: ^[a-zA-Z0-9_\.\-]+$
@@ -62,6 +142,82 @@ components:
       pattern: ^[0-9]+$
       minLength: 1
       maxLength: 128
+    GetMediaInput:
+      type: object
+      properties:
+        StreamName:
+          allOf:
+          - $ref: '#/components/schemas/StreamName'
+          description: The Kinesis video stream name from where you want to get the
+            media content. If you don't specify the `streamName`, you must specify
+            the `streamARN`.
+        StreamARN:
+          allOf:
+          - $ref: '#/components/schemas/ResourceARN'
+          description: The ARN of the stream from where you want to get the media
+            content. If you don't specify the `streamARN`, you must specify the `streamName`.
+        StartSelector:
+          allOf:
+          - $ref: '#/components/schemas/StartSelector'
+          description: Identifies the starting chunk to get from the specified stream.
+      required:
+      - StartSelector
+    GetMediaOutput:
+      type: object
+      properties:
+        ContentType:
+          allOf:
+          - $ref: '#/components/schemas/ContentType'
+          description: The content type of the requested media.
+        Payload:
+          allOf:
+          - $ref: '#/components/schemas/Payload'
+          description: "The payload Kinesis Video Streams returns is a sequence of\
+            \ chunks from the specified stream. For information about the chunks,\
+            \ see . The chunks that Kinesis Video Streams returns in the `GetMedia`\
+            \ call also include the following additional Matroska (MKV) tags:\n\n\
+            \  * AWS_KINESISVIDEO_CONTINUATION_TOKEN (UTF-8 string) - In the event\
+            \ your `GetMedia` call terminates, you can use this continuation token\
+            \ in your next request to get the next chunk where the last request terminated.\n\
+            \n  * AWS_KINESISVIDEO_MILLIS_BEHIND_NOW (UTF-8 string) - Client applications\
+            \ can use this tag value to determine how far behind the chunk returned\
+            \ in the response is from the latest chunk on the stream. \n\n  * AWS_KINESISVIDEO_FRAGMENT_NUMBER\
+            \ - Fragment number returned in the chunk.\n\n  * AWS_KINESISVIDEO_SERVER_TIMESTAMP\
+            \ - Server timestamp of the fragment.\n\n  * AWS_KINESISVIDEO_PRODUCER_TIMESTAMP\
+            \ - Producer timestamp of the fragment.\n\nThe following tags will be\
+            \ present if an error occurs:\n\n  * AWS_KINESISVIDEO_ERROR_CODE - String\
+            \ description of an error that caused GetMedia to stop.\n\n  * AWS_KINESISVIDEO_ERROR_ID:\
+            \ Integer code of the error.\n\nThe error codes are as follows:\n\n  *\
+            \ 3002 - Error writing to the stream\n\n  * 4000 - Requested fragment\
+            \ is not found\n\n  * 4500 - Access denied for the stream's KMS key\n\n\
+            \  * 4501 - Stream's KMS key is disabled\n\n  * 4502 - Validation error\
+            \ on the stream's KMS key\n\n  * 4503 - KMS key specified in the stream\
+            \ is unavailable\n\n  * 4504 - Invalid usage of the KMS key specified\
+            \ in the stream\n\n  * 4505 - Invalid state of the KMS key specified in\
+            \ the stream\n\n  * 4506 - Unable to find the KMS key specified in the\
+            \ stream\n\n  * 5000 - Internal error"
+    InvalidArgumentException:
+      type: object
+      properties:
+        Message:
+          $ref: '#/components/schemas/ErrorMessage'
+      description: The value for this input parameter is invalid.
+    InvalidEndpointException:
+      type: object
+      properties:
+        Message:
+          $ref: '#/components/schemas/ErrorMessage'
+      description: 'Status Code: 400, Caller used wrong endpoint to write data to
+        a stream. On receiving such an exception, the user must call `GetDataEndpoint`
+        with `AccessMode` set to "READ" and use the endpoint Kinesis Video returns
+        in the next `GetMedia` call.'
+    NotAuthorizedException:
+      type: object
+      properties:
+        Message:
+          $ref: '#/components/schemas/ErrorMessage'
+      description: 'Status Code: 403, The caller is not authorized to perform an operation
+        on the given stream, or the token has expired.'
     Payload:
       type: string
       format: byte
@@ -70,6 +226,58 @@ components:
       pattern: ^arn:aws:kinesisvideo:[a-z0-9-]+:[0-9]+:[a-z]+/[a-zA-Z0-9_.-]+/[0-9]+$
       minLength: 1
       maxLength: 1024
+    ResourceNotFoundException:
+      type: object
+      properties:
+        Message:
+          $ref: '#/components/schemas/ErrorMessage'
+      description: 'Status Code: 404, The stream with the given name does not exist.'
+    StartSelector:
+      type: object
+      properties:
+        StartSelectorType:
+          allOf:
+          - $ref: '#/components/schemas/StartSelectorType'
+          description: "Identifies the fragment on the Kinesis video stream where\
+            \ you want to start getting the data from.\n\n  * NOW - Start with the\
+            \ latest chunk on the stream.\n\n  * EARLIEST - Start with earliest available\
+            \ chunk on the stream.\n\n  * FRAGMENT_NUMBER - Start with the chunk after\
+            \ a specific fragment. You must also specify the `AfterFragmentNumber`\
+            \ parameter.\n\n  * PRODUCER_TIMESTAMP or SERVER_TIMESTAMP - Start with\
+            \ the chunk containing a fragment with the specified producer or server\
+            \ timestamp. You specify the timestamp by adding `StartTimestamp`.\n\n\
+            \  * CONTINUATION_TOKEN - Read using the specified continuation token.\
+            \ \n\nIf you choose the NOW, EARLIEST, or CONTINUATION_TOKEN as the `startSelectorType`,\
+            \ you don't provide any additional information in the `startSelector`."
+        AfterFragmentNumber:
+          allOf:
+          - $ref: '#/components/schemas/FragmentNumberString'
+          description: Specifies the fragment number from where you want the `GetMedia`
+            API to start returning the fragments.
+        StartTimestamp:
+          allOf:
+          - $ref: '#/components/schemas/Timestamp'
+          description: A timestamp value. This value is required if you choose the
+            PRODUCER_TIMESTAMP or the SERVER_TIMESTAMP as the `startSelectorType`.
+            The `GetMedia` API then starts with the chunk containing the fragment
+            that has the specified timestamp.
+        ContinuationToken:
+          allOf:
+          - $ref: '#/components/schemas/ContinuationToken'
+          description: Continuation token that Kinesis Video Streams returned in the
+            previous `GetMedia` response. The `GetMedia` API then starts with the
+            chunk identified by the continuation token.
+      required:
+      - StartSelectorType
+      description: "Identifies the chunk on the Kinesis video stream where you want\
+        \ the `GetMedia` API to start returning media data. You have the following\
+        \ options to identify the starting chunk:\n\n  * Choose the latest (or oldest)\
+        \ chunk.\n\n  * Identify a specific chunk. You can identify a specific chunk\
+        \ either by providing a fragment number or timestamp (server or producer).\
+        \ \n\n  * Each chunk's metadata includes a continuation token as a Matroska\
+        \ (MKV) tag (`AWS_KINESISVIDEO_CONTINUATION_TOKEN`). If your previous `GetMedia`\
+        \ request terminated, you can use this tag value in your next `GetMedia` request.\
+        \ The API then starts returning chunks starting where the last API ended."
     StartSelectorType:
       type: string
       enum:

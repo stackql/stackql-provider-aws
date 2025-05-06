@@ -7,7 +7,7 @@ info:
   x-stackql-serviceName: backupsearch
   x-aws-serviceName: backupsearch
   x-aws-protocol: aws.protocols#restJson1
-  x-dateGenerated: '2025-05-05'
+  x-dateGenerated: '2025-05-07'
   version: '2018-05-10'
   title: AWS Backup Search
   description: |-
@@ -51,13 +51,568 @@ servers:
       - sa-east-1
       - me-south-1
       default: us-east-1
-paths: {}
+paths:
+  /search-jobs/{SearchJobIdentifier}:
+    get:
+      operationId: GetSearchJob
+      description: |-
+        This operation retrieves metadata of a search job, including its progress.
+      parameters:
+      - name: SearchJobIdentifier
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/GenericId'
+      responses:
+        '200': {}
+        '404':
+          description: |-
+            The resource was not found for this request.
+
+            Confirm the resource information, such as the ARN or type is correct and exists, then retry the request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+  /export-search-jobs/{ExportJobIdentifier}:
+    get:
+      operationId: GetSearchResultExportJob
+      description: |-
+        This operation retrieves the metadata of an export job.
+
+        An export job is an operation that transmits the results of a search job to a specified S3 bucket in a .csv file.
+
+        An export job allows you to retain results of a search beyond the search job's scheduled retention of 7 days.
+      parameters:
+      - name: ExportJobIdentifier
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/GenericId'
+      responses:
+        '200': {}
+        '404':
+          description: |-
+            The resource was not found for this request.
+
+            Confirm the resource information, such as the ARN or type is correct and exists, then retry the request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+  /search-jobs/{SearchJobIdentifier}/backups:
+    get:
+      operationId: ListSearchJobBackups
+      description: |-
+        This operation returns a list of all backups (recovery points) in a paginated format that were included in the search job.
+
+        If a search does not display an expected backup in the results, you can call this operation to display each backup included in the search. Any backups that were not included because they have a `FAILED` status from a permissions issue will be displayed, along with a status message.
+
+        Only recovery points with a backup index that has a status of `ACTIVE` will be included in search results. If the index has any other status, its status will be displayed along with a status message.
+      parameters:
+      - name: SearchJobIdentifier
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/GenericId'
+      - name: nextToken
+        in: query
+        required: false
+        schema:
+          $ref: '#/components/schemas/String'
+      - name: maxResults
+        in: query
+        required: false
+        schema:
+          $ref: '#/components/schemas/Integer'
+      responses:
+        '200': {}
+        '404':
+          description: |-
+            The resource was not found for this request.
+
+            Confirm the resource information, such as the ARN or type is correct and exists, then retry the request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+  /search-jobs/{SearchJobIdentifier}/search-results:
+    get:
+      operationId: ListSearchJobResults
+      description: |-
+        This operation returns a list of a specified search job.
+      parameters:
+      - name: SearchJobIdentifier
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/GenericId'
+      - name: nextToken
+        in: query
+        required: false
+        schema:
+          $ref: '#/components/schemas/String'
+      - name: maxResults
+        in: query
+        required: false
+        schema:
+          $ref: '#/components/schemas/Integer'
+      responses:
+        '200': {}
+        '404':
+          description: |-
+            The resource was not found for this request.
+
+            Confirm the resource information, such as the ARN or type is correct and exists, then retry the request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+  /search-jobs:
+    get:
+      operationId: ListSearchJobs
+      description: |-
+        This operation returns a list of search jobs belonging to an account.
+      parameters:
+      - name: Status
+        in: query
+        required: false
+        schema:
+          $ref: '#/components/schemas/SearchJobState'
+      - name: NextToken
+        in: query
+        required: false
+        schema:
+          $ref: '#/components/schemas/String'
+      - name: MaxResults
+        in: query
+        required: false
+        schema:
+          $ref: '#/components/schemas/Integer'
+      responses:
+        '200': {}
+    put:
+      operationId: StartSearchJob
+      description: |-
+        This operation creates a search job which returns recovery points filtered by SearchScope and items filtered by ItemFilters.
+
+        You can optionally include ClientToken, EncryptionKeyArn, Name, and/or Tags.
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                Tags:
+                  $ref: '#/components/schemas/TagMap'
+                Name:
+                  $ref: '#/components/schemas/String'
+                EncryptionKeyArn:
+                  $ref: '#/components/schemas/EncryptionKeyArn'
+                ClientToken:
+                  $ref: '#/components/schemas/String'
+                SearchScope:
+                  $ref: '#/components/schemas/SearchScope'
+                ItemFilters:
+                  $ref: '#/components/schemas/ItemFilters'
+      responses:
+        '200': {}
+        '409':
+          description: |-
+            This exception occurs when a conflict with a previous successful operation is detected. This generally occurs when the previous operation did not have time to propagate to the host serving the current request.
+
+            A retry (with appropriate backoff logic) is the recommended response to this exception.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConflictException'
+        '402':
+          description: |-
+            The request denied due to exceeding the quota limits permitted.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServiceQuotaExceededException'
+  /export-search-jobs:
+    get:
+      operationId: ListSearchResultExportJobs
+      description: |-
+        This operation exports search results of a search job to a specified destination S3 bucket.
+      parameters:
+      - name: Status
+        in: query
+        required: false
+        schema:
+          $ref: '#/components/schemas/ExportJobStatus'
+      - name: SearchJobIdentifier
+        in: query
+        required: false
+        schema:
+          $ref: '#/components/schemas/GenericId'
+      - name: NextToken
+        in: query
+        required: false
+        schema:
+          $ref: '#/components/schemas/String'
+      - name: MaxResults
+        in: query
+        required: false
+        schema:
+          $ref: '#/components/schemas/Integer'
+      responses:
+        '200': {}
+        '404':
+          description: |-
+            The resource was not found for this request.
+
+            Confirm the resource information, such as the ARN or type is correct and exists, then retry the request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+        '402':
+          description: |-
+            The request denied due to exceeding the quota limits permitted.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServiceQuotaExceededException'
+    put:
+      operationId: StartSearchResultExportJob
+      description: |-
+        This operations starts a job to export the results of search job to a designated S3 bucket.
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                SearchJobIdentifier:
+                  $ref: '#/components/schemas/GenericId'
+                ExportSpecification:
+                  $ref: '#/components/schemas/ExportSpecification'
+                ClientToken:
+                  $ref: '#/components/schemas/String'
+                Tags:
+                  $ref: '#/components/schemas/TagMap'
+                RoleArn:
+                  $ref: '#/components/schemas/IamRoleArn'
+      responses:
+        '200': {}
+        '409':
+          description: |-
+            This exception occurs when a conflict with a previous successful operation is detected. This generally occurs when the previous operation did not have time to propagate to the host serving the current request.
+
+            A retry (with appropriate backoff logic) is the recommended response to this exception.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConflictException'
+        '404':
+          description: |-
+            The resource was not found for this request.
+
+            Confirm the resource information, such as the ARN or type is correct and exists, then retry the request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+        '402':
+          description: |-
+            The request denied due to exceeding the quota limits permitted.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServiceQuotaExceededException'
+  /tags/{ResourceArn}:
+    get:
+      operationId: ListTagsForResource
+      description: |-
+        This operation returns the tags for a resource type.
+      parameters:
+      - name: ResourceArn
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/String'
+      responses:
+        '200': {}
+        '404':
+          description: |-
+            The resource was not found for this request.
+
+            Confirm the resource information, such as the ARN or type is correct and exists, then retry the request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+    post:
+      operationId: TagResource
+      description: |-
+        This operation puts tags on the resource you indicate.
+      parameters:
+      - name: ResourceArn
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/String'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                Tags:
+                  $ref: '#/components/schemas/TagMap'
+      responses:
+        '200': {}
+        '404':
+          description: |-
+            The resource was not found for this request.
+
+            Confirm the resource information, such as the ARN or type is correct and exists, then retry the request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+    delete:
+      operationId: UntagResource
+      description: |-
+        This operation removes tags from the specified resource.
+      parameters:
+      - name: ResourceArn
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/String'
+      - name: tagKeys
+        in: query
+        required: true
+        schema:
+          $ref: '#/components/schemas/TagKeys'
+      responses:
+        '200': {}
+        '404':
+          description: |-
+            The resource was not found for this request.
+
+            Confirm the resource information, such as the ARN or type is correct and exists, then retry the request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+  /search-jobs/{SearchJobIdentifier}/actions/cancel:
+    put:
+      operationId: StopSearchJob
+      description: |-
+        This operations ends a search job.
+
+        Only a search job with a status of `RUNNING` can be stopped.
+      parameters:
+      - name: SearchJobIdentifier
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/GenericId'
+      responses:
+        '200': {}
+        '409':
+          description: |-
+            This exception occurs when a conflict with a previous successful operation is detected. This generally occurs when the previous operation did not have time to propagate to the host serving the current request.
+
+            A retry (with appropriate backoff logic) is the recommended response to this exception.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConflictException'
+        '404':
+          description: |-
+            The resource was not found for this request.
+
+            Confirm the resource information, such as the ARN or type is correct and exists, then retry the request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
 components:
   schemas:
+    AccessDeniedException:
+      type: object
+      properties:
+        message:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: User does not have sufficient access to perform this action.
+      required:
+      - message
+      description: You do not have sufficient access to perform this action.
+    BackupCreationTimeFilter:
+      type: object
+      properties:
+        CreatedAfter:
+          allOf:
+          - $ref: '#/components/schemas/Timestamp'
+          description: This timestamp includes recovery points only created after
+            the specified time.
+        CreatedBefore:
+          allOf:
+          - $ref: '#/components/schemas/Timestamp'
+          description: This timestamp includes recovery points only created before
+            the specified time.
+      description: This filters by recovery points within the CreatedAfter and CreatedBefore
+        timestamps.
+    ConflictException:
+      type: object
+      properties:
+        message:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: Updating or deleting a resource can cause an inconsistent state.
+        resourceId:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: Identifier of the resource affected.
+        resourceType:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: Type of the resource affected.
+      required:
+      - message
+      - resourceId
+      - resourceType
+      description: 'This exception occurs when a conflict with a previous successful
+        operation is detected. This generally occurs when the previous operation did
+        not have time to propagate to the host serving the current request.
+
+
+        A retry (with appropriate backoff logic) is the recommended response to this
+        exception.'
+    CurrentSearchProgress:
+      type: object
+      properties:
+        RecoveryPointsScannedCount:
+          allOf:
+          - $ref: '#/components/schemas/Integer'
+          description: This number is the sum of all backups that have been scanned
+            so far during a search job.
+        ItemsScannedCount:
+          allOf:
+          - $ref: '#/components/schemas/Long'
+          description: This number is the sum of all items that have been scanned
+            so far during a search job.
+        ItemsMatchedCount:
+          allOf:
+          - $ref: '#/components/schemas/Long'
+          description: This number is the sum of all items that match the item filters
+            in a search job in progress.
+      description: This contains information results retrieved from a search job that
+        may not have completed.
+    EBSItemFilter:
+      type: object
+      properties:
+        FilePaths:
+          allOf:
+          - $ref: '#/components/schemas/StringConditionList'
+          description: 'You can include 1 to 10 values.
+
+
+            If one file path is included, the results will return only items that
+            match the file path.
+
+
+            If more than one file path is included, the results will return all items
+            that match any of the file paths.'
+        Sizes:
+          allOf:
+          - $ref: '#/components/schemas/LongConditionList'
+          description: 'You can include 1 to 10 values.
+
+
+            If one is included, the results will return only items that match.
+
+
+            If more than one is included, the results will return all items that match
+            any of the included values.'
+        CreationTimes:
+          allOf:
+          - $ref: '#/components/schemas/TimeConditionList'
+          description: 'You can include 1 to 10 values.
+
+
+            If one is included, the results will return only items that match.
+
+
+            If more than one is included, the results will return all items that match
+            any of the included values.'
+        LastModificationTimes:
+          allOf:
+          - $ref: '#/components/schemas/TimeConditionList'
+          description: 'You can include 1 to 10 values.
+
+
+            If one is included, the results will return only items that match.
+
+
+            If more than one is included, the results will return all items that match
+            any of the included values.'
+      description: This contains arrays of objects, which may include CreationTimes
+        time condition objects, FilePaths string objects, LastModificationTimes time
+        condition objects,
     EBSItemFilters:
       type: array
       items:
         $ref: '#/components/schemas/EBSItemFilter'
+    EBSResultItem:
+      type: object
+      properties:
+        BackupResourceArn:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: These are one or more items in the results that match values
+            for the Amazon Resource Name (ARN) of recovery points returned in a search
+            of Amazon EBS backup metadata.
+        SourceResourceArn:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: These are one or more items in the results that match values
+            for the Amazon Resource Name (ARN) of source resources returned in a search
+            of Amazon EBS backup metadata.
+        BackupVaultName:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The name of the backup vault.
+        FileSystemIdentifier:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: These are one or more items in the results that match values
+            for file systems returned in a search of Amazon EBS backup metadata.
+        FilePath:
+          allOf:
+          - $ref: '#/components/schemas/FilePath'
+          description: These are one or more items in the results that match values
+            for file paths returned in a search of Amazon EBS backup metadata.
+        FileSize:
+          allOf:
+          - $ref: '#/components/schemas/Long'
+          description: These are one or more items in the results that match values
+            for file sizes returned in a search of Amazon EBS backup metadata.
+        CreationTime:
+          allOf:
+          - $ref: '#/components/schemas/Timestamp'
+          description: These are one or more items in the results that match values
+            for creation times returned in a search of Amazon EBS backup metadata.
+        LastModifiedTime:
+          allOf:
+          - $ref: '#/components/schemas/Timestamp'
+          description: These are one or more items in the results that match values
+            for Last Modified Time returned in a search of Amazon EBS backup metadata.
+      description: These are the items returned in the results of a search of Amazon
+        EBS backup metadata.
     EncryptionKeyArn:
       type: string
     ExportJobArn:
@@ -72,6 +627,51 @@ components:
       type: array
       items:
         $ref: '#/components/schemas/ExportJobSummary'
+    ExportJobSummary:
+      type: object
+      properties:
+        ExportJobIdentifier:
+          allOf:
+          - $ref: '#/components/schemas/GenericId'
+          description: This is the unique string that identifies a specific export
+            job.
+        ExportJobArn:
+          allOf:
+          - $ref: '#/components/schemas/ExportJobArn'
+          description: This is the unique ARN (Amazon Resource Name) that belongs
+            to the new export job.
+        Status:
+          allOf:
+          - $ref: '#/components/schemas/ExportJobStatus'
+          description: 'The status of the export job is one of the following:
+
+
+            `CREATED`; `RUNNING`; `FAILED`; or `COMPLETED`.'
+        CreationTime:
+          allOf:
+          - $ref: '#/components/schemas/Timestamp'
+          description: This is a timestamp of the time the export job was created.
+        CompletionTime:
+          allOf:
+          - $ref: '#/components/schemas/Timestamp'
+          description: This is a timestamp of the time the export job compeleted.
+        StatusMessage:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: 'A status message is a string that is returned for an export
+            job.
+
+
+            A status message is included for any status other than `COMPLETED` without
+            issues.'
+        SearchJobArn:
+          allOf:
+          - $ref: '#/components/schemas/SearchJobArn'
+          description: The unique string that identifies the Amazon Resource Name
+            (ARN) of the specified search job.
+      required:
+      - ExportJobIdentifier
+      description: This is the summary of an export job.
     ExportSpecification:
       allOf:
       - allOf:
@@ -84,11 +684,402 @@ components:
       type: string
     GenericId:
       type: string
+    GetSearchJobInput:
+      type: object
+      properties:
+        SearchJobIdentifier:
+          allOf:
+          - $ref: '#/components/schemas/GenericId'
+          description: Required unique string that specifies the search job.
+      required:
+      - SearchJobIdentifier
+    GetSearchJobOutput:
+      type: object
+      properties:
+        Name:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: Returned name of the specified search job.
+        SearchScopeSummary:
+          allOf:
+          - $ref: '#/components/schemas/SearchScopeSummary'
+          description: "Returned summary of the specified search job scope, including:\n\
+            \n  * TotalBackupsToScanCount, the number of recovery points returned\
+            \ by the search.\n\n  * TotalItemsToScanCount, the number of items returned\
+            \ by the search."
+        CurrentSearchProgress:
+          allOf:
+          - $ref: '#/components/schemas/CurrentSearchProgress'
+          description: Returns numbers representing BackupsScannedCount, ItemsScanned,
+            and ItemsMatched.
+        StatusMessage:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: 'A status message will be returned for either a earch job with
+            a status of `ERRORED` or a status of `COMPLETED` jobs with issues.
+
+
+            For example, a message may say that a search contained recovery points
+            unable to be scanned because of a permissions issue.'
+        EncryptionKeyArn:
+          allOf:
+          - $ref: '#/components/schemas/EncryptionKeyArn'
+          description: 'The encryption key for the specified search job.
+
+
+            Example: `arn:aws:kms:us-west-2:111122223333:key/1234abcd-12ab-34cd-56ef-1234567890ab`.'
+        CompletionTime:
+          allOf:
+          - $ref: '#/components/schemas/Timestamp'
+          description: The date and time that a search job completed, in Unix format
+            and Coordinated Universal Time (UTC). The value of `CompletionTime` is
+            accurate to milliseconds. For example, the value 1516925490.087 represents
+            Friday, January 26, 2018 12:11:30.087 AM.
+        Status:
+          allOf:
+          - $ref: '#/components/schemas/SearchJobState'
+          description: 'The current status of the specified search job.
+
+
+            A search job may have one of the following statuses: `RUNNING`; `COMPLETED`;
+            `STOPPED`; `FAILED`; `TIMED_OUT`; or `EXPIRED` .'
+        SearchScope:
+          allOf:
+          - $ref: '#/components/schemas/SearchScope'
+          description: The search scope is all backup properties input into a search.
+        ItemFilters:
+          allOf:
+          - $ref: '#/components/schemas/ItemFilters'
+          description: Item Filters represent all input item properties specified
+            when the search was created.
+        CreationTime:
+          allOf:
+          - $ref: '#/components/schemas/Timestamp'
+          description: The date and time that a search job was created, in Unix format
+            and Coordinated Universal Time (UTC). The value of `CompletionTime` is
+            accurate to milliseconds. For example, the value 1516925490.087 represents
+            Friday, January 26, 2018 12:11:30.087 AM.
+        SearchJobIdentifier:
+          allOf:
+          - $ref: '#/components/schemas/GenericId'
+          description: The unique string that identifies the specified search job.
+        SearchJobArn:
+          allOf:
+          - $ref: '#/components/schemas/SearchJobArn'
+          description: The unique string that identifies the Amazon Resource Name
+            (ARN) of the specified search job.
+      required:
+      - Status
+      - SearchScope
+      - ItemFilters
+      - CreationTime
+      - SearchJobIdentifier
+      - SearchJobArn
+    GetSearchResultExportJobInput:
+      type: object
+      properties:
+        ExportJobIdentifier:
+          allOf:
+          - $ref: '#/components/schemas/GenericId'
+          description: 'This is the unique string that identifies a specific export
+            job.
+
+
+            Required for this operation.'
+      required:
+      - ExportJobIdentifier
+    GetSearchResultExportJobOutput:
+      type: object
+      properties:
+        ExportJobIdentifier:
+          allOf:
+          - $ref: '#/components/schemas/GenericId'
+          description: This is the unique string that identifies the specified export
+            job.
+        ExportJobArn:
+          allOf:
+          - $ref: '#/components/schemas/ExportJobArn'
+          description: The unique Amazon Resource Name (ARN) that uniquely identifies
+            the export job.
+        Status:
+          allOf:
+          - $ref: '#/components/schemas/ExportJobStatus'
+          description: This is the current status of the export job.
+        CreationTime:
+          allOf:
+          - $ref: '#/components/schemas/Timestamp'
+          description: The date and time that an export job was created, in Unix format
+            and Coordinated Universal Time (UTC). The value of `CreationTime` is accurate
+            to milliseconds. For example, the value 1516925490.087 represents Friday,
+            January 26, 2018 12:11:30.087 AM.
+        CompletionTime:
+          allOf:
+          - $ref: '#/components/schemas/Timestamp'
+          description: The date and time that an export job completed, in Unix format
+            and Coordinated Universal Time (UTC). The value of `CreationTime` is accurate
+            to milliseconds. For example, the value 1516925490.087 represents Friday,
+            January 26, 2018 12:11:30.087 AM.
+        StatusMessage:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: A status message is a string that is returned for search job
+            with a status of `FAILED`, along with steps to remedy and retry the operation.
+        ExportSpecification:
+          allOf:
+          - $ref: '#/components/schemas/ExportSpecification'
+          description: The export specification consists of the destination S3 bucket
+            to which the search results were exported, along with the destination
+            prefix.
+        SearchJobArn:
+          allOf:
+          - $ref: '#/components/schemas/SearchJobArn'
+          description: The unique string that identifies the Amazon Resource Name
+            (ARN) of the specified search job.
+      required:
+      - ExportJobIdentifier
     IamRoleArn:
       type: string
       pattern: ^arn:(?:aws|aws-cn|aws-us-gov):iam::[a-z0-9-]+:role/(.+)$
       minLength: 20
       maxLength: 2048
+    InternalServerException:
+      type: object
+      properties:
+        message:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: Unexpected error during processing of request.
+        retryAfterSeconds:
+          allOf:
+          - $ref: '#/components/schemas/Integer'
+          description: Retry the call after number of seconds.
+      required:
+      - message
+      description: An internal server error occurred. Retry your request.
+    ItemFilters:
+      type: object
+      properties:
+        S3ItemFilters:
+          allOf:
+          - $ref: '#/components/schemas/S3ItemFilters'
+          description: This array can contain CreationTimes, ETags, ObjectKeys, Sizes,
+            or VersionIds objects.
+        EBSItemFilters:
+          allOf:
+          - $ref: '#/components/schemas/EBSItemFilters'
+          description: This array can contain CreationTimes, FilePaths, LastModificationTimes,
+            or Sizes objects.
+      description: 'Item Filters represent all input item properties specified when
+        the search was created.
+
+
+        Contains either EBSItemFilters or S3ItemFilters'
+    ListSearchJobBackupsInput:
+      type: object
+      properties:
+        SearchJobIdentifier:
+          allOf:
+          - $ref: '#/components/schemas/GenericId'
+          description: The unique string that specifies the search job.
+        NextToken:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: 'The next item following a partial list of returned backups
+            included in a search job.
+
+
+            For example, if a request is made to return `MaxResults` number of backups,
+            `NextToken` allows you to return more items in your list starting at the
+            location pointed to by the next token.'
+        MaxResults:
+          allOf:
+          - $ref: '#/components/schemas/Integer'
+          description: The maximum number of resource list items to be returned.
+      required:
+      - SearchJobIdentifier
+    ListSearchJobBackupsOutput:
+      type: object
+      properties:
+        Results:
+          allOf:
+          - $ref: '#/components/schemas/SearchJobBackupsResults'
+          description: The recovery points returned the results of a search job
+        NextToken:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: 'The next item following a partial list of returned backups
+            included in a search job.
+
+
+            For example, if a request is made to return `MaxResults` number of backups,
+            `NextToken` allows you to return more items in your list starting at the
+            location pointed to by the next token.'
+      required:
+      - Results
+    ListSearchJobResultsInput:
+      type: object
+      properties:
+        SearchJobIdentifier:
+          allOf:
+          - $ref: '#/components/schemas/GenericId'
+          description: The unique string that specifies the search job.
+        NextToken:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: 'The next item following a partial list of returned search
+            job results.
+
+
+            For example, if a request is made to return `MaxResults` number of search
+            job results, `NextToken` allows you to return more items in your list
+            starting at the location pointed to by the next token.'
+        MaxResults:
+          allOf:
+          - $ref: '#/components/schemas/Integer'
+          description: The maximum number of resource list items to be returned.
+      required:
+      - SearchJobIdentifier
+    ListSearchJobResultsOutput:
+      type: object
+      properties:
+        Results:
+          allOf:
+          - $ref: '#/components/schemas/Results'
+          description: The results consist of either EBSResultItem or S3ResultItem.
+        NextToken:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: 'The next item following a partial list of search job results.
+
+
+            For example, if a request is made to return `MaxResults` number of backups,
+            `NextToken` allows you to return more items in your list starting at the
+            location pointed to by the next token.'
+      required:
+      - Results
+    ListSearchJobsInput:
+      type: object
+      properties:
+        ByStatus:
+          allOf:
+          - $ref: '#/components/schemas/SearchJobState'
+          description: Include this parameter to filter list by search job status.
+        NextToken:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: 'The next item following a partial list of returned search
+            jobs.
+
+
+            For example, if a request is made to return `MaxResults` number of backups,
+            `NextToken` allows you to return more items in your list starting at the
+            location pointed to by the next token.'
+        MaxResults:
+          allOf:
+          - $ref: '#/components/schemas/Integer'
+          description: The maximum number of resource list items to be returned.
+    ListSearchJobsOutput:
+      type: object
+      properties:
+        SearchJobs:
+          allOf:
+          - $ref: '#/components/schemas/SearchJobs'
+          description: The search jobs among the list, with details of the returned
+            search jobs.
+        NextToken:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: 'The next item following a partial list of returned backups
+            included in a search job.
+
+
+            For example, if a request is made to return `MaxResults` number of backups,
+            `NextToken` allows you to return more items in your list starting at the
+            location pointed to by the next token.'
+      required:
+      - SearchJobs
+    ListSearchResultExportJobsInput:
+      type: object
+      properties:
+        Status:
+          allOf:
+          - $ref: '#/components/schemas/ExportJobStatus'
+          description: The search jobs to be included in the export job can be filtered
+            by including this parameter.
+        SearchJobIdentifier:
+          allOf:
+          - $ref: '#/components/schemas/GenericId'
+          description: The unique string that specifies the search job.
+        NextToken:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: 'The next item following a partial list of returned backups
+            included in a search job.
+
+
+            For example, if a request is made to return `MaxResults` number of backups,
+            `NextToken` allows you to return more items in your list starting at the
+            location pointed to by the next token.'
+        MaxResults:
+          allOf:
+          - $ref: '#/components/schemas/Integer'
+          description: The maximum number of resource list items to be returned.
+    ListSearchResultExportJobsOutput:
+      type: object
+      properties:
+        ExportJobs:
+          allOf:
+          - $ref: '#/components/schemas/ExportJobSummaries'
+          description: The operation returns the included export jobs.
+        NextToken:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: 'The next item following a partial list of returned backups
+            included in a search job.
+
+
+            For example, if a request is made to return `MaxResults` number of backups,
+            `NextToken` allows you to return more items in your list starting at the
+            location pointed to by the next token.'
+      required:
+      - ExportJobs
+    ListTagsForResourceRequest:
+      type: object
+      properties:
+        ResourceArn:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The Amazon Resource Name (ARN) that uniquely identifies the
+            resource.>
+      required:
+      - ResourceArn
+    ListTagsForResourceResponse:
+      type: object
+      properties:
+        Tags:
+          allOf:
+          - $ref: '#/components/schemas/TagMap'
+          description: List of tags returned by the operation.
+    LongCondition:
+      type: object
+      properties:
+        Value:
+          allOf:
+          - $ref: '#/components/schemas/Long'
+          description: The value of an item included in one of the search item filters.
+        Operator:
+          allOf:
+          - $ref: '#/components/schemas/LongConditionOperator'
+          description: 'A string that defines what values will be returned.
+
+
+            If this is included, avoid combinations of operators that will return
+            all possible values. For example, including both `EQUALS_TO` and `NOT_EQUALS_TO`
+            with a value of `4` will return all values.'
+      required:
+      - Value
+      description: The long condition contains a `Value` and can optionally contain
+        an `Operator`.
     LongConditionList:
       type: array
       items:
@@ -112,6 +1103,30 @@ components:
       type: array
       items:
         type: string
+    ResourceNotFoundException:
+      type: object
+      properties:
+        message:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: Request references a resource which does not exist.
+        resourceId:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: Hypothetical identifier of the resource affected.
+        resourceType:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: Hypothetical type of the resource affected.
+      required:
+      - message
+      - resourceId
+      - resourceType
+      description: 'The resource was not found for this request.
+
+
+        Confirm the resource information, such as the ARN or type is correct and exists,
+        then retry the request.'
     ResourceType:
       type: string
       enum:
@@ -137,12 +1152,175 @@ components:
       type: array
       items:
         $ref: '#/components/schemas/ResultItem'
+    S3ExportSpecification:
+      type: object
+      properties:
+        DestinationBucket:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: This specifies the destination Amazon S3 bucket for the export
+            job.
+        DestinationPrefix:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: This specifies the prefix for the destination Amazon S3 bucket
+            for the export job.
+      required:
+      - DestinationBucket
+      description: This specification contains a required string of the destination
+        bucket; optionally, you can include the destination prefix.
+    S3ItemFilter:
+      type: object
+      properties:
+        ObjectKeys:
+          allOf:
+          - $ref: '#/components/schemas/StringConditionList'
+          description: 'You can include 1 to 10 values.
+
+
+            If one value is included, the results will return only items that match
+            the value.
+
+
+            If more than one value is included, the results will return all items
+            that match any of the values.'
+        Sizes:
+          allOf:
+          - $ref: '#/components/schemas/LongConditionList'
+          description: 'You can include 1 to 10 values.
+
+
+            If one value is included, the results will return only items that match
+            the value.
+
+
+            If more than one value is included, the results will return all items
+            that match any of the values.'
+        CreationTimes:
+          allOf:
+          - $ref: '#/components/schemas/TimeConditionList'
+          description: 'You can include 1 to 10 values.
+
+
+            If one value is included, the results will return only items that match
+            the value.
+
+
+            If more than one value is included, the results will return all items
+            that match any of the values.'
+        VersionIds:
+          allOf:
+          - $ref: '#/components/schemas/StringConditionList'
+          description: 'You can include 1 to 10 values.
+
+
+            If one value is included, the results will return only items that match
+            the value.
+
+
+            If more than one value is included, the results will return all items
+            that match any of the values.'
+        ETags:
+          allOf:
+          - $ref: '#/components/schemas/StringConditionList'
+          description: 'You can include 1 to 10 values.
+
+
+            If one value is included, the results will return only items that match
+            the value.
+
+
+            If more than one value is included, the results will return all items
+            that match any of the values.'
+      description: This contains arrays of objects, which may include ObjectKeys,
+        Sizes, CreationTimes, VersionIds, and/or Etags.
     S3ItemFilters:
       type: array
       items:
         $ref: '#/components/schemas/S3ItemFilter'
+    S3ResultItem:
+      type: object
+      properties:
+        BackupResourceArn:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: These are items in the returned results that match recovery
+            point Amazon Resource Names (ARN) input during a search of Amazon S3 backup
+            metadata.
+        SourceResourceArn:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: These are items in the returned results that match source Amazon
+            Resource Names (ARN) input during a search of Amazon S3 backup metadata.
+        BackupVaultName:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The name of the backup vault.
+        ObjectKey:
+          allOf:
+          - $ref: '#/components/schemas/ObjectKey'
+          description: This is one or more items returned in the results of a search
+            of Amazon S3 backup metadata that match the values input for object key.
+        ObjectSize:
+          allOf:
+          - $ref: '#/components/schemas/Long'
+          description: These are items in the returned results that match values for
+            object size(s) input during a search of Amazon S3 backup metadata.
+        CreationTime:
+          allOf:
+          - $ref: '#/components/schemas/Timestamp'
+          description: These are one or more items in the returned results that match
+            values for item creation time input during a search of Amazon S3 backup
+            metadata.
+        ETag:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: These are one or more items in the returned results that match
+            values for ETags input during a search of Amazon S3 backup metadata.
+        VersionId:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: These are one or more items in the returned results that match
+            values for version IDs input during a search of Amazon S3 backup metadata.
+      description: These are the items returned in the results of a search of Amazon
+        S3 backup metadata.
     SearchJobArn:
       type: string
+    SearchJobBackupsResult:
+      type: object
+      properties:
+        Status:
+          allOf:
+          - $ref: '#/components/schemas/SearchJobState'
+          description: This is the status of the search job backup result.
+        StatusMessage:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: This is the status message included with the results.
+        ResourceType:
+          allOf:
+          - $ref: '#/components/schemas/ResourceType'
+          description: This is the resource type of the search.
+        BackupResourceArn:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The Amazon Resource Name (ARN) that uniquely identifies the
+            backup resources.
+        SourceResourceArn:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The Amazon Resource Name (ARN) that uniquely identifies the
+            source resources.
+        IndexCreationTime:
+          allOf:
+          - $ref: '#/components/schemas/Timestamp'
+          description: This is the creation time of the backup index.
+        BackupCreationTime:
+          allOf:
+          - $ref: '#/components/schemas/Timestamp'
+          description: This is the creation time of the backup (recovery point).
+      description: This contains the information about recovery points returned in
+        results of a search job.
     SearchJobBackupsResults:
       type: array
       items:
@@ -155,10 +1333,280 @@ components:
       - STOPPING
       - STOPPED
       - FAILED
+    SearchJobSummary:
+      type: object
+      properties:
+        SearchJobIdentifier:
+          allOf:
+          - $ref: '#/components/schemas/GenericId'
+          description: The unique string that specifies the search job.
+        SearchJobArn:
+          allOf:
+          - $ref: '#/components/schemas/SearchJobArn'
+          description: The unique string that identifies the Amazon Resource Name
+            (ARN) of the specified search job.
+        Name:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: This is the name of the search job.
+        Status:
+          allOf:
+          - $ref: '#/components/schemas/SearchJobState'
+          description: This is the status of the search job.
+        CreationTime:
+          allOf:
+          - $ref: '#/components/schemas/Timestamp'
+          description: This is the creation time of the search job.
+        CompletionTime:
+          allOf:
+          - $ref: '#/components/schemas/Timestamp'
+          description: This is the completion time of the search job.
+        SearchScopeSummary:
+          allOf:
+          - $ref: '#/components/schemas/SearchScopeSummary'
+          description: "Returned summary of the specified search job scope, including:\n\
+            \n  * TotalBackupsToScanCount, the number of recovery points returned\
+            \ by the search.\n\n  * TotalItemsToScanCount, the number of items returned\
+            \ by the search."
+        StatusMessage:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: 'A status message will be returned for either a earch job with
+            a status of `ERRORED` or a status of `COMPLETED` jobs with issues.
+
+
+            For example, a message may say that a search contained recovery points
+            unable to be scanned because of a permissions issue.'
+      description: This is information pertaining to a search job.
     SearchJobs:
       type: array
       items:
         $ref: '#/components/schemas/SearchJobSummary'
+    SearchScope:
+      type: object
+      properties:
+        BackupResourceTypes:
+          allOf:
+          - $ref: '#/components/schemas/ResourceTypeList'
+          description: 'The resource types included in a search.
+
+
+            Eligible resource types include S3 and EBS.'
+        BackupResourceCreationTime:
+          allOf:
+          - $ref: '#/components/schemas/BackupCreationTimeFilter'
+          description: This is the time a backup resource was created.
+        SourceResourceArns:
+          allOf:
+          - $ref: '#/components/schemas/ResourceArnList'
+          description: The Amazon Resource Name (ARN) that uniquely identifies the
+            source resources.
+        BackupResourceArns:
+          allOf:
+          - $ref: '#/components/schemas/RecoveryPointArnList'
+          description: The Amazon Resource Name (ARN) that uniquely identifies the
+            backup resources.
+        BackupResourceTags:
+          allOf:
+          - $ref: '#/components/schemas/TagMap'
+          description: These are one or more tags on the backup (recovery point).
+      required:
+      - BackupResourceTypes
+      description: The search scope is all backup properties input into a search.
+    SearchScopeSummary:
+      type: object
+      properties:
+        TotalRecoveryPointsToScanCount:
+          allOf:
+          - $ref: '#/components/schemas/Integer'
+          description: This is the count of the total number of backups that will
+            be scanned in a search.
+        TotalItemsToScanCount:
+          allOf:
+          - $ref: '#/components/schemas/Long'
+          description: This is the count of the total number of items that will be
+            scanned in a search.
+      description: "The summary of the specified search job scope, including:\n\n\
+        \  * TotalBackupsToScanCount, the number of recovery points returned by the\
+        \ search.\n\n  * TotalItemsToScanCount, the number of items returned by the\
+        \ search."
+    ServiceQuotaExceededException:
+      type: object
+      properties:
+        message:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: This request was not successful due to a service quota exceeding
+            limits.
+        resourceId:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: Identifier of the resource.
+        resourceType:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: Type of resource.
+        serviceCode:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: This is the code unique to the originating service with the
+            quota.
+        quotaCode:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: This is the code specific to the quota type.
+      required:
+      - message
+      - resourceId
+      - resourceType
+      - serviceCode
+      - quotaCode
+      description: The request denied due to exceeding the quota limits permitted.
+    StartSearchJobInput:
+      type: object
+      properties:
+        Tags:
+          allOf:
+          - $ref: '#/components/schemas/TagMap'
+          description: List of tags returned by the operation.
+        Name:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: Include alphanumeric characters to create a name for this search
+            job.
+        EncryptionKeyArn:
+          allOf:
+          - $ref: '#/components/schemas/EncryptionKeyArn'
+          description: The encryption key for the specified search job.
+        ClientToken:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: 'Include this parameter to allow multiple identical calls for
+            idempotency.
+
+
+            A client token is valid for 8 hours after the first request that uses
+            it is completed. After this time, any request with the same token is treated
+            as a new request.'
+        SearchScope:
+          allOf:
+          - $ref: '#/components/schemas/SearchScope'
+          description: This object can contain BackupResourceTypes, BackupResourceArns,
+            BackupResourceCreationTime, BackupResourceTags, and SourceResourceArns
+            to filter the recovery points returned by the search job.
+        ItemFilters:
+          allOf:
+          - $ref: '#/components/schemas/ItemFilters'
+          description: 'Item Filters represent all input item properties specified
+            when the search was created.
+
+
+            Contains either EBSItemFilters or S3ItemFilters'
+      required:
+      - SearchScope
+    StartSearchJobOutput:
+      type: object
+      properties:
+        SearchJobArn:
+          allOf:
+          - $ref: '#/components/schemas/SearchJobArn'
+          description: The unique string that identifies the Amazon Resource Name
+            (ARN) of the specified search job.
+        CreationTime:
+          allOf:
+          - $ref: '#/components/schemas/Timestamp'
+          description: The date and time that a job was created, in Unix format and
+            Coordinated Universal Time (UTC). The value of `CompletionTime` is accurate
+            to milliseconds. For example, the value 1516925490.087 represents Friday,
+            January 26, 2018 12:11:30.087 AM.
+        SearchJobIdentifier:
+          allOf:
+          - $ref: '#/components/schemas/GenericId'
+          description: The unique string that specifies the search job.
+    StartSearchResultExportJobInput:
+      type: object
+      properties:
+        SearchJobIdentifier:
+          allOf:
+          - $ref: '#/components/schemas/GenericId'
+          description: The unique string that specifies the search job.
+        ExportSpecification:
+          allOf:
+          - $ref: '#/components/schemas/ExportSpecification'
+          description: This specification contains a required string of the destination
+            bucket; optionally, you can include the destination prefix.
+        ClientToken:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: 'Include this parameter to allow multiple identical calls for
+            idempotency.
+
+
+            A client token is valid for 8 hours after the first request that uses
+            it is completed. After this time, any request with the same token is treated
+            as a new request.'
+        Tags:
+          allOf:
+          - $ref: '#/components/schemas/TagMap'
+          description: 'Optional tags to include. A tag is a key-value pair you can
+            use to manage, filter, and search for your resources. Allowed characters
+            include UTF-8 letters, numbers, spaces, and the following characters:
+            + - = . _ : /.'
+        RoleArn:
+          allOf:
+          - $ref: '#/components/schemas/IamRoleArn'
+          description: This parameter specifies the role ARN used to start the search
+            results export jobs.
+      required:
+      - SearchJobIdentifier
+      - ExportSpecification
+    StartSearchResultExportJobOutput:
+      type: object
+      properties:
+        ExportJobArn:
+          allOf:
+          - $ref: '#/components/schemas/ExportJobArn'
+          description: This is the unique ARN (Amazon Resource Name) that belongs
+            to the new export job.
+        ExportJobIdentifier:
+          allOf:
+          - $ref: '#/components/schemas/GenericId'
+          description: This is the unique identifier that specifies the new export
+            job.
+      required:
+      - ExportJobIdentifier
+    StopSearchJobInput:
+      type: object
+      properties:
+        SearchJobIdentifier:
+          allOf:
+          - $ref: '#/components/schemas/GenericId'
+          description: The unique string that specifies the search job.
+      required:
+      - SearchJobIdentifier
+    StopSearchJobOutput:
+      type: object
+      properties: {}
+    StringCondition:
+      type: object
+      properties:
+        Value:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The value of the string.
+        Operator:
+          allOf:
+          - $ref: '#/components/schemas/StringConditionOperator'
+          description: 'A string that defines what values will be returned.
+
+
+            If this is included, avoid combinations of operators that will return
+            all possible values. For example, including both `EQUALS_TO` and `NOT_EQUALS_TO`
+            with a value of `4` will return all values.'
+      required:
+      - Value
+      description: This contains the value of the string and can contain one or more
+        operators.
     StringConditionList:
       type: array
       items:
@@ -182,6 +1630,73 @@ components:
       type: object
       additionalProperties:
         $ref: '#/components/schemas/String'
+    TagResourceRequest:
+      type: object
+      properties:
+        ResourceArn:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: 'The Amazon Resource Name (ARN) that uniquely identifies the
+            resource.
+
+
+            This is the resource that will have the indicated tags.'
+        Tags:
+          allOf:
+          - $ref: '#/components/schemas/TagMap'
+          description: 'Required tags to include. A tag is a key-value pair you can
+            use to manage, filter, and search for your resources. Allowed characters
+            include UTF-8 letters, numbers, spaces, and the following characters:
+            + - = . _ : /.'
+      required:
+      - ResourceArn
+      - Tags
+    TagResourceResponse:
+      type: object
+      properties: {}
+    ThrottlingException:
+      type: object
+      properties:
+        message:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: Request was unsuccessful due to request throttling.
+        serviceCode:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: This is the code unique to the originating service.
+        quotaCode:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: This is the code unique to the originating service with the
+            quota.
+        retryAfterSeconds:
+          allOf:
+          - $ref: '#/components/schemas/Integer'
+          description: Retry the call after number of seconds.
+      required:
+      - message
+      description: The request was denied due to request throttling.
+    TimeCondition:
+      type: object
+      properties:
+        Value:
+          allOf:
+          - $ref: '#/components/schemas/Timestamp'
+          description: This is the timestamp value of the time condition.
+        Operator:
+          allOf:
+          - $ref: '#/components/schemas/TimeConditionOperator'
+          description: 'A string that defines what values will be returned.
+
+
+            If this is included, avoid combinations of operators that will return
+            all possible values. For example, including both `EQUALS_TO` and `NOT_EQUALS_TO`
+            with a value of `4` will return all values.'
+      required:
+      - Value
+      description: A time condition denotes a creation time, last modification time,
+        or other time.
     TimeConditionList:
       type: array
       items:
@@ -193,3 +1708,33 @@ components:
       - NOT_EQUALS_TO
       - LESS_THAN_EQUAL_TO
       - GREATER_THAN_EQUAL_TO
+    UntagResourceRequest:
+      type: object
+      properties:
+        ResourceArn:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The Amazon Resource Name (ARN) that uniquely identifies the
+            resource where you want to remove tags.
+        TagKeys:
+          allOf:
+          - $ref: '#/components/schemas/TagKeys'
+          description: This required parameter contains the tag keys you want to remove
+            from the source.
+      required:
+      - ResourceArn
+      - TagKeys
+    UntagResourceResponse:
+      type: object
+      properties: {}
+    ValidationException:
+      type: object
+      properties:
+        message:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The input fails to satisfy the constraints specified by an
+            Amazon service.
+      required:
+      - message
+      description: The input fails to satisfy the constraints specified by a service.

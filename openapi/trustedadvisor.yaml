@@ -7,7 +7,7 @@ info:
   x-stackql-serviceName: trustedadvisor
   x-aws-serviceName: trustedadvisor
   x-aws-protocol: aws.protocols#restJson1
-  x-dateGenerated: '2025-05-05'
+  x-dateGenerated: '2025-05-07'
   version: '2022-09-15'
   title: TrustedAdvisor Public API
   description: |-
@@ -43,9 +43,753 @@ servers:
       - sa-east-1
       - me-south-1
       default: us-east-1
-paths: {}
+paths:
+  /v1/batch-update-recommendation-resource-exclusion:
+    put:
+      operationId: BatchUpdateRecommendationResourceExclusion
+      description: |-
+        Update one or more exclusion status for a list of recommendation resources
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                recommendationResourceExclusions:
+                  $ref: '#/components/schemas/RecommendationResourceExclusionList'
+      responses:
+        '200': {}
+        '403':
+          description: |-
+            Exception that access has been denied due to insufficient access
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '409':
+          description: |-
+            Exception that the request was denied due to conflictions in state
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConflictException'
+        '500':
+          description: |-
+            Exception to notify that an unexpected internal error occurred during processing of the request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerException'
+        '429':
+          description: |-
+            Exception to notify that requests are being throttled
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThrottlingException'
+        '400':
+          description: |-
+            Exception that the request failed to satisfy service constraints
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+  /v1/organization-recommendations/{organizationRecommendationIdentifier}:
+    get:
+      operationId: GetOrganizationRecommendation
+      description: |-
+        Get a specific recommendation within an AWS Organizations organization. This API supports only prioritized recommendations.
+      parameters:
+      - name: organizationRecommendationIdentifier
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/OrganizationRecommendationIdentifier'
+      responses:
+        '200': {}
+        '403':
+          description: |-
+            Exception that access has been denied due to insufficient access
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '500':
+          description: |-
+            Exception to notify that an unexpected internal error occurred during processing of the request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerException'
+        '404':
+          description: |-
+            Exception that the requested resource has not been found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+        '429':
+          description: |-
+            Exception to notify that requests are being throttled
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThrottlingException'
+        '400':
+          description: |-
+            Exception that the request failed to satisfy service constraints
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+  /v1/recommendations/{recommendationIdentifier}:
+    get:
+      operationId: GetRecommendation
+      description: |-
+        Get a specific Recommendation
+      parameters:
+      - name: recommendationIdentifier
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/AccountRecommendationIdentifier'
+      responses:
+        '200': {}
+        '403':
+          description: |-
+            Exception that access has been denied due to insufficient access
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '500':
+          description: |-
+            Exception to notify that an unexpected internal error occurred during processing of the request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerException'
+        '404':
+          description: |-
+            Exception that the requested resource has not been found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+        '429':
+          description: |-
+            Exception to notify that requests are being throttled
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThrottlingException'
+        '400':
+          description: |-
+            Exception that the request failed to satisfy service constraints
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+  /v1/checks:
+    get:
+      operationId: ListChecks
+      description: |-
+        List a filterable set of Checks
+      parameters:
+      - name: nextToken
+        in: query
+        required: false
+        schema:
+          $ref: '#/components/schemas/String'
+      - name: maxResults
+        in: query
+        required: false
+        schema:
+          $ref: '#/components/schemas/Integer'
+      - name: pillar
+        in: query
+        required: false
+        schema:
+          $ref: '#/components/schemas/RecommendationPillar'
+      - name: awsService
+        in: query
+        required: false
+        schema:
+          $ref: '#/components/schemas/RecommendationAwsService'
+      - name: source
+        in: query
+        required: false
+        schema:
+          $ref: '#/components/schemas/RecommendationSource'
+      - name: language
+        in: query
+        required: false
+        schema:
+          $ref: '#/components/schemas/RecommendationLanguage'
+      responses:
+        '200': {}
+        '403':
+          description: |-
+            Exception that access has been denied due to insufficient access
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '500':
+          description: |-
+            Exception to notify that an unexpected internal error occurred during processing of the request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerException'
+        '429':
+          description: |-
+            Exception to notify that requests are being throttled
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThrottlingException'
+        '400':
+          description: |-
+            Exception that the request failed to satisfy service constraints
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+  /v1/organization-recommendations/{organizationRecommendationIdentifier}/accounts:
+    get:
+      operationId: ListOrganizationRecommendationAccounts
+      description: |-
+        Lists the accounts that own the resources for an organization aggregate recommendation. This API only supports prioritized recommendations.
+      parameters:
+      - name: nextToken
+        in: query
+        required: false
+        schema:
+          $ref: '#/components/schemas/String'
+      - name: maxResults
+        in: query
+        required: false
+        schema:
+          $ref: '#/components/schemas/Integer'
+      - name: organizationRecommendationIdentifier
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/OrganizationRecommendationIdentifier'
+      - name: affectedAccountId
+        in: query
+        required: false
+        schema:
+          $ref: '#/components/schemas/AccountId'
+      responses:
+        '200': {}
+        '403':
+          description: |-
+            Exception that access has been denied due to insufficient access
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '500':
+          description: |-
+            Exception to notify that an unexpected internal error occurred during processing of the request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerException'
+        '404':
+          description: |-
+            Exception that the requested resource has not been found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+        '429':
+          description: |-
+            Exception to notify that requests are being throttled
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThrottlingException'
+        '400':
+          description: |-
+            Exception that the request failed to satisfy service constraints
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+  /v1/organization-recommendations/{organizationRecommendationIdentifier}/resources:
+    get:
+      operationId: ListOrganizationRecommendationResources
+      description: |-
+        List Resources of a Recommendation within an Organization. This API only supports prioritized recommendations.
+      parameters:
+      - name: nextToken
+        in: query
+        required: false
+        schema:
+          $ref: '#/components/schemas/String'
+      - name: maxResults
+        in: query
+        required: false
+        schema:
+          $ref: '#/components/schemas/Integer'
+      - name: status
+        in: query
+        required: false
+        schema:
+          $ref: '#/components/schemas/ResourceStatus'
+      - name: exclusionStatus
+        in: query
+        required: false
+        schema:
+          $ref: '#/components/schemas/ExclusionStatus'
+      - name: regionCode
+        in: query
+        required: false
+        schema:
+          $ref: '#/components/schemas/String'
+      - name: organizationRecommendationIdentifier
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/OrganizationRecommendationIdentifier'
+      - name: affectedAccountId
+        in: query
+        required: false
+        schema:
+          $ref: '#/components/schemas/AccountId'
+      responses:
+        '200': {}
+        '403':
+          description: |-
+            Exception that access has been denied due to insufficient access
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '500':
+          description: |-
+            Exception to notify that an unexpected internal error occurred during processing of the request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerException'
+        '404':
+          description: |-
+            Exception that the requested resource has not been found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+        '429':
+          description: |-
+            Exception to notify that requests are being throttled
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThrottlingException'
+        '400':
+          description: |-
+            Exception that the request failed to satisfy service constraints
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+  /v1/organization-recommendations:
+    get:
+      operationId: ListOrganizationRecommendations
+      description: |-
+        List a filterable set of Recommendations within an Organization. This API only supports prioritized recommendations.
+      parameters:
+      - name: nextToken
+        in: query
+        required: false
+        schema:
+          $ref: '#/components/schemas/String'
+      - name: maxResults
+        in: query
+        required: false
+        schema:
+          $ref: '#/components/schemas/Integer'
+      - name: type
+        in: query
+        required: false
+        schema:
+          $ref: '#/components/schemas/RecommendationType'
+      - name: status
+        in: query
+        required: false
+        schema:
+          $ref: '#/components/schemas/RecommendationStatus'
+      - name: pillar
+        in: query
+        required: false
+        schema:
+          $ref: '#/components/schemas/RecommendationPillar'
+      - name: awsService
+        in: query
+        required: false
+        schema:
+          $ref: '#/components/schemas/RecommendationAwsService'
+      - name: source
+        in: query
+        required: false
+        schema:
+          $ref: '#/components/schemas/RecommendationSource'
+      - name: checkIdentifier
+        in: query
+        required: false
+        schema:
+          $ref: '#/components/schemas/CheckIdentifier'
+      - name: afterLastUpdatedAt
+        in: query
+        required: false
+        schema:
+          $ref: '#/components/schemas/Timestamp'
+      - name: beforeLastUpdatedAt
+        in: query
+        required: false
+        schema:
+          $ref: '#/components/schemas/Timestamp'
+      responses:
+        '200': {}
+        '403':
+          description: |-
+            Exception that access has been denied due to insufficient access
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '500':
+          description: |-
+            Exception to notify that an unexpected internal error occurred during processing of the request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerException'
+        '429':
+          description: |-
+            Exception to notify that requests are being throttled
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThrottlingException'
+        '400':
+          description: |-
+            Exception that the request failed to satisfy service constraints
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+  /v1/recommendations/{recommendationIdentifier}/resources:
+    get:
+      operationId: ListRecommendationResources
+      description: |-
+        List Resources of a Recommendation
+      parameters:
+      - name: nextToken
+        in: query
+        required: false
+        schema:
+          $ref: '#/components/schemas/String'
+      - name: maxResults
+        in: query
+        required: false
+        schema:
+          $ref: '#/components/schemas/Integer'
+      - name: status
+        in: query
+        required: false
+        schema:
+          $ref: '#/components/schemas/ResourceStatus'
+      - name: exclusionStatus
+        in: query
+        required: false
+        schema:
+          $ref: '#/components/schemas/ExclusionStatus'
+      - name: regionCode
+        in: query
+        required: false
+        schema:
+          $ref: '#/components/schemas/String'
+      - name: recommendationIdentifier
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/AccountRecommendationIdentifier'
+      responses:
+        '200': {}
+        '403':
+          description: |-
+            Exception that access has been denied due to insufficient access
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '500':
+          description: |-
+            Exception to notify that an unexpected internal error occurred during processing of the request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerException'
+        '404':
+          description: |-
+            Exception that the requested resource has not been found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+        '429':
+          description: |-
+            Exception to notify that requests are being throttled
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThrottlingException'
+        '400':
+          description: |-
+            Exception that the request failed to satisfy service constraints
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+  /v1/recommendations:
+    get:
+      operationId: ListRecommendations
+      description: |-
+        List a filterable set of Recommendations
+      parameters:
+      - name: nextToken
+        in: query
+        required: false
+        schema:
+          $ref: '#/components/schemas/String'
+      - name: maxResults
+        in: query
+        required: false
+        schema:
+          $ref: '#/components/schemas/Integer'
+      - name: type
+        in: query
+        required: false
+        schema:
+          $ref: '#/components/schemas/RecommendationType'
+      - name: status
+        in: query
+        required: false
+        schema:
+          $ref: '#/components/schemas/RecommendationStatus'
+      - name: pillar
+        in: query
+        required: false
+        schema:
+          $ref: '#/components/schemas/RecommendationPillar'
+      - name: awsService
+        in: query
+        required: false
+        schema:
+          $ref: '#/components/schemas/RecommendationAwsService'
+      - name: source
+        in: query
+        required: false
+        schema:
+          $ref: '#/components/schemas/RecommendationSource'
+      - name: checkIdentifier
+        in: query
+        required: false
+        schema:
+          $ref: '#/components/schemas/CheckIdentifier'
+      - name: afterLastUpdatedAt
+        in: query
+        required: false
+        schema:
+          $ref: '#/components/schemas/Timestamp'
+      - name: beforeLastUpdatedAt
+        in: query
+        required: false
+        schema:
+          $ref: '#/components/schemas/Timestamp'
+      responses:
+        '200': {}
+        '403':
+          description: |-
+            Exception that access has been denied due to insufficient access
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '500':
+          description: |-
+            Exception to notify that an unexpected internal error occurred during processing of the request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerException'
+        '429':
+          description: |-
+            Exception to notify that requests are being throttled
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThrottlingException'
+        '400':
+          description: |-
+            Exception that the request failed to satisfy service constraints
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+  /v1/organization-recommendations/{organizationRecommendationIdentifier}/lifecycle:
+    put:
+      operationId: UpdateOrganizationRecommendationLifecycle
+      description: |-
+        Update the lifecycle of a Recommendation within an Organization. This API only supports prioritized recommendations.
+      parameters:
+      - name: organizationRecommendationIdentifier
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/OrganizationRecommendationIdentifier'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                lifecycleStage:
+                  $ref: '#/components/schemas/UpdateRecommendationLifecycleStage'
+                updateReason:
+                  $ref: '#/components/schemas/RecommendationUpdateReason'
+                updateReasonCode:
+                  $ref: '#/components/schemas/UpdateRecommendationLifecycleStageReasonCode'
+      responses:
+        '200': {}
+        '403':
+          description: |-
+            Exception that access has been denied due to insufficient access
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '409':
+          description: |-
+            Exception that the request was denied due to conflictions in state
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConflictException'
+        '500':
+          description: |-
+            Exception to notify that an unexpected internal error occurred during processing of the request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerException'
+        '404':
+          description: |-
+            Exception that the requested resource has not been found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+        '429':
+          description: |-
+            Exception to notify that requests are being throttled
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThrottlingException'
+        '400':
+          description: |-
+            Exception that the request failed to satisfy service constraints
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+  /v1/recommendations/{recommendationIdentifier}/lifecycle:
+    put:
+      operationId: UpdateRecommendationLifecycle
+      description: |-
+        Update the lifecyle of a Recommendation. This API only supports prioritized recommendations.
+      parameters:
+      - name: recommendationIdentifier
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/AccountRecommendationIdentifier'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                lifecycleStage:
+                  $ref: '#/components/schemas/UpdateRecommendationLifecycleStage'
+                updateReason:
+                  $ref: '#/components/schemas/RecommendationUpdateReason'
+                updateReasonCode:
+                  $ref: '#/components/schemas/UpdateRecommendationLifecycleStageReasonCode'
+      responses:
+        '200': {}
+        '403':
+          description: |-
+            Exception that access has been denied due to insufficient access
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '409':
+          description: |-
+            Exception that the request was denied due to conflictions in state
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConflictException'
+        '500':
+          description: |-
+            Exception to notify that an unexpected internal error occurred during processing of the request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerException'
+        '404':
+          description: |-
+            Exception that the requested resource has not been found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+        '429':
+          description: |-
+            Exception to notify that requests are being throttled
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThrottlingException'
+        '400':
+          description: |-
+            Exception that the request failed to satisfy service constraints
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
 components:
   schemas:
+    AccessDeniedException:
+      type: object
+      properties:
+        message:
+          $ref: '#/components/schemas/String'
+      required:
+      - message
+      description: Exception that access has been denied due to insufficient access
     AccountId:
       type: string
       pattern: ^\d+$
@@ -61,10 +805,73 @@ components:
       pattern: ^arn:[\w-]+:trustedadvisor::\d{12}:recommendation\/[\w-]+$
       minLength: 20
       maxLength: 200
+    AccountRecommendationLifecycleSummary:
+      type: object
+      properties:
+        accountId:
+          allOf:
+          - $ref: '#/components/schemas/AccountId'
+          description: The AWS account ID
+        accountRecommendationArn:
+          allOf:
+          - $ref: '#/components/schemas/AccountRecommendationArn'
+          description: The Recommendation ARN
+        lifecycleStage:
+          allOf:
+          - $ref: '#/components/schemas/RecommendationLifecycleStage'
+          description: The lifecycle stage from AWS Trusted Advisor Priority
+        updatedOnBehalfOf:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The person on whose behalf a Technical Account Manager (TAM)
+            updated the recommendation. This information is only available when a
+            Technical Account Manager takes an action on a recommendation managed
+            by AWS Trusted Advisor Priority
+        updatedOnBehalfOfJobTitle:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The job title of the person on whose behalf a Technical Account
+            Manager (TAM) updated the recommendation. This information is only available
+            when a Technical Account Manager takes an action on a recommendation managed
+            by AWS Trusted Advisor Priority
+        updateReason:
+          allOf:
+          - $ref: '#/components/schemas/RecommendationUpdateReason'
+          description: Reason for the lifecycle stage change
+        updateReasonCode:
+          allOf:
+          - $ref: '#/components/schemas/UpdateRecommendationLifecycleStageReasonCode'
+          description: Reason code for the lifecycle state change
+        lastUpdatedAt:
+          allOf:
+          - $ref: '#/components/schemas/Timestamp'
+          description: When the Recommendation was last updated
+      description: Summary of an AccountRecommendationLifecycle for an Organization
+        Recommendation
     AccountRecommendationLifecycleSummaryList:
       type: array
       items:
         $ref: '#/components/schemas/AccountRecommendationLifecycleSummary'
+    BatchUpdateRecommendationResourceExclusionRequest:
+      type: object
+      properties:
+        recommendationResourceExclusions:
+          allOf:
+          - $ref: '#/components/schemas/RecommendationResourceExclusionList'
+          description: A list of recommendation resource ARNs and exclusion status
+            to update
+      required:
+      - recommendationResourceExclusions
+    BatchUpdateRecommendationResourceExclusionResponse:
+      type: object
+      properties:
+        batchUpdateRecommendationResourceExclusionErrors:
+          allOf:
+          - $ref: '#/components/schemas/UpdateRecommendationResourceExclusionErrorList'
+          description: A list of recommendation resource ARNs whose exclusion status
+            failed to update, if any
+      required:
+      - batchUpdateRecommendationResourceExclusionErrors
     CheckArn:
       type: string
       pattern: ^arn:[\w-]+:trustedadvisor:::check\/[\w-]+$
@@ -75,15 +882,516 @@ components:
       pattern: ^arn:[\w-]+:trustedadvisor:::check\/[\w-]+$
       minLength: 20
       maxLength: 64
+    CheckSummary:
+      type: object
+      properties:
+        id:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The unique identifier of the AWS Trusted Advisor Check
+        arn:
+          allOf:
+          - $ref: '#/components/schemas/CheckArn'
+          description: The ARN of the AWS Trusted Advisor Check
+        name:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The name of the AWS Trusted Advisor Check
+        description:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: A description of what the AWS Trusted Advisor Check is monitoring
+        pillars:
+          allOf:
+          - $ref: '#/components/schemas/RecommendationPillarList'
+          description: The Recommendation pillars that the AWS Trusted Advisor Check
+            falls under
+        awsServices:
+          allOf:
+          - $ref: '#/components/schemas/RecommendationAwsServiceList'
+          description: The AWS Services that the Check applies to
+        source:
+          allOf:
+          - $ref: '#/components/schemas/RecommendationSource'
+          description: The source of the Recommendation
+        metadata:
+          allOf:
+          - $ref: '#/components/schemas/StringMap'
+          description: The column headings for the metadata returned in the resource
+      required:
+      - id
+      - arn
+      - name
+      - description
+      - pillars
+      - awsServices
+      - source
+      - metadata
+      description: A summary of an AWS Trusted Advisor Check
     CheckSummaryList:
       type: array
       items:
         $ref: '#/components/schemas/CheckSummary'
+    ConflictException:
+      type: object
+      properties:
+        message:
+          $ref: '#/components/schemas/String'
+      required:
+      - message
+      description: Exception that the request was denied due to conflictions in state
     ExclusionStatus:
       type: string
       enum:
       - excluded
       - included
+    GetOrganizationRecommendationRequest:
+      type: object
+      properties:
+        organizationRecommendationIdentifier:
+          allOf:
+          - $ref: '#/components/schemas/OrganizationRecommendationIdentifier'
+          description: The Recommendation identifier
+      required:
+      - organizationRecommendationIdentifier
+    GetOrganizationRecommendationResponse:
+      type: object
+      properties:
+        organizationRecommendation:
+          allOf:
+          - $ref: '#/components/schemas/OrganizationRecommendation'
+          description: The Recommendation
+    GetRecommendationRequest:
+      type: object
+      properties:
+        recommendationIdentifier:
+          allOf:
+          - $ref: '#/components/schemas/AccountRecommendationIdentifier'
+          description: The Recommendation identifier
+      required:
+      - recommendationIdentifier
+    GetRecommendationResponse:
+      type: object
+      properties:
+        recommendation:
+          allOf:
+          - $ref: '#/components/schemas/Recommendation'
+          description: The Recommendation
+    InternalServerException:
+      type: object
+      properties:
+        message:
+          $ref: '#/components/schemas/String'
+      required:
+      - message
+      description: Exception to notify that an unexpected internal error occurred
+        during processing of the request
+    ListChecksRequest:
+      type: object
+      properties:
+        nextToken:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The token for the next set of results. Use the value returned
+            in the previous response in the next request to retrieve the next set
+            of results.
+        maxResults:
+          allOf:
+          - $ref: '#/components/schemas/Integer'
+          description: The maximum number of results to return per page.
+        pillar:
+          allOf:
+          - $ref: '#/components/schemas/RecommendationPillar'
+          description: The pillar of the check
+        awsService:
+          allOf:
+          - $ref: '#/components/schemas/RecommendationAwsService'
+          description: The aws service associated with the check
+        source:
+          allOf:
+          - $ref: '#/components/schemas/RecommendationSource'
+          description: The source of the check
+        language:
+          allOf:
+          - $ref: '#/components/schemas/RecommendationLanguage'
+          description: The ISO 639-1 code for the language that you want your checks
+            to appear in.
+    ListChecksResponse:
+      type: object
+      properties:
+        nextToken:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The token for the next set of results. Use the value returned
+            in the previous response in the next request to retrieve the next set
+            of results.
+        checkSummaries:
+          allOf:
+          - $ref: '#/components/schemas/CheckSummaryList'
+          description: The list of Checks
+      required:
+      - checkSummaries
+    ListOrganizationRecommendationAccountsRequest:
+      type: object
+      properties:
+        nextToken:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The token for the next set of results. Use the value returned
+            in the previous response in the next request to retrieve the next set
+            of results.
+        maxResults:
+          allOf:
+          - $ref: '#/components/schemas/Integer'
+          description: The maximum number of results to return per page.
+        organizationRecommendationIdentifier:
+          allOf:
+          - $ref: '#/components/schemas/OrganizationRecommendationIdentifier'
+          description: The Recommendation identifier
+        affectedAccountId:
+          allOf:
+          - $ref: '#/components/schemas/AccountId'
+          description: An account affected by this organization recommendation
+      required:
+      - organizationRecommendationIdentifier
+    ListOrganizationRecommendationAccountsResponse:
+      type: object
+      properties:
+        nextToken:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The token for the next set of results. Use the value returned
+            in the previous response in the next request to retrieve the next set
+            of results.
+        accountRecommendationLifecycleSummaries:
+          allOf:
+          - $ref: '#/components/schemas/AccountRecommendationLifecycleSummaryList'
+          description: The account recommendations lifecycles that are applicable
+            to the Recommendation
+      required:
+      - accountRecommendationLifecycleSummaries
+    ListOrganizationRecommendationResourcesRequest:
+      type: object
+      properties:
+        nextToken:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The token for the next set of results. Use the value returned
+            in the previous response in the next request to retrieve the next set
+            of results.
+        maxResults:
+          allOf:
+          - $ref: '#/components/schemas/Integer'
+          description: The maximum number of results to return per page.
+        status:
+          allOf:
+          - $ref: '#/components/schemas/ResourceStatus'
+          description: The status of the resource
+        exclusionStatus:
+          allOf:
+          - $ref: '#/components/schemas/ExclusionStatus'
+          description: The exclusion status of the resource
+        regionCode:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The AWS Region code of the resource
+        organizationRecommendationIdentifier:
+          allOf:
+          - $ref: '#/components/schemas/OrganizationRecommendationIdentifier'
+          description: The AWS Organization organization's Recommendation identifier
+        affectedAccountId:
+          allOf:
+          - $ref: '#/components/schemas/AccountId'
+          description: An account affected by this organization recommendation
+      required:
+      - organizationRecommendationIdentifier
+    ListOrganizationRecommendationResourcesResponse:
+      type: object
+      properties:
+        nextToken:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The token for the next set of results. Use the value returned
+            in the previous response in the next request to retrieve the next set
+            of results.
+        organizationRecommendationResourceSummaries:
+          allOf:
+          - $ref: '#/components/schemas/OrganizationRecommendationResourceSummaryList'
+          description: A list of Recommendation Resources
+      required:
+      - organizationRecommendationResourceSummaries
+    ListOrganizationRecommendationsRequest:
+      type: object
+      properties:
+        nextToken:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The token for the next set of results. Use the value returned
+            in the previous response in the next request to retrieve the next set
+            of results.
+        maxResults:
+          allOf:
+          - $ref: '#/components/schemas/Integer'
+          description: The maximum number of results to return per page.
+        type:
+          allOf:
+          - $ref: '#/components/schemas/RecommendationType'
+          description: The type of the Recommendation
+        status:
+          allOf:
+          - $ref: '#/components/schemas/RecommendationStatus'
+          description: The status of the Recommendation
+        pillar:
+          allOf:
+          - $ref: '#/components/schemas/RecommendationPillar'
+          description: The pillar of the Recommendation
+        awsService:
+          allOf:
+          - $ref: '#/components/schemas/RecommendationAwsService'
+          description: The aws service associated with the Recommendation
+        source:
+          allOf:
+          - $ref: '#/components/schemas/RecommendationSource'
+          description: The source of the Recommendation
+        checkIdentifier:
+          allOf:
+          - $ref: '#/components/schemas/CheckIdentifier'
+          description: The check identifier of the Recommendation
+        afterLastUpdatedAt:
+          allOf:
+          - $ref: '#/components/schemas/Timestamp'
+          description: After the last update of the Recommendation
+        beforeLastUpdatedAt:
+          allOf:
+          - $ref: '#/components/schemas/Timestamp'
+          description: Before the last update of the Recommendation
+    ListOrganizationRecommendationsResponse:
+      type: object
+      properties:
+        nextToken:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The token for the next set of results. Use the value returned
+            in the previous response in the next request to retrieve the next set
+            of results.
+        organizationRecommendationSummaries:
+          allOf:
+          - $ref: '#/components/schemas/OrganizationRecommendationSummaryList'
+          description: The list of Recommendations
+      required:
+      - organizationRecommendationSummaries
+    ListRecommendationResourcesRequest:
+      type: object
+      properties:
+        nextToken:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The token for the next set of results. Use the value returned
+            in the previous response in the next request to retrieve the next set
+            of results.
+        maxResults:
+          allOf:
+          - $ref: '#/components/schemas/Integer'
+          description: The maximum number of results to return per page.
+        status:
+          allOf:
+          - $ref: '#/components/schemas/ResourceStatus'
+          description: The status of the resource
+        exclusionStatus:
+          allOf:
+          - $ref: '#/components/schemas/ExclusionStatus'
+          description: The exclusion status of the resource
+        regionCode:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The AWS Region code of the resource
+        recommendationIdentifier:
+          allOf:
+          - $ref: '#/components/schemas/AccountRecommendationIdentifier'
+          description: The Recommendation identifier
+      required:
+      - recommendationIdentifier
+    ListRecommendationResourcesResponse:
+      type: object
+      properties:
+        nextToken:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The token for the next set of results. Use the value returned
+            in the previous response in the next request to retrieve the next set
+            of results.
+        recommendationResourceSummaries:
+          allOf:
+          - $ref: '#/components/schemas/RecommendationResourceSummaryList'
+          description: A list of Recommendation Resources
+      required:
+      - recommendationResourceSummaries
+    ListRecommendationsRequest:
+      type: object
+      properties:
+        nextToken:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The token for the next set of results. Use the value returned
+            in the previous response in the next request to retrieve the next set
+            of results.
+        maxResults:
+          allOf:
+          - $ref: '#/components/schemas/Integer'
+          description: The maximum number of results to return per page.
+        type:
+          allOf:
+          - $ref: '#/components/schemas/RecommendationType'
+          description: The type of the Recommendation
+        status:
+          allOf:
+          - $ref: '#/components/schemas/RecommendationStatus'
+          description: The status of the Recommendation
+        pillar:
+          allOf:
+          - $ref: '#/components/schemas/RecommendationPillar'
+          description: The pillar of the Recommendation
+        awsService:
+          allOf:
+          - $ref: '#/components/schemas/RecommendationAwsService'
+          description: The aws service associated with the Recommendation
+        source:
+          allOf:
+          - $ref: '#/components/schemas/RecommendationSource'
+          description: The source of the Recommendation
+        checkIdentifier:
+          allOf:
+          - $ref: '#/components/schemas/CheckIdentifier'
+          description: The check identifier of the Recommendation
+        afterLastUpdatedAt:
+          allOf:
+          - $ref: '#/components/schemas/Timestamp'
+          description: After the last update of the Recommendation
+        beforeLastUpdatedAt:
+          allOf:
+          - $ref: '#/components/schemas/Timestamp'
+          description: Before the last update of the Recommendation
+    ListRecommendationsResponse:
+      type: object
+      properties:
+        nextToken:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The token for the next set of results. Use the value returned
+            in the previous response in the next request to retrieve the next set
+            of results.
+        recommendationSummaries:
+          allOf:
+          - $ref: '#/components/schemas/RecommendationSummaryList'
+          description: The list of Recommendations
+      required:
+      - recommendationSummaries
+    OrganizationRecommendation:
+      type: object
+      properties:
+        id:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The ID which identifies where the Recommendation was produced
+        type:
+          allOf:
+          - $ref: '#/components/schemas/RecommendationType'
+          description: Whether the Recommendation was automated or generated by AWS
+            Trusted Advisor Priority
+        checkArn:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The AWS Trusted Advisor Check ARN that relates to the Recommendation
+        status:
+          allOf:
+          - $ref: '#/components/schemas/RecommendationStatus'
+          description: The status of the Recommendation
+        lifecycleStage:
+          allOf:
+          - $ref: '#/components/schemas/RecommendationLifecycleStage'
+          description: The lifecycle stage from AWS Trusted Advisor Priority
+        pillars:
+          allOf:
+          - $ref: '#/components/schemas/RecommendationPillarList'
+          description: The Pillars that the Recommendation is optimizing
+        source:
+          allOf:
+          - $ref: '#/components/schemas/RecommendationSource'
+          description: The source of the Recommendation
+        awsServices:
+          allOf:
+          - $ref: '#/components/schemas/RecommendationAwsServiceList'
+          description: The AWS Services that the Recommendation applies to
+        name:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The name of the AWS Trusted Advisor Recommendation
+        resourcesAggregates:
+          allOf:
+          - $ref: '#/components/schemas/RecommendationResourcesAggregates'
+          description: An aggregation of all resources
+        pillarSpecificAggregates:
+          allOf:
+          - $ref: '#/components/schemas/RecommendationPillarSpecificAggregates'
+          description: The pillar aggregations for cost savings
+        createdAt:
+          allOf:
+          - $ref: '#/components/schemas/Timestamp'
+          description: When the Recommendation was created, if created by AWS Trusted
+            Advisor Priority
+        lastUpdatedAt:
+          allOf:
+          - $ref: '#/components/schemas/Timestamp'
+          description: When the Recommendation was last updated
+        arn:
+          allOf:
+          - $ref: '#/components/schemas/OrganizationRecommendationArn'
+          description: The ARN of the Recommendation
+        description:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: A description for AWS Trusted Advisor recommendations
+        createdBy:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The creator, if created by AWS Trusted Advisor Priority
+        updatedOnBehalfOf:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The person on whose behalf a Technical Account Manager (TAM)
+            updated the recommendation. This information is only available when a
+            Technical Account Manager takes an action on a recommendation managed
+            by AWS Trusted Advisor Priority
+        updatedOnBehalfOfJobTitle:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The job title of the person on whose behalf a Technical Account
+            Manager (TAM) updated the recommendation. This information is only available
+            when a Technical Account Manager takes an action on a recommendation managed
+            by AWS Trusted Advisor Priority
+        updateReason:
+          allOf:
+          - $ref: '#/components/schemas/RecommendationUpdateReason'
+          description: Reason for the lifecycle stage change
+        updateReasonCode:
+          allOf:
+          - $ref: '#/components/schemas/UpdateRecommendationLifecycleStageReasonCode'
+          description: Reason code for the lifecycle state change
+        resolvedAt:
+          allOf:
+          - $ref: '#/components/schemas/Timestamp'
+          description: When the Recommendation was resolved
+      required:
+      - id
+      - type
+      - status
+      - pillars
+      - source
+      - name
+      - resourcesAggregates
+      - arn
+      - description
+      description: A Recommendation for accounts within an Organization
     OrganizationRecommendationArn:
       type: string
       pattern: ^arn:[\w-]+:trustedadvisor:::organization-recommendation\/[\w-]+$
@@ -94,14 +1402,244 @@ components:
       pattern: ^arn:[\w-]+:trustedadvisor:::organization-recommendation\/[\w-]+$
       minLength: 20
       maxLength: 200
+    OrganizationRecommendationResourceSummary:
+      type: object
+      properties:
+        id:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The ID of the Recommendation Resource
+        arn:
+          allOf:
+          - $ref: '#/components/schemas/RecommendationResourceArn'
+          description: The ARN of the Recommendation Resource
+        awsResourceId:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The AWS resource identifier
+        regionCode:
+          allOf:
+          - $ref: '#/components/schemas/RecommendationRegionCode'
+          description: The AWS Region code that the Recommendation Resource is in
+        status:
+          allOf:
+          - $ref: '#/components/schemas/ResourceStatus'
+          description: The current status of the Recommendation Resource
+        metadata:
+          allOf:
+          - $ref: '#/components/schemas/StringMap'
+          description: Metadata associated with the Recommendation Resource
+        lastUpdatedAt:
+          allOf:
+          - $ref: '#/components/schemas/Timestamp'
+          description: When the Recommendation Resource was last updated
+        exclusionStatus:
+          allOf:
+          - $ref: '#/components/schemas/ExclusionStatus'
+          description: The exclusion status of the Recommendation Resource
+        accountId:
+          allOf:
+          - $ref: '#/components/schemas/AccountId'
+          description: The AWS account ID
+        recommendationArn:
+          allOf:
+          - $ref: '#/components/schemas/OrganizationRecommendationArn'
+          description: The Recommendation ARN
+      required:
+      - id
+      - arn
+      - awsResourceId
+      - regionCode
+      - status
+      - metadata
+      - lastUpdatedAt
+      - recommendationArn
+      description: Organization Recommendation Resource Summary
     OrganizationRecommendationResourceSummaryList:
       type: array
       items:
         $ref: '#/components/schemas/OrganizationRecommendationResourceSummary'
+    OrganizationRecommendationSummary:
+      type: object
+      properties:
+        id:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The ID which identifies where the Recommendation was produced
+        type:
+          allOf:
+          - $ref: '#/components/schemas/RecommendationType'
+          description: Whether the Recommendation was automated or generated by AWS
+            Trusted Advisor Priority
+        checkArn:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The AWS Trusted Advisor Check ARN that relates to the Recommendation
+        status:
+          allOf:
+          - $ref: '#/components/schemas/RecommendationStatus'
+          description: The status of the Recommendation
+        lifecycleStage:
+          allOf:
+          - $ref: '#/components/schemas/RecommendationLifecycleStage'
+          description: The lifecycle stage from AWS Trusted Advisor Priority
+        pillars:
+          allOf:
+          - $ref: '#/components/schemas/RecommendationPillarList'
+          description: The Pillars that the Recommendation is optimizing
+        source:
+          allOf:
+          - $ref: '#/components/schemas/RecommendationSource'
+          description: The source of the Recommendation
+        awsServices:
+          allOf:
+          - $ref: '#/components/schemas/RecommendationAwsServiceList'
+          description: The AWS Services that the Recommendation applies to
+        name:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The name of the AWS Trusted Advisor Recommendation
+        resourcesAggregates:
+          allOf:
+          - $ref: '#/components/schemas/RecommendationResourcesAggregates'
+          description: An aggregation of all resources
+        pillarSpecificAggregates:
+          allOf:
+          - $ref: '#/components/schemas/RecommendationPillarSpecificAggregates'
+          description: The pillar aggregations for cost savings
+        createdAt:
+          allOf:
+          - $ref: '#/components/schemas/Timestamp'
+          description: When the Recommendation was created, if created by AWS Trusted
+            Advisor Priority
+        lastUpdatedAt:
+          allOf:
+          - $ref: '#/components/schemas/Timestamp'
+          description: When the Recommendation was last updated
+        arn:
+          allOf:
+          - $ref: '#/components/schemas/OrganizationRecommendationArn'
+          description: The ARN of the Recommendation
+      required:
+      - id
+      - type
+      - status
+      - pillars
+      - source
+      - name
+      - resourcesAggregates
+      - arn
+      description: Summary of recommendation for accounts within an Organization
     OrganizationRecommendationSummaryList:
       type: array
       items:
         $ref: '#/components/schemas/OrganizationRecommendationSummary'
+    Recommendation:
+      type: object
+      properties:
+        id:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The ID which identifies where the Recommendation was produced
+        type:
+          allOf:
+          - $ref: '#/components/schemas/RecommendationType'
+          description: Whether the Recommendation was automated or generated by AWS
+            Trusted Advisor Priority
+        checkArn:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The AWS Trusted Advisor Check ARN that relates to the Recommendation
+        status:
+          allOf:
+          - $ref: '#/components/schemas/RecommendationStatus'
+          description: The status of the Recommendation
+        lifecycleStage:
+          allOf:
+          - $ref: '#/components/schemas/RecommendationLifecycleStage'
+          description: The lifecycle stage from AWS Trusted Advisor Priority
+        pillars:
+          allOf:
+          - $ref: '#/components/schemas/RecommendationPillarList'
+          description: The Pillars that the Recommendation is optimizing
+        source:
+          allOf:
+          - $ref: '#/components/schemas/RecommendationSource'
+          description: The source of the Recommendation
+        awsServices:
+          allOf:
+          - $ref: '#/components/schemas/RecommendationAwsServiceList'
+          description: The AWS Services that the Recommendation applies to
+        name:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The name of the AWS Trusted Advisor Recommendation
+        resourcesAggregates:
+          allOf:
+          - $ref: '#/components/schemas/RecommendationResourcesAggregates'
+          description: An aggregation of all resources
+        pillarSpecificAggregates:
+          allOf:
+          - $ref: '#/components/schemas/RecommendationPillarSpecificAggregates'
+          description: The pillar aggregations for cost savings
+        createdAt:
+          allOf:
+          - $ref: '#/components/schemas/Timestamp'
+          description: When the Recommendation was created, if created by AWS Trusted
+            Advisor Priority
+        lastUpdatedAt:
+          allOf:
+          - $ref: '#/components/schemas/Timestamp'
+          description: When the Recommendation was last updated
+        arn:
+          allOf:
+          - $ref: '#/components/schemas/AccountRecommendationArn'
+          description: The ARN of the Recommendation
+        description:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: A description for AWS Trusted Advisor recommendations
+        createdBy:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The creator, if created by AWS Trusted Advisor Priority
+        updatedOnBehalfOf:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The person on whose behalf a Technical Account Manager (TAM)
+            updated the recommendation. This information is only available when a
+            Technical Account Manager takes an action on a recommendation managed
+            by AWS Trusted Advisor Priority
+        updatedOnBehalfOfJobTitle:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The job title of the person on whose behalf a Technical Account
+            Manager (TAM) updated the recommendation. This information is only available
+            when a Technical Account Manager takes an action on a recommendation managed
+            by AWS Trusted Advisor Priority
+        updateReason:
+          allOf:
+          - $ref: '#/components/schemas/RecommendationUpdateReason'
+          description: Reason for the lifecycle stage change
+        updateReasonCode:
+          allOf:
+          - $ref: '#/components/schemas/UpdateRecommendationLifecycleStageReasonCode'
+          description: Reason code for the lifecycle state change
+        resolvedAt:
+          allOf:
+          - $ref: '#/components/schemas/Timestamp'
+          description: When the Recommendation was resolved
+      required:
+      - id
+      - type
+      - status
+      - pillars
+      - source
+      - name
+      - resourcesAggregates
+      - arn
+      - description
+      description: A Recommendation for an Account
     RecommendationAwsService:
       type: string
       minLength: 2
@@ -110,6 +1648,21 @@ components:
       type: array
       items:
         $ref: '#/components/schemas/RecommendationAwsService'
+    RecommendationCostOptimizingAggregates:
+      type: object
+      properties:
+        estimatedMonthlySavings:
+          allOf:
+          - $ref: '#/components/schemas/Double'
+          description: The estimated monthly savings
+        estimatedPercentMonthlySavings:
+          allOf:
+          - $ref: '#/components/schemas/Double'
+          description: The estimated percently monthly savings
+      required:
+      - estimatedMonthlySavings
+      - estimatedPercentMonthlySavings
+      description: Cost optimizing aggregates for a Recommendation
     RecommendationLanguage:
       type: string
       enum:
@@ -144,6 +1697,14 @@ components:
       type: array
       items:
         $ref: '#/components/schemas/RecommendationPillar'
+    RecommendationPillarSpecificAggregates:
+      type: object
+      properties:
+        costOptimizing:
+          allOf:
+          - $ref: '#/components/schemas/RecommendationCostOptimizingAggregates'
+          description: Cost optimizing aggregates
+      description: Recommendation pillar aggregates
     RecommendationRegionCode:
       type: string
       minLength: 9
@@ -153,14 +1714,103 @@ components:
       pattern: ^arn:[\w-]+:trustedadvisor::\d{12}:recommendation-resource\/[\w-]+\/[\w-]+$
       minLength: 20
       maxLength: 2048
+    RecommendationResourceExclusion:
+      type: object
+      properties:
+        arn:
+          allOf:
+          - $ref: '#/components/schemas/RecommendationResourceArn'
+          description: The ARN of the Recommendation Resource
+        isExcluded:
+          allOf:
+          - $ref: '#/components/schemas/Boolean'
+          description: The exclusion status
+      required:
+      - arn
+      - isExcluded
+      description: The request entry for Recommendation Resource exclusion. Each entry
+        is a combination of Recommendation Resource ARN and corresponding exclusion
+        status
     RecommendationResourceExclusionList:
       type: array
       items:
         $ref: '#/components/schemas/RecommendationResourceExclusion'
+    RecommendationResourceSummary:
+      type: object
+      properties:
+        id:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The ID of the Recommendation Resource
+        arn:
+          allOf:
+          - $ref: '#/components/schemas/RecommendationResourceArn'
+          description: The ARN of the Recommendation Resource
+        awsResourceId:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The AWS resource identifier
+        regionCode:
+          allOf:
+          - $ref: '#/components/schemas/RecommendationRegionCode'
+          description: The AWS Region code that the Recommendation Resource is in
+        status:
+          allOf:
+          - $ref: '#/components/schemas/ResourceStatus'
+          description: The current status of the Recommendation Resource
+        metadata:
+          allOf:
+          - $ref: '#/components/schemas/StringMap'
+          description: Metadata associated with the Recommendation Resource
+        lastUpdatedAt:
+          allOf:
+          - $ref: '#/components/schemas/Timestamp'
+          description: When the Recommendation Resource was last updated
+        exclusionStatus:
+          allOf:
+          - $ref: '#/components/schemas/ExclusionStatus'
+          description: The exclusion status of the Recommendation Resource
+        recommendationArn:
+          allOf:
+          - $ref: '#/components/schemas/AccountRecommendationArn'
+          description: The Recommendation ARN
+      required:
+      - id
+      - arn
+      - awsResourceId
+      - regionCode
+      - status
+      - metadata
+      - lastUpdatedAt
+      - recommendationArn
+      description: Summary of a Recommendation Resource
     RecommendationResourceSummaryList:
       type: array
       items:
         $ref: '#/components/schemas/RecommendationResourceSummary'
+    RecommendationResourcesAggregates:
+      type: object
+      properties:
+        okCount:
+          allOf:
+          - $ref: '#/components/schemas/Long'
+          description: The number of AWS resources that were flagged to be OK according
+            to the Trusted Advisor check
+        warningCount:
+          allOf:
+          - $ref: '#/components/schemas/Long'
+          description: The number of AWS resources that were flagged to have warning
+            according to the Trusted Advisor check
+        errorCount:
+          allOf:
+          - $ref: '#/components/schemas/Long'
+          description: The number of AWS resources that were flagged to have errors
+            according to the Trusted Advisor check
+      required:
+      - okCount
+      - warningCount
+      - errorCount
+      description: Aggregation of Recommendation Resources
     RecommendationSource:
       type: string
       enum:
@@ -183,6 +1833,77 @@ components:
       - ok
       - warning
       - error
+    RecommendationSummary:
+      type: object
+      properties:
+        id:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The ID which identifies where the Recommendation was produced
+        type:
+          allOf:
+          - $ref: '#/components/schemas/RecommendationType'
+          description: Whether the Recommendation was automated or generated by AWS
+            Trusted Advisor Priority
+        checkArn:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The AWS Trusted Advisor Check ARN that relates to the Recommendation
+        status:
+          allOf:
+          - $ref: '#/components/schemas/RecommendationStatus'
+          description: The status of the Recommendation
+        lifecycleStage:
+          allOf:
+          - $ref: '#/components/schemas/RecommendationLifecycleStage'
+          description: The lifecycle stage from AWS Trusted Advisor Priority
+        pillars:
+          allOf:
+          - $ref: '#/components/schemas/RecommendationPillarList'
+          description: The Pillars that the Recommendation is optimizing
+        source:
+          allOf:
+          - $ref: '#/components/schemas/RecommendationSource'
+          description: The source of the Recommendation
+        awsServices:
+          allOf:
+          - $ref: '#/components/schemas/RecommendationAwsServiceList'
+          description: The AWS Services that the Recommendation applies to
+        name:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The name of the AWS Trusted Advisor Recommendation
+        resourcesAggregates:
+          allOf:
+          - $ref: '#/components/schemas/RecommendationResourcesAggregates'
+          description: An aggregation of all resources
+        pillarSpecificAggregates:
+          allOf:
+          - $ref: '#/components/schemas/RecommendationPillarSpecificAggregates'
+          description: The pillar aggregations for cost savings
+        createdAt:
+          allOf:
+          - $ref: '#/components/schemas/Timestamp'
+          description: When the Recommendation was created, if created by AWS Trusted
+            Advisor Priority
+        lastUpdatedAt:
+          allOf:
+          - $ref: '#/components/schemas/Timestamp'
+          description: When the Recommendation was last updated
+        arn:
+          allOf:
+          - $ref: '#/components/schemas/AccountRecommendationArn'
+          description: The ARN of the Recommendation
+      required:
+      - id
+      - type
+      - status
+      - pillars
+      - source
+      - name
+      - resourcesAggregates
+      - arn
+      description: Summary of Recommendation for an Account
     RecommendationSummaryList:
       type: array
       items:
@@ -197,6 +1918,14 @@ components:
       pattern: ^[\s\S]*$
       minLength: 10
       maxLength: 4096
+    ResourceNotFoundException:
+      type: object
+      properties:
+        message:
+          $ref: '#/components/schemas/String'
+      required:
+      - message
+      description: Exception that the requested resource has not been found
     ResourceStatus:
       type: string
       enum:
@@ -207,6 +1936,60 @@ components:
       type: object
       additionalProperties:
         $ref: '#/components/schemas/String'
+    ThrottlingException:
+      type: object
+      properties:
+        message:
+          $ref: '#/components/schemas/String'
+      required:
+      - message
+      description: Exception to notify that requests are being throttled
+    UpdateOrganizationRecommendationLifecycleRequest:
+      type: object
+      properties:
+        lifecycleStage:
+          allOf:
+          - $ref: '#/components/schemas/UpdateRecommendationLifecycleStage'
+          description: The new lifecycle stage
+        updateReason:
+          allOf:
+          - $ref: '#/components/schemas/RecommendationUpdateReason'
+          description: Reason for the lifecycle stage change
+        updateReasonCode:
+          allOf:
+          - $ref: '#/components/schemas/UpdateRecommendationLifecycleStageReasonCode'
+          description: Reason code for the lifecycle state change
+        organizationRecommendationIdentifier:
+          allOf:
+          - $ref: '#/components/schemas/OrganizationRecommendationIdentifier'
+          description: The Recommendation identifier for AWS Trusted Advisor Priority
+            recommendations
+      required:
+      - lifecycleStage
+      - organizationRecommendationIdentifier
+    UpdateRecommendationLifecycleRequest:
+      type: object
+      properties:
+        lifecycleStage:
+          allOf:
+          - $ref: '#/components/schemas/UpdateRecommendationLifecycleStage'
+          description: The new lifecycle stage
+        updateReason:
+          allOf:
+          - $ref: '#/components/schemas/RecommendationUpdateReason'
+          description: Reason for the lifecycle stage change
+        updateReasonCode:
+          allOf:
+          - $ref: '#/components/schemas/UpdateRecommendationLifecycleStageReasonCode'
+          description: Reason code for the lifecycle state change
+        recommendationIdentifier:
+          allOf:
+          - $ref: '#/components/schemas/AccountRecommendationIdentifier'
+          description: The Recommendation identifier for AWS Trusted Advisor Priority
+            recommendations
+      required:
+      - lifecycleStage
+      - recommendationIdentifier
     UpdateRecommendationLifecycleStage:
       type: string
       enum:
@@ -224,7 +2007,32 @@ components:
       - low_priority
       - not_applicable
       - other
+    UpdateRecommendationResourceExclusionError:
+      type: object
+      properties:
+        arn:
+          allOf:
+          - $ref: '#/components/schemas/RecommendationResourceArn'
+          description: The ARN of the Recommendation Resource
+        errorCode:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The error code
+        errorMessage:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The error message
+      description: The error entry for Recommendation Resource exclusion. Each entry
+        is a combination of Recommendation Resource ARN, error code and error message
     UpdateRecommendationResourceExclusionErrorList:
       type: array
       items:
         $ref: '#/components/schemas/UpdateRecommendationResourceExclusionError'
+    ValidationException:
+      type: object
+      properties:
+        message:
+          $ref: '#/components/schemas/String'
+      required:
+      - message
+      description: Exception that the request failed to satisfy service constraints

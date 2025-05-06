@@ -7,7 +7,7 @@ info:
   x-stackql-serviceName: inspector_scan
   x-aws-serviceName: inspectorscan
   x-aws-protocol: aws.protocols#restJson1
-  x-dateGenerated: '2025-05-05'
+  x-dateGenerated: '2025-05-07'
   version: '2023-08-08'
   title: Inspector Scan
   description: |-
@@ -43,9 +43,82 @@ servers:
       - sa-east-1
       - me-south-1
       default: us-east-1
-paths: {}
+paths:
+  /scan/sbom:
+    post:
+      operationId: ScanSbom
+      description: |-
+        Scans a provided CycloneDX 1.5 SBOM and reports on any vulnerabilities discovered in that SBOM. You can generate compatible SBOMs for your resources using the [Amazon Inspector SBOM generator]().
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                sbom:
+                  $ref: '#/components/schemas/Sbom'
+                outputFormat:
+                  $ref: '#/components/schemas/OutputFormat'
+      responses:
+        '200': {}
+        '403':
+          description: |-
+            You do not have sufficient access to perform this action.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '500':
+          description: |-
+            The request processing has failed because of an unknown error, exception or failure.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerException'
+        '429':
+          description: |-
+            The request was denied due to request throttling.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThrottlingException'
+        '400':
+          description: |-
+            The request has failed validation due to missing required fields or having invalid inputs.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
 components:
   schemas:
+    AccessDeniedException:
+      type: object
+      properties:
+        message:
+          $ref: '#/components/schemas/String'
+      required:
+      - message
+      description: You do not have sufficient access to perform this action.
+    InternalServerException:
+      type: object
+      properties:
+        message:
+          $ref: '#/components/schemas/String'
+        reason:
+          allOf:
+          - $ref: '#/components/schemas/InternalServerExceptionReason'
+          description: The reason for the validation failure.
+        retryAfterSeconds:
+          allOf:
+          - $ref: '#/components/schemas/Integer'
+          description: The number of seconds to wait before retrying the request.
+      required:
+      - message
+      - reason
+      description: The request processing has failed because of an unknown error,
+        exception or failure.
     InternalServerExceptionReason:
       type: string
       enum:
@@ -59,6 +132,73 @@ components:
     Sbom:
       type: object
       additionalProperties: true
+    ScanSbomRequest:
+      type: object
+      properties:
+        sbom:
+          allOf:
+          - $ref: '#/components/schemas/Sbom'
+          description: The JSON file for the SBOM you want to scan. The SBOM must
+            be in CycloneDX 1.5 format.
+        outputFormat:
+          allOf:
+          - $ref: '#/components/schemas/OutputFormat'
+          description: The output format for the vulnerability report.
+      required:
+      - sbom
+    ScanSbomResponse:
+      type: object
+      properties:
+        sbom:
+          allOf:
+          - $ref: '#/components/schemas/Sbom'
+          description: The vulnerability report for the scanned SBOM.
+    ThrottlingException:
+      type: object
+      properties:
+        message:
+          $ref: '#/components/schemas/String'
+        retryAfterSeconds:
+          allOf:
+          - $ref: '#/components/schemas/Integer'
+          description: The number of seconds to wait before retrying the request.
+      required:
+      - message
+      description: The request was denied due to request throttling.
+    ValidationException:
+      type: object
+      properties:
+        message:
+          $ref: '#/components/schemas/String'
+        reason:
+          allOf:
+          - $ref: '#/components/schemas/ValidationExceptionReason'
+          description: The reason for the validation failure.
+        fields:
+          allOf:
+          - $ref: '#/components/schemas/ValidationExceptionFields'
+          description: The fields that failed validation.
+      required:
+      - message
+      - reason
+      description: The request has failed validation due to missing required fields
+        or having invalid inputs.
+    ValidationExceptionField:
+      type: object
+      properties:
+        name:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The name of the validation exception.
+        message:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The validation exception message.
+      required:
+      - name
+      - message
+      description: The request has failed validation due to missing required fields
+        or having invalid inputs.
     ValidationExceptionFields:
       type: array
       items:

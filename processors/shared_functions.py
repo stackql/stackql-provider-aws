@@ -457,3 +457,142 @@ def add_component_schema_union(openapi_spec, shape_name, shape):
         schema["allOf"].append(member_schema)
 
     openapi_spec["components"]["schemas"][short_name] = schema
+
+def add_component_schema_structure(openapi_spec, shape_name, shape):
+    short_name = shape_name.split("#")[-1]
+    schema = {
+        "type": "object",
+        "properties": {},
+        "required": []
+    }
+
+    traits = shape.get("traits", {})
+
+    # Optional top-level documentation
+    if "smithy.api#documentation" in traits:
+        schema["description"] = html_to_md(traits["smithy.api#documentation"])
+
+    members = shape.get("members", {})
+    for member_name, member_def in members.items():
+        target = member_def.get("target")
+        ref_name = target.split("#")[-1]
+
+        member_schema = {
+            "$ref": f"#/components/schemas/{ref_name}"
+        }
+
+        member_traits = member_def.get("traits", {})
+
+        # Inline documentation
+        if "smithy.api#documentation" in member_traits:
+            member_schema = {
+                "allOf": [member_schema],
+                "description": html_to_md(member_traits["smithy.api#documentation"])
+            }
+
+        # Check for required trait
+        if "smithy.api#required" in member_traits:
+            schema["required"].append(member_name)
+
+        schema["properties"][member_name] = member_schema
+
+    # Clean up empty 'required' list to avoid clutter
+    if not schema["required"]:
+        del schema["required"]
+
+    openapi_spec["components"]["schemas"][short_name] = schema
+
+def add_operation(openapi_spec, shape_name, shape, shapes):
+    operation_id = shape_name.split("#")[-1]
+    print(f"adding operation {operation_id}")
+    
+    # process traits
+    path = shape["traits"]["smithy.api#http"]["uri"]
+    verb = shape["traits"]["smithy.api#http"]["method"].lower()
+    if "code" in shape["traits"]["smithy.api#http"]:
+        success_code = shape["traits"]["smithy.api#http"]["code"]
+    else:
+        success_code = 200
+    if path not in openapi_spec["paths"]:
+        openapi_spec["paths"][path] = {}
+    if verb not in openapi_spec["paths"][path]:
+        openapi_spec["paths"][path][verb] = {}
+    openapi_spec["paths"][path][verb]["operationId"] = operation_id
+    if "smithy.api#documentation" in shape["traits"]:
+        description = LiteralStr(html_to_md(shape["traits"]["smithy.api#documentation"]))
+        openapi_spec["paths"][path][verb]["description"] = description
+    
+    input_shape_name = shape.get("input", {}).get("target")
+    if input_shape_name and input_shape_name != "smithy.api#Unit":
+        input_shape = shapes[input_shape_name]
+        members = input_shape.get("members", {})
+        parameters = []
+        body_fields = {}
+
+        for member_name, member_def in members.items():
+            traits = member_def.get("traits", {})
+            target = member_def["target"]
+            ref_name = target.split("#")[-1]
+
+            if "smithy.api#httpLabel" in traits:
+                parameters.append({
+                    "name": member_name,
+                    "in": "path",
+                    "required": "smithy.api#required" in traits,
+                    "schema": { "$ref": f"#/components/schemas/{ref_name}" }
+                })
+            elif "smithy.api#httpQuery" in traits:
+                param_name = traits["smithy.api#httpQuery"]
+                parameters.append({
+                    "name": param_name,
+                    "in": "query",
+                    "required": "smithy.api#required" in traits,
+                    "schema": { "$ref": f"#/components/schemas/{ref_name}" }
+                })
+            elif "smithy.api#httpHeader" in traits:
+                param_name = traits["smithy.api#httpHeader"]
+                parameters.append({
+                    "name": param_name,
+                    "in": "header",
+                    "required": "smithy.api#required" in traits,
+                    "schema": { "$ref": f"#/components/schemas/{ref_name}" }
+                })
+            else:
+                # default: treat as part of the body
+                body_fields[member_name] = { "$ref": f"#/components/schemas/{ref_name}" }
+
+        openapi_spec["paths"][path][verb]["parameters"] = parameters
+
+        if body_fields:
+            openapi_spec["paths"][path][verb]["requestBody"] = {
+                "required": True,
+                "content": {
+                    "application/json": {
+                        "schema": {
+                            "type": "object",
+                            "properties": body_fields
+                        }
+                    }
+                }
+            }
+
+    # process output
+    openapi_spec["paths"][path][verb]["responses"] = {}
+    openapi_spec["paths"][path][verb]["responses"][str(success_code)] = {}
+    if "errors" in shape:
+        for error in shape["errors"]:
+            error_component_name = error["target"].split("#")[-1]
+            print(f"adding error {error_component_name}")
+            error_shape = shapes[error["target"]]
+            if "smithy.api#httpError" in error_shape["traits"]:
+                error_code = error_shape["traits"]["smithy.api#httpError"]
+            else:
+                error_code = 400
+
+            openapi_spec["paths"][path][verb]["responses"][str(error_code)] = {}
+            if "smithy.api#documentation" in error_shape["traits"]:
+                openapi_spec["paths"][path][verb]["responses"][str(error_code)]["description"] = LiteralStr(html_to_md(error_shape["traits"]["smithy.api#documentation"]))
+            openapi_spec["paths"][path][verb]["responses"][str(error_code)]["content"] = {}
+            openapi_spec["paths"][path][verb]["responses"][str(error_code)]["content"]["application/json"] = {}
+            openapi_spec["paths"][path][verb]["responses"][str(error_code)]["content"]["application/json"]["schema"] = {}
+            openapi_spec["paths"][path][verb]["responses"][str(error_code)]["content"]["application/json"]["schema"]["$ref"] = f"#/components/schemas/{error_component_name}"

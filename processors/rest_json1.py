@@ -21,6 +21,8 @@ from processors.shared_functions import (
     add_component_schema_document,
     add_component_schema_list,
     add_component_schema_union,
+    add_component_schema_structure,
+    add_operation,
 )
 
 yaml.add_representer(LiteralStr, literal_str_representer)
@@ -77,9 +79,10 @@ def process(model_entry):
             add_component_schema_list(openapi_spec, shape_name, shape)
         elif shape.get("type") == "union":
             add_component_schema_union(openapi_spec, shape_name, shape)
-
-        # elif shape.get("type") == "structure":
-        #     add_component(openapi_spec, shape_name, shape, shapes)
+        elif shape.get("type") == "structure":
+            add_component_schema_structure(openapi_spec, shape_name, shape)
+        elif shape.get("type") == "operation":
+            add_operation(openapi_spec, shape_name, shape, shapes)
 
 
     # Write output YAML

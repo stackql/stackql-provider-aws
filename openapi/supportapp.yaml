@@ -7,7 +7,7 @@ info:
   x-stackql-serviceName: support_app
   x-aws-serviceName: supportapp
   x-aws-protocol: aws.protocols#restJson1
-  x-dateGenerated: '2025-05-05'
+  x-dateGenerated: '2025-05-07'
   version: '2021-08-20'
   title: AWS Support App
   description: "Amazon Web Services Support App in Slack\n\nYou can use the Amazon\
@@ -63,24 +63,953 @@ servers:
       - sa-east-1
       - me-south-1
       default: us-east-1
-paths: {}
+paths:
+  /control/create-slack-channel-configuration:
+    post:
+      operationId: CreateSlackChannelConfiguration
+      description: |-
+        Creates a Slack channel configuration for your Amazon Web Services account.
+
+          * You can add up to 5 Slack workspaces for your account.
+
+          * You can add up to 20 Slack channels for your account.
+
+        A Slack channel can have up to 100 Amazon Web Services accounts. This means that only 100 accounts can add the same Slack channel to the Amazon Web Services Support App. We recommend that you only add the accounts that you need to manage support cases for your organization. This can reduce the notifications about case updates that you receive in the Slack channel.
+
+        We recommend that you choose a private Slack channel so that only members in that channel have read and write access to your support cases. Anyone in your Slack channel can create, update, or resolve support cases for your account. Users require an invitation to join private channels.
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                teamId:
+                  $ref: '#/components/schemas/teamId'
+                channelId:
+                  $ref: '#/components/schemas/channelId'
+                channelName:
+                  $ref: '#/components/schemas/channelName'
+                notifyOnCreateOrReopenCase:
+                  $ref: '#/components/schemas/booleanValue'
+                notifyOnAddCorrespondenceToCase:
+                  $ref: '#/components/schemas/booleanValue'
+                notifyOnResolveCase:
+                  $ref: '#/components/schemas/booleanValue'
+                notifyOnCaseSeverity:
+                  $ref: '#/components/schemas/NotificationSeverityLevel'
+                channelRoleArn:
+                  $ref: '#/components/schemas/roleArn'
+      responses:
+        '200': {}
+        '403':
+          description: |-
+            You don't have sufficient permission to perform this action.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '409':
+          description: |-
+            Your request has a conflict. For example, you might receive this error if you try the following:
+
+              * Add, update, or delete a Slack channel configuration before you add a Slack workspace to your Amazon Web Services account.
+
+              * Add a Slack channel configuration that already exists in your Amazon Web Services account.
+
+              * Delete a Slack channel configuration for a live chat channel.
+
+              * Delete a Slack workspace from your Amazon Web Services account that has an active live chat channel.
+
+              * Call the `RegisterSlackWorkspaceForOrganization` API from an Amazon Web Services account that doesn't belong to an organization.
+
+              * Call the `RegisterSlackWorkspaceForOrganization` API from a member account, but the management account hasn't registered that workspace yet for the organization.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConflictException'
+        '500':
+          description: |-
+            We can’t process your request right now because of a server issue. Try again later.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerException'
+        '402':
+          description: |-
+            Your Service Quotas request exceeds the quota for the service. For example, your Service Quotas request to Amazon Web Services Support App might exceed the maximum number of workspaces or channels per account, or the maximum number of accounts per Slack channel.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServiceQuotaExceededException'
+        '400':
+          description: |-
+            Your request input doesn't meet the constraints that the Amazon Web Services Support App specifies.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+  /control/delete-account-alias:
+    post:
+      operationId: DeleteAccountAlias
+      description: |-
+        Deletes an alias for an Amazon Web Services account ID. The alias appears in the Amazon Web Services Support App page of the Amazon Web Services Support Center. The alias also appears in Slack messages from the Amazon Web Services Support App.
+      parameters: []
+      responses:
+        '200': {}
+        '403':
+          description: |-
+            You don't have sufficient permission to perform this action.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '500':
+          description: |-
+            We can’t process your request right now because of a server issue. Try again later.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerException'
+        '404':
+          description: |-
+            The specified resource is missing or doesn't exist, such as an account alias, Slack channel configuration, or Slack workspace configuration.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+  /control/delete-slack-channel-configuration:
+    post:
+      operationId: DeleteSlackChannelConfiguration
+      description: |-
+        Deletes a Slack channel configuration from your Amazon Web Services account. This operation doesn't delete your Slack channel.
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                teamId:
+                  $ref: '#/components/schemas/teamId'
+                channelId:
+                  $ref: '#/components/schemas/channelId'
+      responses:
+        '200': {}
+        '403':
+          description: |-
+            You don't have sufficient permission to perform this action.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '409':
+          description: |-
+            Your request has a conflict. For example, you might receive this error if you try the following:
+
+              * Add, update, or delete a Slack channel configuration before you add a Slack workspace to your Amazon Web Services account.
+
+              * Add a Slack channel configuration that already exists in your Amazon Web Services account.
+
+              * Delete a Slack channel configuration for a live chat channel.
+
+              * Delete a Slack workspace from your Amazon Web Services account that has an active live chat channel.
+
+              * Call the `RegisterSlackWorkspaceForOrganization` API from an Amazon Web Services account that doesn't belong to an organization.
+
+              * Call the `RegisterSlackWorkspaceForOrganization` API from a member account, but the management account hasn't registered that workspace yet for the organization.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConflictException'
+        '500':
+          description: |-
+            We can’t process your request right now because of a server issue. Try again later.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerException'
+        '404':
+          description: |-
+            The specified resource is missing or doesn't exist, such as an account alias, Slack channel configuration, or Slack workspace configuration.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+        '400':
+          description: |-
+            Your request input doesn't meet the constraints that the Amazon Web Services Support App specifies.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+  /control/delete-slack-workspace-configuration:
+    post:
+      operationId: DeleteSlackWorkspaceConfiguration
+      description: |-
+        Deletes a Slack workspace configuration from your Amazon Web Services account. This operation doesn't delete your Slack workspace.
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                teamId:
+                  $ref: '#/components/schemas/teamId'
+      responses:
+        '200': {}
+        '403':
+          description: |-
+            You don't have sufficient permission to perform this action.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '409':
+          description: |-
+            Your request has a conflict. For example, you might receive this error if you try the following:
+
+              * Add, update, or delete a Slack channel configuration before you add a Slack workspace to your Amazon Web Services account.
+
+              * Add a Slack channel configuration that already exists in your Amazon Web Services account.
+
+              * Delete a Slack channel configuration for a live chat channel.
+
+              * Delete a Slack workspace from your Amazon Web Services account that has an active live chat channel.
+
+              * Call the `RegisterSlackWorkspaceForOrganization` API from an Amazon Web Services account that doesn't belong to an organization.
+
+              * Call the `RegisterSlackWorkspaceForOrganization` API from a member account, but the management account hasn't registered that workspace yet for the organization.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConflictException'
+        '500':
+          description: |-
+            We can’t process your request right now because of a server issue. Try again later.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerException'
+        '404':
+          description: |-
+            The specified resource is missing or doesn't exist, such as an account alias, Slack channel configuration, or Slack workspace configuration.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+        '400':
+          description: |-
+            Your request input doesn't meet the constraints that the Amazon Web Services Support App specifies.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+  /control/get-account-alias:
+    post:
+      operationId: GetAccountAlias
+      description: |-
+        Retrieves the alias from an Amazon Web Services account ID. The alias appears in the Amazon Web Services Support App page of the Amazon Web Services Support Center. The alias also appears in Slack messages from the Amazon Web Services Support App.
+      parameters: []
+      responses:
+        '200': {}
+        '500':
+          description: |-
+            We can’t process your request right now because of a server issue. Try again later.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerException'
+  /control/list-slack-channel-configurations:
+    post:
+      operationId: ListSlackChannelConfigurations
+      description: |-
+        Lists the Slack channel configurations for an Amazon Web Services account.
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                nextToken:
+                  $ref: '#/components/schemas/paginationToken'
+      responses:
+        '200': {}
+        '403':
+          description: |-
+            You don't have sufficient permission to perform this action.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '500':
+          description: |-
+            We can’t process your request right now because of a server issue. Try again later.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerException'
+  /control/list-slack-workspace-configurations:
+    post:
+      operationId: ListSlackWorkspaceConfigurations
+      description: |-
+        Lists the Slack workspace configurations for an Amazon Web Services account.
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                nextToken:
+                  $ref: '#/components/schemas/paginationToken'
+      responses:
+        '200': {}
+        '403':
+          description: |-
+            You don't have sufficient permission to perform this action.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '500':
+          description: |-
+            We can’t process your request right now because of a server issue. Try again later.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerException'
+  /control/put-account-alias:
+    post:
+      operationId: PutAccountAlias
+      description: |-
+        Creates or updates an individual alias for each Amazon Web Services account ID. The alias appears in the Amazon Web Services Support App page of the Amazon Web Services Support Center. The alias also appears in Slack messages from the Amazon Web Services Support App.
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                accountAlias:
+                  $ref: '#/components/schemas/awsAccountAlias'
+      responses:
+        '200': {}
+        '403':
+          description: |-
+            You don't have sufficient permission to perform this action.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '500':
+          description: |-
+            We can’t process your request right now because of a server issue. Try again later.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerException'
+        '400':
+          description: |-
+            Your request input doesn't meet the constraints that the Amazon Web Services Support App specifies.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+  /control/register-slack-workspace-for-organization:
+    post:
+      operationId: RegisterSlackWorkspaceForOrganization
+      description: |-
+        Registers a Slack workspace for your Amazon Web Services account. To call this API, your account must be part of an organization in Organizations.
+
+        If you're the _management account_ and you want to register Slack workspaces for your organization, you must complete the following tasks:
+
+          1. Sign in to the [Amazon Web Services Support Center](https://console.aws.amazon.com/support/app) and authorize the Slack workspaces where you want your organization to have access to. See [Authorize a Slack workspace](https://docs.aws.amazon.com/awssupport/latest/user/authorize-slack-workspace.html) in the _Amazon Web Services Support User Guide_.
+
+          2. Call the `RegisterSlackWorkspaceForOrganization` API to authorize each Slack workspace for the organization.
+
+        After the management account authorizes the Slack workspace, member accounts can call this API to authorize the same Slack workspace for their individual accounts. Member accounts don't need to authorize the Slack workspace manually through the [Amazon Web Services Support Center](https://console.aws.amazon.com/support/app).
+
+        To use the Amazon Web Services Support App, each account must then complete the following tasks:
+
+          * Create an Identity and Access Management (IAM) role with the required permission. For more information, see [Managing access to the Amazon Web Services Support App](https://docs.aws.amazon.com/awssupport/latest/user/support-app-permissions.html).
+
+          * Configure a Slack channel to use the Amazon Web Services Support App for support cases for that account. For more information, see [Configuring a Slack channel](https://docs.aws.amazon.com/awssupport/latest/user/add-your-slack-channel.html).
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                teamId:
+                  $ref: '#/components/schemas/teamId'
+      responses:
+        '200': {}
+        '403':
+          description: |-
+            You don't have sufficient permission to perform this action.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '409':
+          description: |-
+            Your request has a conflict. For example, you might receive this error if you try the following:
+
+              * Add, update, or delete a Slack channel configuration before you add a Slack workspace to your Amazon Web Services account.
+
+              * Add a Slack channel configuration that already exists in your Amazon Web Services account.
+
+              * Delete a Slack channel configuration for a live chat channel.
+
+              * Delete a Slack workspace from your Amazon Web Services account that has an active live chat channel.
+
+              * Call the `RegisterSlackWorkspaceForOrganization` API from an Amazon Web Services account that doesn't belong to an organization.
+
+              * Call the `RegisterSlackWorkspaceForOrganization` API from a member account, but the management account hasn't registered that workspace yet for the organization.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConflictException'
+        '500':
+          description: |-
+            We can’t process your request right now because of a server issue. Try again later.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerException'
+        '404':
+          description: |-
+            The specified resource is missing or doesn't exist, such as an account alias, Slack channel configuration, or Slack workspace configuration.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+        '400':
+          description: |-
+            Your request input doesn't meet the constraints that the Amazon Web Services Support App specifies.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+  /control/update-slack-channel-configuration:
+    post:
+      operationId: UpdateSlackChannelConfiguration
+      description: |-
+        Updates the configuration for a Slack channel, such as case update notifications.
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                teamId:
+                  $ref: '#/components/schemas/teamId'
+                channelId:
+                  $ref: '#/components/schemas/channelId'
+                channelName:
+                  $ref: '#/components/schemas/channelName'
+                notifyOnCreateOrReopenCase:
+                  $ref: '#/components/schemas/booleanValue'
+                notifyOnAddCorrespondenceToCase:
+                  $ref: '#/components/schemas/booleanValue'
+                notifyOnResolveCase:
+                  $ref: '#/components/schemas/booleanValue'
+                notifyOnCaseSeverity:
+                  $ref: '#/components/schemas/NotificationSeverityLevel'
+                channelRoleArn:
+                  $ref: '#/components/schemas/roleArn'
+      responses:
+        '200': {}
+        '403':
+          description: |-
+            You don't have sufficient permission to perform this action.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '409':
+          description: |-
+            Your request has a conflict. For example, you might receive this error if you try the following:
+
+              * Add, update, or delete a Slack channel configuration before you add a Slack workspace to your Amazon Web Services account.
+
+              * Add a Slack channel configuration that already exists in your Amazon Web Services account.
+
+              * Delete a Slack channel configuration for a live chat channel.
+
+              * Delete a Slack workspace from your Amazon Web Services account that has an active live chat channel.
+
+              * Call the `RegisterSlackWorkspaceForOrganization` API from an Amazon Web Services account that doesn't belong to an organization.
+
+              * Call the `RegisterSlackWorkspaceForOrganization` API from a member account, but the management account hasn't registered that workspace yet for the organization.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConflictException'
+        '500':
+          description: |-
+            We can’t process your request right now because of a server issue. Try again later.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerException'
+        '404':
+          description: |-
+            The specified resource is missing or doesn't exist, such as an account alias, Slack channel configuration, or Slack workspace configuration.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+        '400':
+          description: |-
+            Your request input doesn't meet the constraints that the Amazon Web Services Support App specifies.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
 components:
   schemas:
+    AccessDeniedException:
+      type: object
+      properties:
+        message:
+          $ref: '#/components/schemas/errorMessage'
+      description: You don't have sufficient permission to perform this action.
     AccountType:
       type: string
       enum:
       - management
       - member
+    ConflictException:
+      type: object
+      properties:
+        message:
+          $ref: '#/components/schemas/errorMessage'
+      description: "Your request has a conflict. For example, you might receive this\
+        \ error if you try the following:\n\n  * Add, update, or delete a Slack channel\
+        \ configuration before you add a Slack workspace to your Amazon Web Services\
+        \ account.\n\n  * Add a Slack channel configuration that already exists in\
+        \ your Amazon Web Services account.\n\n  * Delete a Slack channel configuration\
+        \ for a live chat channel.\n\n  * Delete a Slack workspace from your Amazon\
+        \ Web Services account that has an active live chat channel.\n\n  * Call the\
+        \ `RegisterSlackWorkspaceForOrganization` API from an Amazon Web Services\
+        \ account that doesn't belong to an organization.\n\n  * Call the `RegisterSlackWorkspaceForOrganization`\
+        \ API from a member account, but the management account hasn't registered\
+        \ that workspace yet for the organization."
+    CreateSlackChannelConfigurationRequest:
+      type: object
+      properties:
+        teamId:
+          allOf:
+          - $ref: '#/components/schemas/teamId'
+          description: The team ID in Slack. This ID uniquely identifies a Slack workspace,
+            such as `T012ABCDEFG`.
+        channelId:
+          allOf:
+          - $ref: '#/components/schemas/channelId'
+          description: The channel ID in Slack. This ID identifies a channel within
+            a Slack workspace.
+        channelName:
+          allOf:
+          - $ref: '#/components/schemas/channelName'
+          description: The name of the Slack channel that you configure for the Amazon
+            Web Services Support App.
+        notifyOnCreateOrReopenCase:
+          allOf:
+          - $ref: '#/components/schemas/booleanValue'
+          description: Whether you want to get notified when a support case is created
+            or reopened.
+        notifyOnAddCorrespondenceToCase:
+          allOf:
+          - $ref: '#/components/schemas/booleanValue'
+          description: Whether you want to get notified when a support case has a
+            new correspondence.
+        notifyOnResolveCase:
+          allOf:
+          - $ref: '#/components/schemas/booleanValue'
+          description: Whether you want to get notified when a support case is resolved.
+        notifyOnCaseSeverity:
+          allOf:
+          - $ref: '#/components/schemas/NotificationSeverityLevel'
+          description: "The case severity for a support case that you want to receive\
+            \ notifications.\n\nIf you specify `high` or `all`, you must specify `true`\
+            \ for at least one of the following parameters:\n\n  * `notifyOnAddCorrespondenceToCase`\n\
+            \n  * `notifyOnCreateOrReopenCase`\n\n  * `notifyOnResolveCase`\n\nIf\
+            \ you specify `none`, the following parameters must be null or `false`:\n\
+            \n  * `notifyOnAddCorrespondenceToCase`\n\n  * `notifyOnCreateOrReopenCase`\n\
+            \n  * `notifyOnResolveCase`\n\nIf you don't specify these parameters in\
+            \ your request, they default to `false`."
+        channelRoleArn:
+          allOf:
+          - $ref: '#/components/schemas/roleArn'
+          description: The Amazon Resource Name (ARN) of an IAM role that you want
+            to use to perform operations on Amazon Web Services. For more information,
+            see [Managing access to the Amazon Web Services Support App](https://docs.aws.amazon.com/awssupport/latest/user/support-app-permissions.html)
+            in the _Amazon Web Services Support User Guide_.
+      required:
+      - teamId
+      - channelId
+      - notifyOnCaseSeverity
+      - channelRoleArn
+    CreateSlackChannelConfigurationResult:
+      type: object
+      properties: {}
+    DeleteAccountAliasRequest:
+      type: object
+      properties: {}
+    DeleteAccountAliasResult:
+      type: object
+      properties: {}
+    DeleteSlackChannelConfigurationRequest:
+      type: object
+      properties:
+        teamId:
+          allOf:
+          - $ref: '#/components/schemas/teamId'
+          description: The team ID in Slack. This ID uniquely identifies a Slack workspace,
+            such as `T012ABCDEFG`.
+        channelId:
+          allOf:
+          - $ref: '#/components/schemas/channelId'
+          description: The channel ID in Slack. This ID identifies a channel within
+            a Slack workspace.
+      required:
+      - teamId
+      - channelId
+    DeleteSlackChannelConfigurationResult:
+      type: object
+      properties: {}
+    DeleteSlackWorkspaceConfigurationRequest:
+      type: object
+      properties:
+        teamId:
+          allOf:
+          - $ref: '#/components/schemas/teamId'
+          description: The team ID in Slack. This ID uniquely identifies a Slack workspace,
+            such as `T012ABCDEFG`.
+      required:
+      - teamId
+    DeleteSlackWorkspaceConfigurationResult:
+      type: object
+      properties: {}
+    GetAccountAliasRequest:
+      type: object
+      properties: {}
+    GetAccountAliasResult:
+      type: object
+      properties:
+        accountAlias:
+          allOf:
+          - $ref: '#/components/schemas/awsAccountAlias'
+          description: An alias or short name for an Amazon Web Services account.
+    InternalServerException:
+      type: object
+      properties:
+        message:
+          $ref: '#/components/schemas/errorMessage'
+      description: We can’t process your request right now because of a server issue.
+        Try again later.
+    ListSlackChannelConfigurationsRequest:
+      type: object
+      properties:
+        nextToken:
+          allOf:
+          - $ref: '#/components/schemas/paginationToken'
+          description: If the results of a search are large, the API only returns
+            a portion of the results and includes a `nextToken` pagination token in
+            the response. To retrieve the next batch of results, reissue the search
+            request and include the returned token. When the API returns the last
+            set of results, the response doesn't include a pagination token value.
+    ListSlackChannelConfigurationsResult:
+      type: object
+      properties:
+        nextToken:
+          allOf:
+          - $ref: '#/components/schemas/paginationToken'
+          description: The point where pagination should resume when the response
+            returns only partial results.
+        slackChannelConfigurations:
+          allOf:
+          - $ref: '#/components/schemas/slackChannelConfigurationList'
+          description: The configurations for a Slack channel.
+      required:
+      - slackChannelConfigurations
+    ListSlackWorkspaceConfigurationsRequest:
+      type: object
+      properties:
+        nextToken:
+          allOf:
+          - $ref: '#/components/schemas/paginationToken'
+          description: If the results of a search are large, the API only returns
+            a portion of the results and includes a `nextToken` pagination token in
+            the response. To retrieve the next batch of results, reissue the search
+            request and include the returned token. When the API returns the last
+            set of results, the response doesn't include a pagination token value.
+    ListSlackWorkspaceConfigurationsResult:
+      type: object
+      properties:
+        nextToken:
+          allOf:
+          - $ref: '#/components/schemas/paginationToken'
+          description: The point where pagination should resume when the response
+            returns only partial results.
+        slackWorkspaceConfigurations:
+          allOf:
+          - $ref: '#/components/schemas/SlackWorkspaceConfigurationList'
+          description: The configurations for a Slack workspace.
     NotificationSeverityLevel:
       type: string
       enum:
       - none
       - all
       - high
+    PutAccountAliasRequest:
+      type: object
+      properties:
+        accountAlias:
+          allOf:
+          - $ref: '#/components/schemas/awsAccountAlias'
+          description: An alias or short name for an Amazon Web Services account.
+      required:
+      - accountAlias
+    PutAccountAliasResult:
+      type: object
+      properties: {}
+    RegisterSlackWorkspaceForOrganizationRequest:
+      type: object
+      properties:
+        teamId:
+          allOf:
+          - $ref: '#/components/schemas/teamId'
+          description: The team ID in Slack. This ID uniquely identifies a Slack workspace,
+            such as `T012ABCDEFG`. Specify the Slack workspace that you want to use
+            for your organization.
+      required:
+      - teamId
+    RegisterSlackWorkspaceForOrganizationResult:
+      type: object
+      properties:
+        teamId:
+          allOf:
+          - $ref: '#/components/schemas/teamId'
+          description: The team ID in Slack. This ID uniquely identifies a Slack workspace,
+            such as `T012ABCDEFG`.
+        teamName:
+          allOf:
+          - $ref: '#/components/schemas/teamName'
+          description: The name of the Slack workspace.
+        accountType:
+          allOf:
+          - $ref: '#/components/schemas/AccountType'
+          description: Whether the Amazon Web Services account is a management or
+            member account that's part of an organization in Organizations.
+    ResourceNotFoundException:
+      type: object
+      properties:
+        message:
+          $ref: '#/components/schemas/errorMessage'
+      description: The specified resource is missing or doesn't exist, such as an
+        account alias, Slack channel configuration, or Slack workspace configuration.
+    ServiceQuotaExceededException:
+      type: object
+      properties:
+        message:
+          $ref: '#/components/schemas/errorMessage'
+      description: Your Service Quotas request exceeds the quota for the service.
+        For example, your Service Quotas request to Amazon Web Services Support App
+        might exceed the maximum number of workspaces or channels per account, or
+        the maximum number of accounts per Slack channel.
+    SlackChannelConfiguration:
+      type: object
+      properties:
+        teamId:
+          allOf:
+          - $ref: '#/components/schemas/teamId'
+          description: The team ID in Slack. This ID uniquely identifies a Slack workspace,
+            such as `T012ABCDEFG`.
+        channelId:
+          allOf:
+          - $ref: '#/components/schemas/channelId'
+          description: The channel ID in Slack. This ID identifies a channel within
+            a Slack workspace.
+        channelName:
+          allOf:
+          - $ref: '#/components/schemas/channelName'
+          description: The name of the Slack channel that you configured with the
+            Amazon Web Services Support App for your Amazon Web Services account.
+        notifyOnCreateOrReopenCase:
+          allOf:
+          - $ref: '#/components/schemas/booleanValue'
+          description: Whether you want to get notified when a support case is created
+            or reopened.
+        notifyOnAddCorrespondenceToCase:
+          allOf:
+          - $ref: '#/components/schemas/booleanValue'
+          description: Whether you want to get notified when a support case has a
+            new correspondence.
+        notifyOnResolveCase:
+          allOf:
+          - $ref: '#/components/schemas/booleanValue'
+          description: Whether you want to get notified when a support case is resolved.
+        notifyOnCaseSeverity:
+          allOf:
+          - $ref: '#/components/schemas/NotificationSeverityLevel'
+          description: The case severity for a support case that you want to receive
+            notifications.
+        channelRoleArn:
+          allOf:
+          - $ref: '#/components/schemas/roleArn'
+          description: The Amazon Resource Name (ARN) of an IAM role that you want
+            to use to perform operations on Amazon Web Services. For more information,
+            see [Managing access to the Amazon Web Services Support App](https://docs.aws.amazon.com/awssupport/latest/user/support-app-permissions.html)
+            in the _Amazon Web Services Support User Guide_.
+      required:
+      - teamId
+      - channelId
+      description: The configuration for a Slack channel that you added for your Amazon
+        Web Services account.
+    SlackWorkspaceConfiguration:
+      type: object
+      properties:
+        teamId:
+          allOf:
+          - $ref: '#/components/schemas/teamId'
+          description: The team ID in Slack. This ID uniquely identifies a Slack workspace,
+            such as `T012ABCDEFG`.
+        teamName:
+          allOf:
+          - $ref: '#/components/schemas/teamName'
+          description: The name of the Slack workspace.
+        allowOrganizationMemberAccount:
+          allOf:
+          - $ref: '#/components/schemas/booleanValue'
+          description: Whether to allow member accounts to authorize Slack workspaces.
+            Member accounts must be part of an organization in Organizations.
+      required:
+      - teamId
+      description: The configuration for a Slack workspace that you added to an Amazon
+        Web Services account.
     SlackWorkspaceConfigurationList:
       type: array
       items:
         $ref: '#/components/schemas/SlackWorkspaceConfiguration'
+    UpdateSlackChannelConfigurationRequest:
+      type: object
+      properties:
+        teamId:
+          allOf:
+          - $ref: '#/components/schemas/teamId'
+          description: The team ID in Slack. This ID uniquely identifies a Slack workspace,
+            such as `T012ABCDEFG`.
+        channelId:
+          allOf:
+          - $ref: '#/components/schemas/channelId'
+          description: The channel ID in Slack. This ID identifies a channel within
+            a Slack workspace.
+        channelName:
+          allOf:
+          - $ref: '#/components/schemas/channelName'
+          description: The Slack channel name that you want to update.
+        notifyOnCreateOrReopenCase:
+          allOf:
+          - $ref: '#/components/schemas/booleanValue'
+          description: Whether you want to get notified when a support case is created
+            or reopened.
+        notifyOnAddCorrespondenceToCase:
+          allOf:
+          - $ref: '#/components/schemas/booleanValue'
+          description: Whether you want to get notified when a support case has a
+            new correspondence.
+        notifyOnResolveCase:
+          allOf:
+          - $ref: '#/components/schemas/booleanValue'
+          description: Whether you want to get notified when a support case is resolved.
+        notifyOnCaseSeverity:
+          allOf:
+          - $ref: '#/components/schemas/NotificationSeverityLevel'
+          description: "The case severity for a support case that you want to receive\
+            \ notifications.\n\nIf you specify `high` or `all`, at least one of the\
+            \ following parameters must be `true`:\n\n  * `notifyOnAddCorrespondenceToCase`\n\
+            \n  * `notifyOnCreateOrReopenCase`\n\n  * `notifyOnResolveCase`\n\nIf\
+            \ you specify `none`, any of the following parameters that you specify\
+            \ in your request must be `false`:\n\n  * `notifyOnAddCorrespondenceToCase`\n\
+            \n  * `notifyOnCreateOrReopenCase`\n\n  * `notifyOnResolveCase`\n\nIf\
+            \ you don't specify these parameters in your request, the Amazon Web Services\
+            \ Support App uses the current values by default."
+        channelRoleArn:
+          allOf:
+          - $ref: '#/components/schemas/roleArn'
+          description: The Amazon Resource Name (ARN) of an IAM role that you want
+            to use to perform operations on Amazon Web Services. For more information,
+            see [Managing access to the Amazon Web Services Support App](https://docs.aws.amazon.com/awssupport/latest/user/support-app-permissions.html)
+            in the _Amazon Web Services Support User Guide_.
+      required:
+      - teamId
+      - channelId
+    UpdateSlackChannelConfigurationResult:
+      type: object
+      properties:
+        teamId:
+          allOf:
+          - $ref: '#/components/schemas/teamId'
+          description: The team ID in Slack. This ID uniquely identifies a Slack workspace,
+            such as `T012ABCDEFG`.
+        channelId:
+          allOf:
+          - $ref: '#/components/schemas/channelId'
+          description: The channel ID in Slack. This ID identifies a channel within
+            a Slack workspace.
+        channelName:
+          allOf:
+          - $ref: '#/components/schemas/channelName'
+          description: The name of the Slack channel that you configure for the Amazon
+            Web Services Support App.
+        notifyOnCreateOrReopenCase:
+          allOf:
+          - $ref: '#/components/schemas/booleanValue'
+          description: Whether you want to get notified when a support case is created
+            or reopened.
+        notifyOnAddCorrespondenceToCase:
+          allOf:
+          - $ref: '#/components/schemas/booleanValue'
+          description: Whether you want to get notified when a support case has a
+            new correspondence.
+        notifyOnResolveCase:
+          allOf:
+          - $ref: '#/components/schemas/booleanValue'
+          description: Whether you want to get notified when a support case is resolved.
+        notifyOnCaseSeverity:
+          allOf:
+          - $ref: '#/components/schemas/NotificationSeverityLevel'
+          description: The case severity for a support case that you want to receive
+            notifications.
+        channelRoleArn:
+          allOf:
+          - $ref: '#/components/schemas/roleArn'
+          description: The Amazon Resource Name (ARN) of an IAM role that you want
+            to use to perform operations on Amazon Web Services. For more information,
+            see [Managing access to the Amazon Web Services Support App](https://docs.aws.amazon.com/awssupport/latest/user/support-app-permissions.html)
+            in the _Amazon Web Services Support User Guide_.
+    ValidationException:
+      type: object
+      properties:
+        message:
+          $ref: '#/components/schemas/errorMessage'
+      description: Your request input doesn't meet the constraints that the Amazon
+        Web Services Support App specifies.
     awsAccountAlias:
       type: string
       pattern: ^[\w\- ]+$

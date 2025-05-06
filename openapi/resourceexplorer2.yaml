@@ -7,7 +7,7 @@ info:
   x-stackql-serviceName: resource_explorer_2
   x-aws-serviceName: resourceexplorer2
   x-aws-protocol: aws.protocols#restJson1
-  x-dateGenerated: '2025-05-05'
+  x-dateGenerated: '2025-05-07'
   version: '2022-07-28'
   title: AWS Resource Explorer
   description: |-
@@ -49,7 +49,1389 @@ servers:
       - sa-east-1
       - me-south-1
       default: us-east-1
-paths: {}
+paths:
+  /AssociateDefaultView:
+    post:
+      operationId: AssociateDefaultView
+      description: |-
+        Sets the specified view as the default for the Amazon Web Services Region in which you call this operation. When a user performs a Search that doesn't explicitly specify which view to use, then Amazon Web Services Resource Explorer automatically chooses this default view for searches performed in this Amazon Web Services Region.
+
+        If an Amazon Web Services Region doesn't have a default view configured, then users must explicitly specify a view with every `Search` operation performed in that Region.
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                ViewArn:
+                  $ref: '#/components/schemas/String'
+      responses:
+        '200': {}
+        '403':
+          description: |-
+            The credentials that you used to call this operation don't have the minimum required permissions.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '500':
+          description: |-
+            The request failed because of internal service error. Try your request again later.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerException'
+        '404':
+          description: |-
+            You specified a resource that doesn't exist. Check the ID or ARN that you used to identity the resource, and try again.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+        '429':
+          description: |-
+            The request failed because you exceeded a rate limit for this operation. For more information, see [Quotas for Resource Explorer](https://docs.aws.amazon.com/resource-explorer/latest/userguide/quotas.html).
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThrottlingException'
+        '400':
+          description: |-
+            You provided an invalid value for one of the operation's parameters. Check the syntax for the operation, and try again.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+  /BatchGetView:
+    post:
+      operationId: BatchGetView
+      description: |-
+        Retrieves details about a list of views.
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                ViewArns:
+                  $ref: '#/components/schemas/ViewArnList'
+      responses:
+        '200': {}
+        '403':
+          description: |-
+            The credentials that you used to call this operation don't have the minimum required permissions.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '500':
+          description: |-
+            The request failed because of internal service error. Try your request again later.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerException'
+        '429':
+          description: |-
+            The request failed because you exceeded a rate limit for this operation. For more information, see [Quotas for Resource Explorer](https://docs.aws.amazon.com/resource-explorer/latest/userguide/quotas.html).
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThrottlingException'
+        '401':
+          description: |-
+            The principal making the request isn't permitted to perform the operation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnauthorizedException'
+        '400':
+          description: |-
+            You provided an invalid value for one of the operation's parameters. Check the syntax for the operation, and try again.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+  /CreateIndex:
+    post:
+      operationId: CreateIndex
+      description: |-
+        Turns on Amazon Web Services Resource Explorer in the Amazon Web Services Region in which you called this operation by creating an index. Resource Explorer begins discovering the resources in this Region and stores the details about the resources in the index so that they can be queried by using the Search operation. You can create only one index in a Region.
+
+        This operation creates only a _local_ index. To promote the local index in one Amazon Web Services Region into the aggregator index for the Amazon Web Services account, use the UpdateIndexType operation. For more information, see [Turning on cross-Region search by creating an aggregator index](https://docs.aws.amazon.com/resource-explorer/latest/userguide/manage-aggregator-region.html) in the _Amazon Web Services Resource Explorer User Guide_.
+
+        For more details about what happens when you turn on Resource Explorer in an Amazon Web Services Region, see [Turn on Resource Explorer to index your resources in an Amazon Web Services Region](https://docs.aws.amazon.com/resource-explorer/latest/userguide/manage-service-activate.html) in the _Amazon Web Services Resource Explorer User Guide_.
+
+        If this is the first Amazon Web Services Region in which you've created an index for Resource Explorer, then this operation also [creates a service-linked role](https://docs.aws.amazon.com/resource-explorer/latest/userguide/security_iam_service-linked-roles.html) in your Amazon Web Services account that allows Resource Explorer to enumerate your resources to populate the index.
+
+          * **Action** : `resource-explorer-2:CreateIndex`
+
+        **Resource** : The ARN of the index (as it will exist after the operation completes) in the Amazon Web Services Region and account in which you're trying to create the index. Use the wildcard character (`*`) at the end of the string to match the eventual UUID. For example, the following `Resource` element restricts the role or user to creating an index in only the `us-east-2` Region of the specified account.
+
+        `"Resource": "arn:aws:resource-explorer-2:us-west-2:_< account-id>_:index/*"`
+
+        Alternatively, you can use `"Resource": "*"` to allow the role or user to create an index in any Region.
+
+          * **Action** : `iam:CreateServiceLinkedRole`
+
+        **Resource** : No specific resource (*).
+
+        This permission is required only the first time you create an index to turn on Resource Explorer in the account. Resource Explorer uses this to create the [service-linked role needed to index the resources in your account](https://docs.aws.amazon.com/resource-explorer/latest/userguide/security_iam_service-linked-roles.html). Resource Explorer uses the same service-linked role for all additional indexes you create afterwards.
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                ClientToken:
+                  $ref: '#/components/schemas/String'
+                Tags:
+                  $ref: '#/components/schemas/TagMap'
+      responses:
+        '200': {}
+        '403':
+          description: |-
+            The credentials that you used to call this operation don't have the minimum required permissions.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '409':
+          description: |-
+            If you attempted to create a view, then the request failed because either you specified parameters that didn’t match the original request, or you attempted to create a view with a name that already exists in this Amazon Web Services Region.
+
+            If you attempted to create an index, then the request failed because either you specified parameters that didn't match the original request, or an index already exists in the current Amazon Web Services Region.
+
+            If you attempted to update an index type to `AGGREGATOR`, then the request failed because you already have an `AGGREGATOR` index in a different Amazon Web Services Region.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConflictException'
+        '500':
+          description: |-
+            The request failed because of internal service error. Try your request again later.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerException'
+        '429':
+          description: |-
+            The request failed because you exceeded a rate limit for this operation. For more information, see [Quotas for Resource Explorer](https://docs.aws.amazon.com/resource-explorer/latest/userguide/quotas.html).
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThrottlingException'
+        '400':
+          description: |-
+            You provided an invalid value for one of the operation's parameters. Check the syntax for the operation, and try again.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+  /CreateView:
+    post:
+      operationId: CreateView
+      description: |-
+        Creates a view that users can query by using the Search operation. Results from queries that you make using this view include only resources that match the view's `Filters`. For more information about Amazon Web Services Resource Explorer views, see [Managing views](https://docs.aws.amazon.com/resource-explorer/latest/userguide/manage-views.html) in the _Amazon Web Services Resource Explorer User Guide_.
+
+        Only the principals with an IAM identity-based policy that grants `Allow` to the `Search` action on a `Resource` with the [Amazon resource name (ARN)](https://docs.aws.amazon.com/general/latest/gr/aws-arns-and-namespaces.html) of this view can Search using views you create with this operation.
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                ClientToken:
+                  $ref: '#/components/schemas/String'
+                ViewName:
+                  $ref: '#/components/schemas/ViewName'
+                IncludedProperties:
+                  $ref: '#/components/schemas/IncludedPropertyList'
+                Scope:
+                  $ref: '#/components/schemas/String'
+                Filters:
+                  $ref: '#/components/schemas/SearchFilter'
+                Tags:
+                  $ref: '#/components/schemas/TagMap'
+      responses:
+        '200': {}
+        '403':
+          description: |-
+            The credentials that you used to call this operation don't have the minimum required permissions.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '409':
+          description: |-
+            If you attempted to create a view, then the request failed because either you specified parameters that didn’t match the original request, or you attempted to create a view with a name that already exists in this Amazon Web Services Region.
+
+            If you attempted to create an index, then the request failed because either you specified parameters that didn't match the original request, or an index already exists in the current Amazon Web Services Region.
+
+            If you attempted to update an index type to `AGGREGATOR`, then the request failed because you already have an `AGGREGATOR` index in a different Amazon Web Services Region.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConflictException'
+        '500':
+          description: |-
+            The request failed because of internal service error. Try your request again later.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerException'
+        '402':
+          description: |-
+            The request failed because it exceeds a service quota.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServiceQuotaExceededException'
+        '429':
+          description: |-
+            The request failed because you exceeded a rate limit for this operation. For more information, see [Quotas for Resource Explorer](https://docs.aws.amazon.com/resource-explorer/latest/userguide/quotas.html).
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThrottlingException'
+        '401':
+          description: |-
+            The principal making the request isn't permitted to perform the operation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnauthorizedException'
+        '400':
+          description: |-
+            You provided an invalid value for one of the operation's parameters. Check the syntax for the operation, and try again.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+  /DeleteIndex:
+    post:
+      operationId: DeleteIndex
+      description: |-
+        Deletes the specified index and turns off Amazon Web Services Resource Explorer in the specified Amazon Web Services Region. When you delete an index, Resource Explorer stops discovering and indexing resources in that Region. Resource Explorer also deletes all views in that Region. These actions occur as asynchronous background tasks. You can check to see when the actions are complete by using the GetIndex operation and checking the `Status` response value.
+
+        If the index you delete is the aggregator index for the Amazon Web Services account, you must wait 24 hours before you can promote another local index to be the aggregator index for the account. Users can't perform account-wide searches using Resource Explorer until another aggregator index is configured.
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                Arn:
+                  $ref: '#/components/schemas/String'
+      responses:
+        '200': {}
+        '403':
+          description: |-
+            The credentials that you used to call this operation don't have the minimum required permissions.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '500':
+          description: |-
+            The request failed because of internal service error. Try your request again later.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerException'
+        '404':
+          description: |-
+            You specified a resource that doesn't exist. Check the ID or ARN that you used to identity the resource, and try again.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+        '429':
+          description: |-
+            The request failed because you exceeded a rate limit for this operation. For more information, see [Quotas for Resource Explorer](https://docs.aws.amazon.com/resource-explorer/latest/userguide/quotas.html).
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThrottlingException'
+        '400':
+          description: |-
+            You provided an invalid value for one of the operation's parameters. Check the syntax for the operation, and try again.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+  /DeleteView:
+    post:
+      operationId: DeleteView
+      description: |-
+        Deletes the specified view.
+
+        If the specified view is the default view for its Amazon Web Services Region, then all Search operations in that Region must explicitly specify the view to use until you configure a new default by calling the AssociateDefaultView operation.
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                ViewArn:
+                  $ref: '#/components/schemas/String'
+      responses:
+        '200': {}
+        '403':
+          description: |-
+            The credentials that you used to call this operation don't have the minimum required permissions.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '500':
+          description: |-
+            The request failed because of internal service error. Try your request again later.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerException'
+        '404':
+          description: |-
+            You specified a resource that doesn't exist. Check the ID or ARN that you used to identity the resource, and try again.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+        '429':
+          description: |-
+            The request failed because you exceeded a rate limit for this operation. For more information, see [Quotas for Resource Explorer](https://docs.aws.amazon.com/resource-explorer/latest/userguide/quotas.html).
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThrottlingException'
+        '401':
+          description: |-
+            The principal making the request isn't permitted to perform the operation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnauthorizedException'
+        '400':
+          description: |-
+            You provided an invalid value for one of the operation's parameters. Check the syntax for the operation, and try again.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+  /DisassociateDefaultView:
+    post:
+      operationId: DisassociateDefaultView
+      description: |-
+        After you call this operation, the affected Amazon Web Services Region no longer has a default view. All Search operations in that Region must explicitly specify a view or the operation fails. You can configure a new default by calling the AssociateDefaultView operation.
+
+        If an Amazon Web Services Region doesn't have a default view configured, then users must explicitly specify a view with every `Search` operation performed in that Region.
+      responses:
+        '200': {}
+        '403':
+          description: |-
+            The credentials that you used to call this operation don't have the minimum required permissions.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '500':
+          description: |-
+            The request failed because of internal service error. Try your request again later.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerException'
+        '404':
+          description: |-
+            You specified a resource that doesn't exist. Check the ID or ARN that you used to identity the resource, and try again.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+        '429':
+          description: |-
+            The request failed because you exceeded a rate limit for this operation. For more information, see [Quotas for Resource Explorer](https://docs.aws.amazon.com/resource-explorer/latest/userguide/quotas.html).
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThrottlingException'
+        '400':
+          description: |-
+            You provided an invalid value for one of the operation's parameters. Check the syntax for the operation, and try again.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+  /GetAccountLevelServiceConfiguration:
+    post:
+      operationId: GetAccountLevelServiceConfiguration
+      description: |-
+        Retrieves the status of your account's Amazon Web Services service access, and validates the service linked role required to access the multi-account search feature. Only the management account can invoke this API call.
+      responses:
+        '200': {}
+        '403':
+          description: |-
+            The credentials that you used to call this operation don't have the minimum required permissions.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '500':
+          description: |-
+            The request failed because of internal service error. Try your request again later.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerException'
+        '404':
+          description: |-
+            You specified a resource that doesn't exist. Check the ID or ARN that you used to identity the resource, and try again.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+        '429':
+          description: |-
+            The request failed because you exceeded a rate limit for this operation. For more information, see [Quotas for Resource Explorer](https://docs.aws.amazon.com/resource-explorer/latest/userguide/quotas.html).
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThrottlingException'
+  /GetDefaultView:
+    post:
+      operationId: GetDefaultView
+      description: |-
+        Retrieves the Amazon Resource Name (ARN) of the view that is the default for the Amazon Web Services Region in which you call this operation. You can then call GetView to retrieve the details of that view.
+      responses:
+        '200': {}
+        '403':
+          description: |-
+            The credentials that you used to call this operation don't have the minimum required permissions.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '500':
+          description: |-
+            The request failed because of internal service error. Try your request again later.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerException'
+        '404':
+          description: |-
+            You specified a resource that doesn't exist. Check the ID or ARN that you used to identity the resource, and try again.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+        '429':
+          description: |-
+            The request failed because you exceeded a rate limit for this operation. For more information, see [Quotas for Resource Explorer](https://docs.aws.amazon.com/resource-explorer/latest/userguide/quotas.html).
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThrottlingException'
+        '400':
+          description: |-
+            You provided an invalid value for one of the operation's parameters. Check the syntax for the operation, and try again.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+  /GetIndex:
+    post:
+      operationId: GetIndex
+      description: |-
+        Retrieves details about the Amazon Web Services Resource Explorer index in the Amazon Web Services Region in which you invoked the operation.
+      responses:
+        '200': {}
+        '403':
+          description: |-
+            The credentials that you used to call this operation don't have the minimum required permissions.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '500':
+          description: |-
+            The request failed because of internal service error. Try your request again later.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerException'
+        '404':
+          description: |-
+            You specified a resource that doesn't exist. Check the ID or ARN that you used to identity the resource, and try again.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+        '429':
+          description: |-
+            The request failed because you exceeded a rate limit for this operation. For more information, see [Quotas for Resource Explorer](https://docs.aws.amazon.com/resource-explorer/latest/userguide/quotas.html).
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThrottlingException'
+        '400':
+          description: |-
+            You provided an invalid value for one of the operation's parameters. Check the syntax for the operation, and try again.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+  /GetManagedView:
+    post:
+      operationId: GetManagedView
+      description: |-
+        Retrieves details of the specified [Amazon Web Services-managed view](https://docs.aws.amazon.com/resource-explorer/latest/userguide/aws-managed-views.html).
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                ManagedViewArn:
+                  $ref: '#/components/schemas/String'
+      responses:
+        '200': {}
+        '403':
+          description: |-
+            The credentials that you used to call this operation don't have the minimum required permissions.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '500':
+          description: |-
+            The request failed because of internal service error. Try your request again later.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerException'
+        '404':
+          description: |-
+            You specified a resource that doesn't exist. Check the ID or ARN that you used to identity the resource, and try again.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+        '429':
+          description: |-
+            The request failed because you exceeded a rate limit for this operation. For more information, see [Quotas for Resource Explorer](https://docs.aws.amazon.com/resource-explorer/latest/userguide/quotas.html).
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThrottlingException'
+        '401':
+          description: |-
+            The principal making the request isn't permitted to perform the operation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnauthorizedException'
+        '400':
+          description: |-
+            You provided an invalid value for one of the operation's parameters. Check the syntax for the operation, and try again.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+  /GetView:
+    post:
+      operationId: GetView
+      description: |-
+        Retrieves details of the specified view.
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                ViewArn:
+                  $ref: '#/components/schemas/String'
+      responses:
+        '200': {}
+        '403':
+          description: |-
+            The credentials that you used to call this operation don't have the minimum required permissions.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '500':
+          description: |-
+            The request failed because of internal service error. Try your request again later.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerException'
+        '404':
+          description: |-
+            You specified a resource that doesn't exist. Check the ID or ARN that you used to identity the resource, and try again.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+        '429':
+          description: |-
+            The request failed because you exceeded a rate limit for this operation. For more information, see [Quotas for Resource Explorer](https://docs.aws.amazon.com/resource-explorer/latest/userguide/quotas.html).
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThrottlingException'
+        '401':
+          description: |-
+            The principal making the request isn't permitted to perform the operation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnauthorizedException'
+        '400':
+          description: |-
+            You provided an invalid value for one of the operation's parameters. Check the syntax for the operation, and try again.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+  /ListIndexes:
+    post:
+      operationId: ListIndexes
+      description: |-
+        Retrieves a list of all of the indexes in Amazon Web Services Regions that are currently collecting resource information for Amazon Web Services Resource Explorer.
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                Type:
+                  $ref: '#/components/schemas/IndexType'
+                Regions:
+                  $ref: '#/components/schemas/RegionList'
+                MaxResults:
+                  $ref: '#/components/schemas/Integer'
+                NextToken:
+                  $ref: '#/components/schemas/String'
+      responses:
+        '200': {}
+        '403':
+          description: |-
+            The credentials that you used to call this operation don't have the minimum required permissions.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '500':
+          description: |-
+            The request failed because of internal service error. Try your request again later.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerException'
+        '429':
+          description: |-
+            The request failed because you exceeded a rate limit for this operation. For more information, see [Quotas for Resource Explorer](https://docs.aws.amazon.com/resource-explorer/latest/userguide/quotas.html).
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThrottlingException'
+        '400':
+          description: |-
+            You provided an invalid value for one of the operation's parameters. Check the syntax for the operation, and try again.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+  /ListIndexesForMembers:
+    post:
+      operationId: ListIndexesForMembers
+      description: |-
+        Retrieves a list of a member's indexes in all Amazon Web Services Regions that are currently collecting resource information for Amazon Web Services Resource Explorer. Only the management account or a delegated administrator with service access enabled can invoke this API call.
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                AccountIdList:
+                  $ref: '#/components/schemas/AccountIdList'
+                MaxResults:
+                  $ref: '#/components/schemas/Integer'
+                NextToken:
+                  $ref: '#/components/schemas/String'
+      responses:
+        '200': {}
+        '403':
+          description: |-
+            The credentials that you used to call this operation don't have the minimum required permissions.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '500':
+          description: |-
+            The request failed because of internal service error. Try your request again later.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerException'
+        '429':
+          description: |-
+            The request failed because you exceeded a rate limit for this operation. For more information, see [Quotas for Resource Explorer](https://docs.aws.amazon.com/resource-explorer/latest/userguide/quotas.html).
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThrottlingException'
+        '400':
+          description: |-
+            You provided an invalid value for one of the operation's parameters. Check the syntax for the operation, and try again.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+  /ListManagedViews:
+    post:
+      operationId: ListManagedViews
+      description: |-
+        Lists the Amazon resource names (ARNs) of the [Amazon Web Services-managed views](https://docs.aws.amazon.com/resource-explorer/latest/userguide/aws-managed-views.html) available in the Amazon Web Services Region in which you call this operation.
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                MaxResults:
+                  $ref: '#/components/schemas/Integer'
+                NextToken:
+                  $ref: '#/components/schemas/String'
+                ServicePrincipal:
+                  $ref: '#/components/schemas/String'
+      responses:
+        '200': {}
+        '403':
+          description: |-
+            The credentials that you used to call this operation don't have the minimum required permissions.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '500':
+          description: |-
+            The request failed because of internal service error. Try your request again later.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerException'
+        '429':
+          description: |-
+            The request failed because you exceeded a rate limit for this operation. For more information, see [Quotas for Resource Explorer](https://docs.aws.amazon.com/resource-explorer/latest/userguide/quotas.html).
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThrottlingException'
+        '401':
+          description: |-
+            The principal making the request isn't permitted to perform the operation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnauthorizedException'
+        '400':
+          description: |-
+            You provided an invalid value for one of the operation's parameters. Check the syntax for the operation, and try again.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+  /ListResources:
+    post:
+      operationId: ListResources
+      description: |-
+        Returns a list of resources and their details that match the specified criteria. This query must use a view. If you don’t explicitly specify a view, then Resource Explorer uses the default view for the Amazon Web Services Region in which you call this operation.
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                Filters:
+                  $ref: '#/components/schemas/SearchFilter'
+                MaxResults:
+                  $ref: '#/components/schemas/Integer'
+                ViewArn:
+                  $ref: '#/components/schemas/String'
+                NextToken:
+                  $ref: '#/components/schemas/String'
+      responses:
+        '200': {}
+        '403':
+          description: |-
+            The credentials that you used to call this operation don't have the minimum required permissions.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '500':
+          description: |-
+            The request failed because of internal service error. Try your request again later.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerException'
+        '404':
+          description: |-
+            You specified a resource that doesn't exist. Check the ID or ARN that you used to identity the resource, and try again.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+        '429':
+          description: |-
+            The request failed because you exceeded a rate limit for this operation. For more information, see [Quotas for Resource Explorer](https://docs.aws.amazon.com/resource-explorer/latest/userguide/quotas.html).
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThrottlingException'
+        '401':
+          description: |-
+            The principal making the request isn't permitted to perform the operation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnauthorizedException'
+        '400':
+          description: |-
+            You provided an invalid value for one of the operation's parameters. Check the syntax for the operation, and try again.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+  /ListSupportedResourceTypes:
+    post:
+      operationId: ListSupportedResourceTypes
+      description: |-
+        Retrieves a list of all resource types currently supported by Amazon Web Services Resource Explorer.
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                NextToken:
+                  $ref: '#/components/schemas/String'
+                MaxResults:
+                  $ref: '#/components/schemas/Integer'
+      responses:
+        '200': {}
+        '403':
+          description: |-
+            The credentials that you used to call this operation don't have the minimum required permissions.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '500':
+          description: |-
+            The request failed because of internal service error. Try your request again later.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerException'
+        '429':
+          description: |-
+            The request failed because you exceeded a rate limit for this operation. For more information, see [Quotas for Resource Explorer](https://docs.aws.amazon.com/resource-explorer/latest/userguide/quotas.html).
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThrottlingException'
+        '400':
+          description: |-
+            You provided an invalid value for one of the operation's parameters. Check the syntax for the operation, and try again.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+  /tags/{resourceArn}:
+    get:
+      operationId: ListTagsForResource
+      description: |-
+        Lists the tags that are attached to the specified resource.
+      parameters:
+      - name: resourceArn
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/String'
+      responses:
+        '200': {}
+        '403':
+          description: |-
+            The credentials that you used to call this operation don't have the minimum required permissions.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '500':
+          description: |-
+            The request failed because of internal service error. Try your request again later.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerException'
+        '404':
+          description: |-
+            You specified a resource that doesn't exist. Check the ID or ARN that you used to identity the resource, and try again.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+        '429':
+          description: |-
+            The request failed because you exceeded a rate limit for this operation. For more information, see [Quotas for Resource Explorer](https://docs.aws.amazon.com/resource-explorer/latest/userguide/quotas.html).
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThrottlingException'
+        '401':
+          description: |-
+            The principal making the request isn't permitted to perform the operation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnauthorizedException'
+        '400':
+          description: |-
+            You provided an invalid value for one of the operation's parameters. Check the syntax for the operation, and try again.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+    post:
+      operationId: TagResource
+      description: |-
+        Adds one or more tag key and value pairs to an Amazon Web Services Resource Explorer view or index.
+      parameters:
+      - name: resourceArn
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/String'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                Tags:
+                  $ref: '#/components/schemas/TagMap'
+      responses:
+        '200': {}
+        '403':
+          description: |-
+            The credentials that you used to call this operation don't have the minimum required permissions.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '409':
+          description: |-
+            If you attempted to create a view, then the request failed because either you specified parameters that didn’t match the original request, or you attempted to create a view with a name that already exists in this Amazon Web Services Region.
+
+            If you attempted to create an index, then the request failed because either you specified parameters that didn't match the original request, or an index already exists in the current Amazon Web Services Region.
+
+            If you attempted to update an index type to `AGGREGATOR`, then the request failed because you already have an `AGGREGATOR` index in a different Amazon Web Services Region.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConflictException'
+        '500':
+          description: |-
+            The request failed because of internal service error. Try your request again later.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerException'
+        '429':
+          description: |-
+            The request failed because you exceeded a rate limit for this operation. For more information, see [Quotas for Resource Explorer](https://docs.aws.amazon.com/resource-explorer/latest/userguide/quotas.html).
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThrottlingException'
+        '401':
+          description: |-
+            The principal making the request isn't permitted to perform the operation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnauthorizedException'
+        '400':
+          description: |-
+            You provided an invalid value for one of the operation's parameters. Check the syntax for the operation, and try again.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+    delete:
+      operationId: UntagResource
+      description: |-
+        Removes one or more tag key and value pairs from an Amazon Web Services Resource Explorer view or index.
+      parameters:
+      - name: resourceArn
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/String'
+      - name: tagKeys
+        in: query
+        required: true
+        schema:
+          $ref: '#/components/schemas/StringList'
+      responses:
+        '200': {}
+        '403':
+          description: |-
+            The credentials that you used to call this operation don't have the minimum required permissions.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '500':
+          description: |-
+            The request failed because of internal service error. Try your request again later.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerException'
+        '404':
+          description: |-
+            You specified a resource that doesn't exist. Check the ID or ARN that you used to identity the resource, and try again.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+        '429':
+          description: |-
+            The request failed because you exceeded a rate limit for this operation. For more information, see [Quotas for Resource Explorer](https://docs.aws.amazon.com/resource-explorer/latest/userguide/quotas.html).
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThrottlingException'
+        '401':
+          description: |-
+            The principal making the request isn't permitted to perform the operation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnauthorizedException'
+        '400':
+          description: |-
+            You provided an invalid value for one of the operation's parameters. Check the syntax for the operation, and try again.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+  /ListViews:
+    post:
+      operationId: ListViews
+      description: |-
+        Lists the [Amazon resource names (ARNs)](https://docs.aws.amazon.com/general/latest/gr/aws-arns-and-namespaces.html) of the views available in the Amazon Web Services Region in which you call this operation.
+
+        Always check the `NextToken` response parameter for a `null` value when calling a paginated operation. These operations can occasionally return an empty set of results even when there are more results available. The `NextToken` response parameter value is `null` _only_ when there are no more results to display.
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                NextToken:
+                  $ref: '#/components/schemas/String'
+                MaxResults:
+                  $ref: '#/components/schemas/Integer'
+      responses:
+        '200': {}
+        '403':
+          description: |-
+            The credentials that you used to call this operation don't have the minimum required permissions.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '500':
+          description: |-
+            The request failed because of internal service error. Try your request again later.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerException'
+        '429':
+          description: |-
+            The request failed because you exceeded a rate limit for this operation. For more information, see [Quotas for Resource Explorer](https://docs.aws.amazon.com/resource-explorer/latest/userguide/quotas.html).
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThrottlingException'
+        '400':
+          description: |-
+            You provided an invalid value for one of the operation's parameters. Check the syntax for the operation, and try again.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+  /Search:
+    post:
+      operationId: Search
+      description: |-
+        Searches for resources and displays details about all resources that match the specified criteria. You must specify a query string.
+
+        All search queries must use a view. If you don't explicitly specify a view, then Amazon Web Services Resource Explorer uses the default view for the Amazon Web Services Region in which you call this operation. The results are the logical intersection of the results that match both the `QueryString` parameter supplied to this operation and the `SearchFilter` parameter attached to the view.
+
+        For the complete syntax supported by the `QueryString` parameter, see [Search query syntax reference for Resource Explorer](https://docs.aws.amazon.com/resource-explorer/latest/APIReference/about-query-syntax.html).
+
+        If your search results are empty, or are missing results that you think should be there, see [Troubleshooting Resource Explorer search](https://docs.aws.amazon.com/resource-explorer/latest/userguide/troubleshooting_search.html).
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                QueryString:
+                  $ref: '#/components/schemas/QueryString'
+                MaxResults:
+                  $ref: '#/components/schemas/Integer'
+                ViewArn:
+                  $ref: '#/components/schemas/String'
+                NextToken:
+                  $ref: '#/components/schemas/String'
+      responses:
+        '200': {}
+        '403':
+          description: |-
+            The credentials that you used to call this operation don't have the minimum required permissions.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '500':
+          description: |-
+            The request failed because of internal service error. Try your request again later.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerException'
+        '404':
+          description: |-
+            You specified a resource that doesn't exist. Check the ID or ARN that you used to identity the resource, and try again.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+        '429':
+          description: |-
+            The request failed because you exceeded a rate limit for this operation. For more information, see [Quotas for Resource Explorer](https://docs.aws.amazon.com/resource-explorer/latest/userguide/quotas.html).
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThrottlingException'
+        '401':
+          description: |-
+            The principal making the request isn't permitted to perform the operation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnauthorizedException'
+        '400':
+          description: |-
+            You provided an invalid value for one of the operation's parameters. Check the syntax for the operation, and try again.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+  /UpdateIndexType:
+    post:
+      operationId: UpdateIndexType
+      description: |-
+        Changes the type of the index from one of the following types to the other. For more information about indexes and the role they perform in Amazon Web Services Resource Explorer, see [Turning on cross-Region search by creating an aggregator index](https://docs.aws.amazon.com/resource-explorer/latest/userguide/manage-aggregator-region.html) in the _Amazon Web Services Resource Explorer User Guide_.
+
+          * **`AGGREGATOR` index type**
+
+        The index contains information about resources from all Amazon Web Services Regions in the Amazon Web Services account in which you've created a Resource Explorer index. Resource information from all other Regions is replicated to this Region's index.
+
+        When you change the index type to `AGGREGATOR`, Resource Explorer turns on replication of all discovered resource information from the other Amazon Web Services Regions in your account to this index. You can then, from this Region only, perform resource search queries that span all Amazon Web Services Regions in the Amazon Web Services account. Turning on replication from all other Regions is performed by asynchronous background tasks. You can check the status of the asynchronous tasks by using the GetIndex operation. When the asynchronous tasks complete, the `Status` response of that operation changes from `UPDATING` to `ACTIVE`. After that, you can start to see results from other Amazon Web Services Regions in query results. However, it can take several hours for replication from all other Regions to complete.
+
+        You can have only one aggregator index per Amazon Web Services account. Before you can promote a different index to be the aggregator index for the account, you must first demote the existing aggregator index to type `LOCAL`.
+
+          * **`LOCAL` index type**
+
+        The index contains information about resources in only the Amazon Web Services Region in which the index exists. If an aggregator index in another Region exists, then information in this local index is replicated to the aggregator index.
+
+        When you change the index type to `LOCAL`, Resource Explorer turns off the replication of resource information from all other Amazon Web Services Regions in the Amazon Web Services account to this Region. The aggregator index remains in the `UPDATING` state until all replication with other Regions successfully stops. You can check the status of the asynchronous task by using the GetIndex operation. When Resource Explorer successfully stops all replication with other Regions, the `Status` response of that operation changes from `UPDATING` to `ACTIVE`. Separately, the resource information from other Regions that was previously stored in the index is deleted within 30 days by another background task. Until that asynchronous task completes, some results from other Regions can continue to appear in search results.
+
+        After you demote an aggregator index to a local index, you must wait 24 hours before you can promote another index to be the new aggregator index for the account.
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                Arn:
+                  $ref: '#/components/schemas/String'
+                Type:
+                  $ref: '#/components/schemas/IndexType'
+      responses:
+        '200': {}
+        '403':
+          description: |-
+            The credentials that you used to call this operation don't have the minimum required permissions.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '409':
+          description: |-
+            If you attempted to create a view, then the request failed because either you specified parameters that didn’t match the original request, or you attempted to create a view with a name that already exists in this Amazon Web Services Region.
+
+            If you attempted to create an index, then the request failed because either you specified parameters that didn't match the original request, or an index already exists in the current Amazon Web Services Region.
+
+            If you attempted to update an index type to `AGGREGATOR`, then the request failed because you already have an `AGGREGATOR` index in a different Amazon Web Services Region.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConflictException'
+        '500':
+          description: |-
+            The request failed because of internal service error. Try your request again later.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerException'
+        '404':
+          description: |-
+            You specified a resource that doesn't exist. Check the ID or ARN that you used to identity the resource, and try again.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+        '402':
+          description: |-
+            The request failed because it exceeds a service quota.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServiceQuotaExceededException'
+        '429':
+          description: |-
+            The request failed because you exceeded a rate limit for this operation. For more information, see [Quotas for Resource Explorer](https://docs.aws.amazon.com/resource-explorer/latest/userguide/quotas.html).
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThrottlingException'
+        '400':
+          description: |-
+            You provided an invalid value for one of the operation's parameters. Check the syntax for the operation, and try again.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+  /UpdateView:
+    post:
+      operationId: UpdateView
+      description: |-
+        Modifies some of the details of a view. You can change the filter string and the list of included properties. You can't change the name of the view.
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                ViewArn:
+                  $ref: '#/components/schemas/String'
+                IncludedProperties:
+                  $ref: '#/components/schemas/IncludedPropertyList'
+                Filters:
+                  $ref: '#/components/schemas/SearchFilter'
+      responses:
+        '200': {}
+        '403':
+          description: |-
+            The credentials that you used to call this operation don't have the minimum required permissions.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '500':
+          description: |-
+            The request failed because of internal service error. Try your request again later.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerException'
+        '402':
+          description: |-
+            The request failed because it exceeds a service quota.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServiceQuotaExceededException'
+        '429':
+          description: |-
+            The request failed because you exceeded a rate limit for this operation. For more information, see [Quotas for Resource Explorer](https://docs.aws.amazon.com/resource-explorer/latest/userguide/quotas.html).
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThrottlingException'
+        '401':
+          description: |-
+            The principal making the request isn't permitted to perform the operation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnauthorizedException'
+        '400':
+          description: |-
+            You provided an invalid value for one of the operation's parameters. Check the syntax for the operation, and try again.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
 components:
   schemas:
     AWSServiceAccessStatus:
@@ -57,6 +1439,13 @@ components:
       enum:
       - ENABLED
       - DISABLED
+    AccessDeniedException:
+      type: object
+      properties:
+        Message:
+          $ref: '#/components/schemas/String'
+      description: The credentials that you used to call this operation don't have
+        the minimum required permissions.
     AccountId:
       type: string
       minLength: 1
@@ -65,14 +1454,405 @@ components:
       type: array
       items:
         $ref: '#/components/schemas/AccountId'
+    AssociateDefaultViewInput:
+      type: object
+      properties:
+        ViewArn:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The [Amazon resource name (ARN)](https://docs.aws.amazon.com/general/latest/gr/aws-arns-and-namespaces.html)
+            of the view to set as the default for the Amazon Web Services Region and
+            Amazon Web Services account in which you call this operation. The specified
+            view must already exist in the called Region.
+      required:
+      - ViewArn
+    AssociateDefaultViewOutput:
+      type: object
+      properties:
+        ViewArn:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The [Amazon resource name (ARN)](https://docs.aws.amazon.com/general/latest/gr/aws-arns-and-namespaces.html)
+            of the view that the operation set as the default for queries made in
+            the Amazon Web Services Region and Amazon Web Services account in which
+            you called this operation.
+    BatchGetViewError:
+      type: object
+      properties:
+        ViewArn:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The [Amazon resource name (ARN)](https://docs.aws.amazon.com/general/latest/gr/aws-arns-and-namespaces.html)
+            of the view for which Resource Explorer failed to retrieve details.
+        ErrorMessage:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The description of the error for the specified view.
+      required:
+      - ViewArn
+      - ErrorMessage
+      description: A collection of error messages for any views that Amazon Web Services
+        Resource Explorer couldn't retrieve details.
     BatchGetViewErrors:
       type: array
       items:
         $ref: '#/components/schemas/BatchGetViewError'
+    BatchGetViewInput:
+      type: object
+      properties:
+        ViewArns:
+          allOf:
+          - $ref: '#/components/schemas/ViewArnList'
+          description: A list of [Amazon resource names (ARNs)](https://docs.aws.amazon.com/general/latest/gr/aws-arns-and-namespaces.html)
+            that identify the views you want details for.
+    BatchGetViewOutput:
+      type: object
+      properties:
+        Views:
+          allOf:
+          - $ref: '#/components/schemas/ViewList'
+          description: A structure with a list of objects with details for each of
+            the specified views.
+        Errors:
+          allOf:
+          - $ref: '#/components/schemas/BatchGetViewErrors'
+          description: If any of the specified ARNs result in an error, then this
+            structure describes the error.
+    ConflictException:
+      type: object
+      properties:
+        Message:
+          $ref: '#/components/schemas/String'
+      required:
+      - Message
+      description: 'If you attempted to create a view, then the request failed because
+        either you specified parameters that didn’t match the original request, or
+        you attempted to create a view with a name that already exists in this Amazon
+        Web Services Region.
+
+
+        If you attempted to create an index, then the request failed because either
+        you specified parameters that didn''t match the original request, or an index
+        already exists in the current Amazon Web Services Region.
+
+
+        If you attempted to update an index type to `AGGREGATOR`, then the request
+        failed because you already have an `AGGREGATOR` index in a different Amazon
+        Web Services Region.'
+    CreateIndexInput:
+      type: object
+      properties:
+        ClientToken:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: This value helps ensure idempotency. Resource Explorer uses
+            this value to prevent the accidental creation of duplicate versions. We
+            recommend that you generate a [UUID-type value](https://wikipedia.org/wiki/Universally_unique_identifier)
+            to ensure the uniqueness of your index.
+        Tags:
+          allOf:
+          - $ref: '#/components/schemas/TagMap'
+          description: The specified tags are attached only to the index created in
+            this Amazon Web Services Region. The tags aren't attached to any of the
+            resources listed in the index.
+    CreateIndexOutput:
+      type: object
+      properties:
+        Arn:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: 'The ARN of the new local index for the Region. You can reference
+            this ARN in IAM permission policies to authorize the following operations:
+            DeleteIndex | GetIndex | UpdateIndexType | CreateView'
+        State:
+          allOf:
+          - $ref: '#/components/schemas/IndexState'
+          description: 'Indicates the current state of the index. You can check for
+            changes to the state for asynchronous operations by calling the GetIndex
+            operation.
+
+
+            The state can remain in the `CREATING` or `UPDATING` state for several
+            hours as Resource Explorer discovers the information about your resources
+            and populates the index.'
+        CreatedAt:
+          allOf:
+          - $ref: '#/components/schemas/Timestamp'
+          description: The date and timestamp when the index was created.
+    CreateViewInput:
+      type: object
+      properties:
+        ClientToken:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: This value helps ensure idempotency. Resource Explorer uses
+            this value to prevent the accidental creation of duplicate versions. We
+            recommend that you generate a [UUID-type value](https://wikipedia.org/wiki/Universally_unique_identifier)
+            to ensure the uniqueness of your views.
+        ViewName:
+          allOf:
+          - $ref: '#/components/schemas/ViewName'
+          description: 'The name of the new view. This name appears in the list of
+            views in Resource Explorer.
+
+
+            The name must be no more than 64 characters long, and can include letters,
+            digits, and the dash (-) character. The name must be unique within its
+            Amazon Web Services Region.'
+        IncludedProperties:
+          allOf:
+          - $ref: '#/components/schemas/IncludedPropertyList'
+          description: 'Specifies optional fields that you want included in search
+            results from this view. It is a list of objects that each describe a field
+            to include.
+
+
+            The default is an empty list, with no optional fields included in the
+            results.'
+        Scope:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The root ARN of the account, an organizational unit (OU), or
+            an organization ARN. If left empty, the default is account.
+        Filters:
+          allOf:
+          - $ref: '#/components/schemas/SearchFilter'
+          description: 'An array of strings that specify which resources are included
+            in the results of queries made using this view. When you use this view
+            in a Search operation, the filter string is combined with the search''s
+            `QueryString` parameter using a logical `AND` operator.
+
+
+            For information about the supported syntax, see [Search query reference
+            for Resource Explorer](https://docs.aws.amazon.com/resource-explorer/latest/userguide/using-search-query-syntax.html)
+            in the _Amazon Web Services Resource Explorer User Guide_.
+
+
+            This query string in the context of this operation supports only [filter
+            prefixes](https://docs.aws.amazon.com/resource-explorer/latest/userguide/using-search-query-syntax.html#query-syntax-filters)
+            with optional [operators](https://docs.aws.amazon.com/resource-explorer/latest/userguide/using-search-query-syntax.html#query-syntax-operators).
+            It doesn''t support free-form text. For example, the string `region:us*
+            service:ec2 -tag:stage=prod` includes all Amazon EC2 resources in any
+            Amazon Web Services Region that begins with the letters `us` and is _not_
+            tagged with a key `Stage` that has the value `prod`.'
+        Tags:
+          allOf:
+          - $ref: '#/components/schemas/TagMap'
+          description: Tag key and value pairs that are attached to the view.
+      required:
+      - ViewName
+    CreateViewOutput:
+      type: object
+      properties:
+        View:
+          allOf:
+          - $ref: '#/components/schemas/View'
+          description: A structure that contains the details about the new view.
+    DeleteIndexInput:
+      type: object
+      properties:
+        Arn:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The [Amazon resource name (ARN)](https://docs.aws.amazon.com/general/latest/gr/aws-arns-and-namespaces.html)
+            of the index that you want to delete.
+      required:
+      - Arn
+    DeleteIndexOutput:
+      type: object
+      properties:
+        Arn:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: 'The [Amazon resource name (ARN)](https://docs.aws.amazon.com/general/latest/gr/aws-arns-and-namespaces.html)
+            of the index that you successfully started the deletion process.
+
+
+            This operation is asynchronous. To check its status, call the GetIndex
+            operation.'
+        State:
+          allOf:
+          - $ref: '#/components/schemas/IndexState'
+          description: Indicates the current state of the index.
+        LastUpdatedAt:
+          allOf:
+          - $ref: '#/components/schemas/Timestamp'
+          description: The date and time when you last updated this index.
+    DeleteViewInput:
+      type: object
+      properties:
+        ViewArn:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The [Amazon resource name (ARN)](https://docs.aws.amazon.com/general/latest/gr/aws-arns-and-namespaces.html)
+            of the view that you want to delete.
+      required:
+      - ViewArn
+    DeleteViewOutput:
+      type: object
+      properties:
+        ViewArn:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The [Amazon resource name (ARN)](https://docs.aws.amazon.com/general/latest/gr/aws-arns-and-namespaces.html)
+            of the view that you successfully deleted.
+    GetAccountLevelServiceConfigurationOutput:
+      type: object
+      properties:
+        OrgConfiguration:
+          allOf:
+          - $ref: '#/components/schemas/OrgConfiguration'
+          description: Details about the organization, and whether configuration is
+            `ENABLED` or `DISABLED`.
+    GetDefaultViewOutput:
+      type: object
+      properties:
+        ViewArn:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The [Amazon resource name (ARN)](https://docs.aws.amazon.com/general/latest/gr/aws-arns-and-namespaces.html)
+            of the view that is the current default for the Amazon Web Services Region
+            in which you called this operation.
+    GetIndexOutput:
+      type: object
+      properties:
+        Arn:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The [Amazon resource name (ARN)](https://docs.aws.amazon.com/general/latest/gr/aws-arns-and-namespaces.html)
+            of the index.
+        Type:
+          allOf:
+          - $ref: '#/components/schemas/IndexType'
+          description: The type of the index in this Region. For information about
+            the aggregator index and how it differs from a local index, see [Turning
+            on cross-Region search by creating an aggregator index](https://docs.aws.amazon.com/resource-explorer/latest/userguide/manage-aggregator-region.html).
+        State:
+          allOf:
+          - $ref: '#/components/schemas/IndexState'
+          description: The current state of the index in this Amazon Web Services
+            Region.
+        ReplicatingFrom:
+          allOf:
+          - $ref: '#/components/schemas/RegionList'
+          description: 'This response value is present only if this index is `Type=AGGREGATOR`.
+
+
+            A list of the Amazon Web Services Regions that replicate their content
+            to the index in this Region.'
+        ReplicatingTo:
+          allOf:
+          - $ref: '#/components/schemas/RegionList'
+          description: 'This response value is present only if this index is `Type=LOCAL`.
+
+
+            The Amazon Web Services Region that contains the aggregator index, if
+            one exists. If an aggregator index does exist then the Region in which
+            you called this operation replicates its index information to the Region
+            specified in this response value.'
+        CreatedAt:
+          allOf:
+          - $ref: '#/components/schemas/Timestamp'
+          description: The date and time when the index was originally created.
+        LastUpdatedAt:
+          allOf:
+          - $ref: '#/components/schemas/Timestamp'
+          description: The date and time when the index was last updated.
+        Tags:
+          allOf:
+          - $ref: '#/components/schemas/TagMap'
+          description: Tag key and value pairs that are attached to the index.
+    GetManagedViewInput:
+      type: object
+      properties:
+        ManagedViewArn:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The Amazon resource name (ARN) of the managed view.
+      required:
+      - ManagedViewArn
+    GetManagedViewOutput:
+      type: object
+      properties:
+        ManagedView:
+          allOf:
+          - $ref: '#/components/schemas/ManagedView'
+          description: Details about the specified managed view.
+    GetViewInput:
+      type: object
+      properties:
+        ViewArn:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The [Amazon resource name (ARN)](https://docs.aws.amazon.com/general/latest/gr/aws-arns-and-namespaces.html)
+            of the view that you want information about.
+      required:
+      - ViewArn
+    GetViewOutput:
+      type: object
+      properties:
+        View:
+          allOf:
+          - $ref: '#/components/schemas/View'
+          description: A structure that contains the details for the requested view.
+        Tags:
+          allOf:
+          - $ref: '#/components/schemas/TagMap'
+          description: Tag key and value pairs that are attached to the view.
+    IncludedProperty:
+      type: object
+      properties:
+        Name:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: "The name of the property that is included in this view.\n\n\
+            You can specify the following property names for this field:\n\n  * `tags`"
+      required:
+      - Name
+      description: Information about an additional property that describes a resource,
+        that you can optionally include in the view. This lets you view that property
+        in search results, and filter your search results based on the value of the
+        property.
     IncludedPropertyList:
       type: array
       items:
         $ref: '#/components/schemas/IncludedProperty'
+    Index:
+      type: object
+      properties:
+        Region:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The Amazon Web Services Region in which the index exists.
+        Arn:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The [Amazon resource name (ARN)](https://docs.aws.amazon.com/general/latest/gr/aws-arns-and-namespaces.html)
+            of the index.
+        Type:
+          allOf:
+          - $ref: '#/components/schemas/IndexType'
+          description: "The type of index. It can be one of the following values:\n\
+            \n  * `LOCAL` – The index contains information about resources from only\
+            \ the same Amazon Web Services Region.\n\n  * `AGGREGATOR` – Resource\
+            \ Explorer replicates copies of the indexed information about resources\
+            \ in all other Amazon Web Services Regions to the aggregator index. This\
+            \ lets search results in the Region with the aggregator index to include\
+            \ resources from all Regions in the account where Resource Explorer is\
+            \ turned on."
+      description: 'An index is the data store used by Amazon Web Services Resource
+        Explorer to hold information about your Amazon Web Services resources that
+        the service discovers. Creating an index in an Amazon Web Services Region
+        turns on Resource Explorer and lets it discover your resources.
+
+
+        By default, an index is _local_ , meaning that it contains information about
+        resources in only the same Region as the index. However, you can promote the
+        index of one Region in the account by calling UpdateIndexType to convert it
+        into an aggregator index. The aggregator index receives a replicated copy
+        of the index information from all other Regions where Resource Explorer is
+        turned on. This allows search operations in that Region to return results
+        from all Regions in the account.'
     IndexList:
       type: array
       items:
@@ -90,14 +1870,453 @@ components:
       enum:
       - LOCAL
       - AGGREGATOR
+    InternalServerException:
+      type: object
+      properties:
+        Message:
+          $ref: '#/components/schemas/String'
+      description: The request failed because of internal service error. Try your
+        request again later.
+    ListIndexesForMembersInput:
+      type: object
+      properties:
+        AccountIdList:
+          allOf:
+          - $ref: '#/components/schemas/AccountIdList'
+          description: The account IDs will limit the output to only indexes from
+            these accounts.
+        MaxResults:
+          allOf:
+          - $ref: '#/components/schemas/Integer'
+          description: 'The maximum number of results that you want included on each
+            page of the response. If you do not include this parameter, it defaults
+            to a value appropriate to the operation. If additional items exist beyond
+            those included in the current response, the `NextToken` response element
+            is present and has a value (is not null). Include that value as the `NextToken`
+            request parameter in the next call to the operation to get the next part
+            of the results.
+
+
+            An API operation can return fewer results than the maximum even when there
+            are more results available. You should check `NextToken` after every operation
+            to ensure that you receive all of the results.'
+        NextToken:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The parameter for receiving additional results if you receive
+            a `NextToken` response in a previous request. A `NextToken` response indicates
+            that more output is available. Set this parameter to the value of the
+            previous call's `NextToken` response to indicate where the output should
+            continue from. The pagination tokens expire after 24 hours.
+      required:
+      - AccountIdList
+    ListIndexesForMembersOutput:
+      type: object
+      properties:
+        Indexes:
+          allOf:
+          - $ref: '#/components/schemas/MemberIndexList'
+          description: A structure that contains the details and status of each index.
+        NextToken:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: If present, indicates that more output is available than is
+            included in the current response. Use this value in the `NextToken` request
+            parameter in a subsequent call to the operation to get the next part of
+            the output. You should repeat this until the `NextToken` response element
+            comes back as `null`. The pagination tokens expire after 24 hours.
+    ListIndexesInput:
+      type: object
+      properties:
+        Type:
+          allOf:
+          - $ref: '#/components/schemas/IndexType'
+          description: 'If specified, limits the output to only indexes of the specified
+            Type, either `LOCAL` or `AGGREGATOR`.
+
+
+            Use this option to discover the aggregator index for your account.'
+        Regions:
+          allOf:
+          - $ref: '#/components/schemas/RegionList'
+          description: If specified, limits the response to only information about
+            the index in the specified list of Amazon Web Services Regions.
+        MaxResults:
+          allOf:
+          - $ref: '#/components/schemas/Integer'
+          description: 'The maximum number of results that you want included on each
+            page of the response. If you do not include this parameter, it defaults
+            to a value appropriate to the operation. If additional items exist beyond
+            those included in the current response, the `NextToken` response element
+            is present and has a value (is not null). Include that value as the `NextToken`
+            request parameter in the next call to the operation to get the next part
+            of the results.
+
+
+            An API operation can return fewer results than the maximum even when there
+            are more results available. You should check `NextToken` after every operation
+            to ensure that you receive all of the results.'
+        NextToken:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The parameter for receiving additional results if you receive
+            a `NextToken` response in a previous request. A `NextToken` response indicates
+            that more output is available. Set this parameter to the value of the
+            previous call's `NextToken` response to indicate where the output should
+            continue from. The pagination tokens expire after 24 hours.
+    ListIndexesOutput:
+      type: object
+      properties:
+        Indexes:
+          allOf:
+          - $ref: '#/components/schemas/IndexList'
+          description: A structure that contains the details and status of each index.
+        NextToken:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: If present, indicates that more output is available than is
+            included in the current response. Use this value in the `NextToken` request
+            parameter in a subsequent call to the operation to get the next part of
+            the output. You should repeat this until the `NextToken` response element
+            comes back as `null`. The pagination tokens expire after 24 hours.
+    ListManagedViewsInput:
+      type: object
+      properties:
+        MaxResults:
+          allOf:
+          - $ref: '#/components/schemas/Integer'
+          description: 'The maximum number of results that you want included on each
+            page of the response. If you do not include this parameter, it defaults
+            to a value appropriate to the operation. If additional items exist beyond
+            those included in the current response, the `NextToken` response element
+            is present and has a value (is not null). Include that value as the `NextToken`
+            request parameter in the next call to the operation to get the next part
+            of the results.
+
+
+            An API operation can return fewer results than the maximum even when there
+            are more results available. You should check `NextToken` after every operation
+            to ensure that you receive all of the results.'
+        NextToken:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The parameter for receiving additional results if you receive
+            a `NextToken` response in a previous request. A `NextToken` response indicates
+            that more output is available. Set this parameter to the value of the
+            previous call's `NextToken` response to indicate where the output should
+            continue from. The pagination tokens expire after 24 hours.
+        ServicePrincipal:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: Specifies a service principal name. If specified, then the
+            operation only returns the managed views that are managed by the input
+            service.
+    ListManagedViewsOutput:
+      type: object
+      properties:
+        NextToken:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: If present, indicates that more output is available than is
+            included in the current response. Use this value in the `NextToken` request
+            parameter in a subsequent call to the operation to get the next part of
+            the output. You should repeat this until the `NextToken` response element
+            comes back as `null`. The pagination tokens expire after 24 hours.
+        ManagedViews:
+          allOf:
+          - $ref: '#/components/schemas/ManagedViewArnList'
+          description: The list of managed views available in the Amazon Web Services
+            Region in which you called this operation.
+    ListResourcesInput:
+      type: object
+      properties:
+        Filters:
+          allOf:
+          - $ref: '#/components/schemas/SearchFilter'
+          description: 'An array of strings that specify which resources are included
+            in the results of queries made using this view. When you use this view
+            in a Search operation, the filter string is combined with the search''s
+            `QueryString` parameter using a logical `AND` operator.
+
+
+            For information about the supported syntax, see [Search query reference
+            for Resource Explorer](https://docs.aws.amazon.com/resource-explorer/latest/userguide/using-search-query-syntax.html)
+            in the _Amazon Web Services Resource Explorer User Guide_.
+
+
+            This query string in the context of this operation supports only [filter
+            prefixes](https://docs.aws.amazon.com/resource-explorer/latest/userguide/using-search-query-syntax.html#query-syntax-filters)
+            with optional [operators](https://docs.aws.amazon.com/resource-explorer/latest/userguide/using-search-query-syntax.html#query-syntax-operators).
+            It doesn''t support free-form text. For example, the string `region:us*
+            service:ec2 -tag:stage=prod` includes all Amazon EC2 resources in any
+            Amazon Web Services Region that begins with the letters `us` and is _not_
+            tagged with a key `Stage` that has the value `prod`.'
+        MaxResults:
+          allOf:
+          - $ref: '#/components/schemas/Integer'
+          description: 'The maximum number of results that you want included on each
+            page of the response. If you do not include this parameter, it defaults
+            to a value appropriate to the operation. If additional items exist beyond
+            those included in the current response, the `NextToken` response element
+            is present and has a value (is not null). Include that value as the `NextToken`
+            request parameter in the next call to the operation to get the next part
+            of the results.
+
+
+            An API operation can return fewer results than the maximum even when there
+            are more results available. You should check `NextToken` after every operation
+            to ensure that you receive all of the results.'
+        ViewArn:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: Specifies the Amazon resource name (ARN) of the view to use
+            for the query. If you don't specify a value for this parameter, then the
+            operation automatically uses the default view for the Amazon Web Services
+            Region in which you called this operation. If the Region either doesn't
+            have a default view or if you don't have permission to use the default
+            view, then the operation fails with a 401 Unauthorized exception.
+        NextToken:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: 'The parameter for receiving additional results if you receive
+            a `NextToken` response in a previous request. A `NextToken` response indicates
+            that more output is available. Set this parameter to the value of the
+            previous call''s `NextToken` response to indicate where the output should
+            continue from. The pagination tokens expire after 24 hours.
+
+
+            The `ListResources` operation does not generate a `NextToken` if you set
+            `MaxResults` to 1000.'
+    ListResourcesOutput:
+      type: object
+      properties:
+        Resources:
+          allOf:
+          - $ref: '#/components/schemas/ResourceList'
+          description: The list of structures that describe the resources that match
+            the query.
+        NextToken:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: If present, indicates that more output is available than is
+            included in the current response. Use this value in the `NextToken` request
+            parameter in a subsequent call to the operation to get the next part of
+            the output. You should repeat this until the `NextToken` response element
+            comes back as `null`. The pagination tokens expire after 24 hours.
+        ViewArn:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The Amazon resource name (ARN) of the view that this operation
+            used to perform the search.
+    ListSupportedResourceTypesInput:
+      type: object
+      properties:
+        NextToken:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The parameter for receiving additional results if you receive
+            a `NextToken` response in a previous request. A `NextToken` response indicates
+            that more output is available. Set this parameter to the value of the
+            previous call's `NextToken` response to indicate where the output should
+            continue from. The pagination tokens expire after 24 hours.
+        MaxResults:
+          allOf:
+          - $ref: '#/components/schemas/Integer'
+          description: 'The maximum number of results that you want included on each
+            page of the response. If you do not include this parameter, it defaults
+            to a value appropriate to the operation. If additional items exist beyond
+            those included in the current response, the `NextToken` response element
+            is present and has a value (is not null). Include that value as the `NextToken`
+            request parameter in the next call to the operation to get the next part
+            of the results.
+
+
+            An API operation can return fewer results than the maximum even when there
+            are more results available. You should check `NextToken` after every operation
+            to ensure that you receive all of the results.'
+    ListSupportedResourceTypesOutput:
+      type: object
+      properties:
+        ResourceTypes:
+          allOf:
+          - $ref: '#/components/schemas/ResourceTypeList'
+          description: The list of resource types supported by Resource Explorer.
+        NextToken:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: If present, indicates that more output is available than is
+            included in the current response. Use this value in the `NextToken` request
+            parameter in a subsequent call to the operation to get the next part of
+            the output. You should repeat this until the `NextToken` response element
+            comes back as `null`. The pagination tokens expire after 24 hours.
+    ListTagsForResourceInput:
+      type: object
+      properties:
+        resourceArn:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The [Amazon resource name (ARN)](https://docs.aws.amazon.com/general/latest/gr/aws-arns-and-namespaces.html)
+            of the view or index that you want to attach tags to.
+      required:
+      - resourceArn
+    ListTagsForResourceOutput:
+      type: object
+      properties:
+        Tags:
+          allOf:
+          - $ref: '#/components/schemas/TagMap'
+          description: The tag key and value pairs that you want to attach to the
+            specified view or index.
+    ListViewsInput:
+      type: object
+      properties:
+        NextToken:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The parameter for receiving additional results if you receive
+            a `NextToken` response in a previous request. A `NextToken` response indicates
+            that more output is available. Set this parameter to the value of the
+            previous call's `NextToken` response to indicate where the output should
+            continue from. The pagination tokens expire after 24 hours.
+        MaxResults:
+          allOf:
+          - $ref: '#/components/schemas/Integer'
+          description: 'The maximum number of results that you want included on each
+            page of the response. If you do not include this parameter, it defaults
+            to a value appropriate to the operation. If additional items exist beyond
+            those included in the current response, the `NextToken` response element
+            is present and has a value (is not null). Include that value as the `NextToken`
+            request parameter in the next call to the operation to get the next part
+            of the results.
+
+
+            An API operation can return fewer results than the maximum even when there
+            are more results available. You should check `NextToken` after every operation
+            to ensure that you receive all of the results.'
+    ListViewsOutput:
+      type: object
+      properties:
+        Views:
+          allOf:
+          - $ref: '#/components/schemas/ViewArnList'
+          description: The list of views available in the Amazon Web Services Region
+            in which you called this operation.
+        NextToken:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: If present, indicates that more output is available than is
+            included in the current response. Use this value in the `NextToken` request
+            parameter in a subsequent call to the operation to get the next part of
+            the output. You should repeat this until the `NextToken` response element
+            comes back as `null`. The pagination tokens expire after 24 hours.
+    ManagedView:
+      type: object
+      properties:
+        ManagedViewArn:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The [Amazon resource name (ARN)](https://docs.aws.amazon.com/general/latest/gr/aws-arns-and-namespaces.html)
+            of the managed view.
+        ManagedViewName:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The name of the managed view.
+        TrustedService:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The service principal of the Amazon Web Services service that
+            created and manages the managed view.
+        LastUpdatedAt:
+          allOf:
+          - $ref: '#/components/schemas/Timestamp'
+          description: The date and time when this managed view was last modified.
+        Owner:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The Amazon Web Services account that owns this managed view.
+        Scope:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: An [Amazon resource name (ARN)](https://docs.aws.amazon.com/general/latest/gr/aws-arns-and-namespaces.html)
+            of an Amazon Web Services account or organization that specifies whether
+            this managed view includes resources from only the specified Amazon Web
+            Services account or all accounts in the specified organization.
+        IncludedProperties:
+          allOf:
+          - $ref: '#/components/schemas/IncludedPropertyList'
+          description: A structure that contains additional information about the
+            managed view.
+        Filters:
+          $ref: '#/components/schemas/SearchFilter'
+        ResourcePolicy:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The resource policy that defines access to the managed view.
+            To learn more about this policy, review [Managed views](https://docs.aws.amazon.com/resource-explorer/latest/userguide/aws-managed-views.html).
+        Version:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The version of the managed view.
+      description: An Amazon Web Services-managed view is how other Amazon Web Services
+        services can access resource information indexed by Resource Explorer for
+        your Amazon Web Services account or organization with your consent. For more
+        information, see [Managed views](https://docs.aws.amazon.com/resource-explorer/latest/userguide/aws-managed-views.html).
     ManagedViewArnList:
       type: array
       items:
         type: string
+    MemberIndex:
+      type: object
+      properties:
+        AccountId:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The account ID for the index.
+        Region:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The Amazon Web Services Region in which the index exists.
+        Arn:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The [Amazon resource name (ARN)](https://docs.aws.amazon.com/general/latest/gr/aws-arns-and-namespaces.html)
+            of the index.
+        Type:
+          allOf:
+          - $ref: '#/components/schemas/IndexType'
+          description: "The type of index. It can be one of the following values:\n\
+            \n  * `LOCAL` – The index contains information about resources from only\
+            \ the same Amazon Web Services Region.\n\n  * `AGGREGATOR` – Resource\
+            \ Explorer replicates copies of the indexed information about resources\
+            \ in all other Amazon Web Services Regions to the aggregator index. This\
+            \ lets search results in the Region with the aggregator index to include\
+            \ resources from all Regions in the account where Resource Explorer is\
+            \ turned on."
+      description: An index is the data store used by Amazon Web Services Resource
+        Explorer to hold information about your Amazon Web Services resources that
+        the service discovers.
     MemberIndexList:
       type: array
       items:
         $ref: '#/components/schemas/MemberIndex'
+    OrgConfiguration:
+      type: object
+      properties:
+        AWSServiceAccessStatus:
+          allOf:
+          - $ref: '#/components/schemas/AWSServiceAccessStatus'
+          description: This value displays whether your Amazon Web Services service
+            access is `ENABLED` or `DISABLED`.
+        ServiceLinkedRole:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: This value shows whether or not you have a valid a service-linked
+            role required to start the multi-account search feature.
+      required:
+      - AWSServiceAccessStatus
+      description: This is a structure that contains the status of Amazon Web Services
+        service access, and whether you have a valid service-linked role to enable
+        multi-account search for your organization.
     QueryString:
       type: string
       minLength: 0
@@ -106,10 +2325,101 @@ components:
       type: array
       items:
         type: string
+    Resource:
+      type: object
+      properties:
+        Arn:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The [Amazon resource name (ARN)](https://docs.aws.amazon.com/general/latest/gr/aws-arns-and-namespaces.html)
+            of the resource.
+        OwningAccountId:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The Amazon Web Services account that owns the resource.
+        Region:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The Amazon Web Services Region in which the resource was created
+            and exists.
+        ResourceType:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The type of the resource.
+        Service:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The Amazon Web Services service that owns the resource and
+            is responsible for creating and updating it.
+        LastReportedAt:
+          allOf:
+          - $ref: '#/components/schemas/Timestamp'
+          description: The date and time that Resource Explorer last queried this
+            resource and updated the index with the latest information about the resource.
+        Properties:
+          allOf:
+          - $ref: '#/components/schemas/ResourcePropertyList'
+          description: A structure with additional type-specific details about the
+            resource. These properties can be added by turning on integration between
+            Resource Explorer and other Amazon Web Services services.
+      description: A resource in Amazon Web Services that Amazon Web Services Resource
+        Explorer has discovered, and for which it has stored information in the index
+        of the Amazon Web Services Region that contains the resource.
+    ResourceCount:
+      type: object
+      properties:
+        TotalResources:
+          allOf:
+          - $ref: '#/components/schemas/Long'
+          description: The number of resources that match the search query. This value
+            can't exceed 1,000. If there are more than 1,000 resources that match
+            the query, then only 1,000 are counted and the `Complete` field is set
+            to false. We recommend that you refine your query to return a smaller
+            number of results.
+        Complete:
+          allOf:
+          - $ref: '#/components/schemas/Boolean'
+          description: "Indicates whether the `TotalResources` value represents an\
+            \ exhaustive count of search results.\n\n  * If `True`, it indicates that\
+            \ the search was exhaustive. Every resource that matches the query was\
+            \ counted.\n\n  * If `False`, then the search reached the limit of 1,000\
+            \ matching results, and stopped counting."
+      description: 'Information about the number of results that match the query.
+        At this time, Amazon Web Services Resource Explorer doesn''t count more than
+        1,000 matches for any query. This structure provides information about whether
+        the query exceeded this limit.
+
+
+        This field is included in every page when you paginate the results.'
     ResourceList:
       type: array
       items:
         $ref: '#/components/schemas/Resource'
+    ResourceNotFoundException:
+      type: object
+      properties:
+        Message:
+          $ref: '#/components/schemas/String'
+      description: You specified a resource that doesn't exist. Check the ID or ARN
+        that you used to identity the resource, and try again.
+    ResourceProperty:
+      type: object
+      properties:
+        Name:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The name of this property of the resource.
+        LastReportedAt:
+          allOf:
+          - $ref: '#/components/schemas/Timestamp'
+          description: The date and time that the information about this resource
+            property was last updated.
+        Data:
+          allOf:
+          - $ref: '#/components/schemas/Document'
+          description: Details about this property. The content of this field is a
+            JSON object that varies based on the resource type.
+      description: A structure that describes a property of a resource.
     ResourcePropertyList:
       type: array
       items:
@@ -118,19 +2428,357 @@ components:
       type: array
       items:
         $ref: '#/components/schemas/SupportedResourceType'
+    SearchFilter:
+      type: object
+      properties:
+        FilterString:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The string that contains the search keywords, prefixes, and
+            operators to control the results that can be returned by a Search operation.
+            For more details, see [Search query syntax](https://docs.aws.amazon.com/resource-explorer/latest/APIReference/about-query-syntax.html).
+      required:
+      - FilterString
+      description: A search filter defines which resources can be part of a search
+        query result set.
+    SearchInput:
+      type: object
+      properties:
+        QueryString:
+          allOf:
+          - $ref: '#/components/schemas/QueryString'
+          description: 'A string that includes keywords and filters that specify the
+            resources that you want to include in the results.
+
+
+            For the complete syntax supported by the `QueryString` parameter, see
+            [Search query syntax reference for Resource Explorer](https://docs.aws.amazon.com/resource-explorer/latest/userguide/using-search-query-syntax.html).
+
+
+            The search is completely case insensitive. You can specify an empty string
+            to return all results up to the limit of 1,000 total results.
+
+
+            The operation can return only the first 1,000 results. If the resource
+            you want is not included, then use a different value for `QueryString`
+            to refine the results.'
+        MaxResults:
+          allOf:
+          - $ref: '#/components/schemas/Integer'
+          description: 'The maximum number of results that you want included on each
+            page of the response. If you do not include this parameter, it defaults
+            to a value appropriate to the operation. If additional items exist beyond
+            those included in the current response, the `NextToken` response element
+            is present and has a value (is not null). Include that value as the `NextToken`
+            request parameter in the next call to the operation to get the next part
+            of the results.
+
+
+            An API operation can return fewer results than the maximum even when there
+            are more results available. You should check `NextToken` after every operation
+            to ensure that you receive all of the results.'
+        ViewArn:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: Specifies the [Amazon resource name (ARN)](https://docs.aws.amazon.com/general/latest/gr/aws-arns-and-namespaces.html)
+            of the view to use for the query. If you don't specify a value for this
+            parameter, then the operation automatically uses the default view for
+            the Amazon Web Services Region in which you called this operation. If
+            the Region either doesn't have a default view or if you don't have permission
+            to use the default view, then the operation fails with a `401 Unauthorized`
+            exception.
+        NextToken:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The parameter for receiving additional results if you receive
+            a `NextToken` response in a previous request. A `NextToken` response indicates
+            that more output is available. Set this parameter to the value of the
+            previous call's `NextToken` response to indicate where the output should
+            continue from. The pagination tokens expire after 24 hours.
+      required:
+      - QueryString
+    SearchOutput:
+      type: object
+      properties:
+        Resources:
+          allOf:
+          - $ref: '#/components/schemas/ResourceList'
+          description: The list of structures that describe the resources that match
+            the query.
+        NextToken:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: If present, indicates that more output is available than is
+            included in the current response. Use this value in the `NextToken` request
+            parameter in a subsequent call to the operation to get the next part of
+            the output. You should repeat this until the `NextToken` response element
+            comes back as `null`. The pagination tokens expire after 24 hours.
+        ViewArn:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The [Amazon resource name (ARN)](https://docs.aws.amazon.com/general/latest/gr/aws-arns-and-namespaces.html)
+            of the view that this operation used to perform the search.
+        Count:
+          allOf:
+          - $ref: '#/components/schemas/ResourceCount'
+          description: The number of resources that match the query.
+    ServiceQuotaExceededException:
+      type: object
+      properties:
+        Message:
+          $ref: '#/components/schemas/String'
+        Name:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The name of the service quota that was exceeded by the request.
+        Value:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The current value for the quota that the request tried to exceed.
+      required:
+      - Message
+      - Name
+      - Value
+      description: The request failed because it exceeds a service quota.
     StringList:
       type: array
       items:
         type: string
       x-sensitive: true
+    SupportedResourceType:
+      type: object
+      properties:
+        Service:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The Amazon Web Services service that is associated with the
+            resource type. This is the primary service that lets you create and interact
+            with resources of this type.
+        ResourceType:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The unique identifier of the resource type.
+      description: A structure that describes a resource type supported by Amazon
+        Web Services Resource Explorer.
     TagMap:
       type: object
       additionalProperties:
         $ref: '#/components/schemas/String'
+    TagResourceInput:
+      type: object
+      properties:
+        resourceArn:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The Amazon Resource Name (ARN) of the view or index that you
+            want to attach tags to.
+        Tags:
+          allOf:
+          - $ref: '#/components/schemas/TagMap'
+          description: A list of tag key and value pairs that you want to attach to
+            the specified view or index.
+      required:
+      - resourceArn
+    TagResourceOutput:
+      type: object
+      properties: {}
+    ThrottlingException:
+      type: object
+      properties:
+        Message:
+          $ref: '#/components/schemas/String'
+      description: The request failed because you exceeded a rate limit for this operation.
+        For more information, see [Quotas for Resource Explorer](https://docs.aws.amazon.com/resource-explorer/latest/userguide/quotas.html).
+    UnauthorizedException:
+      type: object
+      properties:
+        Message:
+          $ref: '#/components/schemas/String'
+      description: The principal making the request isn't permitted to perform the
+        operation.
+    UntagResourceInput:
+      type: object
+      properties:
+        resourceArn:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The Amazon Resource Name (ARN) of the view or index that you
+            want to remove tags from.
+        tagKeys:
+          allOf:
+          - $ref: '#/components/schemas/StringList'
+          description: A list of the keys for the tags that you want to remove from
+            the specified view or index.
+      required:
+      - resourceArn
+      - tagKeys
+    UntagResourceOutput:
+      type: object
+      properties: {}
+    UpdateIndexTypeInput:
+      type: object
+      properties:
+        Arn:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The [Amazon resource name (ARN)](https://docs.aws.amazon.com/general/latest/gr/aws-arns-and-namespaces.html)
+            of the index that you want to update.
+        Type:
+          allOf:
+          - $ref: '#/components/schemas/IndexType'
+          description: The type of the index. To understand the difference between
+            `LOCAL` and `AGGREGATOR`, see [Turning on cross-Region search](https://docs.aws.amazon.com/resource-explorer/latest/userguide/manage-aggregator-region.html)
+            in the _Amazon Web Services Resource Explorer User Guide_.
+      required:
+      - Arn
+      - Type
+    UpdateIndexTypeOutput:
+      type: object
+      properties:
+        Arn:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The [Amazon resource name (ARN)](https://docs.aws.amazon.com/general/latest/gr/aws-arns-and-namespaces.html)
+            of the index that you updated.
+        Type:
+          allOf:
+          - $ref: '#/components/schemas/IndexType'
+          description: Specifies the type of the specified index after the operation
+            completes.
+        State:
+          allOf:
+          - $ref: '#/components/schemas/IndexState'
+          description: Indicates the state of the request to update the index. This
+            operation is asynchronous. Call the GetIndex operation to check for changes.
+        LastUpdatedAt:
+          allOf:
+          - $ref: '#/components/schemas/Timestamp'
+          description: The date and timestamp when the index was last updated.
+    UpdateViewInput:
+      type: object
+      properties:
+        ViewArn:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The [Amazon resource name (ARN)](https://docs.aws.amazon.com/general/latest/gr/aws-arns-and-namespaces.html)
+            of the view that you want to modify.
+        IncludedProperties:
+          allOf:
+          - $ref: '#/components/schemas/IncludedPropertyList'
+          description: 'Specifies optional fields that you want included in search
+            results from this view. It is a list of objects that each describe a field
+            to include.
+
+
+            The default is an empty list, with no optional fields included in the
+            results.'
+        Filters:
+          allOf:
+          - $ref: '#/components/schemas/SearchFilter'
+          description: 'An array of strings that specify which resources are included
+            in the results of queries made using this view. When you use this view
+            in a Search operation, the filter string is combined with the search''s
+            `QueryString` parameter using a logical `AND` operator.
+
+
+            For information about the supported syntax, see [Search query reference
+            for Resource Explorer](https://docs.aws.amazon.com/resource-explorer/latest/userguide/using-search-query-syntax.html)
+            in the _Amazon Web Services Resource Explorer User Guide_.
+
+
+            This query string in the context of this operation supports only [filter
+            prefixes](https://docs.aws.amazon.com/resource-explorer/latest/userguide/using-search-query-syntax.html#query-syntax-filters)
+            with optional [operators](https://docs.aws.amazon.com/resource-explorer/latest/userguide/using-search-query-syntax.html#query-syntax-operators).
+            It doesn''t support free-form text. For example, the string `region:us*
+            service:ec2 -tag:stage=prod` includes all Amazon EC2 resources in any
+            Amazon Web Services Region that begins with the letters `us` and is _not_
+            tagged with a key `Stage` that has the value `prod`.'
+      required:
+      - ViewArn
+    UpdateViewOutput:
+      type: object
+      properties:
+        View:
+          allOf:
+          - $ref: '#/components/schemas/View'
+          description: Details about the view that you changed with this operation.
+    ValidationException:
+      type: object
+      properties:
+        Message:
+          $ref: '#/components/schemas/String'
+        FieldList:
+          allOf:
+          - $ref: '#/components/schemas/ValidationExceptionFieldList'
+          description: An array of the request fields that had validation errors.
+      required:
+      - Message
+      description: You provided an invalid value for one of the operation's parameters.
+        Check the syntax for the operation, and try again.
+    ValidationExceptionField:
+      type: object
+      properties:
+        Name:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The name of the request field that had a validation error.
+        ValidationIssue:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The validation error caused by the request field.
+      required:
+      - Name
+      - ValidationIssue
+      description: A structure that describes a request field with a validation error.
     ValidationExceptionFieldList:
       type: array
       items:
         $ref: '#/components/schemas/ValidationExceptionField'
+    View:
+      type: object
+      properties:
+        ViewArn:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The [Amazon resource name (ARN)](https://docs.aws.amazon.com/general/latest/gr/aws-arns-and-namespaces.html)
+            of the view.
+        Owner:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The Amazon Web Services account that owns this view.
+        LastUpdatedAt:
+          allOf:
+          - $ref: '#/components/schemas/Timestamp'
+          description: The date and time when this view was last modified.
+        Scope:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: 'An [Amazon resource name (ARN)](https://docs.aws.amazon.com/general/latest/gr/aws-arns-and-namespaces.html)
+            of an Amazon Web Services account, an organization, or an organizational
+            unit (OU) that specifies whether this view includes resources from only
+            the specified Amazon Web Services account, all accounts in the specified
+            organization, or all accounts in the specified OU.
+
+
+            If not specified, the value defaults to the Amazon Web Services account
+            used to call this operation.'
+        IncludedProperties:
+          allOf:
+          - $ref: '#/components/schemas/IncludedPropertyList'
+          description: A structure that contains additional information about the
+            view.
+        Filters:
+          allOf:
+          - $ref: '#/components/schemas/SearchFilter'
+          description: An array of SearchFilter objects that specify which resources
+            can be included in the results of queries made using this view.
+      description: A view is a structure that defines a set of filters that provide
+        a view into the information in the Amazon Web Services Resource Explorer index.
+        The filters specify which information from the index is visible to the users
+        of the view. For example, you can specify filters that include only resources
+        that are tagged with the key "ENV" and the value "DEVELOPMENT" in the results
+        returned by this view. You could also create a second view that includes only
+        resources that are tagged with "ENV" and "PRODUCTION".
     ViewArnList:
       type: array
       items:

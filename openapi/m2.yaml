@@ -7,7 +7,7 @@ info:
   x-stackql-serviceName: m2
   x-aws-serviceName: m2
   x-aws-protocol: aws.protocols#restJson1
-  x-dateGenerated: '2025-05-05'
+  x-dateGenerated: '2025-05-07'
   version: '2021-04-28'
   title: AWSMainframeModernization
   description: |-
@@ -43,9 +43,2304 @@ servers:
       - sa-east-1
       - me-south-1
       default: us-east-1
-paths: {}
+paths:
+  /applications/{applicationId}/batch-job-executions/{executionId}/cancel:
+    post:
+      operationId: CancelBatchJobExecution
+      description: |-
+        Cancels the running of a specific batch job execution.
+      parameters:
+      - name: applicationId
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/Identifier'
+      - name: executionId
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/Identifier'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                authSecretsManagerArn:
+                  $ref: '#/components/schemas/AuthSecretsManagerArn'
+      responses:
+        '200': {}
+        '403':
+          description: |-
+            The account or role doesn't have the right permissions to make the request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '409':
+          description: |-
+            The parameters provided in the request conflict with existing resources.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConflictException'
+        '500':
+          description: |-
+            An unexpected error occurred during the processing of the request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerException'
+        '404':
+          description: |-
+            The specified resource was not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+        '429':
+          description: |-
+            The number of requests made exceeds the limit.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThrottlingException'
+        '400':
+          description: |-
+            One or more parameters provided in the request is not valid.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+  /applications:
+    post:
+      operationId: CreateApplication
+      description: |-
+        Creates a new application with given parameters. Requires an existing runtime environment and application definition file.
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  $ref: '#/components/schemas/EntityName'
+                description:
+                  $ref: '#/components/schemas/EntityDescription'
+                engineType:
+                  $ref: '#/components/schemas/EngineType'
+                definition:
+                  $ref: '#/components/schemas/Definition'
+                tags:
+                  $ref: '#/components/schemas/TagMap'
+                clientToken:
+                  $ref: '#/components/schemas/ClientToken'
+                kmsKeyId:
+                  $ref: '#/components/schemas/String'
+                roleArn:
+                  $ref: '#/components/schemas/Arn'
+      responses:
+        '200': {}
+        '403':
+          description: |-
+            The account or role doesn't have the right permissions to make the request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '409':
+          description: |-
+            The parameters provided in the request conflict with existing resources.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConflictException'
+        '500':
+          description: |-
+            An unexpected error occurred during the processing of the request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerException'
+        '402':
+          description: |-
+            One or more quotas for Amazon Web Services Mainframe Modernization exceeds the limit.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServiceQuotaExceededException'
+        '429':
+          description: |-
+            The number of requests made exceeds the limit.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThrottlingException'
+        '400':
+          description: |-
+            One or more parameters provided in the request is not valid.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+    get:
+      operationId: ListApplications
+      description: |-
+        Lists the applications associated with a specific Amazon Web Services account. You can provide the unique identifier of a specific runtime environment in a query parameter to see all applications associated with that environment.
+      parameters:
+      - name: nextToken
+        in: query
+        required: false
+        schema:
+          $ref: '#/components/schemas/NextToken'
+      - name: maxResults
+        in: query
+        required: false
+        schema:
+          $ref: '#/components/schemas/MaxResults'
+      - name: names
+        in: query
+        required: false
+        schema:
+          $ref: '#/components/schemas/EntityNameList'
+      - name: environmentId
+        in: query
+        required: false
+        schema:
+          $ref: '#/components/schemas/Identifier'
+      responses:
+        '200': {}
+        '403':
+          description: |-
+            The account or role doesn't have the right permissions to make the request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '500':
+          description: |-
+            An unexpected error occurred during the processing of the request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerException'
+        '429':
+          description: |-
+            The number of requests made exceeds the limit.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThrottlingException'
+        '400':
+          description: |-
+            One or more parameters provided in the request is not valid.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+  /applications/{applicationId}/dataset-export-task:
+    post:
+      operationId: CreateDataSetExportTask
+      description: |-
+        Starts a data set export task for a specific application.
+      parameters:
+      - name: applicationId
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/Identifier'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                exportConfig:
+                  $ref: '#/components/schemas/DataSetExportConfig'
+                clientToken:
+                  $ref: '#/components/schemas/ClientToken'
+                kmsKeyId:
+                  $ref: '#/components/schemas/KMSKeyId'
+      responses:
+        '200': {}
+        '403':
+          description: |-
+            The account or role doesn't have the right permissions to make the request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '409':
+          description: |-
+            The parameters provided in the request conflict with existing resources.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConflictException'
+        '500':
+          description: |-
+            An unexpected error occurred during the processing of the request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerException'
+        '404':
+          description: |-
+            The specified resource was not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+        '402':
+          description: |-
+            One or more quotas for Amazon Web Services Mainframe Modernization exceeds the limit.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServiceQuotaExceededException'
+        '429':
+          description: |-
+            The number of requests made exceeds the limit.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThrottlingException'
+        '400':
+          description: |-
+            One or more parameters provided in the request is not valid.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+  /applications/{applicationId}/dataset-import-task:
+    post:
+      operationId: CreateDataSetImportTask
+      description: |-
+        Starts a data set import task for a specific application.
+      parameters:
+      - name: applicationId
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/Identifier'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                importConfig:
+                  $ref: '#/components/schemas/DataSetImportConfig'
+                clientToken:
+                  $ref: '#/components/schemas/ClientToken'
+      responses:
+        '200': {}
+        '403':
+          description: |-
+            The account or role doesn't have the right permissions to make the request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '409':
+          description: |-
+            The parameters provided in the request conflict with existing resources.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConflictException'
+        '500':
+          description: |-
+            An unexpected error occurred during the processing of the request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerException'
+        '404':
+          description: |-
+            The specified resource was not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+        '402':
+          description: |-
+            One or more quotas for Amazon Web Services Mainframe Modernization exceeds the limit.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServiceQuotaExceededException'
+        '429':
+          description: |-
+            The number of requests made exceeds the limit.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThrottlingException'
+        '400':
+          description: |-
+            One or more parameters provided in the request is not valid.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+  /applications/{applicationId}/deployments:
+    post:
+      operationId: CreateDeployment
+      description: |-
+        Creates and starts a deployment to deploy an application into a runtime environment.
+      parameters:
+      - name: applicationId
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/Identifier'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                environmentId:
+                  $ref: '#/components/schemas/Identifier'
+                applicationVersion:
+                  $ref: '#/components/schemas/Version'
+                clientToken:
+                  $ref: '#/components/schemas/ClientToken'
+      responses:
+        '200': {}
+        '403':
+          description: |-
+            The account or role doesn't have the right permissions to make the request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '409':
+          description: |-
+            The parameters provided in the request conflict with existing resources.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConflictException'
+        '500':
+          description: |-
+            An unexpected error occurred during the processing of the request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerException'
+        '404':
+          description: |-
+            The specified resource was not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+        '402':
+          description: |-
+            One or more quotas for Amazon Web Services Mainframe Modernization exceeds the limit.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServiceQuotaExceededException'
+        '429':
+          description: |-
+            The number of requests made exceeds the limit.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThrottlingException'
+        '400':
+          description: |-
+            One or more parameters provided in the request is not valid.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+    get:
+      operationId: ListDeployments
+      description: |-
+        Returns a list of all deployments of a specific application. A deployment is a combination of a specific application and a specific version of that application. Each deployment is mapped to a particular application version.
+      parameters:
+      - name: nextToken
+        in: query
+        required: false
+        schema:
+          $ref: '#/components/schemas/NextToken'
+      - name: maxResults
+        in: query
+        required: false
+        schema:
+          $ref: '#/components/schemas/MaxResults'
+      - name: applicationId
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/Identifier'
+      responses:
+        '200': {}
+        '403':
+          description: |-
+            The account or role doesn't have the right permissions to make the request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '500':
+          description: |-
+            An unexpected error occurred during the processing of the request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerException'
+        '404':
+          description: |-
+            The specified resource was not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+        '429':
+          description: |-
+            The number of requests made exceeds the limit.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThrottlingException'
+        '400':
+          description: |-
+            One or more parameters provided in the request is not valid.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+  /environments:
+    post:
+      operationId: CreateEnvironment
+      description: |-
+        Creates a runtime environment for a given runtime engine.
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  $ref: '#/components/schemas/EntityName'
+                instanceType:
+                  $ref: '#/components/schemas/String20'
+                description:
+                  $ref: '#/components/schemas/EntityDescription'
+                engineType:
+                  $ref: '#/components/schemas/EngineType'
+                engineVersion:
+                  $ref: '#/components/schemas/EngineVersion'
+                subnetIds:
+                  $ref: '#/components/schemas/String50List'
+                securityGroupIds:
+                  $ref: '#/components/schemas/String50List'
+                storageConfigurations:
+                  $ref: '#/components/schemas/StorageConfigurationList'
+                publiclyAccessible:
+                  $ref: '#/components/schemas/Boolean'
+                highAvailabilityConfig:
+                  $ref: '#/components/schemas/HighAvailabilityConfig'
+                tags:
+                  $ref: '#/components/schemas/TagMap'
+                preferredMaintenanceWindow:
+                  $ref: '#/components/schemas/String50'
+                networkType:
+                  $ref: '#/components/schemas/NetworkType'
+                clientToken:
+                  $ref: '#/components/schemas/ClientToken'
+                kmsKeyId:
+                  $ref: '#/components/schemas/String'
+      responses:
+        '200': {}
+        '403':
+          description: |-
+            The account or role doesn't have the right permissions to make the request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '409':
+          description: |-
+            The parameters provided in the request conflict with existing resources.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConflictException'
+        '500':
+          description: |-
+            An unexpected error occurred during the processing of the request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerException'
+        '402':
+          description: |-
+            One or more quotas for Amazon Web Services Mainframe Modernization exceeds the limit.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServiceQuotaExceededException'
+        '429':
+          description: |-
+            The number of requests made exceeds the limit.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThrottlingException'
+        '400':
+          description: |-
+            One or more parameters provided in the request is not valid.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+    get:
+      operationId: ListEnvironments
+      description: |-
+        Lists the runtime environments.
+      parameters:
+      - name: nextToken
+        in: query
+        required: false
+        schema:
+          $ref: '#/components/schemas/NextToken'
+      - name: maxResults
+        in: query
+        required: false
+        schema:
+          $ref: '#/components/schemas/MaxResults'
+      - name: names
+        in: query
+        required: false
+        schema:
+          $ref: '#/components/schemas/EntityNameList'
+      - name: engineType
+        in: query
+        required: false
+        schema:
+          $ref: '#/components/schemas/EngineType'
+      responses:
+        '200': {}
+        '403':
+          description: |-
+            The account or role doesn't have the right permissions to make the request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '500':
+          description: |-
+            An unexpected error occurred during the processing of the request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerException'
+        '429':
+          description: |-
+            The number of requests made exceeds the limit.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThrottlingException'
+        '400':
+          description: |-
+            One or more parameters provided in the request is not valid.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+  /applications/{applicationId}:
+    delete:
+      operationId: DeleteApplication
+      description: |-
+        Deletes a specific application. You cannot delete a running application.
+      parameters:
+      - name: applicationId
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/Identifier'
+      responses:
+        '200': {}
+        '403':
+          description: |-
+            The account or role doesn't have the right permissions to make the request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '409':
+          description: |-
+            The parameters provided in the request conflict with existing resources.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConflictException'
+        '500':
+          description: |-
+            An unexpected error occurred during the processing of the request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerException'
+        '429':
+          description: |-
+            The number of requests made exceeds the limit.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThrottlingException'
+        '400':
+          description: |-
+            One or more parameters provided in the request is not valid.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+    get:
+      operationId: GetApplication
+      description: |-
+        Describes the details of a specific application.
+      parameters:
+      - name: applicationId
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/Identifier'
+      responses:
+        '200': {}
+        '403':
+          description: |-
+            The account or role doesn't have the right permissions to make the request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '500':
+          description: |-
+            An unexpected error occurred during the processing of the request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerException'
+        '404':
+          description: |-
+            The specified resource was not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+        '429':
+          description: |-
+            The number of requests made exceeds the limit.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThrottlingException'
+        '400':
+          description: |-
+            One or more parameters provided in the request is not valid.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+    patch:
+      operationId: UpdateApplication
+      description: |-
+        Updates an application and creates a new version.
+      parameters:
+      - name: applicationId
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/Identifier'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                description:
+                  $ref: '#/components/schemas/EntityDescription'
+                currentApplicationVersion:
+                  $ref: '#/components/schemas/Version'
+                definition:
+                  $ref: '#/components/schemas/Definition'
+      responses:
+        '200': {}
+        '403':
+          description: |-
+            The account or role doesn't have the right permissions to make the request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '409':
+          description: |-
+            The parameters provided in the request conflict with existing resources.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConflictException'
+        '500':
+          description: |-
+            An unexpected error occurred during the processing of the request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerException'
+        '404':
+          description: |-
+            The specified resource was not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+        '429':
+          description: |-
+            The number of requests made exceeds the limit.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThrottlingException'
+        '400':
+          description: |-
+            One or more parameters provided in the request is not valid.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+  /applications/{applicationId}/environment/{environmentId}:
+    delete:
+      operationId: DeleteApplicationFromEnvironment
+      description: |-
+        Deletes a specific application from the specific runtime environment where it was previously deployed. You cannot delete a runtime environment using DeleteEnvironment if any application has ever been deployed to it. This API removes the association of the application with the runtime environment so you can delete the environment smoothly.
+      parameters:
+      - name: applicationId
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/Identifier'
+      - name: environmentId
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/Identifier'
+      responses:
+        '200': {}
+        '403':
+          description: |-
+            The account or role doesn't have the right permissions to make the request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '409':
+          description: |-
+            The parameters provided in the request conflict with existing resources.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConflictException'
+        '500':
+          description: |-
+            An unexpected error occurred during the processing of the request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerException'
+        '404':
+          description: |-
+            The specified resource was not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+        '429':
+          description: |-
+            The number of requests made exceeds the limit.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThrottlingException'
+        '400':
+          description: |-
+            One or more parameters provided in the request is not valid.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+  /environments/{environmentId}:
+    delete:
+      operationId: DeleteEnvironment
+      description: |-
+        Deletes a specific runtime environment. The environment cannot contain deployed applications. If it does, you must delete those applications before you delete the environment.
+      parameters:
+      - name: environmentId
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/Identifier'
+      responses:
+        '200': {}
+        '403':
+          description: |-
+            The account or role doesn't have the right permissions to make the request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '409':
+          description: |-
+            The parameters provided in the request conflict with existing resources.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConflictException'
+        '500':
+          description: |-
+            An unexpected error occurred during the processing of the request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerException'
+        '429':
+          description: |-
+            The number of requests made exceeds the limit.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThrottlingException'
+        '400':
+          description: |-
+            One or more parameters provided in the request is not valid.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+    get:
+      operationId: GetEnvironment
+      description: |-
+        Describes a specific runtime environment.
+      parameters:
+      - name: environmentId
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/Identifier'
+      responses:
+        '200': {}
+        '403':
+          description: |-
+            The account or role doesn't have the right permissions to make the request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '500':
+          description: |-
+            An unexpected error occurred during the processing of the request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerException'
+        '404':
+          description: |-
+            The specified resource was not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+        '429':
+          description: |-
+            The number of requests made exceeds the limit.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThrottlingException'
+        '400':
+          description: |-
+            One or more parameters provided in the request is not valid.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+    patch:
+      operationId: UpdateEnvironment
+      description: |-
+        Updates the configuration details for a specific runtime environment.
+      parameters:
+      - name: environmentId
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/Identifier'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                desiredCapacity:
+                  $ref: '#/components/schemas/CapacityValue'
+                instanceType:
+                  $ref: '#/components/schemas/String20'
+                engineVersion:
+                  $ref: '#/components/schemas/EngineVersion'
+                preferredMaintenanceWindow:
+                  $ref: '#/components/schemas/String'
+                applyDuringMaintenanceWindow:
+                  $ref: '#/components/schemas/Boolean'
+                forceUpdate:
+                  $ref: '#/components/schemas/Boolean'
+      responses:
+        '200': {}
+        '403':
+          description: |-
+            The account or role doesn't have the right permissions to make the request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '409':
+          description: |-
+            The parameters provided in the request conflict with existing resources.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConflictException'
+        '500':
+          description: |-
+            An unexpected error occurred during the processing of the request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerException'
+        '404':
+          description: |-
+            The specified resource was not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+        '402':
+          description: |-
+            One or more quotas for Amazon Web Services Mainframe Modernization exceeds the limit.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServiceQuotaExceededException'
+        '429':
+          description: |-
+            The number of requests made exceeds the limit.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThrottlingException'
+        '400':
+          description: |-
+            One or more parameters provided in the request is not valid.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+  /applications/{applicationId}/versions/{applicationVersion}:
+    get:
+      operationId: GetApplicationVersion
+      description: |-
+        Returns details about a specific version of a specific application.
+      parameters:
+      - name: applicationId
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/Identifier'
+      - name: applicationVersion
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/Version'
+      responses:
+        '200': {}
+        '403':
+          description: |-
+            The account or role doesn't have the right permissions to make the request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '500':
+          description: |-
+            An unexpected error occurred during the processing of the request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerException'
+        '404':
+          description: |-
+            The specified resource was not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+        '429':
+          description: |-
+            The number of requests made exceeds the limit.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThrottlingException'
+        '400':
+          description: |-
+            One or more parameters provided in the request is not valid.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+  /applications/{applicationId}/batch-job-executions/{executionId}:
+    get:
+      operationId: GetBatchJobExecution
+      description: |-
+        Gets the details of a specific batch job execution for a specific application.
+      parameters:
+      - name: applicationId
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/Identifier'
+      - name: executionId
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/Identifier'
+      responses:
+        '200': {}
+        '403':
+          description: |-
+            The account or role doesn't have the right permissions to make the request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '500':
+          description: |-
+            An unexpected error occurred during the processing of the request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerException'
+        '404':
+          description: |-
+            The specified resource was not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+        '429':
+          description: |-
+            The number of requests made exceeds the limit.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThrottlingException'
+        '400':
+          description: |-
+            One or more parameters provided in the request is not valid.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+  /applications/{applicationId}/datasets/{dataSetName}:
+    get:
+      operationId: GetDataSetDetails
+      description: |-
+        Gets the details of a specific data set.
+      parameters:
+      - name: applicationId
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/Identifier'
+      - name: dataSetName
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/String200'
+      responses:
+        '200': {}
+        '403':
+          description: |-
+            The account or role doesn't have the right permissions to make the request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '409':
+          description: |-
+            The parameters provided in the request conflict with existing resources.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConflictException'
+        '504':
+          description: |-
+            Failed to connect to server, or didn’t receive response within expected time period.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExecutionTimeoutException'
+        '500':
+          description: |-
+            An unexpected error occurred during the processing of the request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerException'
+        '404':
+          description: |-
+            The specified resource was not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+        '503':
+          description: |-
+            Server cannot process the request at the moment.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServiceUnavailableException'
+        '429':
+          description: |-
+            The number of requests made exceeds the limit.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThrottlingException'
+        '400':
+          description: |-
+            One or more parameters provided in the request is not valid.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+  /applications/{applicationId}/dataset-export-tasks/{taskId}:
+    get:
+      operationId: GetDataSetExportTask
+      description: |-
+        Gets the status of a data set import task initiated with the CreateDataSetExportTask operation.
+      parameters:
+      - name: applicationId
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/Identifier'
+      - name: taskId
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/Identifier'
+      responses:
+        '200': {}
+        '403':
+          description: |-
+            The account or role doesn't have the right permissions to make the request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '500':
+          description: |-
+            An unexpected error occurred during the processing of the request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerException'
+        '404':
+          description: |-
+            The specified resource was not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+        '429':
+          description: |-
+            The number of requests made exceeds the limit.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThrottlingException'
+        '400':
+          description: |-
+            One or more parameters provided in the request is not valid.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+  /applications/{applicationId}/dataset-import-tasks/{taskId}:
+    get:
+      operationId: GetDataSetImportTask
+      description: |-
+        Gets the status of a data set import task initiated with the CreateDataSetImportTask operation.
+      parameters:
+      - name: applicationId
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/Identifier'
+      - name: taskId
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/Identifier'
+      responses:
+        '200': {}
+        '403':
+          description: |-
+            The account or role doesn't have the right permissions to make the request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '500':
+          description: |-
+            An unexpected error occurred during the processing of the request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerException'
+        '404':
+          description: |-
+            The specified resource was not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+        '429':
+          description: |-
+            The number of requests made exceeds the limit.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThrottlingException'
+        '400':
+          description: |-
+            One or more parameters provided in the request is not valid.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+  /applications/{applicationId}/deployments/{deploymentId}:
+    get:
+      operationId: GetDeployment
+      description: |-
+        Gets details of a specific deployment with a given deployment identifier.
+      parameters:
+      - name: deploymentId
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/Identifier'
+      - name: applicationId
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/Identifier'
+      responses:
+        '200': {}
+        '403':
+          description: |-
+            The account or role doesn't have the right permissions to make the request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '500':
+          description: |-
+            An unexpected error occurred during the processing of the request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerException'
+        '404':
+          description: |-
+            The specified resource was not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+        '429':
+          description: |-
+            The number of requests made exceeds the limit.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThrottlingException'
+        '400':
+          description: |-
+            One or more parameters provided in the request is not valid.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+  /signed-bi-url:
+    get:
+      operationId: GetSignedBluinsightsUrl
+      description: |-
+        Gets a single sign-on URL that can be used to connect to AWS Blu Insights.
+      responses:
+        '200': {}
+        '403':
+          description: |-
+            The account or role doesn't have the right permissions to make the request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '500':
+          description: |-
+            An unexpected error occurred during the processing of the request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerException'
+        '429':
+          description: |-
+            The number of requests made exceeds the limit.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThrottlingException'
+  /applications/{applicationId}/versions:
+    get:
+      operationId: ListApplicationVersions
+      description: |-
+        Returns a list of the application versions for a specific application.
+      parameters:
+      - name: nextToken
+        in: query
+        required: false
+        schema:
+          $ref: '#/components/schemas/NextToken'
+      - name: maxResults
+        in: query
+        required: false
+        schema:
+          $ref: '#/components/schemas/MaxResults'
+      - name: applicationId
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/Identifier'
+      responses:
+        '200': {}
+        '403':
+          description: |-
+            The account or role doesn't have the right permissions to make the request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '500':
+          description: |-
+            An unexpected error occurred during the processing of the request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerException'
+        '404':
+          description: |-
+            The specified resource was not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+        '429':
+          description: |-
+            The number of requests made exceeds the limit.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThrottlingException'
+        '400':
+          description: |-
+            One or more parameters provided in the request is not valid.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+  /applications/{applicationId}/batch-job-definitions:
+    get:
+      operationId: ListBatchJobDefinitions
+      description: |-
+        Lists all the available batch job definitions based on the batch job resources uploaded during the application creation. You can use the batch job definitions in the list to start a batch job.
+      parameters:
+      - name: nextToken
+        in: query
+        required: false
+        schema:
+          $ref: '#/components/schemas/NextToken'
+      - name: maxResults
+        in: query
+        required: false
+        schema:
+          $ref: '#/components/schemas/MaxResults'
+      - name: applicationId
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/Identifier'
+      - name: prefix
+        in: query
+        required: false
+        schema:
+          $ref: '#/components/schemas/String'
+      responses:
+        '200': {}
+        '403':
+          description: |-
+            The account or role doesn't have the right permissions to make the request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '500':
+          description: |-
+            An unexpected error occurred during the processing of the request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerException'
+        '404':
+          description: |-
+            The specified resource was not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+        '429':
+          description: |-
+            The number of requests made exceeds the limit.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThrottlingException'
+        '400':
+          description: |-
+            One or more parameters provided in the request is not valid.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+  /applications/{applicationId}/batch-job-executions:
+    get:
+      operationId: ListBatchJobExecutions
+      description: |-
+        Lists historical, current, and scheduled batch job executions for a specific application.
+      parameters:
+      - name: nextToken
+        in: query
+        required: false
+        schema:
+          $ref: '#/components/schemas/NextToken'
+      - name: maxResults
+        in: query
+        required: false
+        schema:
+          $ref: '#/components/schemas/MaxResults'
+      - name: applicationId
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/Identifier'
+      - name: executionIds
+        in: query
+        required: false
+        schema:
+          $ref: '#/components/schemas/IdentifierList'
+      - name: jobName
+        in: query
+        required: false
+        schema:
+          $ref: '#/components/schemas/String100'
+      - name: status
+        in: query
+        required: false
+        schema:
+          $ref: '#/components/schemas/BatchJobExecutionStatus'
+      - name: startedAfter
+        in: query
+        required: false
+        schema:
+          $ref: '#/components/schemas/Timestamp'
+      - name: startedBefore
+        in: query
+        required: false
+        schema:
+          $ref: '#/components/schemas/Timestamp'
+      responses:
+        '200': {}
+        '403':
+          description: |-
+            The account or role doesn't have the right permissions to make the request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '500':
+          description: |-
+            An unexpected error occurred during the processing of the request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerException'
+        '404':
+          description: |-
+            The specified resource was not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+        '429':
+          description: |-
+            The number of requests made exceeds the limit.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThrottlingException'
+        '400':
+          description: |-
+            One or more parameters provided in the request is not valid.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+  /applications/{applicationId}/batch-job-executions/{executionId}/steps:
+    get:
+      operationId: ListBatchJobRestartPoints
+      description: |-
+        Lists all the job steps for a JCL file to restart a batch job. This is only applicable for Micro Focus engine with versions 8.0.6 and above.
+      parameters:
+      - name: applicationId
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/Identifier'
+      - name: executionId
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/Identifier'
+      - name: authSecretsManagerArn
+        in: query
+        required: false
+        schema:
+          $ref: '#/components/schemas/AuthSecretsManagerArn'
+      responses:
+        '200': {}
+        '403':
+          description: |-
+            The account or role doesn't have the right permissions to make the request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '409':
+          description: |-
+            The parameters provided in the request conflict with existing resources.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConflictException'
+        '500':
+          description: |-
+            An unexpected error occurred during the processing of the request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerException'
+        '404':
+          description: |-
+            The specified resource was not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+        '429':
+          description: |-
+            The number of requests made exceeds the limit.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThrottlingException'
+        '400':
+          description: |-
+            One or more parameters provided in the request is not valid.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+  /applications/{applicationId}/dataset-export-tasks:
+    get:
+      operationId: ListDataSetExportHistory
+      description: |-
+        Lists the data set exports for the specified application.
+      parameters:
+      - name: nextToken
+        in: query
+        required: false
+        schema:
+          $ref: '#/components/schemas/NextToken'
+      - name: maxResults
+        in: query
+        required: false
+        schema:
+          $ref: '#/components/schemas/MaxResults'
+      - name: applicationId
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/Identifier'
+      responses:
+        '200': {}
+        '403':
+          description: |-
+            The account or role doesn't have the right permissions to make the request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '500':
+          description: |-
+            An unexpected error occurred during the processing of the request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerException'
+        '404':
+          description: |-
+            The specified resource was not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+        '429':
+          description: |-
+            The number of requests made exceeds the limit.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThrottlingException'
+        '400':
+          description: |-
+            One or more parameters provided in the request is not valid.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+  /applications/{applicationId}/dataset-import-tasks:
+    get:
+      operationId: ListDataSetImportHistory
+      description: |-
+        Lists the data set imports for the specified application.
+      parameters:
+      - name: nextToken
+        in: query
+        required: false
+        schema:
+          $ref: '#/components/schemas/NextToken'
+      - name: maxResults
+        in: query
+        required: false
+        schema:
+          $ref: '#/components/schemas/MaxResults'
+      - name: applicationId
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/Identifier'
+      responses:
+        '200': {}
+        '403':
+          description: |-
+            The account or role doesn't have the right permissions to make the request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '500':
+          description: |-
+            An unexpected error occurred during the processing of the request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerException'
+        '404':
+          description: |-
+            The specified resource was not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+        '429':
+          description: |-
+            The number of requests made exceeds the limit.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThrottlingException'
+        '400':
+          description: |-
+            One or more parameters provided in the request is not valid.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+  /applications/{applicationId}/datasets:
+    get:
+      operationId: ListDataSets
+      description: |-
+        Lists the data sets imported for a specific application. In Amazon Web Services Mainframe Modernization, data sets are associated with applications deployed on runtime environments. This is known as importing data sets. Currently, Amazon Web Services Mainframe Modernization can import data sets into catalogs using [CreateDataSetImportTask](https://docs.aws.amazon.com/m2/latest/APIReference/API_CreateDataSetImportTask.html).
+      parameters:
+      - name: applicationId
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/Identifier'
+      - name: nextToken
+        in: query
+        required: false
+        schema:
+          $ref: '#/components/schemas/NextToken'
+      - name: maxResults
+        in: query
+        required: false
+        schema:
+          $ref: '#/components/schemas/MaxResults'
+      - name: prefix
+        in: query
+        required: false
+        schema:
+          $ref: '#/components/schemas/String200'
+      - name: nameFilter
+        in: query
+        required: false
+        schema:
+          $ref: '#/components/schemas/String200'
+      responses:
+        '200': {}
+        '403':
+          description: |-
+            The account or role doesn't have the right permissions to make the request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '409':
+          description: |-
+            The parameters provided in the request conflict with existing resources.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConflictException'
+        '504':
+          description: |-
+            Failed to connect to server, or didn’t receive response within expected time period.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExecutionTimeoutException'
+        '500':
+          description: |-
+            An unexpected error occurred during the processing of the request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerException'
+        '404':
+          description: |-
+            The specified resource was not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+        '503':
+          description: |-
+            Server cannot process the request at the moment.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServiceUnavailableException'
+        '429':
+          description: |-
+            The number of requests made exceeds the limit.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThrottlingException'
+        '400':
+          description: |-
+            One or more parameters provided in the request is not valid.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+  /engine-versions:
+    get:
+      operationId: ListEngineVersions
+      description: |-
+        Lists the available engine versions.
+      parameters:
+      - name: engineType
+        in: query
+        required: false
+        schema:
+          $ref: '#/components/schemas/EngineType'
+      - name: nextToken
+        in: query
+        required: false
+        schema:
+          $ref: '#/components/schemas/NextToken'
+      - name: maxResults
+        in: query
+        required: false
+        schema:
+          $ref: '#/components/schemas/MaxResults'
+      responses:
+        '200': {}
+        '403':
+          description: |-
+            The account or role doesn't have the right permissions to make the request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '500':
+          description: |-
+            An unexpected error occurred during the processing of the request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerException'
+        '429':
+          description: |-
+            The number of requests made exceeds the limit.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThrottlingException'
+        '400':
+          description: |-
+            One or more parameters provided in the request is not valid.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+  /tags/{resourceArn}:
+    get:
+      operationId: ListTagsForResource
+      description: |-
+        Lists the tags for the specified resource.
+      parameters:
+      - name: resourceArn
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/Arn'
+      responses:
+        '200': {}
+        '403':
+          description: |-
+            The account or role doesn't have the right permissions to make the request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '500':
+          description: |-
+            An unexpected error occurred during the processing of the request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerException'
+        '404':
+          description: |-
+            The specified resource was not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+        '429':
+          description: |-
+            The number of requests made exceeds the limit.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThrottlingException'
+        '400':
+          description: |-
+            One or more parameters provided in the request is not valid.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+    post:
+      operationId: TagResource
+      description: |-
+        Adds one or more tags to the specified resource.
+      parameters:
+      - name: resourceArn
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/Arn'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                tags:
+                  $ref: '#/components/schemas/TagMap'
+      responses:
+        '200': {}
+        '403':
+          description: |-
+            The account or role doesn't have the right permissions to make the request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '500':
+          description: |-
+            An unexpected error occurred during the processing of the request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerException'
+        '404':
+          description: |-
+            The specified resource was not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+        '402':
+          description: |-
+            One or more quotas for Amazon Web Services Mainframe Modernization exceeds the limit.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServiceQuotaExceededException'
+        '429':
+          description: |-
+            The number of requests made exceeds the limit.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThrottlingException'
+        '400':
+          description: |-
+            One or more parameters provided in the request is not valid.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+    delete:
+      operationId: UntagResource
+      description: |-
+        Removes one or more tags from the specified resource.
+      parameters:
+      - name: resourceArn
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/Arn'
+      - name: tagKeys
+        in: query
+        required: true
+        schema:
+          $ref: '#/components/schemas/TagKeyList'
+      responses:
+        '200': {}
+        '403':
+          description: |-
+            The account or role doesn't have the right permissions to make the request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '500':
+          description: |-
+            An unexpected error occurred during the processing of the request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerException'
+        '404':
+          description: |-
+            The specified resource was not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+        '429':
+          description: |-
+            The number of requests made exceeds the limit.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThrottlingException'
+        '400':
+          description: |-
+            One or more parameters provided in the request is not valid.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+  /applications/{applicationId}/start:
+    post:
+      operationId: StartApplication
+      description: |-
+        Starts an application that is currently stopped.
+      parameters:
+      - name: applicationId
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/Identifier'
+      responses:
+        '200': {}
+        '403':
+          description: |-
+            The account or role doesn't have the right permissions to make the request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '409':
+          description: |-
+            The parameters provided in the request conflict with existing resources.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConflictException'
+        '500':
+          description: |-
+            An unexpected error occurred during the processing of the request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerException'
+        '404':
+          description: |-
+            The specified resource was not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+        '429':
+          description: |-
+            The number of requests made exceeds the limit.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThrottlingException'
+        '400':
+          description: |-
+            One or more parameters provided in the request is not valid.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+  /applications/{applicationId}/batch-job:
+    post:
+      operationId: StartBatchJob
+      description: |-
+        Starts a batch job and returns the unique identifier of this execution of the batch job. The associated application must be running in order to start the batch job.
+      parameters:
+      - name: applicationId
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/Identifier'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                batchJobIdentifier:
+                  $ref: '#/components/schemas/BatchJobIdentifier'
+                jobParams:
+                  $ref: '#/components/schemas/BatchJobParametersMap'
+                authSecretsManagerArn:
+                  $ref: '#/components/schemas/AuthSecretsManagerArn'
+      responses:
+        '200': {}
+        '403':
+          description: |-
+            The account or role doesn't have the right permissions to make the request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '409':
+          description: |-
+            The parameters provided in the request conflict with existing resources.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConflictException'
+        '500':
+          description: |-
+            An unexpected error occurred during the processing of the request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerException'
+        '404':
+          description: |-
+            The specified resource was not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+        '429':
+          description: |-
+            The number of requests made exceeds the limit.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThrottlingException'
+        '400':
+          description: |-
+            One or more parameters provided in the request is not valid.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+  /applications/{applicationId}/stop:
+    post:
+      operationId: StopApplication
+      description: |-
+        Stops a running application.
+      parameters:
+      - name: applicationId
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/Identifier'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                forceStop:
+                  $ref: '#/components/schemas/Boolean'
+      responses:
+        '200': {}
+        '403':
+          description: |-
+            The account or role doesn't have the right permissions to make the request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '409':
+          description: |-
+            The parameters provided in the request conflict with existing resources.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConflictException'
+        '500':
+          description: |-
+            An unexpected error occurred during the processing of the request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerException'
+        '404':
+          description: |-
+            The specified resource was not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+        '429':
+          description: |-
+            The number of requests made exceeds the limit.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThrottlingException'
+        '400':
+          description: |-
+            One or more parameters provided in the request is not valid.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
 components:
   schemas:
+    AccessDeniedException:
+      type: object
+      properties:
+        message:
+          $ref: '#/components/schemas/String'
+      required:
+      - message
+      description: The account or role doesn't have the right permissions to make
+        the request.
+    AlternateKey:
+      type: object
+      properties:
+        name:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The name of the alternate key.
+        offset:
+          allOf:
+          - $ref: '#/components/schemas/Integer'
+          description: A positive integer value representing the offset to mark the
+            start of the alternate key part in the record byte array.
+        length:
+          allOf:
+          - $ref: '#/components/schemas/Integer'
+          description: A strictly positive integer value representing the length of
+            the alternate key.
+        allowDuplicates:
+          allOf:
+          - $ref: '#/components/schemas/Boolean'
+          description: Indicates whether the alternate key values are supposed to
+            be unique for the given data set.
+      required:
+      - offset
+      - length
+      description: Defines an alternate key. This value is optional. A legacy data
+        set might not have any alternate key defined but if those alternate keys definitions
+        exist, provide them, as some applications will make use of them.
     AlternateKeyList:
       type: array
       items:
@@ -69,6 +2364,75 @@ components:
       - Failed
       - Deleting
       - Deleting From Environment
+    ApplicationSummary:
+      type: object
+      properties:
+        name:
+          allOf:
+          - $ref: '#/components/schemas/EntityName'
+          description: The name of the application.
+        description:
+          allOf:
+          - $ref: '#/components/schemas/EntityDescription'
+          description: The description of the application.
+        applicationId:
+          allOf:
+          - $ref: '#/components/schemas/Identifier'
+          description: The unique identifier of the application.
+        applicationArn:
+          allOf:
+          - $ref: '#/components/schemas/Arn'
+          description: The Amazon Resource Name (ARN) of the application.
+        applicationVersion:
+          allOf:
+          - $ref: '#/components/schemas/Version'
+          description: The version of the application.
+        status:
+          allOf:
+          - $ref: '#/components/schemas/ApplicationLifecycle'
+          description: The status of the application.
+        engineType:
+          allOf:
+          - $ref: '#/components/schemas/EngineType'
+          description: The type of the target platform for this application.
+        creationTime:
+          allOf:
+          - $ref: '#/components/schemas/Timestamp'
+          description: The timestamp when the application was created.
+        environmentId:
+          allOf:
+          - $ref: '#/components/schemas/Identifier'
+          description: The unique identifier of the runtime environment that hosts
+            this application.
+        lastStartTime:
+          allOf:
+          - $ref: '#/components/schemas/Timestamp'
+          description: The timestamp when you last started the application. Null until
+            the application runs for the first time.
+        versionStatus:
+          allOf:
+          - $ref: '#/components/schemas/ApplicationVersionLifecycle'
+          description: Indicates the status of the latest version of the application.
+        deploymentStatus:
+          allOf:
+          - $ref: '#/components/schemas/ApplicationDeploymentLifecycle'
+          description: Indicates either an ongoing deployment or if the application
+            has ever deployed successfully.
+        roleArn:
+          allOf:
+          - $ref: '#/components/schemas/Arn'
+          description: The Amazon Resource Name (ARN) of the role associated with
+            the application.
+      required:
+      - name
+      - applicationId
+      - applicationArn
+      - applicationVersion
+      - status
+      - engineType
+      - creationTime
+      description: A subset of the possible application attributes. Used in the application
+        list.
     ApplicationSummaryList:
       type: array
       items:
@@ -79,6 +2443,30 @@ components:
       - Creating
       - Available
       - Failed
+    ApplicationVersionSummary:
+      type: object
+      properties:
+        applicationVersion:
+          allOf:
+          - $ref: '#/components/schemas/Version'
+          description: The application version.
+        status:
+          allOf:
+          - $ref: '#/components/schemas/ApplicationVersionLifecycle'
+          description: The status of the application.
+        statusReason:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The reason for the reported status.
+        creationTime:
+          allOf:
+          - $ref: '#/components/schemas/Timestamp'
+          description: The timestamp when the application version was created.
+      required:
+      - applicationVersion
+      - status
+      - creationTime
+      description: Defines an application version summary.
     ApplicationVersionSummaryList:
       type: array
       items:
@@ -123,6 +2511,59 @@ components:
       - Failed
       - Purged
       - Succeeded With Warning
+    BatchJobExecutionSummary:
+      type: object
+      properties:
+        executionId:
+          allOf:
+          - $ref: '#/components/schemas/Identifier'
+          description: The unique identifier of this execution of the batch job.
+        applicationId:
+          allOf:
+          - $ref: '#/components/schemas/Identifier'
+          description: The unique identifier of the application that hosts this batch
+            job.
+        jobId:
+          allOf:
+          - $ref: '#/components/schemas/String100'
+          description: The unique identifier of a particular batch job.
+        jobName:
+          allOf:
+          - $ref: '#/components/schemas/String100'
+          description: The name of a particular batch job.
+        jobType:
+          allOf:
+          - $ref: '#/components/schemas/BatchJobType'
+          description: The type of a particular batch job execution.
+        status:
+          allOf:
+          - $ref: '#/components/schemas/BatchJobExecutionStatus'
+          description: The status of a particular batch job execution.
+        startTime:
+          allOf:
+          - $ref: '#/components/schemas/Timestamp'
+          description: The timestamp when a particular batch job execution started.
+        endTime:
+          allOf:
+          - $ref: '#/components/schemas/Timestamp'
+          description: The timestamp when this batch job execution ended.
+        returnCode:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The batch job return code from either the Blu Age or Micro
+            Focus runtime engines. For more information, see [Batch return codes](https://www.ibm.com/docs/en/was/8.5.5?topic=model-batch-return-codes)
+            in the _IBM WebSphere Application Server_ documentation.
+        batchJobIdentifier:
+          allOf:
+          - $ref: '#/components/schemas/BatchJobIdentifier'
+          description: The unique identifier of this batch job.
+      required:
+      - executionId
+      - applicationId
+      - status
+      - startTime
+      description: A subset of the possible batch job attributes. Used in the batch
+        job list.
     BatchJobExecutionSummaryList:
       type: array
       items:
@@ -176,12 +2617,352 @@ components:
     Boolean:
       type: boolean
       default: false
+    CancelBatchJobExecutionRequest:
+      type: object
+      properties:
+        applicationId:
+          allOf:
+          - $ref: '#/components/schemas/Identifier'
+          description: The unique identifier of the application.
+        executionId:
+          allOf:
+          - $ref: '#/components/schemas/Identifier'
+          description: The unique identifier of the batch job execution.
+        authSecretsManagerArn:
+          allOf:
+          - $ref: '#/components/schemas/AuthSecretsManagerArn'
+          description: The Amazon Web Services Secrets Manager containing user's credentials
+            for authentication and authorization for Cancel Batch Job Execution operation.
+      required:
+      - applicationId
+      - executionId
+    CancelBatchJobExecutionResponse:
+      type: object
+      properties: {}
     CapacityValue:
       type: integer
     ClientToken:
       type: string
       pattern: ^[!-~]+$
       maxLength: 128
+    ConflictException:
+      type: object
+      properties:
+        message:
+          $ref: '#/components/schemas/String'
+        resourceId:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The ID of the conflicting resource.
+        resourceType:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The type of the conflicting resource.
+      required:
+      - message
+      description: The parameters provided in the request conflict with existing resources.
+    CreateApplicationRequest:
+      type: object
+      properties:
+        name:
+          allOf:
+          - $ref: '#/components/schemas/EntityName'
+          description: The unique identifier of the application.
+        description:
+          allOf:
+          - $ref: '#/components/schemas/EntityDescription'
+          description: The description of the application.
+        engineType:
+          allOf:
+          - $ref: '#/components/schemas/EngineType'
+          description: The type of the target platform for this application.
+        definition:
+          allOf:
+          - $ref: '#/components/schemas/Definition'
+          description: The application definition for this application. You can specify
+            either inline JSON or an S3 bucket location.
+        tags:
+          allOf:
+          - $ref: '#/components/schemas/TagMap'
+          description: A list of tags to apply to the application.
+        clientToken:
+          allOf:
+          - $ref: '#/components/schemas/ClientToken'
+          description: A client token is a unique, case-sensitive string of up to
+            128 ASCII characters with ASCII values of 33-126 inclusive. It's generated
+            by the client to ensure idempotent operations, allowing for safe retries
+            without unintended side effects.
+        kmsKeyId:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The identifier of a customer managed key.
+        roleArn:
+          allOf:
+          - $ref: '#/components/schemas/Arn'
+          description: The Amazon Resource Name (ARN) that identifies a role that
+            the application uses to access Amazon Web Services resources that are
+            not part of the application or are in a different Amazon Web Services
+            account.
+      required:
+      - name
+      - engineType
+      - definition
+    CreateApplicationResponse:
+      type: object
+      properties:
+        applicationArn:
+          allOf:
+          - $ref: '#/components/schemas/Arn'
+          description: The Amazon Resource Name (ARN) of the application.
+        applicationId:
+          allOf:
+          - $ref: '#/components/schemas/Identifier'
+          description: The unique application identifier.
+        applicationVersion:
+          allOf:
+          - $ref: '#/components/schemas/Version'
+          description: The version number of the application.
+      required:
+      - applicationArn
+      - applicationId
+      - applicationVersion
+    CreateDataSetExportTaskRequest:
+      type: object
+      properties:
+        applicationId:
+          allOf:
+          - $ref: '#/components/schemas/Identifier'
+          description: The unique identifier of the application for which you want
+            to export data sets.
+        exportConfig:
+          allOf:
+          - $ref: '#/components/schemas/DataSetExportConfig'
+          description: The data set export task configuration.
+        clientToken:
+          allOf:
+          - $ref: '#/components/schemas/ClientToken'
+          description: Unique, case-sensitive identifier you provide to ensure the
+            idempotency of the request to create a data set export. The service generates
+            the clientToken when the API call is triggered. The token expires after
+            one hour, so if you retry the API within this timeframe with the same
+            clientToken, you will get the same response. The service also handles
+            deleting the clientToken after it expires.
+        kmsKeyId:
+          allOf:
+          - $ref: '#/components/schemas/KMSKeyId'
+          description: The identifier of a customer managed key.
+      required:
+      - applicationId
+      - exportConfig
+    CreateDataSetExportTaskResponse:
+      type: object
+      properties:
+        taskId:
+          allOf:
+          - $ref: '#/components/schemas/Identifier'
+          description: The task identifier. This operation is asynchronous. Use this
+            identifier with the GetDataSetExportTask operation to obtain the status
+            of this task.
+      required:
+      - taskId
+    CreateDataSetImportTaskRequest:
+      type: object
+      properties:
+        applicationId:
+          allOf:
+          - $ref: '#/components/schemas/Identifier'
+          description: The unique identifier of the application for which you want
+            to import data sets.
+        importConfig:
+          allOf:
+          - $ref: '#/components/schemas/DataSetImportConfig'
+          description: The data set import task configuration.
+        clientToken:
+          allOf:
+          - $ref: '#/components/schemas/ClientToken'
+          description: Unique, case-sensitive identifier you provide to ensure the
+            idempotency of the request to create a data set import. The service generates
+            the clientToken when the API call is triggered. The token expires after
+            one hour, so if you retry the API within this timeframe with the same
+            clientToken, you will get the same response. The service also handles
+            deleting the clientToken after it expires.
+      required:
+      - applicationId
+      - importConfig
+    CreateDataSetImportTaskResponse:
+      type: object
+      properties:
+        taskId:
+          allOf:
+          - $ref: '#/components/schemas/Identifier'
+          description: The task identifier. This operation is asynchronous. Use this
+            identifier with the GetDataSetImportTask operation to obtain the status
+            of this task.
+      required:
+      - taskId
+    CreateDeploymentRequest:
+      type: object
+      properties:
+        environmentId:
+          allOf:
+          - $ref: '#/components/schemas/Identifier'
+          description: The identifier of the runtime environment where you want to
+            deploy this application.
+        applicationId:
+          allOf:
+          - $ref: '#/components/schemas/Identifier'
+          description: The application identifier.
+        applicationVersion:
+          allOf:
+          - $ref: '#/components/schemas/Version'
+          description: The version of the application to deploy.
+        clientToken:
+          allOf:
+          - $ref: '#/components/schemas/ClientToken'
+          description: Unique, case-sensitive identifier you provide to ensure the
+            idempotency of the request to create a deployment. The service generates
+            the clientToken when the API call is triggered. The token expires after
+            one hour, so if you retry the API within this timeframe with the same
+            clientToken, you will get the same response. The service also handles
+            deleting the clientToken after it expires.
+      required:
+      - environmentId
+      - applicationId
+      - applicationVersion
+    CreateDeploymentResponse:
+      type: object
+      properties:
+        deploymentId:
+          allOf:
+          - $ref: '#/components/schemas/Identifier'
+          description: The unique identifier of the deployment.
+      required:
+      - deploymentId
+    CreateEnvironmentRequest:
+      type: object
+      properties:
+        name:
+          allOf:
+          - $ref: '#/components/schemas/EntityName'
+          description: The name of the runtime environment. Must be unique within
+            the account.
+        instanceType:
+          allOf:
+          - $ref: '#/components/schemas/String20'
+          description: The type of instance for the runtime environment.
+        description:
+          allOf:
+          - $ref: '#/components/schemas/EntityDescription'
+          description: The description of the runtime environment.
+        engineType:
+          allOf:
+          - $ref: '#/components/schemas/EngineType'
+          description: The engine type for the runtime environment.
+        engineVersion:
+          allOf:
+          - $ref: '#/components/schemas/EngineVersion'
+          description: The version of the engine type for the runtime environment.
+        subnetIds:
+          allOf:
+          - $ref: '#/components/schemas/String50List'
+          description: The list of subnets associated with the VPC for this runtime
+            environment.
+        securityGroupIds:
+          allOf:
+          - $ref: '#/components/schemas/String50List'
+          description: The list of security groups for the VPC associated with this
+            runtime environment.
+        storageConfigurations:
+          allOf:
+          - $ref: '#/components/schemas/StorageConfigurationList'
+          description: Optional. The storage configurations for this runtime environment.
+        publiclyAccessible:
+          allOf:
+          - $ref: '#/components/schemas/Boolean'
+          description: Specifies whether the runtime environment is publicly accessible.
+        highAvailabilityConfig:
+          allOf:
+          - $ref: '#/components/schemas/HighAvailabilityConfig'
+          description: The details of a high availability configuration for this runtime
+            environment.
+        tags:
+          allOf:
+          - $ref: '#/components/schemas/TagMap'
+          description: The tags for the runtime environment.
+        preferredMaintenanceWindow:
+          allOf:
+          - $ref: '#/components/schemas/String50'
+          description: 'Configures the maintenance window that you want for the runtime
+            environment. The maintenance window must have the format `ddd:hh24:mi-ddd:hh24:mi`
+            and must be less than 24 hours. The following two examples are valid maintenance
+            windows: `sun:23:45-mon:00:15` or `sat:01:00-sat:03:00`.
+
+
+            If you do not provide a value, a random system-generated value will be
+            assigned.'
+        networkType:
+          allOf:
+          - $ref: '#/components/schemas/NetworkType'
+          description: The network type required for the runtime environment.
+        clientToken:
+          allOf:
+          - $ref: '#/components/schemas/ClientToken'
+          description: Unique, case-sensitive identifier you provide to ensure the
+            idempotency of the request to create an environment. The service generates
+            the clientToken when the API call is triggered. The token expires after
+            one hour, so if you retry the API within this timeframe with the same
+            clientToken, you will get the same response. The service also handles
+            deleting the clientToken after it expires.
+        kmsKeyId:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The identifier of a customer managed key.
+      required:
+      - name
+      - instanceType
+      - engineType
+    CreateEnvironmentResponse:
+      type: object
+      properties:
+        environmentId:
+          allOf:
+          - $ref: '#/components/schemas/Identifier'
+          description: The unique identifier of the runtime environment.
+      required:
+      - environmentId
+    DataSet:
+      type: object
+      properties:
+        storageType:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: 'The storage type of the data set: database or file system.
+            For Micro Focus, database corresponds to datastore and file system corresponds
+            to EFS/FSX. For Blu Age, there is no support of file system and database
+            corresponds to Blusam.'
+        datasetName:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The logical identifier for a specific data set (in mainframe
+            format).
+        datasetOrg:
+          allOf:
+          - $ref: '#/components/schemas/DatasetOrgAttributes'
+          description: The type of dataset. The only supported value is VSAM.
+        relativePath:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The relative location of the data set in the database or file
+            system.
+        recordLength:
+          allOf:
+          - $ref: '#/components/schemas/RecordLength'
+          description: The length of a record.
+      required:
+      - datasetName
+      - datasetOrg
+      - recordLength
+      description: Defines a data set.
     DataSetExportConfig:
       allOf:
       - allOf:
@@ -194,10 +2975,79 @@ components:
           The data sets.
       description: |-
         Identifies one or more data sets you want to import with the CreateDataSetExportTask operation.
+    DataSetExportItem:
+      type: object
+      properties:
+        datasetName:
+          allOf:
+          - $ref: '#/components/schemas/String200'
+          description: The data set.
+        externalLocation:
+          allOf:
+          - $ref: '#/components/schemas/ExternalLocation'
+          description: The location of the data set.
+      required:
+      - datasetName
+      - externalLocation
+      description: Identifies a specific data set to export from an external location.
     DataSetExportList:
       type: array
       items:
         $ref: '#/components/schemas/DataSetExportItem'
+    DataSetExportSummary:
+      type: object
+      properties:
+        total:
+          allOf:
+          - $ref: '#/components/schemas/Integer'
+          description: The total number of data set exports.
+        succeeded:
+          allOf:
+          - $ref: '#/components/schemas/Integer'
+          description: The number of data set exports that have succeeded.
+        failed:
+          allOf:
+          - $ref: '#/components/schemas/Integer'
+          description: The number of data set exports that have failed.
+        pending:
+          allOf:
+          - $ref: '#/components/schemas/Integer'
+          description: The number of data set exports that are pending.
+        inProgress:
+          allOf:
+          - $ref: '#/components/schemas/Integer'
+          description: The number of data set exports that are in progress.
+      required:
+      - total
+      - succeeded
+      - failed
+      - pending
+      - inProgress
+      description: Represents a summary of data set exports.
+    DataSetExportTask:
+      type: object
+      properties:
+        taskId:
+          allOf:
+          - $ref: '#/components/schemas/Identifier'
+          description: The identifier of the data set export task.
+        status:
+          allOf:
+          - $ref: '#/components/schemas/DataSetTaskLifecycle'
+          description: The status of the data set export task.
+        summary:
+          allOf:
+          - $ref: '#/components/schemas/DataSetExportSummary'
+          description: A summary of the data set export task.
+        statusReason:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: If dataset exports failed, the failure reason will show here.
+      required:
+      - taskId
+      - status
+      - summary
+      description: Contains information about a data set export task.
     DataSetExportTaskList:
       type: array
       items:
@@ -214,14 +3064,113 @@ components:
           The data sets.
       description: |-
         Identifies one or more data sets you want to import with the CreateDataSetImportTask operation.
+    DataSetImportItem:
+      type: object
+      properties:
+        dataSet:
+          allOf:
+          - $ref: '#/components/schemas/DataSet'
+          description: The data set.
+        externalLocation:
+          allOf:
+          - $ref: '#/components/schemas/ExternalLocation'
+          description: The location of the data set.
+      required:
+      - dataSet
+      - externalLocation
+      description: Identifies a specific data set to import from an external location.
     DataSetImportList:
       type: array
       items:
         $ref: '#/components/schemas/DataSetImportItem'
+    DataSetImportSummary:
+      type: object
+      properties:
+        total:
+          allOf:
+          - $ref: '#/components/schemas/Integer'
+          description: The total number of data set imports.
+        succeeded:
+          allOf:
+          - $ref: '#/components/schemas/Integer'
+          description: The number of data set imports that have succeeded.
+        failed:
+          allOf:
+          - $ref: '#/components/schemas/Integer'
+          description: The number of data set imports that have failed.
+        pending:
+          allOf:
+          - $ref: '#/components/schemas/Integer'
+          description: The number of data set imports that are pending.
+        inProgress:
+          allOf:
+          - $ref: '#/components/schemas/Integer'
+          description: The number of data set imports that are in progress.
+      required:
+      - total
+      - succeeded
+      - failed
+      - pending
+      - inProgress
+      description: Represents a summary of data set imports.
+    DataSetImportTask:
+      type: object
+      properties:
+        taskId:
+          allOf:
+          - $ref: '#/components/schemas/Identifier'
+          description: The identifier of the data set import task.
+        status:
+          allOf:
+          - $ref: '#/components/schemas/DataSetTaskLifecycle'
+          description: The status of the data set import task.
+        summary:
+          allOf:
+          - $ref: '#/components/schemas/DataSetImportSummary'
+          description: A summary of the data set import task.
+        statusReason:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: If dataset import failed, the failure reason will show here.
+      required:
+      - taskId
+      - status
+      - summary
+      description: Contains information about a data set import task.
     DataSetImportTaskList:
       type: array
       items:
         $ref: '#/components/schemas/DataSetImportTask'
+    DataSetSummary:
+      type: object
+      properties:
+        dataSetName:
+          allOf:
+          - $ref: '#/components/schemas/String200'
+          description: The name of the data set.
+        dataSetOrg:
+          allOf:
+          - $ref: '#/components/schemas/String20'
+          description: The type of data set. The only supported value is VSAM.
+        format:
+          allOf:
+          - $ref: '#/components/schemas/String20'
+          description: The format of the data set.
+        creationTime:
+          allOf:
+          - $ref: '#/components/schemas/Timestamp'
+          description: The timestamp when the data set was created.
+        lastUpdatedTime:
+          allOf:
+          - $ref: '#/components/schemas/Timestamp'
+          description: The last time the data set was updated.
+        lastReferencedTime:
+          allOf:
+          - $ref: '#/components/schemas/Timestamp'
+          description: The last time the data set was referenced.
+      required:
+      - dataSetName
+      description: A subset of the possible data set attributes.
     DataSetTaskLifecycle:
       type: string
       enum:
@@ -285,6 +3234,68 @@ components:
           The content of the application definition. This is a JSON object that contains the resource configuration/definitions that identify an application.
       description: |-
         The application definition for a particular application.
+    DeleteApplicationFromEnvironmentRequest:
+      type: object
+      properties:
+        applicationId:
+          allOf:
+          - $ref: '#/components/schemas/Identifier'
+          description: The unique identifier of the application you want to delete.
+        environmentId:
+          allOf:
+          - $ref: '#/components/schemas/Identifier'
+          description: The unique identifier of the runtime environment where the
+            application was previously deployed.
+      required:
+      - applicationId
+      - environmentId
+    DeleteApplicationFromEnvironmentResponse:
+      type: object
+      properties: {}
+    DeleteApplicationRequest:
+      type: object
+      properties:
+        applicationId:
+          allOf:
+          - $ref: '#/components/schemas/Identifier'
+          description: The unique identifier of the application you want to delete.
+      required:
+      - applicationId
+    DeleteApplicationResponse:
+      type: object
+      properties: {}
+    DeleteEnvironmentRequest:
+      type: object
+      properties:
+        environmentId:
+          allOf:
+          - $ref: '#/components/schemas/Identifier'
+          description: The unique identifier of the runtime environment you want to
+            delete.
+      required:
+      - environmentId
+    DeleteEnvironmentResponse:
+      type: object
+      properties: {}
+    DeployedVersionSummary:
+      type: object
+      properties:
+        applicationVersion:
+          allOf:
+          - $ref: '#/components/schemas/Version'
+          description: The version of the deployed application.
+        status:
+          allOf:
+          - $ref: '#/components/schemas/DeploymentLifecycle'
+          description: The status of the deployment.
+        statusReason:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The reason for the reported status.
+      required:
+      - applicationVersion
+      - status
+      description: Contains a summary of a deployed application.
     DeploymentLifecycle:
       type: string
       enum:
@@ -296,6 +3307,60 @@ components:
       type: array
       items:
         $ref: '#/components/schemas/DeploymentSummary'
+    DeploymentSummary:
+      type: object
+      properties:
+        deploymentId:
+          allOf:
+          - $ref: '#/components/schemas/Identifier'
+          description: The unique identifier of the deployment.
+        applicationId:
+          allOf:
+          - $ref: '#/components/schemas/Identifier'
+          description: The unique identifier of the application.
+        environmentId:
+          allOf:
+          - $ref: '#/components/schemas/Identifier'
+          description: The unique identifier of the runtime environment.
+        applicationVersion:
+          allOf:
+          - $ref: '#/components/schemas/Version'
+          description: The version of the application.
+        status:
+          allOf:
+          - $ref: '#/components/schemas/DeploymentLifecycle'
+          description: The current status of the deployment.
+        creationTime:
+          allOf:
+          - $ref: '#/components/schemas/Timestamp'
+          description: The timestamp when the deployment was created.
+        statusReason:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The reason for the reported status.
+      required:
+      - deploymentId
+      - applicationId
+      - environmentId
+      - applicationVersion
+      - status
+      - creationTime
+      description: A subset of information about a specific deployment.
+    EfsStorageConfiguration:
+      type: object
+      properties:
+        fileSystemId:
+          allOf:
+          - $ref: '#/components/schemas/String200'
+          description: The file system identifier.
+        mountPoint:
+          allOf:
+          - $ref: '#/components/schemas/String200'
+          description: The mount point for the file system.
+      required:
+      - fileSystemId
+      - mountPoint
+      description: Defines the storage configuration for an Amazon EFS file system.
     EngineType:
       type: string
       enum:
@@ -304,6 +3369,22 @@ components:
     EngineVersion:
       type: string
       pattern: ^\S{1,10}$
+    EngineVersionsSummary:
+      type: object
+      properties:
+        engineType:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The type of target platform for the application.
+        engineVersion:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The version of the engine type used by the application.
+      required:
+      - engineType
+      - engineVersion
+      description: A subset of information about the engine version for a specific
+        application.
     EngineVersionsSummaryList:
       type: array
       items:
@@ -328,10 +3409,69 @@ components:
       - Deleting
       - Failed
       - UnHealthy
+    EnvironmentSummary:
+      type: object
+      properties:
+        name:
+          allOf:
+          - $ref: '#/components/schemas/EntityName'
+          description: The name of the runtime environment.
+        environmentArn:
+          allOf:
+          - $ref: '#/components/schemas/Arn'
+          description: The Amazon Resource Name (ARN) of a particular runtime environment.
+        environmentId:
+          allOf:
+          - $ref: '#/components/schemas/Identifier'
+          description: The unique identifier of a particular runtime environment.
+        instanceType:
+          allOf:
+          - $ref: '#/components/schemas/String20'
+          description: The instance type of the runtime environment.
+        status:
+          allOf:
+          - $ref: '#/components/schemas/EnvironmentLifecycle'
+          description: The status of the runtime environment
+        engineType:
+          allOf:
+          - $ref: '#/components/schemas/EngineType'
+          description: The target platform for the runtime environment.
+        engineVersion:
+          allOf:
+          - $ref: '#/components/schemas/EngineVersion'
+          description: The version of the runtime engine.
+        creationTime:
+          allOf:
+          - $ref: '#/components/schemas/Timestamp'
+          description: The timestamp when the runtime environment was created.
+        networkType:
+          allOf:
+          - $ref: '#/components/schemas/NetworkType'
+          description: The network type supported by the runtime environment.
+      required:
+      - name
+      - environmentArn
+      - environmentId
+      - instanceType
+      - status
+      - engineType
+      - engineVersion
+      - creationTime
+      description: Contains a subset of the possible runtime environment attributes.
+        Used in the environment list.
     EnvironmentSummaryList:
       type: array
       items:
         $ref: '#/components/schemas/EnvironmentSummary'
+    ExecutionTimeoutException:
+      type: object
+      properties:
+        message:
+          $ref: '#/components/schemas/String'
+      required:
+      - message
+      description: Failed to connect to server, or didn’t receive response within
+        expected time period.
     ExternalLocation:
       allOf:
       - allOf:
@@ -340,6 +3480,657 @@ components:
           The URI of the Amazon S3 bucket.
       description: |-
         Defines an external storage location.
+    FileBatchJobDefinition:
+      type: object
+      properties:
+        fileName:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The name of the file containing the batch job definition.
+        folderPath:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The path to the file containing the batch job definition.
+      required:
+      - fileName
+      description: A file containing a batch job definition.
+    FileBatchJobIdentifier:
+      type: object
+      properties:
+        fileName:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The file name for the batch job identifier.
+        folderPath:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The relative path to the file name for the batch job identifier.
+      required:
+      - fileName
+      description: A batch job identifier in which the batch job to run is identified
+        by the file name and the relative path to the file name.
+    FsxStorageConfiguration:
+      type: object
+      properties:
+        fileSystemId:
+          allOf:
+          - $ref: '#/components/schemas/String200'
+          description: The file system identifier.
+        mountPoint:
+          allOf:
+          - $ref: '#/components/schemas/String200'
+          description: The mount point for the file system.
+      required:
+      - fileSystemId
+      - mountPoint
+      description: Defines the storage configuration for an Amazon FSx file system.
+    GdgAttributes:
+      type: object
+      properties:
+        limit:
+          allOf:
+          - $ref: '#/components/schemas/Integer'
+          description: The maximum number of generation data sets, up to 255, in a
+            GDG.
+        rollDisposition:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The disposition of the data set in the catalog.
+      description: The required attributes for a generation data group data set. A
+        generation data set is one of a collection of successive, historically related,
+        catalogued data sets that together are known as a generation data group (GDG).
+        Use this structure when you want to import a GDG. For more information on
+        GDG, see [Generation data sets](https://www.ibm.com/docs/en/zos/2.3.0?topic=guide-generation-data-sets).
+    GdgDetailAttributes:
+      type: object
+      properties:
+        limit:
+          allOf:
+          - $ref: '#/components/schemas/Integer'
+          description: The maximum number of generation data sets, up to 255, in a
+            GDG.
+        rollDisposition:
+          allOf:
+          - $ref: '#/components/schemas/String50'
+          description: The disposition of the data set in the catalog.
+      description: The required attributes for a generation data group data set. A
+        generation data set is one of a collection of successive, historically related,
+        catalogued data sets that together are known as a generation data group (GDG).
+        Use this structure when you want to import a GDG. For more information on
+        GDG, see [Generation data sets](https://www.ibm.com/docs/en/zos/2.3.0?topic=guide-generation-data-sets).
+    GetApplicationRequest:
+      type: object
+      properties:
+        applicationId:
+          allOf:
+          - $ref: '#/components/schemas/Identifier'
+          description: The identifier of the application.
+      required:
+      - applicationId
+    GetApplicationResponse:
+      type: object
+      properties:
+        name:
+          allOf:
+          - $ref: '#/components/schemas/EntityName'
+          description: The unique identifier of the application.
+        description:
+          allOf:
+          - $ref: '#/components/schemas/EntityDescription'
+          description: The description of the application.
+        applicationId:
+          allOf:
+          - $ref: '#/components/schemas/Identifier'
+          description: The identifier of the application.
+        applicationArn:
+          allOf:
+          - $ref: '#/components/schemas/Arn'
+          description: The Amazon Resource Name (ARN) of the application.
+        status:
+          allOf:
+          - $ref: '#/components/schemas/ApplicationLifecycle'
+          description: The status of the application.
+        latestVersion:
+          allOf:
+          - $ref: '#/components/schemas/ApplicationVersionSummary'
+          description: The latest version of the application.
+        deployedVersion:
+          allOf:
+          - $ref: '#/components/schemas/DeployedVersionSummary'
+          description: The version of the application that is deployed.
+        engineType:
+          allOf:
+          - $ref: '#/components/schemas/EngineType'
+          description: The type of the target platform for the application.
+        logGroups:
+          allOf:
+          - $ref: '#/components/schemas/LogGroupSummaries'
+          description: The list of log summaries. Each log summary includes the log
+            type as well as the log group identifier. These are CloudWatch logs. Amazon
+            Web Services Mainframe Modernization pushes the application log to CloudWatch
+            under the customer's account.
+        creationTime:
+          allOf:
+          - $ref: '#/components/schemas/Timestamp'
+          description: The timestamp when this application was created.
+        lastStartTime:
+          allOf:
+          - $ref: '#/components/schemas/Timestamp'
+          description: The timestamp when you last started the application. Null until
+            the application runs for the first time.
+        tags:
+          allOf:
+          - $ref: '#/components/schemas/TagMap'
+          description: A list of tags associated with the application.
+        environmentId:
+          allOf:
+          - $ref: '#/components/schemas/Identifier'
+          description: The identifier of the runtime environment where you want to
+            deploy the application.
+        targetGroupArns:
+          allOf:
+          - $ref: '#/components/schemas/ArnList'
+          description: Returns the Amazon Resource Names (ARNs) of the target groups
+            that are attached to the network load balancer.
+        listenerArns:
+          allOf:
+          - $ref: '#/components/schemas/ArnList'
+          description: The Amazon Resource Name (ARN) for the network load balancer
+            listener created in your Amazon Web Services account. Amazon Web Services
+            Mainframe Modernization creates this listener for you the first time you
+            deploy an application.
+        listenerPorts:
+          allOf:
+          - $ref: '#/components/schemas/PortList'
+          description: The port associated with the network load balancer listener
+            created in your Amazon Web Services account.
+        loadBalancerDnsName:
+          allOf:
+          - $ref: '#/components/schemas/String100'
+          description: The public DNS name of the load balancer created in your Amazon
+            Web Services account.
+        statusReason:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The reason for the reported status.
+        kmsKeyId:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The identifier of a customer managed key.
+        roleArn:
+          allOf:
+          - $ref: '#/components/schemas/Arn'
+          description: The Amazon Resource Name (ARN) of the role associated with
+            the application.
+      required:
+      - name
+      - applicationId
+      - applicationArn
+      - status
+      - latestVersion
+      - engineType
+      - creationTime
+    GetApplicationVersionRequest:
+      type: object
+      properties:
+        applicationId:
+          allOf:
+          - $ref: '#/components/schemas/Identifier'
+          description: The unique identifier of the application.
+        applicationVersion:
+          allOf:
+          - $ref: '#/components/schemas/Version'
+          description: The specific version of the application.
+      required:
+      - applicationId
+      - applicationVersion
+    GetApplicationVersionResponse:
+      type: object
+      properties:
+        name:
+          allOf:
+          - $ref: '#/components/schemas/EntityName'
+          description: The name of the application version.
+        applicationVersion:
+          allOf:
+          - $ref: '#/components/schemas/Version'
+          description: The specific version of the application.
+        description:
+          allOf:
+          - $ref: '#/components/schemas/EntityDescription'
+          description: The application description.
+        definitionContent:
+          allOf:
+          - $ref: '#/components/schemas/StringFree65000'
+          description: The content of the application definition. This is a JSON object
+            that contains the resource configuration and definitions that identify
+            an application.
+        status:
+          allOf:
+          - $ref: '#/components/schemas/ApplicationVersionLifecycle'
+          description: The status of the application version.
+        creationTime:
+          allOf:
+          - $ref: '#/components/schemas/Timestamp'
+          description: The timestamp when the application version was created.
+        statusReason:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The reason for the reported status.
+      required:
+      - name
+      - applicationVersion
+      - definitionContent
+      - status
+      - creationTime
+    GetBatchJobExecutionRequest:
+      type: object
+      properties:
+        applicationId:
+          allOf:
+          - $ref: '#/components/schemas/Identifier'
+          description: The identifier of the application.
+        executionId:
+          allOf:
+          - $ref: '#/components/schemas/Identifier'
+          description: The unique identifier of the batch job execution.
+      required:
+      - applicationId
+      - executionId
+    GetBatchJobExecutionResponse:
+      type: object
+      properties:
+        executionId:
+          allOf:
+          - $ref: '#/components/schemas/Identifier'
+          description: The unique identifier for this batch job execution.
+        applicationId:
+          allOf:
+          - $ref: '#/components/schemas/Identifier'
+          description: The identifier of the application.
+        jobId:
+          allOf:
+          - $ref: '#/components/schemas/String100'
+          description: The unique identifier for this batch job.
+        jobName:
+          allOf:
+          - $ref: '#/components/schemas/String100'
+          description: The name of this batch job.
+        jobUser:
+          allOf:
+          - $ref: '#/components/schemas/String100'
+          description: The user for the job.
+        jobType:
+          allOf:
+          - $ref: '#/components/schemas/BatchJobType'
+          description: The type of job.
+        status:
+          allOf:
+          - $ref: '#/components/schemas/BatchJobExecutionStatus'
+          description: The status of the batch job execution.
+        startTime:
+          allOf:
+          - $ref: '#/components/schemas/Timestamp'
+          description: The timestamp when the batch job execution started.
+        endTime:
+          allOf:
+          - $ref: '#/components/schemas/Timestamp'
+          description: The timestamp when the batch job execution ended.
+        statusReason:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The reason for the reported status.
+        returnCode:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The batch job return code from either the Blu Age or Micro
+            Focus runtime engines. For more information, see [Batch return codes](https://www.ibm.com/docs/en/was/8.5.5?topic=model-batch-return-codes)
+            in the _IBM WebSphere Application Server_ documentation.
+        batchJobIdentifier:
+          allOf:
+          - $ref: '#/components/schemas/BatchJobIdentifier'
+          description: The unique identifier of this batch job.
+        jobStepRestartMarker:
+          allOf:
+          - $ref: '#/components/schemas/JobStepRestartMarker'
+          description: The step/procedure step information for the restart batch job
+            operation.
+      required:
+      - executionId
+      - applicationId
+      - status
+      - startTime
+    GetDataSetDetailsRequest:
+      type: object
+      properties:
+        applicationId:
+          allOf:
+          - $ref: '#/components/schemas/Identifier'
+          description: The unique identifier of the application that this data set
+            is associated with.
+        dataSetName:
+          allOf:
+          - $ref: '#/components/schemas/String200'
+          description: The name of the data set.
+      required:
+      - applicationId
+      - dataSetName
+    GetDataSetDetailsResponse:
+      type: object
+      properties:
+        dataSetName:
+          allOf:
+          - $ref: '#/components/schemas/String200'
+          description: The name of the data set.
+        dataSetOrg:
+          allOf:
+          - $ref: '#/components/schemas/DatasetDetailOrgAttributes'
+          description: The type of data set. The only supported value is VSAM.
+        recordLength:
+          allOf:
+          - $ref: '#/components/schemas/Integer'
+          description: The length of records in the data set.
+        location:
+          allOf:
+          - $ref: '#/components/schemas/String2000'
+          description: The location where the data set is stored.
+        blocksize:
+          allOf:
+          - $ref: '#/components/schemas/Integer'
+          description: The size of the block on disk.
+        creationTime:
+          allOf:
+          - $ref: '#/components/schemas/Timestamp'
+          description: The timestamp when the data set was created.
+        lastUpdatedTime:
+          allOf:
+          - $ref: '#/components/schemas/Timestamp'
+          description: The last time the data set was updated.
+        lastReferencedTime:
+          allOf:
+          - $ref: '#/components/schemas/Timestamp'
+          description: The last time the data set was referenced.
+        fileSize:
+          allOf:
+          - $ref: '#/components/schemas/Long'
+          description: File size of the dataset.
+      required:
+      - dataSetName
+    GetDataSetExportTaskRequest:
+      type: object
+      properties:
+        applicationId:
+          allOf:
+          - $ref: '#/components/schemas/Identifier'
+          description: The application identifier.
+        taskId:
+          allOf:
+          - $ref: '#/components/schemas/Identifier'
+          description: The task identifier returned by the CreateDataSetExportTask
+            operation.
+      required:
+      - applicationId
+      - taskId
+    GetDataSetExportTaskResponse:
+      type: object
+      properties:
+        taskId:
+          allOf:
+          - $ref: '#/components/schemas/Identifier'
+          description: The task identifier.
+        status:
+          allOf:
+          - $ref: '#/components/schemas/DataSetTaskLifecycle'
+          description: The status of the task.
+        summary:
+          allOf:
+          - $ref: '#/components/schemas/DataSetExportSummary'
+          description: A summary of the status of the task.
+        statusReason:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: If dataset export failed, the failure reason will show here.
+        kmsKeyArn:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The identifier of a customer managed key used for exported
+            data set encryption.
+      required:
+      - taskId
+      - status
+    GetDataSetImportTaskRequest:
+      type: object
+      properties:
+        applicationId:
+          allOf:
+          - $ref: '#/components/schemas/Identifier'
+          description: The application identifier.
+        taskId:
+          allOf:
+          - $ref: '#/components/schemas/Identifier'
+          description: The task identifier returned by the CreateDataSetImportTask
+            operation.
+      required:
+      - applicationId
+      - taskId
+    GetDataSetImportTaskResponse:
+      type: object
+      properties:
+        taskId:
+          allOf:
+          - $ref: '#/components/schemas/Identifier'
+          description: The task identifier.
+        status:
+          allOf:
+          - $ref: '#/components/schemas/DataSetTaskLifecycle'
+          description: The status of the task.
+        summary:
+          allOf:
+          - $ref: '#/components/schemas/DataSetImportSummary'
+          description: A summary of the status of the task.
+      required:
+      - taskId
+      - status
+    GetDeploymentRequest:
+      type: object
+      properties:
+        deploymentId:
+          allOf:
+          - $ref: '#/components/schemas/Identifier'
+          description: The unique identifier for the deployment.
+        applicationId:
+          allOf:
+          - $ref: '#/components/schemas/Identifier'
+          description: The unique identifier of the application.
+      required:
+      - deploymentId
+      - applicationId
+    GetDeploymentResponse:
+      type: object
+      properties:
+        deploymentId:
+          allOf:
+          - $ref: '#/components/schemas/Identifier'
+          description: The unique identifier of the deployment.
+        applicationId:
+          allOf:
+          - $ref: '#/components/schemas/Identifier'
+          description: The unique identifier of the application.
+        environmentId:
+          allOf:
+          - $ref: '#/components/schemas/Identifier'
+          description: The unique identifier of the runtime environment.
+        applicationVersion:
+          allOf:
+          - $ref: '#/components/schemas/Version'
+          description: The application version.
+        status:
+          allOf:
+          - $ref: '#/components/schemas/DeploymentLifecycle'
+          description: The status of the deployment.
+        creationTime:
+          allOf:
+          - $ref: '#/components/schemas/Timestamp'
+          description: The timestamp when the deployment was created.
+        statusReason:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The reason for the reported status.
+      required:
+      - deploymentId
+      - applicationId
+      - environmentId
+      - applicationVersion
+      - status
+      - creationTime
+    GetEnvironmentRequest:
+      type: object
+      properties:
+        environmentId:
+          allOf:
+          - $ref: '#/components/schemas/Identifier'
+          description: The unique identifier of the runtime environment.
+      required:
+      - environmentId
+    GetEnvironmentResponse:
+      type: object
+      properties:
+        name:
+          allOf:
+          - $ref: '#/components/schemas/EntityName'
+          description: The name of the runtime environment. Must be unique within
+            the account.
+        description:
+          allOf:
+          - $ref: '#/components/schemas/EntityDescription'
+          description: The description of the runtime environment.
+        environmentArn:
+          allOf:
+          - $ref: '#/components/schemas/Arn'
+          description: The Amazon Resource Name (ARN) of the runtime environment.
+        environmentId:
+          allOf:
+          - $ref: '#/components/schemas/Identifier'
+          description: The unique identifier of the runtime environment.
+        instanceType:
+          allOf:
+          - $ref: '#/components/schemas/String20'
+          description: The type of instance underlying the runtime environment.
+        status:
+          allOf:
+          - $ref: '#/components/schemas/EnvironmentLifecycle'
+          description: The status of the runtime environment. If the Amazon Web Services
+            Mainframe Modernization environment is missing a connection to the customer
+            owned dependent resource, the status will be `Unhealthy`.
+        engineType:
+          allOf:
+          - $ref: '#/components/schemas/EngineType'
+          description: The target platform for the runtime environment.
+        engineVersion:
+          allOf:
+          - $ref: '#/components/schemas/EngineVersion'
+          description: The version of the runtime engine.
+        vpcId:
+          allOf:
+          - $ref: '#/components/schemas/String50'
+          description: The unique identifier for the VPC used with this runtime environment.
+        subnetIds:
+          allOf:
+          - $ref: '#/components/schemas/String50List'
+          description: The unique identifiers of the subnets assigned to this runtime
+            environment.
+        securityGroupIds:
+          allOf:
+          - $ref: '#/components/schemas/String50List'
+          description: The unique identifiers of the security groups assigned to this
+            runtime environment.
+        creationTime:
+          allOf:
+          - $ref: '#/components/schemas/Timestamp'
+          description: The timestamp when the runtime environment was created.
+        storageConfigurations:
+          allOf:
+          - $ref: '#/components/schemas/StorageConfigurationList'
+          description: The storage configurations defined for the runtime environment.
+        tags:
+          allOf:
+          - $ref: '#/components/schemas/TagMap'
+          description: The tags defined for this runtime environment.
+        highAvailabilityConfig:
+          allOf:
+          - $ref: '#/components/schemas/HighAvailabilityConfig'
+          description: The desired capacity of the high availability configuration
+            for the runtime environment.
+        publiclyAccessible:
+          allOf:
+          - $ref: '#/components/schemas/Boolean'
+          description: Whether applications running in this runtime environment are
+            publicly accessible.
+        actualCapacity:
+          allOf:
+          - $ref: '#/components/schemas/CapacityValue'
+          description: The number of instances included in the runtime environment.
+            A standalone runtime environment has a maximum of one instance. Currently,
+            a high availability runtime environment has a maximum of two instances.
+        loadBalancerArn:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The Amazon Resource Name (ARN) for the load balancer used with
+            the runtime environment.
+        statusReason:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The reason for the reported status.
+        preferredMaintenanceWindow:
+          allOf:
+          - $ref: '#/components/schemas/String50'
+          description: The maintenance window for the runtime environment. If you
+            don't provide a value for the maintenance window, the service assigns
+            a random value.
+        pendingMaintenance:
+          allOf:
+          - $ref: '#/components/schemas/PendingMaintenance'
+          description: Indicates the pending maintenance scheduled on this environment.
+        kmsKeyId:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The identifier of a customer managed key.
+        networkType:
+          allOf:
+          - $ref: '#/components/schemas/NetworkType'
+          description: The network type supported by the runtime environment.
+      required:
+      - name
+      - environmentArn
+      - environmentId
+      - instanceType
+      - status
+      - engineType
+      - engineVersion
+      - vpcId
+      - subnetIds
+      - securityGroupIds
+      - creationTime
+    GetSignedBluinsightsUrlResponse:
+      type: object
+      properties:
+        signedBiUrl:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: Single sign-on AWS Blu Insights URL.
+      required:
+      - signedBiUrl
+    HighAvailabilityConfig:
+      type: object
+      properties:
+        desiredCapacity:
+          allOf:
+          - $ref: '#/components/schemas/CapacityValue'
+          description: The number of instances in a high availability configuration.
+            The minimum possible value is 1 and the maximum is 100.
+      required:
+      - desiredCapacity
+      description: Defines the details of a high availability configuration.
     Identifier:
       type: string
       pattern: ^\S{1,80}$
@@ -350,6 +4141,18 @@ components:
     Integer:
       type: integer
       default: 0
+    InternalServerException:
+      type: object
+      properties:
+        message:
+          $ref: '#/components/schemas/String'
+        retryAfterSeconds:
+          allOf:
+          - $ref: '#/components/schemas/Integer'
+          description: The number of seconds to wait before retrying the request.
+      required:
+      - message
+      description: An unexpected error occurred during the processing of the request.
     JobIdentifier:
       allOf:
       - allOf:
@@ -362,11 +4165,511 @@ components:
           The name of the script that contains the batch job definition.
       description: |-
         Identifies a specific batch job.
+    JobStep:
+      type: object
+      properties:
+        stepNumber:
+          allOf:
+          - $ref: '#/components/schemas/Integer'
+          description: The number of a step.
+        stepName:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The name of a step.
+        procStepNumber:
+          allOf:
+          - $ref: '#/components/schemas/Integer'
+          description: The number of a procedure step.
+        procStepName:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The name of a procedure step.
+        stepCondCode:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The condition code of a step.
+        stepRestartable:
+          allOf:
+          - $ref: '#/components/schemas/Boolean'
+          description: Specifies if a step can be restarted or not.
+        stepCheckpoint:
+          allOf:
+          - $ref: '#/components/schemas/Integer'
+          description: A registered step-level checkpoint identifier that can be used
+            for restarting an Amazon Web Services Blu Age application batch job.
+        stepCheckpointStatus:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The step-level checkpoint status for an Amazon Web Services
+            Blu Age application batch job.
+        stepCheckpointTime:
+          allOf:
+          - $ref: '#/components/schemas/Timestamp'
+          description: The step-level checkpoint status for an Amazon Web Services
+            Blu Age application batch job.
+      description: Provides information related to a job step.
+    JobStepRestartMarker:
+      type: object
+      properties:
+        fromStep:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The step name that a batch job was restarted from.
+        fromProcStep:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The procedure step name that a batch job was restarted from.
+        toStep:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The step name that a batch job was restarted to.
+        toProcStep:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The procedure step name that a batch job was restarted to.
+        stepCheckpoint:
+          allOf:
+          - $ref: '#/components/schemas/Integer'
+          description: Skip selected step and issue a restart from immediate successor
+            step for an Amazon Web Services Blu Age application batch job.
+        skip:
+          allOf:
+          - $ref: '#/components/schemas/Boolean'
+          description: The step-level checkpoint timestamp (creation or last modification)
+            for an Amazon Web Services Blu Age application batch job.
+      required:
+      - fromStep
+      description: Provides step/procedure step information for a restart batch job
+        operation.
     KMSKeyId:
       type: string
       pattern: ^[a-zA-Z0-9:/_-]+$
       minLength: 1
       maxLength: 256
+    ListApplicationVersionsRequest:
+      type: object
+      properties:
+        nextToken:
+          allOf:
+          - $ref: '#/components/schemas/NextToken'
+          description: A pagination token returned from a previous call to this operation.
+            This specifies the next item to return. To return to the beginning of
+            the list, exclude this parameter.
+        maxResults:
+          allOf:
+          - $ref: '#/components/schemas/MaxResults'
+          description: The maximum number of application versions to return.
+        applicationId:
+          allOf:
+          - $ref: '#/components/schemas/Identifier'
+          description: The unique identifier of the application.
+      required:
+      - applicationId
+    ListApplicationVersionsResponse:
+      type: object
+      properties:
+        applicationVersions:
+          allOf:
+          - $ref: '#/components/schemas/ApplicationVersionSummaryList'
+          description: The list of application versions.
+        nextToken:
+          allOf:
+          - $ref: '#/components/schemas/NextToken'
+          description: If there are more items to return, this contains a token that
+            is passed to a subsequent call to this operation to retrieve the next
+            set of items.
+      required:
+      - applicationVersions
+    ListApplicationsRequest:
+      type: object
+      properties:
+        nextToken:
+          allOf:
+          - $ref: '#/components/schemas/NextToken'
+          description: A pagination token to control the number of applications displayed
+            in the list.
+        maxResults:
+          allOf:
+          - $ref: '#/components/schemas/MaxResults'
+          description: The maximum number of applications to return.
+        names:
+          allOf:
+          - $ref: '#/components/schemas/EntityNameList'
+          description: The names of the applications.
+        environmentId:
+          allOf:
+          - $ref: '#/components/schemas/Identifier'
+          description: The unique identifier of the runtime environment where the
+            applications are deployed.
+    ListApplicationsResponse:
+      type: object
+      properties:
+        applications:
+          allOf:
+          - $ref: '#/components/schemas/ApplicationSummaryList'
+          description: Returns a list of summary details for all the applications
+            in a runtime environment.
+        nextToken:
+          allOf:
+          - $ref: '#/components/schemas/NextToken'
+          description: A pagination token that's returned when the response doesn't
+            contain all applications.
+      required:
+      - applications
+    ListBatchJobDefinitionsRequest:
+      type: object
+      properties:
+        nextToken:
+          allOf:
+          - $ref: '#/components/schemas/NextToken'
+          description: A pagination token returned from a previous call to this operation.
+            This specifies the next item to return. To return to the beginning of
+            the list, exclude this parameter.
+        maxResults:
+          allOf:
+          - $ref: '#/components/schemas/MaxResults'
+          description: The maximum number of batch job definitions to return.
+        applicationId:
+          allOf:
+          - $ref: '#/components/schemas/Identifier'
+          description: The identifier of the application.
+        prefix:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: If the batch job definition is a FileBatchJobDefinition, the
+            prefix allows you to search on the file names of FileBatchJobDefinitions.
+      required:
+      - applicationId
+    ListBatchJobDefinitionsResponse:
+      type: object
+      properties:
+        batchJobDefinitions:
+          allOf:
+          - $ref: '#/components/schemas/BatchJobDefinitions'
+          description: The list of batch job definitions.
+        nextToken:
+          allOf:
+          - $ref: '#/components/schemas/NextToken'
+          description: If there are more items to return, this contains a token that
+            is passed to a subsequent call to this operation to retrieve the next
+            set of items.
+      required:
+      - batchJobDefinitions
+    ListBatchJobExecutionsRequest:
+      type: object
+      properties:
+        nextToken:
+          allOf:
+          - $ref: '#/components/schemas/NextToken'
+          description: A pagination token to control the number of batch job executions
+            displayed in the list.
+        maxResults:
+          allOf:
+          - $ref: '#/components/schemas/MaxResults'
+          description: The maximum number of batch job executions to return.
+        applicationId:
+          allOf:
+          - $ref: '#/components/schemas/Identifier'
+          description: The unique identifier of the application.
+        executionIds:
+          allOf:
+          - $ref: '#/components/schemas/IdentifierList'
+          description: The unique identifier of each batch job execution.
+        jobName:
+          allOf:
+          - $ref: '#/components/schemas/String100'
+          description: The name of each batch job execution.
+        status:
+          allOf:
+          - $ref: '#/components/schemas/BatchJobExecutionStatus'
+          description: The status of the batch job executions.
+        startedAfter:
+          allOf:
+          - $ref: '#/components/schemas/Timestamp'
+          description: The time after which the batch job executions started.
+        startedBefore:
+          allOf:
+          - $ref: '#/components/schemas/Timestamp'
+          description: The time before the batch job executions started.
+      required:
+      - applicationId
+    ListBatchJobExecutionsResponse:
+      type: object
+      properties:
+        batchJobExecutions:
+          allOf:
+          - $ref: '#/components/schemas/BatchJobExecutionSummaryList'
+          description: Returns a list of batch job executions for an application.
+        nextToken:
+          allOf:
+          - $ref: '#/components/schemas/NextToken'
+          description: A pagination token that's returned when the response doesn't
+            contain all batch job executions.
+      required:
+      - batchJobExecutions
+    ListBatchJobRestartPointsRequest:
+      type: object
+      properties:
+        applicationId:
+          allOf:
+          - $ref: '#/components/schemas/Identifier'
+          description: The unique identifier of the application.
+        executionId:
+          allOf:
+          - $ref: '#/components/schemas/Identifier'
+          description: The unique identifier of the batch job execution.
+        authSecretsManagerArn:
+          allOf:
+          - $ref: '#/components/schemas/AuthSecretsManagerArn'
+          description: The Amazon Web Services Secrets Manager containing user's credentials
+            for authentication and authorization for List Batch Job Restart Points
+            operation.
+      required:
+      - applicationId
+      - executionId
+    ListBatchJobRestartPointsResponse:
+      type: object
+      properties:
+        batchJobSteps:
+          allOf:
+          - $ref: '#/components/schemas/BatchJobStepList'
+          description: Returns all the batch job steps and related information for
+            a batch job that previously ran.
+    ListDataSetExportHistoryRequest:
+      type: object
+      properties:
+        nextToken:
+          allOf:
+          - $ref: '#/components/schemas/NextToken'
+          description: A pagination token returned from a previous call to this operation.
+            This specifies the next item to return. To return to the beginning of
+            the list, exclude this parameter.
+        maxResults:
+          allOf:
+          - $ref: '#/components/schemas/MaxResults'
+          description: The maximum number of objects to return.
+        applicationId:
+          allOf:
+          - $ref: '#/components/schemas/Identifier'
+          description: The unique identifier of the application.
+      required:
+      - applicationId
+    ListDataSetExportHistoryResponse:
+      type: object
+      properties:
+        dataSetExportTasks:
+          allOf:
+          - $ref: '#/components/schemas/DataSetExportTaskList'
+          description: The data set export tasks.
+        nextToken:
+          allOf:
+          - $ref: '#/components/schemas/NextToken'
+          description: If there are more items to return, this contains a token that
+            is passed to a subsequent call to this operation to retrieve the next
+            set of items.
+      required:
+      - dataSetExportTasks
+    ListDataSetImportHistoryRequest:
+      type: object
+      properties:
+        nextToken:
+          allOf:
+          - $ref: '#/components/schemas/NextToken'
+          description: A pagination token returned from a previous call to this operation.
+            This specifies the next item to return. To return to the beginning of
+            the list, exclude this parameter.
+        maxResults:
+          allOf:
+          - $ref: '#/components/schemas/MaxResults'
+          description: The maximum number of objects to return.
+        applicationId:
+          allOf:
+          - $ref: '#/components/schemas/Identifier'
+          description: The unique identifier of the application.
+      required:
+      - applicationId
+    ListDataSetImportHistoryResponse:
+      type: object
+      properties:
+        dataSetImportTasks:
+          allOf:
+          - $ref: '#/components/schemas/DataSetImportTaskList'
+          description: The data set import tasks.
+        nextToken:
+          allOf:
+          - $ref: '#/components/schemas/NextToken'
+          description: If there are more items to return, this contains a token that
+            is passed to a subsequent call to this operation to retrieve the next
+            set of items.
+      required:
+      - dataSetImportTasks
+    ListDataSetsRequest:
+      type: object
+      properties:
+        applicationId:
+          allOf:
+          - $ref: '#/components/schemas/Identifier'
+          description: The unique identifier of the application for which you want
+            to list the associated data sets.
+        nextToken:
+          allOf:
+          - $ref: '#/components/schemas/NextToken'
+          description: A pagination token returned from a previous call to this operation.
+            This specifies the next item to return. To return to the beginning of
+            the list, exclude this parameter.
+        maxResults:
+          allOf:
+          - $ref: '#/components/schemas/MaxResults'
+          description: The maximum number of objects to return.
+        prefix:
+          allOf:
+          - $ref: '#/components/schemas/String200'
+          description: The prefix of the data set name, which you can use to filter
+            the list of data sets.
+        nameFilter:
+          allOf:
+          - $ref: '#/components/schemas/String200'
+          description: Filter dataset name matching the specified pattern. Can use
+            * and % as wild cards.
+      required:
+      - applicationId
+    ListDataSetsResponse:
+      type: object
+      properties:
+        dataSets:
+          allOf:
+          - $ref: '#/components/schemas/DataSetsSummaryList'
+          description: The list of data sets, containing information including the
+            creation time, the data set name, the data set organization, the data
+            set format, and the last time the data set was referenced or updated.
+        nextToken:
+          allOf:
+          - $ref: '#/components/schemas/NextToken'
+          description: If there are more items to return, this contains a token that
+            is passed to a subsequent call to this operation to retrieve the next
+            set of items.
+      required:
+      - dataSets
+    ListDeploymentsRequest:
+      type: object
+      properties:
+        nextToken:
+          allOf:
+          - $ref: '#/components/schemas/NextToken'
+          description: A pagination token returned from a previous call to this operation.
+            This specifies the next item to return. To return to the beginning of
+            the list, exclude this parameter.
+        maxResults:
+          allOf:
+          - $ref: '#/components/schemas/MaxResults'
+          description: The maximum number of objects to return.
+        applicationId:
+          allOf:
+          - $ref: '#/components/schemas/Identifier'
+          description: The application identifier.
+      required:
+      - applicationId
+    ListDeploymentsResponse:
+      type: object
+      properties:
+        deployments:
+          allOf:
+          - $ref: '#/components/schemas/DeploymentList'
+          description: The list of deployments that is returned.
+        nextToken:
+          allOf:
+          - $ref: '#/components/schemas/NextToken'
+          description: If there are more items to return, this contains a token that
+            is passed to a subsequent call to this operation to retrieve the next
+            set of items.
+      required:
+      - deployments
+    ListEngineVersionsRequest:
+      type: object
+      properties:
+        engineType:
+          allOf:
+          - $ref: '#/components/schemas/EngineType'
+          description: The type of target platform.
+        nextToken:
+          allOf:
+          - $ref: '#/components/schemas/NextToken'
+          description: A pagination token returned from a previous call to this operation.
+            This specifies the next item to return. To return to the beginning of
+            the list, exclude this parameter.
+        maxResults:
+          allOf:
+          - $ref: '#/components/schemas/MaxResults'
+          description: The maximum number of objects to return.
+    ListEngineVersionsResponse:
+      type: object
+      properties:
+        engineVersions:
+          allOf:
+          - $ref: '#/components/schemas/EngineVersionsSummaryList'
+          description: Returns the engine versions.
+        nextToken:
+          allOf:
+          - $ref: '#/components/schemas/NextToken'
+          description: If there are more items to return, this contains a token that
+            is passed to a subsequent call to this operation to retrieve the next
+            set of items.
+      required:
+      - engineVersions
+    ListEnvironmentsRequest:
+      type: object
+      properties:
+        nextToken:
+          allOf:
+          - $ref: '#/components/schemas/NextToken'
+          description: A pagination token to control the number of runtime environments
+            displayed in the list.
+        maxResults:
+          allOf:
+          - $ref: '#/components/schemas/MaxResults'
+          description: The maximum number of runtime environments to return.
+        names:
+          allOf:
+          - $ref: '#/components/schemas/EntityNameList'
+          description: The names of the runtime environments. Must be unique within
+            the account.
+        engineType:
+          allOf:
+          - $ref: '#/components/schemas/EngineType'
+          description: The engine type for the runtime environment.
+    ListEnvironmentsResponse:
+      type: object
+      properties:
+        environments:
+          allOf:
+          - $ref: '#/components/schemas/EnvironmentSummaryList'
+          description: Returns a list of summary details for all the runtime environments
+            in your account.
+        nextToken:
+          allOf:
+          - $ref: '#/components/schemas/NextToken'
+          description: A pagination token that's returned when the response doesn't
+            contain all the runtime environments.
+      required:
+      - environments
+    ListTagsForResourceRequest:
+      type: object
+      properties:
+        resourceArn:
+          allOf:
+          - $ref: '#/components/schemas/Arn'
+          description: The Amazon Resource Name (ARN) of the resource.
+      required:
+      - resourceArn
+    ListTagsForResourceResponse:
+      type: object
+      properties:
+        tags:
+          allOf:
+          - $ref: '#/components/schemas/TagMap'
+          description: The tags for the resource.
+      required:
+      - tags
     LogGroupIdentifier:
       type: string
       minLength: 1
@@ -375,6 +4678,35 @@ components:
       type: array
       items:
         $ref: '#/components/schemas/LogGroupSummary'
+    LogGroupSummary:
+      type: object
+      properties:
+        logType:
+          allOf:
+          - $ref: '#/components/schemas/String20'
+          description: The type of log.
+        logGroupName:
+          allOf:
+          - $ref: '#/components/schemas/LogGroupIdentifier'
+          description: The name of the log group.
+      required:
+      - logType
+      - logGroupName
+      description: A subset of the attributes that describe a log group. In CloudWatch
+        a log group is a group of log streams that share the same retention, monitoring,
+        and access control settings.
+    MaintenanceSchedule:
+      type: object
+      properties:
+        startTime:
+          allOf:
+          - $ref: '#/components/schemas/Timestamp'
+          description: The time the scheduled maintenance is to start.
+        endTime:
+          allOf:
+          - $ref: '#/components/schemas/Timestamp'
+          description: The time the scheduled maintenance is to end.
+      description: The information about the maintenance schedule.
     MaxResults:
       type: integer
       minimum: 1
@@ -387,10 +4719,303 @@ components:
     NextToken:
       type: string
       pattern: ^\S{1,2000}$
+    PendingMaintenance:
+      type: object
+      properties:
+        schedule:
+          allOf:
+          - $ref: '#/components/schemas/MaintenanceSchedule'
+          description: The maintenance schedule for the runtime engine version.
+        engineVersion:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The specific runtime engine that the maintenance schedule applies
+            to.
+      description: The scheduled maintenance for a runtime engine.
+    PoAttributes:
+      type: object
+      properties:
+        format:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The format of the data set records.
+        encoding:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The character set encoding of the data set.
+        memberFileExtensions:
+          allOf:
+          - $ref: '#/components/schemas/String20List'
+          description: An array containing one or more filename extensions, allowing
+            you to specify which files to be included as PDS member.
+      required:
+      - format
+      - memberFileExtensions
+      description: The supported properties for a PO type data set.
+    PoDetailAttributes:
+      type: object
+      properties:
+        format:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The format of the data set records.
+        encoding:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The character set encoding of the data set.
+      required:
+      - format
+      - encoding
+      description: The supported properties for a PO type data set.
     PortList:
       type: array
       items:
         $ref: '#/components/schemas/Integer'
+    PrimaryKey:
+      type: object
+      properties:
+        name:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: A name for the Primary Key.
+        offset:
+          allOf:
+          - $ref: '#/components/schemas/Integer'
+          description: A positive integer value representing the offset to mark the
+            start of the primary key in the record byte array.
+        length:
+          allOf:
+          - $ref: '#/components/schemas/Integer'
+          description: A strictly positive integer value representing the length of
+            the primary key.
+      required:
+      - offset
+      - length
+      description: The primary key for a KSDS data set.
+    PsAttributes:
+      type: object
+      properties:
+        format:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The format of the data set records.
+        encoding:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The character set encoding of the data set.
+      required:
+      - format
+      description: The supported properties for a PS type data set.
+    PsDetailAttributes:
+      type: object
+      properties:
+        format:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The format of the data set records.
+        encoding:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The character set encoding of the data set.
+      required:
+      - format
+      - encoding
+      description: The supported properties for a PS type data set.
+    RecordLength:
+      type: object
+      properties:
+        min:
+          allOf:
+          - $ref: '#/components/schemas/Integer'
+          description: The minimum record length of a record.
+        max:
+          allOf:
+          - $ref: '#/components/schemas/Integer'
+          description: The maximum record length. In case of fixed, both minimum and
+            maximum are the same.
+      required:
+      - min
+      - max
+      description: The length of the records in the data set.
+    ResourceNotFoundException:
+      type: object
+      properties:
+        message:
+          $ref: '#/components/schemas/String'
+        resourceId:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The ID of the missing resource.
+        resourceType:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The type of the missing resource.
+      required:
+      - message
+      description: The specified resource was not found.
+    RestartBatchJobIdentifier:
+      type: object
+      properties:
+        executionId:
+          allOf:
+          - $ref: '#/components/schemas/Identifier'
+          description: The `executionId` from the `StartBatchJob` response when the
+            job ran for the first time.
+        jobStepRestartMarker:
+          allOf:
+          - $ref: '#/components/schemas/JobStepRestartMarker'
+          description: The step/procedure step information for a restart batch job
+            operation.
+      required:
+      - executionId
+      - jobStepRestartMarker
+      description: An identifier for the `StartBatchJob` API to show that it is a
+        restart operation.
+    S3BatchJobIdentifier:
+      type: object
+      properties:
+        bucket:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The Amazon S3 bucket that contains the batch job definitions.
+        keyPrefix:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The key prefix that specifies the path to the folder in the
+            S3 bucket that has the batch job definitions.
+        identifier:
+          allOf:
+          - $ref: '#/components/schemas/JobIdentifier'
+          description: Identifies the batch job definition. This identifier can also
+            point to any batch job definition that already exists in the application
+            or to one of the batch job definitions within the directory that is specified
+            in `keyPrefix`.
+      required:
+      - bucket
+      - identifier
+      description: A batch job identifier in which the batch jobs to run are identified
+        by an Amazon S3 location.
+    ScriptBatchJobDefinition:
+      type: object
+      properties:
+        scriptName:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The name of the script containing the batch job definition.
+      required:
+      - scriptName
+      description: A batch job definition contained in a script.
+    ScriptBatchJobIdentifier:
+      type: object
+      properties:
+        scriptName:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The name of the script containing the batch job definition.
+      required:
+      - scriptName
+      description: A batch job identifier in which the batch job to run is identified
+        by the script name.
+    ServiceQuotaExceededException:
+      type: object
+      properties:
+        message:
+          $ref: '#/components/schemas/String'
+        resourceId:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The ID of the resource that is exceeding the quota limit.
+        resourceType:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The type of resource that is exceeding the quota limit for
+            Amazon Web Services Mainframe Modernization.
+        serviceCode:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: A code that identifies the service that the exceeded quota
+            belongs to.
+        quotaCode:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The identifier of the exceeded quota.
+      required:
+      - message
+      description: One or more quotas for Amazon Web Services Mainframe Modernization
+        exceeds the limit.
+    ServiceUnavailableException:
+      type: object
+      properties:
+        message:
+          $ref: '#/components/schemas/String'
+      required:
+      - message
+      description: Server cannot process the request at the moment.
+    StartApplicationRequest:
+      type: object
+      properties:
+        applicationId:
+          allOf:
+          - $ref: '#/components/schemas/Identifier'
+          description: The unique identifier of the application you want to start.
+      required:
+      - applicationId
+    StartApplicationResponse:
+      type: object
+      properties: {}
+    StartBatchJobRequest:
+      type: object
+      properties:
+        applicationId:
+          allOf:
+          - $ref: '#/components/schemas/Identifier'
+          description: The unique identifier of the application associated with this
+            batch job.
+        batchJobIdentifier:
+          allOf:
+          - $ref: '#/components/schemas/BatchJobIdentifier'
+          description: The unique identifier of the batch job.
+        jobParams:
+          allOf:
+          - $ref: '#/components/schemas/BatchJobParametersMap'
+          description: The collection of batch job parameters. For details about limits
+            for keys and values, see [Coding variables in JCL](https://www.ibm.com/docs/en/workload-automation/9.3.0?topic=zos-coding-variables-in-jcl).
+        authSecretsManagerArn:
+          allOf:
+          - $ref: '#/components/schemas/AuthSecretsManagerArn'
+          description: The Amazon Web Services Secrets Manager containing user's credentials
+            for authentication and authorization for Start Batch Job execution operation.
+      required:
+      - applicationId
+      - batchJobIdentifier
+    StartBatchJobResponse:
+      type: object
+      properties:
+        executionId:
+          allOf:
+          - $ref: '#/components/schemas/Identifier'
+          description: The unique identifier of this execution of the batch job.
+      required:
+      - executionId
+    StopApplicationRequest:
+      type: object
+      properties:
+        applicationId:
+          allOf:
+          - $ref: '#/components/schemas/Identifier'
+          description: The unique identifier of the application you want to stop.
+        forceStop:
+          allOf:
+          - $ref: '#/components/schemas/Boolean'
+          description: Stopping an application process can take a long time. Setting
+            this parameter to true lets you force stop the application so you don't
+            need to wait until the process finishes to apply another action on the
+            application. The default value is false.
+      required:
+      - applicationId
+    StopApplicationResponse:
+      type: object
+      properties: {}
     StorageConfiguration:
       allOf:
       - allOf:
@@ -447,13 +5072,197 @@ components:
       type: object
       additionalProperties:
         $ref: '#/components/schemas/TagValue'
+    TagResourceRequest:
+      type: object
+      properties:
+        resourceArn:
+          allOf:
+          - $ref: '#/components/schemas/Arn'
+          description: The Amazon Resource Name (ARN) of the resource.
+        tags:
+          allOf:
+          - $ref: '#/components/schemas/TagMap'
+          description: The tags to add to the resource.
+      required:
+      - resourceArn
+      - tags
+    TagResourceResponse:
+      type: object
+      properties: {}
     TagValue:
       type: string
       minLength: 0
       maxLength: 256
+    ThrottlingException:
+      type: object
+      properties:
+        message:
+          $ref: '#/components/schemas/String'
+        serviceCode:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The identifier of the service that the throttled request was
+            made to.
+        quotaCode:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The identifier of the throttled request.
+        retryAfterSeconds:
+          allOf:
+          - $ref: '#/components/schemas/Integer'
+          description: The number of seconds to wait before retrying the request.
+      required:
+      - message
+      description: The number of requests made exceeds the limit.
     Timestamp:
       type: string
       format: date-time
+    UntagResourceRequest:
+      type: object
+      properties:
+        resourceArn:
+          allOf:
+          - $ref: '#/components/schemas/Arn'
+          description: The Amazon Resource Name (ARN) of the resource.
+        tagKeys:
+          allOf:
+          - $ref: '#/components/schemas/TagKeyList'
+          description: The keys of the tags to remove.
+      required:
+      - resourceArn
+      - tagKeys
+    UntagResourceResponse:
+      type: object
+      properties: {}
+    UpdateApplicationRequest:
+      type: object
+      properties:
+        applicationId:
+          allOf:
+          - $ref: '#/components/schemas/Identifier'
+          description: The unique identifier of the application you want to update.
+        description:
+          allOf:
+          - $ref: '#/components/schemas/EntityDescription'
+          description: The description of the application to update.
+        currentApplicationVersion:
+          allOf:
+          - $ref: '#/components/schemas/Version'
+          description: The current version of the application to update.
+        definition:
+          allOf:
+          - $ref: '#/components/schemas/Definition'
+          description: The application definition for this application. You can specify
+            either inline JSON or an S3 bucket location.
+      required:
+      - applicationId
+      - currentApplicationVersion
+    UpdateApplicationResponse:
+      type: object
+      properties:
+        applicationVersion:
+          allOf:
+          - $ref: '#/components/schemas/Version'
+          description: The new version of the application.
+      required:
+      - applicationVersion
+    UpdateEnvironmentRequest:
+      type: object
+      properties:
+        environmentId:
+          allOf:
+          - $ref: '#/components/schemas/Identifier'
+          description: The unique identifier of the runtime environment that you want
+            to update.
+        desiredCapacity:
+          allOf:
+          - $ref: '#/components/schemas/CapacityValue'
+          description: The desired capacity for the runtime environment to update.
+            The minimum possible value is 0 and the maximum is 100.
+        instanceType:
+          allOf:
+          - $ref: '#/components/schemas/String20'
+          description: The instance type for the runtime environment to update.
+        engineVersion:
+          allOf:
+          - $ref: '#/components/schemas/EngineVersion'
+          description: The version of the runtime engine for the runtime environment.
+        preferredMaintenanceWindow:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: 'Configures the maintenance window that you want for the runtime
+            environment. The maintenance window must have the format `ddd:hh24:mi-ddd:hh24:mi`
+            and must be less than 24 hours. The following two examples are valid maintenance
+            windows: `sun:23:45-mon:00:15` or `sat:01:00-sat:03:00`.
+
+
+            If you do not provide a value, a random system-generated value will be
+            assigned.'
+        applyDuringMaintenanceWindow:
+          allOf:
+          - $ref: '#/components/schemas/Boolean'
+          description: Indicates whether to update the runtime environment during
+            the maintenance window. The default is false. Currently, Amazon Web Services
+            Mainframe Modernization accepts the `engineVersion` parameter only if
+            `applyDuringMaintenanceWindow` is true. If any parameter other than `engineVersion`
+            is provided in `UpdateEnvironmentRequest`, it will fail if `applyDuringMaintenanceWindow`
+            is set to true.
+        forceUpdate:
+          allOf:
+          - $ref: '#/components/schemas/Boolean'
+          description: 'Forces the updates on the environment. This option is needed
+            if the applications in the environment are not stopped or if there are
+            ongoing application-related activities in the environment.
+
+
+            If you use this option, be aware that it could lead to data corruption
+            in the applications, and that you might need to perform repair and recovery
+            procedures for the applications.
+
+
+            This option is not needed if the attribute being updated is `preferredMaintenanceWindow`.'
+      required:
+      - environmentId
+    UpdateEnvironmentResponse:
+      type: object
+      properties:
+        environmentId:
+          allOf:
+          - $ref: '#/components/schemas/Identifier'
+          description: The unique identifier of the runtime environment that was updated.
+      required:
+      - environmentId
+    ValidationException:
+      type: object
+      properties:
+        message:
+          $ref: '#/components/schemas/String'
+        reason:
+          allOf:
+          - $ref: '#/components/schemas/ValidationExceptionReason'
+          description: The reason why it failed service validation.
+        fieldList:
+          allOf:
+          - $ref: '#/components/schemas/ValidationExceptionFieldList'
+          description: The list of fields that failed service validation.
+      required:
+      - message
+      description: One or more parameters provided in the request is not valid.
+    ValidationExceptionField:
+      type: object
+      properties:
+        name:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The name of the exception field.
+        message:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The message of the exception field.
+      required:
+      - name
+      - message
+      description: Contains information about a validation exception field.
     ValidationExceptionFieldList:
       type: array
       items:
@@ -470,3 +5279,68 @@ components:
     Version:
       type: integer
       minimum: 1
+    VsamAttributes:
+      type: object
+      properties:
+        format:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The record format of the data set.
+        encoding:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The character set used by the data set. Can be ASCII, EBCDIC,
+            or unknown.
+        compressed:
+          allOf:
+          - $ref: '#/components/schemas/Boolean'
+          description: Indicates whether indexes for this dataset are stored as compressed
+            values. If you have a large data set (typically > 100 Mb), consider setting
+            this flag to True.
+        primaryKey:
+          allOf:
+          - $ref: '#/components/schemas/PrimaryKey'
+          description: The primary key of the data set.
+        alternateKeys:
+          allOf:
+          - $ref: '#/components/schemas/AlternateKeyList'
+          description: The alternate key definitions, if any. A legacy dataset might
+            not have any alternate key defined, but if those alternate keys definitions
+            exist, provide them as some applications will make use of them.
+      required:
+      - format
+      description: The attributes of a VSAM type data set.
+    VsamDetailAttributes:
+      type: object
+      properties:
+        encoding:
+          allOf:
+          - $ref: '#/components/schemas/String20'
+          description: The character set used by the data set. Can be ASCII, EBCDIC,
+            or unknown.
+        recordFormat:
+          allOf:
+          - $ref: '#/components/schemas/String20'
+          description: The record format of the data set.
+        compressed:
+          allOf:
+          - $ref: '#/components/schemas/Boolean'
+          description: Indicates whether indexes for this dataset are stored as compressed
+            values. If you have a large data set (typically > 100 Mb), consider setting
+            this flag to True.
+        cacheAtStartup:
+          allOf:
+          - $ref: '#/components/schemas/Boolean'
+          description: If set to True, enforces loading the data set into cache before
+            it’s used by the application.
+        primaryKey:
+          allOf:
+          - $ref: '#/components/schemas/PrimaryKey'
+          description: The primary key of the data set.
+        alternateKeys:
+          allOf:
+          - $ref: '#/components/schemas/AlternateKeyList'
+          description: The alternate key definitions, if any. A legacy dataset might
+            not have any alternate key defined, but if those alternate keys definitions
+            exist, provide them as some applications will make use of them.
+      description: The attributes of a VSAM type data set.

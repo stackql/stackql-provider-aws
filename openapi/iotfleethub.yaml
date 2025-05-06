@@ -7,7 +7,7 @@ info:
   x-stackql-serviceName: iotfleethub
   x-aws-serviceName: iotfleethub
   x-aws-protocol: aws.protocols#restJson1
-  x-dateGenerated: '2025-05-05'
+  x-dateGenerated: '2025-05-07'
   version: '2020-11-03'
   title: AWS IoT Fleet Hub
   description: |-
@@ -43,7 +43,320 @@ servers:
       - sa-east-1
       - me-south-1
       default: us-east-1
-paths: {}
+paths:
+  /applications:
+    post:
+      operationId: CreateApplication
+      description: |-
+        Creates a Fleet Hub for IoT Device Management web application.
+
+        When creating a Fleet Hub application, you must create an organization instance of IAM Identity Center if you don't already have one. The Fleet Hub application you create must also be in the same Amazon Web Services Region of the organization instance of IAM Identity Center. For more information see [Enabling IAM Identity Center](https://docs.aws.amazon.com/singlesignon/latest/userguide/get-set-up-for-idc.html) and [Organization instances of IAM Identity Center](https://docs.aws.amazon.com/singlesignon/latest/userguide/organization-instances-identity-center.html).
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                applicationName:
+                  $ref: '#/components/schemas/Name'
+                applicationDescription:
+                  $ref: '#/components/schemas/Description'
+                clientToken:
+                  $ref: '#/components/schemas/ClientRequestToken'
+                roleArn:
+                  $ref: '#/components/schemas/Arn'
+                tags:
+                  $ref: '#/components/schemas/TagMap'
+      responses:
+        '201': {}
+        '500':
+          description: |-
+            An unexpected error has occurred.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalFailureException'
+        '400':
+          description: |-
+            The rate exceeds the limit.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThrottlingException'
+        '410':
+          description: |-
+            A limit has been exceeded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LimitExceededException'
+    get:
+      operationId: ListApplications
+      description: |-
+        Gets a list of Fleet Hub for IoT Device Management web applications for the current account.
+      parameters:
+      - name: nextToken
+        in: query
+        required: false
+        schema:
+          $ref: '#/components/schemas/NextToken'
+      responses:
+        '200': {}
+        '500':
+          description: |-
+            An unexpected error has occurred.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalFailureException'
+        '400':
+          description: |-
+            The rate exceeds the limit.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThrottlingException'
+  /applications/{applicationId}:
+    delete:
+      operationId: DeleteApplication
+      description: |-
+        Deletes a Fleet Hub for IoT Device Management web application.
+      parameters:
+      - name: applicationId
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/Id'
+      - name: clientToken
+        in: query
+        required: false
+        schema:
+          $ref: '#/components/schemas/ClientRequestToken'
+      responses:
+        '204': {}
+        '500':
+          description: |-
+            An unexpected error has occurred.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalFailureException'
+        '400':
+          description: |-
+            The rate exceeds the limit.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThrottlingException'
+        '404':
+          description: |-
+            The specified resource does not exist.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+    get:
+      operationId: DescribeApplication
+      description: |-
+        Gets information about a Fleet Hub for IoT Device Management web application.
+      parameters:
+      - name: applicationId
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/Id'
+      responses:
+        '200': {}
+        '500':
+          description: |-
+            An unexpected error has occurred.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalFailureException'
+        '400':
+          description: |-
+            The rate exceeds the limit.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThrottlingException'
+        '404':
+          description: |-
+            The specified resource does not exist.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+    patch:
+      operationId: UpdateApplication
+      description: |-
+        Updates information about a Fleet Hub for IoT Device Management web application.
+      parameters:
+      - name: applicationId
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/Id'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                applicationName:
+                  $ref: '#/components/schemas/Name'
+                applicationDescription:
+                  $ref: '#/components/schemas/Description'
+                clientToken:
+                  $ref: '#/components/schemas/ClientRequestToken'
+      responses:
+        '202': {}
+        '409':
+          description: |-
+            The request conflicts with the current state of the resource.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConflictException'
+        '500':
+          description: |-
+            An unexpected error has occurred.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalFailureException'
+        '400':
+          description: |-
+            The rate exceeds the limit.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThrottlingException'
+        '404':
+          description: |-
+            The specified resource does not exist.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+  /tags/{resourceArn}:
+    get:
+      operationId: ListTagsForResource
+      description: |-
+        Lists the tags for the specified resource.
+      parameters:
+      - name: resourceArn
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/ResourceArn'
+      responses:
+        '200': {}
+        '500':
+          description: |-
+            An unexpected error has occurred.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalFailureException'
+        '400':
+          description: |-
+            The request is not valid.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InvalidRequestException'
+        '404':
+          description: |-
+            The specified resource does not exist.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+    post:
+      operationId: TagResource
+      description: |-
+        Adds to or modifies the tags of the specified resource. Tags are metadata which can be used to manage a resource.
+      parameters:
+      - name: resourceArn
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/ResourceArn'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                tags:
+                  $ref: '#/components/schemas/TagMap'
+      responses:
+        '200': {}
+        '500':
+          description: |-
+            An unexpected error has occurred.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalFailureException'
+        '400':
+          description: |-
+            The request is not valid.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InvalidRequestException'
+        '404':
+          description: |-
+            The specified resource does not exist.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+    delete:
+      operationId: UntagResource
+      description: |-
+        Removes the specified tags (metadata) from the resource.
+      parameters:
+      - name: resourceArn
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/ResourceArn'
+      - name: tagKeys
+        in: query
+        required: true
+        schema:
+          $ref: '#/components/schemas/TagKeyList'
+      responses:
+        '200': {}
+        '500':
+          description: |-
+            An unexpected error has occurred.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalFailureException'
+        '400':
+          description: |-
+            The request is not valid.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InvalidRequestException'
+        '404':
+          description: |-
+            The specified resource does not exist.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
 components:
   schemas:
     ApplicationState:
@@ -58,6 +371,45 @@ components:
       type: array
       items:
         $ref: '#/components/schemas/ApplicationSummary'
+    ApplicationSummary:
+      type: object
+      properties:
+        applicationId:
+          allOf:
+          - $ref: '#/components/schemas/Id'
+          description: The unique Id of the web application.
+        applicationName:
+          allOf:
+          - $ref: '#/components/schemas/Name'
+          description: The name of the web application.
+        applicationDescription:
+          allOf:
+          - $ref: '#/components/schemas/Description'
+          description: An optional description of the web application.
+        applicationUrl:
+          allOf:
+          - $ref: '#/components/schemas/Url'
+          description: The URL of the web application.
+        applicationCreationDate:
+          allOf:
+          - $ref: '#/components/schemas/Timestamp'
+          description: The date (in Unix epoch time) when the web application was
+            created.
+        applicationLastUpdateDate:
+          allOf:
+          - $ref: '#/components/schemas/Timestamp'
+          description: The date (in Unix epoch time) when the web application was
+            last updated.
+        applicationState:
+          allOf:
+          - $ref: '#/components/schemas/ApplicationState'
+          description: The current state of the web application.
+      required:
+      - applicationId
+      - applicationName
+      - applicationUrl
+      description: A summary of information about a Fleet Hub for IoT Device Management
+        web application.
     Arn:
       type: string
       pattern: ^arn:[!-~]+$
@@ -68,6 +420,153 @@ components:
       pattern: ^[a-zA-Z0-9-_]+$
       minLength: 1
       maxLength: 64
+    ConflictException:
+      type: object
+      properties:
+        message:
+          $ref: '#/components/schemas/ErrorMessage'
+      description: The request conflicts with the current state of the resource.
+    CreateApplicationRequest:
+      type: object
+      properties:
+        applicationName:
+          allOf:
+          - $ref: '#/components/schemas/Name'
+          description: The name of the web application.
+        applicationDescription:
+          allOf:
+          - $ref: '#/components/schemas/Description'
+          description: An optional description of the web application.
+        clientToken:
+          allOf:
+          - $ref: '#/components/schemas/ClientRequestToken'
+          description: A unique case-sensitive identifier that you can provide to
+            ensure the idempotency of the request. Don't reuse this client token if
+            a new idempotent request is required.
+        roleArn:
+          allOf:
+          - $ref: '#/components/schemas/Arn'
+          description: 'The ARN of the role that the web application assumes when
+            it interacts with Amazon Web Services IoT Core.
+
+
+            The name of the role must be in the form `AWSIotFleetHub__random_string_
+            `.'
+        tags:
+          allOf:
+          - $ref: '#/components/schemas/TagMap'
+          description: A set of key/value pairs that you can use to manage the web
+            application resource.
+      required:
+      - applicationName
+      - roleArn
+    CreateApplicationResponse:
+      type: object
+      properties:
+        applicationId:
+          allOf:
+          - $ref: '#/components/schemas/Id'
+          description: The unique Id of the web application.
+        applicationArn:
+          allOf:
+          - $ref: '#/components/schemas/Arn'
+          description: The ARN of the web application.
+      required:
+      - applicationId
+      - applicationArn
+    DeleteApplicationRequest:
+      type: object
+      properties:
+        applicationId:
+          allOf:
+          - $ref: '#/components/schemas/Id'
+          description: The unique Id of the web application.
+        clientToken:
+          allOf:
+          - $ref: '#/components/schemas/ClientRequestToken'
+          description: A unique case-sensitive identifier that you can provide to
+            ensure the idempotency of the request. Don't reuse this client token if
+            a new idempotent request is required.
+      required:
+      - applicationId
+    DeleteApplicationResponse:
+      type: object
+      properties: {}
+    DescribeApplicationRequest:
+      type: object
+      properties:
+        applicationId:
+          allOf:
+          - $ref: '#/components/schemas/Id'
+          description: The unique Id of the web application.
+      required:
+      - applicationId
+    DescribeApplicationResponse:
+      type: object
+      properties:
+        applicationId:
+          allOf:
+          - $ref: '#/components/schemas/Id'
+          description: The unique Id of the web application.
+        applicationArn:
+          allOf:
+          - $ref: '#/components/schemas/Arn'
+          description: The ARN of the web application.
+        applicationName:
+          allOf:
+          - $ref: '#/components/schemas/Name'
+          description: The name of the web application.
+        applicationDescription:
+          allOf:
+          - $ref: '#/components/schemas/Description'
+          description: An optional description of the web application.
+        applicationUrl:
+          allOf:
+          - $ref: '#/components/schemas/Url'
+          description: The URL of the web application.
+        applicationState:
+          allOf:
+          - $ref: '#/components/schemas/ApplicationState'
+          description: The current state of the web application.
+        applicationCreationDate:
+          allOf:
+          - $ref: '#/components/schemas/Timestamp'
+          description: The date (in Unix epoch time) when the application was created.
+        applicationLastUpdateDate:
+          allOf:
+          - $ref: '#/components/schemas/Timestamp'
+          description: The date (in Unix epoch time) when the application was last
+            updated.
+        roleArn:
+          allOf:
+          - $ref: '#/components/schemas/Arn'
+          description: The ARN of the role that the web application assumes when it
+            interacts with Amazon Web Services IoT Core.
+        ssoClientId:
+          allOf:
+          - $ref: '#/components/schemas/SsoClientId'
+          description: The Id of the single sign-on client that you use to authenticate
+            and authorize users on the web application.
+        errorMessage:
+          allOf:
+          - $ref: '#/components/schemas/ErrorMessage'
+          description: A message that explains any failures included in the `applicationState`
+            response field. This message explains failures in the `CreateApplication`
+            and `DeleteApplication` actions.
+        tags:
+          allOf:
+          - $ref: '#/components/schemas/TagMap'
+          description: A set of key/value pairs that you can use to manage the web
+            application resource.
+      required:
+      - applicationId
+      - applicationArn
+      - applicationName
+      - applicationUrl
+      - applicationState
+      - applicationCreationDate
+      - applicationLastUpdateDate
+      - roleArn
     Description:
       type: string
       pattern: ^[ -~]*$
@@ -80,6 +579,59 @@ components:
       pattern: ^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$
       minLength: 36
       maxLength: 36
+    InternalFailureException:
+      type: object
+      properties:
+        message:
+          $ref: '#/components/schemas/ErrorMessage'
+      description: An unexpected error has occurred.
+    InvalidRequestException:
+      type: object
+      properties:
+        message:
+          $ref: '#/components/schemas/ErrorMessage'
+      description: The request is not valid.
+    LimitExceededException:
+      type: object
+      properties:
+        message:
+          $ref: '#/components/schemas/ErrorMessage'
+      description: A limit has been exceeded.
+    ListApplicationsRequest:
+      type: object
+      properties:
+        nextToken:
+          allOf:
+          - $ref: '#/components/schemas/NextToken'
+          description: A token used to get the next set of results.
+    ListApplicationsResponse:
+      type: object
+      properties:
+        applicationSummaries:
+          allOf:
+          - $ref: '#/components/schemas/ApplicationSummaries'
+          description: An array of objects that provide summaries of information about
+            the web applications in the list.
+        nextToken:
+          allOf:
+          - $ref: '#/components/schemas/NextToken'
+          description: A token used to get the next set of results.
+    ListTagsForResourceRequest:
+      type: object
+      properties:
+        resourceArn:
+          allOf:
+          - $ref: '#/components/schemas/ResourceArn'
+          description: The ARN of the resource.
+      required:
+      - resourceArn
+    ListTagsForResourceResponse:
+      type: object
+      properties:
+        tags:
+          allOf:
+          - $ref: '#/components/schemas/TagMap'
+          description: The list of tags assigned to the resource.
     Name:
       type: string
       pattern: ^[ -~]*$
@@ -92,6 +644,12 @@ components:
       maxLength: 2048
     ResourceArn:
       type: string
+    ResourceNotFoundException:
+      type: object
+      properties:
+        message:
+          $ref: '#/components/schemas/ErrorMessage'
+      description: The specified resource does not exist.
     SsoClientId:
       type: string
     TagKey:
@@ -107,14 +665,80 @@ components:
       type: object
       additionalProperties:
         $ref: '#/components/schemas/TagValue'
+    TagResourceRequest:
+      type: object
+      properties:
+        resourceArn:
+          allOf:
+          - $ref: '#/components/schemas/ResourceArn'
+          description: The ARN of the resource.
+        tags:
+          allOf:
+          - $ref: '#/components/schemas/TagMap'
+          description: The new or modified tags for the resource.
+      required:
+      - resourceArn
+      - tags
+    TagResourceResponse:
+      type: object
+      properties: {}
     TagValue:
       type: string
       minLength: 1
       maxLength: 256
+    ThrottlingException:
+      type: object
+      properties:
+        message:
+          $ref: '#/components/schemas/ErrorMessage'
+      description: The rate exceeds the limit.
     Timestamp:
       type: integer
       format: int64
       default: 0
+    UntagResourceRequest:
+      type: object
+      properties:
+        resourceArn:
+          allOf:
+          - $ref: '#/components/schemas/ResourceArn'
+          description: The ARN of the resource.
+        tagKeys:
+          allOf:
+          - $ref: '#/components/schemas/TagKeyList'
+          description: A list of the keys of the tags to be removed from the resource.
+      required:
+      - resourceArn
+      - tagKeys
+    UntagResourceResponse:
+      type: object
+      properties: {}
+    UpdateApplicationRequest:
+      type: object
+      properties:
+        applicationId:
+          allOf:
+          - $ref: '#/components/schemas/Id'
+          description: The unique Id of the web application.
+        applicationName:
+          allOf:
+          - $ref: '#/components/schemas/Name'
+          description: The name of the web application.
+        applicationDescription:
+          allOf:
+          - $ref: '#/components/schemas/Description'
+          description: An optional description of the web application.
+        clientToken:
+          allOf:
+          - $ref: '#/components/schemas/ClientRequestToken'
+          description: A unique case-sensitive identifier that you can provide to
+            ensure the idempotency of the request. Don't reuse this client token if
+            a new idempotent request is required.
+      required:
+      - applicationId
+    UpdateApplicationResponse:
+      type: object
+      properties: {}
     Url:
       type: string
       pattern: ^https\://\S+$

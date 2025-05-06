@@ -7,7 +7,7 @@ info:
   x-stackql-serviceName: workmailmessageflow
   x-aws-serviceName: workmailmessageflow
   x-aws-protocol: aws.protocols#restJson1
-  x-dateGenerated: '2025-05-05'
+  x-dateGenerated: '2025-05-07'
   version: '2019-05-01'
   title: Amazon WorkMail Message Flow
   description: |-
@@ -43,9 +43,186 @@ servers:
       - sa-east-1
       - me-south-1
       default: us-east-1
-paths: {}
+paths:
+  /messages/{messageId}:
+    get:
+      operationId: GetRawMessageContent
+      description: |-
+        Retrieves the raw content of an in-transit email message, in MIME format.
+      parameters:
+      - name: messageId
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/messageIdType'
+      responses:
+        '200': {}
+        '404':
+          description: |-
+            The requested email message is not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+    post:
+      operationId: PutRawMessageContent
+      description: |-
+        Updates the raw content of an in-transit email message, in MIME format.
+
+        This example describes how to update in-transit email message. For more information and examples for using this API, see [ Updating message content with AWS Lambda](https://docs.aws.amazon.com/workmail/latest/adminguide/update-with-lambda.html).
+
+        Updates to an in-transit message only appear when you call `PutRawMessageContent` from an AWS Lambda function configured with a synchronous [ Run Lambda](https://docs.aws.amazon.com/workmail/latest/adminguide/lambda.html#synchronous-rules) rule. If you call `PutRawMessageContent` on a delivered or sent message, the message remains unchanged, even though [GetRawMessageContent](https://docs.aws.amazon.com/workmail/latest/APIReference/API_messageflow_GetRawMessageContent.html) returns an updated message.
+      parameters:
+      - name: messageId
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/messageIdType'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                content:
+                  $ref: '#/components/schemas/RawMessageContent'
+      responses:
+        '200': {}
+        '400':
+          description: |-
+            The requested email could not be updated due to an error in the MIME content. Check the error message for more information about what caused the error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MessageRejected'
+        '404':
+          description: |-
+            The requested email message is not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
 components:
   schemas:
+    GetRawMessageContentRequest:
+      type: object
+      properties:
+        messageId:
+          allOf:
+          - $ref: '#/components/schemas/messageIdType'
+          description: The identifier of the email message to retrieve.
+      required:
+      - messageId
+    GetRawMessageContentResponse:
+      type: object
+      properties:
+        messageContent:
+          allOf:
+          - $ref: '#/components/schemas/messageContentBlob'
+          description: The raw content of the email message, in MIME format.
+      required:
+      - messageContent
+    InvalidContentLocation:
+      type: object
+      properties:
+        message:
+          $ref: '#/components/schemas/errorMessage'
+      description: "WorkMail could not access the updated email content. Possible\
+        \ reasons:\n\n  * You made the request in a region other than your S3 bucket\
+        \ region.\n\n  * The [S3 bucket owner](https://docs.aws.amazon.com/AmazonS3/latest/dev/bucket-owner-condition.html)\
+        \ is not the same as the calling AWS account.\n\n  * You have an incomplete\
+        \ or missing S3 bucket policy. For more information about policies, see [\
+        \ Updating message content with AWS Lambda ](https://docs.aws.amazon.com/workmail/latest/adminguide/update-with-lambda.html)\
+        \ in the _WorkMail Administrator Guide_."
+    MessageFrozen:
+      type: object
+      properties:
+        message:
+          $ref: '#/components/schemas/errorMessage'
+      description: The requested email is not eligible for update. This is usually
+        the case for a redirected email.
+    MessageRejected:
+      type: object
+      properties:
+        message:
+          $ref: '#/components/schemas/errorMessage'
+      description: The requested email could not be updated due to an error in the
+        MIME content. Check the error message for more information about what caused
+        the error.
+    PutRawMessageContentRequest:
+      type: object
+      properties:
+        messageId:
+          allOf:
+          - $ref: '#/components/schemas/messageIdType'
+          description: The identifier of the email message being updated.
+        content:
+          allOf:
+          - $ref: '#/components/schemas/RawMessageContent'
+          description: Describes the raw message content of the updated email message.
+      required:
+      - messageId
+      - content
+    PutRawMessageContentResponse:
+      type: object
+      properties: {}
+    RawMessageContent:
+      type: object
+      properties:
+        s3Reference:
+          allOf:
+          - $ref: '#/components/schemas/S3Reference'
+          description: The S3 reference of an email message.
+      required:
+      - s3Reference
+      description: "Provides the MIME content of the updated email message as an S3\
+        \ object. All MIME content must meet the following criteria:\n\n  * Each part\
+        \ of a multipart MIME message must be formatted properly.\n\n  * Attachments\
+        \ must be of a content type that Amazon SES supports. For more information,\
+        \ see [Unsupported Attachment Types](https://docs.aws.amazon.com/ses/latest/DeveloperGuide/mime-types-appendix.html).\n\
+        \n  * If any of the MIME parts in a message contain content that is outside\
+        \ of the 7-bit ASCII character range, we recommend encoding that content.\n\
+        \n  * Per [RFC 5321](https://tools.ietf.org/html/rfc5321#section-4.5.3.1.6),\
+        \ the maximum length of each line of text, including the , must not exceed\
+        \ 1,000 characters.\n\n  * The message must contain all the required header\
+        \ fields. Check the returned error message for more information.\n\n  * The\
+        \ value of immutable headers must remain unchanged. Check the returned error\
+        \ message for more information.\n\n  * Certain unique headers can only appear\
+        \ once. Check the returned error message for more information."
+    ResourceNotFoundException:
+      type: object
+      properties:
+        message:
+          $ref: '#/components/schemas/errorMessage'
+      description: The requested email message is not found.
+    S3Reference:
+      type: object
+      properties:
+        bucket:
+          allOf:
+          - $ref: '#/components/schemas/s3BucketIdType'
+          description: The S3 bucket name.
+        key:
+          allOf:
+          - $ref: '#/components/schemas/s3KeyIdType'
+          description: The S3 key object name.
+        objectVersion:
+          allOf:
+          - $ref: '#/components/schemas/s3VersionType'
+          description: If you enable versioning for the bucket, you can specify the
+            object version.
+      required:
+      - bucket
+      - key
+      description: 'Amazon S3 object representing the updated message content, in
+        MIME format.
+
+
+        The region for the S3 bucket containing the S3 object must match the region
+        used for WorkMail operations. Also, for WorkMail to process an S3 object,
+        it must have permission to access that object. For more information, see [
+        Updating message content with AWS Lambda](https://docs.aws.amazon.com/workmail/latest/adminguide/update-with-lambda.html).'
     errorMessage:
       type: string
     messageContentBlob:

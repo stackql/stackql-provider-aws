@@ -7,7 +7,7 @@ info:
   x-stackql-serviceName: connectcases
   x-aws-serviceName: connectcases
   x-aws-protocol: aws.protocols#restJson1
-  x-dateGenerated: '2025-05-05'
+  x-dateGenerated: '2025-05-07'
   version: '2022-10-03'
   title: Amazon Connect Cases
   description: |-
@@ -47,9 +47,2565 @@ servers:
       - sa-east-1
       - me-south-1
       default: us-east-1
-paths: {}
+paths:
+  /domains/{domainId}/rules-batch:
+    post:
+      operationId: BatchGetCaseRule
+      description: |-
+        Gets a batch of case rules. In the Amazon Connect admin website, case rules are known as _case field conditions_. For more information about case field conditions, see [Add case field conditions to a case template](https://docs.aws.amazon.com/connect/latest/adminguide/case-field-conditions.html).
+      parameters:
+      - name: domainId
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/DomainId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                caseRules:
+                  $ref: '#/components/schemas/CaseRuleIdentifierList'
+      responses:
+        '200': {}
+        '403':
+          description: |-
+            You do not have sufficient access to perform this action.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '500':
+          description: |-
+            We couldn't process your request because of an issue with the server. Try again later.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerException'
+        '404':
+          description: |-
+            We couldn't find the requested resource. Check that your resources exists and were created in the same Amazon Web Services Region as your request, and try your request again.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+        '429':
+          description: |-
+            The rate has been exceeded for this API. Please try again after a few minutes.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThrottlingException'
+        '400':
+          description: |-
+            The request isn't valid. Check the syntax and try again.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+  /domains/{domainId}/fields-batch:
+    post:
+      operationId: BatchGetField
+      description: |-
+        Returns the description for the list of fields in the request parameters.
+      parameters:
+      - name: domainId
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/DomainId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                fields:
+                  $ref: '#/components/schemas/BatchGetFieldIdentifierList'
+      responses:
+        '200': {}
+        '403':
+          description: |-
+            You do not have sufficient access to perform this action.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '500':
+          description: |-
+            We couldn't process your request because of an issue with the server. Try again later.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerException'
+        '404':
+          description: |-
+            We couldn't find the requested resource. Check that your resources exists and were created in the same Amazon Web Services Region as your request, and try your request again.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+        '429':
+          description: |-
+            The rate has been exceeded for this API. Please try again after a few minutes.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThrottlingException'
+        '400':
+          description: |-
+            The request isn't valid. Check the syntax and try again.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+  /domains/{domainId}/fields/{fieldId}/options:
+    put:
+      operationId: BatchPutFieldOptions
+      description: |-
+        Creates and updates a set of field options for a single select field in a Cases domain.
+      parameters:
+      - name: domainId
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/DomainId'
+      - name: fieldId
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/FieldId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                options:
+                  $ref: '#/components/schemas/FieldOptionsList'
+      responses:
+        '200': {}
+        '403':
+          description: |-
+            You do not have sufficient access to perform this action.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '500':
+          description: |-
+            We couldn't process your request because of an issue with the server. Try again later.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerException'
+        '404':
+          description: |-
+            We couldn't find the requested resource. Check that your resources exists and were created in the same Amazon Web Services Region as your request, and try your request again.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+        '402':
+          description: |-
+            The service quota has been exceeded. For a list of service quotas, see [Amazon Connect Service Quotas](https://docs.aws.amazon.com/connect/latest/adminguide/amazon-connect-service-limits.html) in the _Amazon Connect Administrator Guide_.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServiceQuotaExceededException'
+        '429':
+          description: |-
+            The rate has been exceeded for this API. Please try again after a few minutes.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThrottlingException'
+        '400':
+          description: |-
+            The request isn't valid. Check the syntax and try again.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+  /domains/{domainId}/cases:
+    post:
+      operationId: CreateCase
+      description: |-
+        If you provide a value for `PerformedBy.UserArn` you must also have [connect:DescribeUser](https://docs.aws.amazon.com/connect/latest/APIReference/API_DescribeUser.html) permission on the User ARN resource that you provide
+
+        Creates a case in the specified Cases domain. Case system and custom fields are taken as an array id/value pairs with a declared data types.
+
+        The following fields are required when creating a case:
+
+          * `customer_id` \- You must provide the full customer profile ARN in this format: `arn:aws:profile:your_AWS_Region:your_AWS_account ID:domains/your_profiles_domain_name/profiles/profile_ID`
+
+          * `title`
+      parameters:
+      - name: domainId
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/DomainId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                templateId:
+                  $ref: '#/components/schemas/TemplateId'
+                fields:
+                  $ref: '#/components/schemas/FieldValueList'
+                clientToken:
+                  $ref: '#/components/schemas/String'
+                performedBy:
+                  $ref: '#/components/schemas/UserUnion'
+      responses:
+        '200': {}
+        '403':
+          description: |-
+            You do not have sufficient access to perform this action.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '409':
+          description: |-
+            The requested operation would cause a conflict with the current state of a service resource associated with the request. Resolve the conflict before retrying this request. See the accompanying error message for details.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConflictException'
+        '500':
+          description: |-
+            We couldn't process your request because of an issue with the server. Try again later.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerException'
+        '404':
+          description: |-
+            We couldn't find the requested resource. Check that your resources exists and were created in the same Amazon Web Services Region as your request, and try your request again.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+        '429':
+          description: |-
+            The rate has been exceeded for this API. Please try again after a few minutes.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThrottlingException'
+        '400':
+          description: |-
+            The request isn't valid. Check the syntax and try again.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+  /domains/{domainId}/case-rules:
+    post:
+      operationId: CreateCaseRule
+      description: |-
+        Creates a new case rule. In the Amazon Connect admin website, case rules are known as _case field conditions_. For more information about case field conditions, see [Add case field conditions to a case template](https://docs.aws.amazon.com/connect/latest/adminguide/case-field-conditions.html).
+      parameters:
+      - name: domainId
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/DomainId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  $ref: '#/components/schemas/CaseRuleName'
+                description:
+                  $ref: '#/components/schemas/CaseRuleDescription'
+                rule:
+                  $ref: '#/components/schemas/CaseRuleDetails'
+      responses:
+        '200': {}
+        '403':
+          description: |-
+            You do not have sufficient access to perform this action.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '409':
+          description: |-
+            The requested operation would cause a conflict with the current state of a service resource associated with the request. Resolve the conflict before retrying this request. See the accompanying error message for details.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConflictException'
+        '500':
+          description: |-
+            We couldn't process your request because of an issue with the server. Try again later.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerException'
+        '404':
+          description: |-
+            We couldn't find the requested resource. Check that your resources exists and were created in the same Amazon Web Services Region as your request, and try your request again.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+        '402':
+          description: |-
+            The service quota has been exceeded. For a list of service quotas, see [Amazon Connect Service Quotas](https://docs.aws.amazon.com/connect/latest/adminguide/amazon-connect-service-limits.html) in the _Amazon Connect Administrator Guide_.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServiceQuotaExceededException'
+        '429':
+          description: |-
+            The rate has been exceeded for this API. Please try again after a few minutes.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThrottlingException'
+        '400':
+          description: |-
+            The request isn't valid. Check the syntax and try again.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+  /domains:
+    post:
+      operationId: CreateDomain
+      description: |-
+        Creates a domain, which is a container for all case data, such as cases, fields, templates and layouts. Each Amazon Connect instance can be associated with only one Cases domain.
+
+        This will not associate your connect instance to Cases domain. Instead, use the Amazon Connect [CreateIntegrationAssociation](https://docs.aws.amazon.com/connect/latest/APIReference/API_CreateIntegrationAssociation.html) API. You need specific IAM permissions to successfully associate the Cases domain. For more information, see [Onboard to Cases](https://docs.aws.amazon.com/connect/latest/adminguide/required-permissions-iam-cases.html#onboard-cases-iam).
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  $ref: '#/components/schemas/DomainName'
+      responses:
+        '200': {}
+        '403':
+          description: |-
+            You do not have sufficient access to perform this action.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '409':
+          description: |-
+            The requested operation would cause a conflict with the current state of a service resource associated with the request. Resolve the conflict before retrying this request. See the accompanying error message for details.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConflictException'
+        '500':
+          description: |-
+            We couldn't process your request because of an issue with the server. Try again later.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerException'
+        '402':
+          description: |-
+            The service quota has been exceeded. For a list of service quotas, see [Amazon Connect Service Quotas](https://docs.aws.amazon.com/connect/latest/adminguide/amazon-connect-service-limits.html) in the _Amazon Connect Administrator Guide_.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServiceQuotaExceededException'
+        '429':
+          description: |-
+            The rate has been exceeded for this API. Please try again after a few minutes.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThrottlingException'
+        '400':
+          description: |-
+            The request isn't valid. Check the syntax and try again.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+  /domains/{domainId}/fields:
+    post:
+      operationId: CreateField
+      description: |-
+        Creates a field in the Cases domain. This field is used to define the case object model (that is, defines what data can be captured on cases) in a Cases domain.
+      parameters:
+      - name: domainId
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/DomainId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  $ref: '#/components/schemas/FieldName'
+                type:
+                  $ref: '#/components/schemas/FieldType'
+                description:
+                  $ref: '#/components/schemas/FieldDescription'
+      responses:
+        '200': {}
+        '403':
+          description: |-
+            You do not have sufficient access to perform this action.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '409':
+          description: |-
+            The requested operation would cause a conflict with the current state of a service resource associated with the request. Resolve the conflict before retrying this request. See the accompanying error message for details.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConflictException'
+        '500':
+          description: |-
+            We couldn't process your request because of an issue with the server. Try again later.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerException'
+        '404':
+          description: |-
+            We couldn't find the requested resource. Check that your resources exists and were created in the same Amazon Web Services Region as your request, and try your request again.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+        '402':
+          description: |-
+            The service quota has been exceeded. For a list of service quotas, see [Amazon Connect Service Quotas](https://docs.aws.amazon.com/connect/latest/adminguide/amazon-connect-service-limits.html) in the _Amazon Connect Administrator Guide_.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServiceQuotaExceededException'
+        '429':
+          description: |-
+            The rate has been exceeded for this API. Please try again after a few minutes.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThrottlingException'
+        '400':
+          description: |-
+            The request isn't valid. Check the syntax and try again.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+  /domains/{domainId}/layouts:
+    post:
+      operationId: CreateLayout
+      description: |-
+        Creates a layout in the Cases domain. Layouts define the following configuration in the top section and More Info tab of the Cases user interface:
+
+          * Fields to display to the users
+
+          * Field ordering
+
+        Title and Status fields cannot be part of layouts since they are not configurable.
+      parameters:
+      - name: domainId
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/DomainId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  $ref: '#/components/schemas/LayoutName'
+                content:
+                  $ref: '#/components/schemas/LayoutContent'
+      responses:
+        '200': {}
+        '403':
+          description: |-
+            You do not have sufficient access to perform this action.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '409':
+          description: |-
+            The requested operation would cause a conflict with the current state of a service resource associated with the request. Resolve the conflict before retrying this request. See the accompanying error message for details.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConflictException'
+        '500':
+          description: |-
+            We couldn't process your request because of an issue with the server. Try again later.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerException'
+        '404':
+          description: |-
+            We couldn't find the requested resource. Check that your resources exists and were created in the same Amazon Web Services Region as your request, and try your request again.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+        '402':
+          description: |-
+            The service quota has been exceeded. For a list of service quotas, see [Amazon Connect Service Quotas](https://docs.aws.amazon.com/connect/latest/adminguide/amazon-connect-service-limits.html) in the _Amazon Connect Administrator Guide_.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServiceQuotaExceededException'
+        '429':
+          description: |-
+            The rate has been exceeded for this API. Please try again after a few minutes.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThrottlingException'
+        '400':
+          description: |-
+            The request isn't valid. Check the syntax and try again.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+  /domains/{domainId}/cases/{caseId}/related-items/:
+    post:
+      operationId: CreateRelatedItem
+      description: |-
+        Creates a related item (comments, tasks, and contacts) and associates it with a case.
+
+          * A Related Item is a resource that is associated with a case. It may or may not have an external identifier linking it to an external resource (for example, a `contactArn`). All Related Items have their own internal identifier, the `relatedItemArn`. Examples of related items include `comments` and `contacts`.
+
+          * If you provide a value for `performedBy.userArn` you must also have [DescribeUser](https://docs.aws.amazon.com/connect/latest/APIReference/API_DescribeUser.html) permission on the ARN of the user that you provide.
+
+          * The `type` field is reserved for internal use only.
+      parameters:
+      - name: domainId
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/DomainId'
+      - name: caseId
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/CaseId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                type:
+                  $ref: '#/components/schemas/RelatedItemType'
+                content:
+                  $ref: '#/components/schemas/RelatedItemInputContent'
+                performedBy:
+                  $ref: '#/components/schemas/UserUnion'
+      responses:
+        '200': {}
+        '403':
+          description: |-
+            You do not have sufficient access to perform this action.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '500':
+          description: |-
+            We couldn't process your request because of an issue with the server. Try again later.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerException'
+        '404':
+          description: |-
+            We couldn't find the requested resource. Check that your resources exists and were created in the same Amazon Web Services Region as your request, and try your request again.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+        '402':
+          description: |-
+            The service quota has been exceeded. For a list of service quotas, see [Amazon Connect Service Quotas](https://docs.aws.amazon.com/connect/latest/adminguide/amazon-connect-service-limits.html) in the _Amazon Connect Administrator Guide_.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServiceQuotaExceededException'
+        '429':
+          description: |-
+            The rate has been exceeded for this API. Please try again after a few minutes.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThrottlingException'
+        '400':
+          description: |-
+            The request isn't valid. Check the syntax and try again.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+  /domains/{domainId}/templates:
+    post:
+      operationId: CreateTemplate
+      description: |-
+        Creates a template in the Cases domain. This template is used to define the case object model (that is, to define what data can be captured on cases) in a Cases domain. A template must have a unique name within a domain, and it must reference existing field IDs and layout IDs. Additionally, multiple fields with same IDs are not allowed within the same Template. A template can be either Active or Inactive, as indicated by its status. Inactive templates cannot be used to create cases.
+
+        Other template APIs are:
+
+          * [DeleteTemplate](https://docs.aws.amazon.com/connect/latest/APIReference/API_connect-cases_DeleteTemplate.html)
+
+          * [GetTemplate](https://docs.aws.amazon.com/connect/latest/APIReference/API_connect-cases_GetTemplate.html)
+
+          * [ListTemplates](https://docs.aws.amazon.com/connect/latest/APIReference/API_connect-cases_ListTemplates.html)
+
+          * [UpdateTemplate](https://docs.aws.amazon.com/connect/latest/APIReference/API_connect-cases_UpdateTemplate.html)
+      parameters:
+      - name: domainId
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/DomainId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  $ref: '#/components/schemas/TemplateName'
+                description:
+                  $ref: '#/components/schemas/TemplateDescription'
+                layoutConfiguration:
+                  $ref: '#/components/schemas/LayoutConfiguration'
+                requiredFields:
+                  $ref: '#/components/schemas/RequiredFieldList'
+                status:
+                  $ref: '#/components/schemas/TemplateStatus'
+                rules:
+                  $ref: '#/components/schemas/TemplateCaseRuleList'
+      responses:
+        '200': {}
+        '403':
+          description: |-
+            You do not have sufficient access to perform this action.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '409':
+          description: |-
+            The requested operation would cause a conflict with the current state of a service resource associated with the request. Resolve the conflict before retrying this request. See the accompanying error message for details.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConflictException'
+        '500':
+          description: |-
+            We couldn't process your request because of an issue with the server. Try again later.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerException'
+        '404':
+          description: |-
+            We couldn't find the requested resource. Check that your resources exists and were created in the same Amazon Web Services Region as your request, and try your request again.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+        '402':
+          description: |-
+            The service quota has been exceeded. For a list of service quotas, see [Amazon Connect Service Quotas](https://docs.aws.amazon.com/connect/latest/adminguide/amazon-connect-service-limits.html) in the _Amazon Connect Administrator Guide_.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServiceQuotaExceededException'
+        '429':
+          description: |-
+            The rate has been exceeded for this API. Please try again after a few minutes.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThrottlingException'
+        '400':
+          description: |-
+            The request isn't valid. Check the syntax and try again.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+  /domains/{domainId}/case-rules/{caseRuleId}:
+    delete:
+      operationId: DeleteCaseRule
+      description: |-
+        Deletes a case rule. In the Amazon Connect admin website, case rules are known as _case field conditions_. For more information about case field conditions, see [Add case field conditions to a case template](https://docs.aws.amazon.com/connect/latest/adminguide/case-field-conditions.html).
+      parameters:
+      - name: domainId
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/DomainId'
+      - name: caseRuleId
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/CaseRuleId'
+      responses:
+        '200': {}
+        '403':
+          description: |-
+            You do not have sufficient access to perform this action.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '409':
+          description: |-
+            The requested operation would cause a conflict with the current state of a service resource associated with the request. Resolve the conflict before retrying this request. See the accompanying error message for details.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConflictException'
+        '500':
+          description: |-
+            We couldn't process your request because of an issue with the server. Try again later.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerException'
+        '404':
+          description: |-
+            We couldn't find the requested resource. Check that your resources exists and were created in the same Amazon Web Services Region as your request, and try your request again.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+        '429':
+          description: |-
+            The rate has been exceeded for this API. Please try again after a few minutes.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThrottlingException'
+    put:
+      operationId: UpdateCaseRule
+      description: |-
+        Updates a case rule. In the Amazon Connect admin website, case rules are known as _case field conditions_. For more information about case field conditions, see [Add case field conditions to a case template](https://docs.aws.amazon.com/connect/latest/adminguide/case-field-conditions.html).
+      parameters:
+      - name: domainId
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/DomainId'
+      - name: caseRuleId
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/CaseRuleId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  $ref: '#/components/schemas/CaseRuleName'
+                description:
+                  $ref: '#/components/schemas/CaseRuleDescription'
+                rule:
+                  $ref: '#/components/schemas/CaseRuleDetails'
+      responses:
+        '200': {}
+        '403':
+          description: |-
+            You do not have sufficient access to perform this action.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '409':
+          description: |-
+            The requested operation would cause a conflict with the current state of a service resource associated with the request. Resolve the conflict before retrying this request. See the accompanying error message for details.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConflictException'
+        '500':
+          description: |-
+            We couldn't process your request because of an issue with the server. Try again later.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerException'
+        '404':
+          description: |-
+            We couldn't find the requested resource. Check that your resources exists and were created in the same Amazon Web Services Region as your request, and try your request again.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+        '429':
+          description: |-
+            The rate has been exceeded for this API. Please try again after a few minutes.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThrottlingException'
+        '400':
+          description: |-
+            The request isn't valid. Check the syntax and try again.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+  /domains/{domainId}:
+    delete:
+      operationId: DeleteDomain
+      description: |-
+        Deletes a Cases domain.
+
+        After deleting your domain you must disassociate the deleted domain from your Amazon Connect instance with another API call before being able to use Cases again with this Amazon Connect instance. See [DeleteIntegrationAssociation](https://docs.aws.amazon.com/connect/latest/APIReference/API_DeleteIntegrationAssociation.html).
+      parameters:
+      - name: domainId
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/DomainId'
+      responses:
+        '200': {}
+        '403':
+          description: |-
+            You do not have sufficient access to perform this action.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '409':
+          description: |-
+            The requested operation would cause a conflict with the current state of a service resource associated with the request. Resolve the conflict before retrying this request. See the accompanying error message for details.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConflictException'
+        '500':
+          description: |-
+            We couldn't process your request because of an issue with the server. Try again later.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerException'
+        '404':
+          description: |-
+            We couldn't find the requested resource. Check that your resources exists and were created in the same Amazon Web Services Region as your request, and try your request again.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+        '429':
+          description: |-
+            The rate has been exceeded for this API. Please try again after a few minutes.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThrottlingException'
+        '400':
+          description: |-
+            The request isn't valid. Check the syntax and try again.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+    post:
+      operationId: GetDomain
+      description: |-
+        Returns information about a specific domain if it exists.
+      parameters:
+      - name: domainId
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/DomainId'
+      responses:
+        '200': {}
+        '403':
+          description: |-
+            You do not have sufficient access to perform this action.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '500':
+          description: |-
+            We couldn't process your request because of an issue with the server. Try again later.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerException'
+        '404':
+          description: |-
+            We couldn't find the requested resource. Check that your resources exists and were created in the same Amazon Web Services Region as your request, and try your request again.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+        '429':
+          description: |-
+            The rate has been exceeded for this API. Please try again after a few minutes.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThrottlingException'
+        '400':
+          description: |-
+            The request isn't valid. Check the syntax and try again.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+  /domains/{domainId}/fields/{fieldId}:
+    delete:
+      operationId: DeleteField
+      description: |-
+        Deletes a field from a cases template. You can delete up to 100 fields per domain.
+
+        After a field is deleted:
+
+          * You can still retrieve the field by calling `BatchGetField`.
+
+          * You cannot update a deleted field by calling `UpdateField`; it throws a `ValidationException`.
+
+          * Deleted fields are not included in the `ListFields` response.
+
+          * Calling `CreateCase` with a deleted field throws a `ValidationException` denoting which field IDs in the request have been deleted.
+
+          * Calling `GetCase` with a deleted field ID returns the deleted field's value if one exists.
+
+          * Calling `UpdateCase` with a deleted field ID throws a `ValidationException` if the case does not already contain a value for the deleted field. Otherwise it succeeds, allowing you to update or remove (using `emptyValue: {}`) the field's value from the case.
+
+          * `GetTemplate` does not return field IDs for deleted fields.
+
+          * `GetLayout` does not return field IDs for deleted fields.
+
+          * Calling `SearchCases` with the deleted field ID as a filter returns any cases that have a value for the deleted field that matches the filter criteria.
+
+          * Calling `SearchCases` with a `searchTerm` value that matches a deleted field's value on a case returns the case in the response.
+
+          * Calling `BatchPutFieldOptions` with a deleted field ID throw a `ValidationException`.
+
+          * Calling `GetCaseEventConfiguration` does not return field IDs for deleted fields.
+      parameters:
+      - name: domainId
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/DomainId'
+      - name: fieldId
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/FieldId'
+      responses:
+        '200': {}
+        '403':
+          description: |-
+            You do not have sufficient access to perform this action.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '409':
+          description: |-
+            The requested operation would cause a conflict with the current state of a service resource associated with the request. Resolve the conflict before retrying this request. See the accompanying error message for details.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConflictException'
+        '500':
+          description: |-
+            We couldn't process your request because of an issue with the server. Try again later.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerException'
+        '404':
+          description: |-
+            We couldn't find the requested resource. Check that your resources exists and were created in the same Amazon Web Services Region as your request, and try your request again.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+        '402':
+          description: |-
+            The service quota has been exceeded. For a list of service quotas, see [Amazon Connect Service Quotas](https://docs.aws.amazon.com/connect/latest/adminguide/amazon-connect-service-limits.html) in the _Amazon Connect Administrator Guide_.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServiceQuotaExceededException'
+        '429':
+          description: |-
+            The rate has been exceeded for this API. Please try again after a few minutes.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThrottlingException'
+        '400':
+          description: |-
+            The request isn't valid. Check the syntax and try again.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+    put:
+      operationId: UpdateField
+      description: |-
+        Updates the properties of an existing field.
+      parameters:
+      - name: domainId
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/DomainId'
+      - name: fieldId
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/FieldId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  $ref: '#/components/schemas/FieldName'
+                description:
+                  $ref: '#/components/schemas/FieldDescription'
+      responses:
+        '200': {}
+        '403':
+          description: |-
+            You do not have sufficient access to perform this action.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '409':
+          description: |-
+            The requested operation would cause a conflict with the current state of a service resource associated with the request. Resolve the conflict before retrying this request. See the accompanying error message for details.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConflictException'
+        '500':
+          description: |-
+            We couldn't process your request because of an issue with the server. Try again later.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerException'
+        '404':
+          description: |-
+            We couldn't find the requested resource. Check that your resources exists and were created in the same Amazon Web Services Region as your request, and try your request again.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+        '429':
+          description: |-
+            The rate has been exceeded for this API. Please try again after a few minutes.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThrottlingException'
+        '400':
+          description: |-
+            The request isn't valid. Check the syntax and try again.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+  /domains/{domainId}/layouts/{layoutId}:
+    delete:
+      operationId: DeleteLayout
+      description: |-
+        Deletes a layout from a cases template. You can delete up to 100 layouts per domain.
+
+        After a layout is deleted:
+
+          * You can still retrieve the layout by calling `GetLayout`.
+
+          * You cannot update a deleted layout by calling `UpdateLayout`; it throws a `ValidationException`.
+
+          * Deleted layouts are not included in the `ListLayouts` response.
+      parameters:
+      - name: domainId
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/DomainId'
+      - name: layoutId
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/LayoutId'
+      responses:
+        '200': {}
+        '403':
+          description: |-
+            You do not have sufficient access to perform this action.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '409':
+          description: |-
+            The requested operation would cause a conflict with the current state of a service resource associated with the request. Resolve the conflict before retrying this request. See the accompanying error message for details.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConflictException'
+        '500':
+          description: |-
+            We couldn't process your request because of an issue with the server. Try again later.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerException'
+        '404':
+          description: |-
+            We couldn't find the requested resource. Check that your resources exists and were created in the same Amazon Web Services Region as your request, and try your request again.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+        '429':
+          description: |-
+            The rate has been exceeded for this API. Please try again after a few minutes.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThrottlingException'
+        '400':
+          description: |-
+            The request isn't valid. Check the syntax and try again.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+    post:
+      operationId: GetLayout
+      description: |-
+        Returns the details for the requested layout.
+      parameters:
+      - name: domainId
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/DomainId'
+      - name: layoutId
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/LayoutId'
+      responses:
+        '200': {}
+        '403':
+          description: |-
+            You do not have sufficient access to perform this action.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '500':
+          description: |-
+            We couldn't process your request because of an issue with the server. Try again later.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerException'
+        '404':
+          description: |-
+            We couldn't find the requested resource. Check that your resources exists and were created in the same Amazon Web Services Region as your request, and try your request again.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+        '429':
+          description: |-
+            The rate has been exceeded for this API. Please try again after a few minutes.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThrottlingException'
+        '400':
+          description: |-
+            The request isn't valid. Check the syntax and try again.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+    put:
+      operationId: UpdateLayout
+      description: |-
+        Updates the attributes of an existing layout.
+
+        If the action is successful, the service sends back an HTTP 200 response with an empty HTTP body.
+
+        A `ValidationException` is returned when you add non-existent `fieldIds` to a layout.
+
+        Title and Status fields cannot be part of layouts because they are not configurable.
+      parameters:
+      - name: domainId
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/DomainId'
+      - name: layoutId
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/LayoutId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  $ref: '#/components/schemas/LayoutName'
+                content:
+                  $ref: '#/components/schemas/LayoutContent'
+      responses:
+        '200': {}
+        '403':
+          description: |-
+            You do not have sufficient access to perform this action.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '409':
+          description: |-
+            The requested operation would cause a conflict with the current state of a service resource associated with the request. Resolve the conflict before retrying this request. See the accompanying error message for details.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConflictException'
+        '500':
+          description: |-
+            We couldn't process your request because of an issue with the server. Try again later.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerException'
+        '404':
+          description: |-
+            We couldn't find the requested resource. Check that your resources exists and were created in the same Amazon Web Services Region as your request, and try your request again.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+        '402':
+          description: |-
+            The service quota has been exceeded. For a list of service quotas, see [Amazon Connect Service Quotas](https://docs.aws.amazon.com/connect/latest/adminguide/amazon-connect-service-limits.html) in the _Amazon Connect Administrator Guide_.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServiceQuotaExceededException'
+        '429':
+          description: |-
+            The rate has been exceeded for this API. Please try again after a few minutes.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThrottlingException'
+        '400':
+          description: |-
+            The request isn't valid. Check the syntax and try again.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+  /domains/{domainId}/templates/{templateId}:
+    delete:
+      operationId: DeleteTemplate
+      description: "Deletes a cases template. You can delete up to 100 templates per\
+        \ domain.\n\nAfter a cases template is deleted:\n\n  * You can still retrieve\
+        \ the template by calling `GetTemplate`.\n\n  * You cannot update the template.\
+        \ \n\n  * You cannot create a case by using the deleted template.\n\n  * Deleted\
+        \ templates are not included in the `ListTemplates` response."
+      parameters:
+      - name: domainId
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/DomainId'
+      - name: templateId
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/TemplateId'
+      responses:
+        '200': {}
+        '403':
+          description: |-
+            You do not have sufficient access to perform this action.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '409':
+          description: |-
+            The requested operation would cause a conflict with the current state of a service resource associated with the request. Resolve the conflict before retrying this request. See the accompanying error message for details.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConflictException'
+        '500':
+          description: |-
+            We couldn't process your request because of an issue with the server. Try again later.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerException'
+        '404':
+          description: |-
+            We couldn't find the requested resource. Check that your resources exists and were created in the same Amazon Web Services Region as your request, and try your request again.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+        '429':
+          description: |-
+            The rate has been exceeded for this API. Please try again after a few minutes.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThrottlingException'
+        '400':
+          description: |-
+            The request isn't valid. Check the syntax and try again.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+    post:
+      operationId: GetTemplate
+      description: |-
+        Returns the details for the requested template. Other template APIs are:
+
+          * [CreateTemplate](https://docs.aws.amazon.com/connect/latest/APIReference/API_connect-cases_CreateTemplate.html)
+
+          * [DeleteTemplate](https://docs.aws.amazon.com/connect/latest/APIReference/API_connect-cases_DeleteTemplate.html)
+
+          * [ListTemplates](https://docs.aws.amazon.com/connect/latest/APIReference/API_connect-cases_ListTemplates.html)
+
+          * [UpdateTemplate](https://docs.aws.amazon.com/connect/latest/APIReference/API_connect-cases_UpdateTemplate.html)
+      parameters:
+      - name: domainId
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/DomainId'
+      - name: templateId
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/TemplateId'
+      responses:
+        '200': {}
+        '403':
+          description: |-
+            You do not have sufficient access to perform this action.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '500':
+          description: |-
+            We couldn't process your request because of an issue with the server. Try again later.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerException'
+        '404':
+          description: |-
+            We couldn't find the requested resource. Check that your resources exists and were created in the same Amazon Web Services Region as your request, and try your request again.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+        '429':
+          description: |-
+            The rate has been exceeded for this API. Please try again after a few minutes.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThrottlingException'
+        '400':
+          description: |-
+            The request isn't valid. Check the syntax and try again.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+    put:
+      operationId: UpdateTemplate
+      description: |-
+        Updates the attributes of an existing template. The template attributes that can be modified include `name`, `description`, `layoutConfiguration`, `requiredFields`, and `status`. At least one of these attributes must not be null. If a null value is provided for a given attribute, that attribute is ignored and its current value is preserved.
+
+        Other template APIs are:
+
+          * [CreateTemplate](https://docs.aws.amazon.com/connect/latest/APIReference/API_connect-cases_CreateTemplate.html)
+
+          * [DeleteTemplate](https://docs.aws.amazon.com/connect/latest/APIReference/API_connect-cases_DeleteTemplate.html)
+
+          * [GetTemplate](https://docs.aws.amazon.com/connect/latest/APIReference/API_connect-cases_GetTemplate.html)
+
+          * [ListTemplates](https://docs.aws.amazon.com/connect/latest/APIReference/API_connect-cases_ListTemplates.html)
+      parameters:
+      - name: domainId
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/DomainId'
+      - name: templateId
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/TemplateId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  $ref: '#/components/schemas/TemplateName'
+                description:
+                  $ref: '#/components/schemas/TemplateDescription'
+                layoutConfiguration:
+                  $ref: '#/components/schemas/LayoutConfiguration'
+                requiredFields:
+                  $ref: '#/components/schemas/RequiredFieldList'
+                status:
+                  $ref: '#/components/schemas/TemplateStatus'
+                rules:
+                  $ref: '#/components/schemas/TemplateCaseRuleList'
+      responses:
+        '200': {}
+        '403':
+          description: |-
+            You do not have sufficient access to perform this action.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '409':
+          description: |-
+            The requested operation would cause a conflict with the current state of a service resource associated with the request. Resolve the conflict before retrying this request. See the accompanying error message for details.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConflictException'
+        '500':
+          description: |-
+            We couldn't process your request because of an issue with the server. Try again later.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerException'
+        '404':
+          description: |-
+            We couldn't find the requested resource. Check that your resources exists and were created in the same Amazon Web Services Region as your request, and try your request again.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+        '429':
+          description: |-
+            The rate has been exceeded for this API. Please try again after a few minutes.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThrottlingException'
+        '400':
+          description: |-
+            The request isn't valid. Check the syntax and try again.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+  /domains/{domainId}/cases/{caseId}:
+    post:
+      operationId: GetCase
+      description: |-
+        Returns information about a specific case if it exists.
+      parameters:
+      - name: caseId
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/CaseId'
+      - name: domainId
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/DomainId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                fields:
+                  $ref: '#/components/schemas/FieldIdentifierList'
+                nextToken:
+                  $ref: '#/components/schemas/NextToken'
+      responses:
+        '200': {}
+        '403':
+          description: |-
+            You do not have sufficient access to perform this action.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '500':
+          description: |-
+            We couldn't process your request because of an issue with the server. Try again later.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerException'
+        '404':
+          description: |-
+            We couldn't find the requested resource. Check that your resources exists and were created in the same Amazon Web Services Region as your request, and try your request again.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+        '429':
+          description: |-
+            The rate has been exceeded for this API. Please try again after a few minutes.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThrottlingException'
+        '400':
+          description: |-
+            The request isn't valid. Check the syntax and try again.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+    put:
+      operationId: UpdateCase
+      description: |-
+        If you provide a value for `PerformedBy.UserArn` you must also have [connect:DescribeUser](https://docs.aws.amazon.com/connect/latest/APIReference/API_DescribeUser.html) permission on the User ARN resource that you provide
+
+        Updates the values of fields on a case. Fields to be updated are received as an array of id/value pairs identical to the `CreateCase` input .
+
+        If the action is successful, the service sends back an HTTP 200 response with an empty HTTP body.
+      parameters:
+      - name: domainId
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/DomainId'
+      - name: caseId
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/CaseId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                fields:
+                  $ref: '#/components/schemas/FieldValueList'
+                performedBy:
+                  $ref: '#/components/schemas/UserUnion'
+      responses:
+        '200': {}
+        '403':
+          description: |-
+            You do not have sufficient access to perform this action.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '500':
+          description: |-
+            We couldn't process your request because of an issue with the server. Try again later.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerException'
+        '404':
+          description: |-
+            We couldn't find the requested resource. Check that your resources exists and were created in the same Amazon Web Services Region as your request, and try your request again.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+        '429':
+          description: |-
+            The rate has been exceeded for this API. Please try again after a few minutes.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThrottlingException'
+        '400':
+          description: |-
+            The request isn't valid. Check the syntax and try again.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+  /domains/{domainId}/cases/{caseId}/audit-history:
+    post:
+      operationId: GetCaseAuditEvents
+      description: |-
+        Returns the audit history about a specific case if it exists.
+      parameters:
+      - name: caseId
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/CaseId'
+      - name: domainId
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/DomainId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                maxResults:
+                  $ref: '#/components/schemas/Integer'
+                nextToken:
+                  $ref: '#/components/schemas/NextToken'
+      responses:
+        '200': {}
+        '403':
+          description: |-
+            You do not have sufficient access to perform this action.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '500':
+          description: |-
+            We couldn't process your request because of an issue with the server. Try again later.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerException'
+        '404':
+          description: |-
+            We couldn't find the requested resource. Check that your resources exists and were created in the same Amazon Web Services Region as your request, and try your request again.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+        '429':
+          description: |-
+            The rate has been exceeded for this API. Please try again after a few minutes.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThrottlingException'
+        '400':
+          description: |-
+            The request isn't valid. Check the syntax and try again.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+  /domains/{domainId}/case-event-configuration:
+    post:
+      operationId: GetCaseEventConfiguration
+      description: |-
+        Returns the case event publishing configuration.
+      parameters:
+      - name: domainId
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/DomainId'
+      responses:
+        '200': {}
+        '403':
+          description: |-
+            You do not have sufficient access to perform this action.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '500':
+          description: |-
+            We couldn't process your request because of an issue with the server. Try again later.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerException'
+        '404':
+          description: |-
+            We couldn't find the requested resource. Check that your resources exists and were created in the same Amazon Web Services Region as your request, and try your request again.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+        '429':
+          description: |-
+            The rate has been exceeded for this API. Please try again after a few minutes.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThrottlingException'
+        '400':
+          description: |-
+            The request isn't valid. Check the syntax and try again.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+    put:
+      operationId: PutCaseEventConfiguration
+      description: |-
+        Adds case event publishing configuration. For a complete list of fields you can add to the event message, see [Create case fields](https://docs.aws.amazon.com/connect/latest/adminguide/case-fields.html) in the _Amazon Connect Administrator Guide_
+      parameters:
+      - name: domainId
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/DomainId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                eventBridge:
+                  $ref: '#/components/schemas/EventBridgeConfiguration'
+      responses:
+        '200': {}
+        '403':
+          description: |-
+            You do not have sufficient access to perform this action.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '409':
+          description: |-
+            The requested operation would cause a conflict with the current state of a service resource associated with the request. Resolve the conflict before retrying this request. See the accompanying error message for details.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConflictException'
+        '500':
+          description: |-
+            We couldn't process your request because of an issue with the server. Try again later.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerException'
+        '404':
+          description: |-
+            We couldn't find the requested resource. Check that your resources exists and were created in the same Amazon Web Services Region as your request, and try your request again.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+        '429':
+          description: |-
+            The rate has been exceeded for this API. Please try again after a few minutes.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThrottlingException'
+        '400':
+          description: |-
+            The request isn't valid. Check the syntax and try again.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+  /domains/{domainId}/rules-list/:
+    post:
+      operationId: ListCaseRules
+      description: |-
+        Lists all case rules in a Cases domain. In the Amazon Connect admin website, case rules are known as _case field conditions_. For more information about case field conditions, see [Add case field conditions to a case template](https://docs.aws.amazon.com/connect/latest/adminguide/case-field-conditions.html).
+      parameters:
+      - name: domainId
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/DomainId'
+      - name: maxResults
+        in: query
+        required: false
+        schema:
+          $ref: '#/components/schemas/MaxResults'
+      - name: nextToken
+        in: query
+        required: false
+        schema:
+          $ref: '#/components/schemas/NextToken'
+      responses:
+        '200': {}
+        '403':
+          description: |-
+            You do not have sufficient access to perform this action.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '500':
+          description: |-
+            We couldn't process your request because of an issue with the server. Try again later.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerException'
+        '404':
+          description: |-
+            We couldn't find the requested resource. Check that your resources exists and were created in the same Amazon Web Services Region as your request, and try your request again.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+        '429':
+          description: |-
+            The rate has been exceeded for this API. Please try again after a few minutes.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThrottlingException'
+        '400':
+          description: |-
+            The request isn't valid. Check the syntax and try again.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+  /domains/{domainId}/list-cases-for-contact:
+    post:
+      operationId: ListCasesForContact
+      description: |-
+        Lists cases for a given contact.
+      parameters:
+      - name: domainId
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/DomainId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                contactArn:
+                  $ref: '#/components/schemas/ContactArn'
+                maxResults:
+                  $ref: '#/components/schemas/Integer'
+                nextToken:
+                  $ref: '#/components/schemas/NextToken'
+      responses:
+        '200': {}
+        '403':
+          description: |-
+            You do not have sufficient access to perform this action.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '500':
+          description: |-
+            We couldn't process your request because of an issue with the server. Try again later.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerException'
+        '404':
+          description: |-
+            We couldn't find the requested resource. Check that your resources exists and were created in the same Amazon Web Services Region as your request, and try your request again.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+        '429':
+          description: |-
+            The rate has been exceeded for this API. Please try again after a few minutes.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThrottlingException'
+        '400':
+          description: |-
+            The request isn't valid. Check the syntax and try again.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+  /domains-list:
+    post:
+      operationId: ListDomains
+      description: |-
+        Lists all cases domains in the Amazon Web Services account. Each list item is a condensed summary object of the domain.
+      parameters:
+      - name: maxResults
+        in: query
+        required: false
+        schema:
+          $ref: '#/components/schemas/MaxResults'
+      - name: nextToken
+        in: query
+        required: false
+        schema:
+          $ref: '#/components/schemas/NextToken'
+      responses:
+        '200': {}
+        '403':
+          description: |-
+            You do not have sufficient access to perform this action.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '500':
+          description: |-
+            We couldn't process your request because of an issue with the server. Try again later.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerException'
+        '429':
+          description: |-
+            The rate has been exceeded for this API. Please try again after a few minutes.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThrottlingException'
+        '400':
+          description: |-
+            The request isn't valid. Check the syntax and try again.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+  /domains/{domainId}/fields/{fieldId}/options-list:
+    post:
+      operationId: ListFieldOptions
+      description: |-
+        Lists all of the field options for a field identifier in the domain.
+      parameters:
+      - name: domainId
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/DomainId'
+      - name: fieldId
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/FieldId'
+      - name: maxResults
+        in: query
+        required: false
+        schema:
+          $ref: '#/components/schemas/MaxResults'
+      - name: nextToken
+        in: query
+        required: false
+        schema:
+          $ref: '#/components/schemas/NextToken'
+      - name: values
+        in: query
+        required: false
+        schema:
+          $ref: '#/components/schemas/ValuesList'
+      responses:
+        '200': {}
+        '403':
+          description: |-
+            You do not have sufficient access to perform this action.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '500':
+          description: |-
+            We couldn't process your request because of an issue with the server. Try again later.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerException'
+        '404':
+          description: |-
+            We couldn't find the requested resource. Check that your resources exists and were created in the same Amazon Web Services Region as your request, and try your request again.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+        '429':
+          description: |-
+            The rate has been exceeded for this API. Please try again after a few minutes.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThrottlingException'
+        '400':
+          description: |-
+            The request isn't valid. Check the syntax and try again.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+  /domains/{domainId}/fields-list:
+    post:
+      operationId: ListFields
+      description: |-
+        Lists all fields in a Cases domain.
+      parameters:
+      - name: domainId
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/DomainId'
+      - name: maxResults
+        in: query
+        required: false
+        schema:
+          $ref: '#/components/schemas/MaxResults'
+      - name: nextToken
+        in: query
+        required: false
+        schema:
+          $ref: '#/components/schemas/NextToken'
+      responses:
+        '200': {}
+        '403':
+          description: |-
+            You do not have sufficient access to perform this action.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '500':
+          description: |-
+            We couldn't process your request because of an issue with the server. Try again later.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerException'
+        '404':
+          description: |-
+            We couldn't find the requested resource. Check that your resources exists and were created in the same Amazon Web Services Region as your request, and try your request again.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+        '429':
+          description: |-
+            The rate has been exceeded for this API. Please try again after a few minutes.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThrottlingException'
+        '400':
+          description: |-
+            The request isn't valid. Check the syntax and try again.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+  /domains/{domainId}/layouts-list:
+    post:
+      operationId: ListLayouts
+      description: |-
+        Lists all layouts in the given cases domain. Each list item is a condensed summary object of the layout.
+      parameters:
+      - name: domainId
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/DomainId'
+      - name: maxResults
+        in: query
+        required: false
+        schema:
+          $ref: '#/components/schemas/MaxResults'
+      - name: nextToken
+        in: query
+        required: false
+        schema:
+          $ref: '#/components/schemas/NextToken'
+      responses:
+        '200': {}
+        '403':
+          description: |-
+            You do not have sufficient access to perform this action.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '500':
+          description: |-
+            We couldn't process your request because of an issue with the server. Try again later.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerException'
+        '404':
+          description: |-
+            We couldn't find the requested resource. Check that your resources exists and were created in the same Amazon Web Services Region as your request, and try your request again.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+        '429':
+          description: |-
+            The rate has been exceeded for this API. Please try again after a few minutes.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThrottlingException'
+        '400':
+          description: |-
+            The request isn't valid. Check the syntax and try again.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+  /tags/{arn}:
+    get:
+      operationId: ListTagsForResource
+      description: |-
+        Lists tags for a resource.
+      parameters:
+      - name: arn
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/Arn'
+      responses:
+        '200': {}
+        '403':
+          description: |-
+            You do not have sufficient access to perform this action.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '500':
+          description: |-
+            We couldn't process your request because of an issue with the server. Try again later.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerException'
+        '404':
+          description: |-
+            We couldn't find the requested resource. Check that your resources exists and were created in the same Amazon Web Services Region as your request, and try your request again.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+        '429':
+          description: |-
+            The rate has been exceeded for this API. Please try again after a few minutes.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThrottlingException'
+        '400':
+          description: |-
+            The request isn't valid. Check the syntax and try again.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+    post:
+      operationId: TagResource
+      description: |-
+        Adds tags to a resource.
+      parameters:
+      - name: arn
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/Arn'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                tags:
+                  $ref: '#/components/schemas/Tags'
+      responses:
+        '200': {}
+        '403':
+          description: |-
+            You do not have sufficient access to perform this action.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '500':
+          description: |-
+            We couldn't process your request because of an issue with the server. Try again later.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerException'
+        '404':
+          description: |-
+            We couldn't find the requested resource. Check that your resources exists and were created in the same Amazon Web Services Region as your request, and try your request again.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+        '429':
+          description: |-
+            The rate has been exceeded for this API. Please try again after a few minutes.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThrottlingException'
+        '400':
+          description: |-
+            The request isn't valid. Check the syntax and try again.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+    delete:
+      operationId: UntagResource
+      description: |-
+        Untags a resource.
+      parameters:
+      - name: arn
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/Arn'
+      - name: tagKeys
+        in: query
+        required: true
+        schema:
+          $ref: '#/components/schemas/TagKeyList'
+      responses:
+        '200': {}
+        '403':
+          description: |-
+            You do not have sufficient access to perform this action.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '500':
+          description: |-
+            We couldn't process your request because of an issue with the server. Try again later.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerException'
+        '404':
+          description: |-
+            We couldn't find the requested resource. Check that your resources exists and were created in the same Amazon Web Services Region as your request, and try your request again.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+        '429':
+          description: |-
+            The rate has been exceeded for this API. Please try again after a few minutes.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThrottlingException'
+        '400':
+          description: |-
+            The request isn't valid. Check the syntax and try again.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+  /domains/{domainId}/templates-list:
+    post:
+      operationId: ListTemplates
+      description: |-
+        Lists all of the templates in a Cases domain. Each list item is a condensed summary object of the template.
+
+        Other template APIs are:
+
+          * [CreateTemplate](https://docs.aws.amazon.com/connect/latest/APIReference/API_connect-cases_CreateTemplate.html)
+
+          * [DeleteTemplate](https://docs.aws.amazon.com/connect/latest/APIReference/API_connect-cases_DeleteTemplate.html)
+
+          * [GetTemplate](https://docs.aws.amazon.com/connect/latest/APIReference/API_connect-cases_GetTemplate.html)
+
+          * [UpdateTemplate](https://docs.aws.amazon.com/connect/latest/APIReference/API_connect-cases_UpdateTemplate.html)
+      parameters:
+      - name: domainId
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/DomainId'
+      - name: maxResults
+        in: query
+        required: false
+        schema:
+          $ref: '#/components/schemas/MaxResults'
+      - name: nextToken
+        in: query
+        required: false
+        schema:
+          $ref: '#/components/schemas/NextToken'
+      - name: status
+        in: query
+        required: false
+        schema:
+          $ref: '#/components/schemas/TemplateStatusFilters'
+      responses:
+        '200': {}
+        '403':
+          description: |-
+            You do not have sufficient access to perform this action.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '500':
+          description: |-
+            We couldn't process your request because of an issue with the server. Try again later.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerException'
+        '404':
+          description: |-
+            We couldn't find the requested resource. Check that your resources exists and were created in the same Amazon Web Services Region as your request, and try your request again.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+        '429':
+          description: |-
+            The rate has been exceeded for this API. Please try again after a few minutes.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThrottlingException'
+        '400':
+          description: |-
+            The request isn't valid. Check the syntax and try again.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+  /domains/{domainId}/cases-search:
+    post:
+      operationId: SearchCases
+      description: |-
+        Searches for cases within their associated Cases domain. Search results are returned as a paginated list of abridged case documents.
+
+        For `customer_id` you must provide the full customer profile ARN in this format: ` arn:aws:profile:your AWS Region:your AWS account ID:domains/profiles domain name/profiles/profile ID`.
+      parameters:
+      - name: domainId
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/DomainId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                maxResults:
+                  $ref: '#/components/schemas/Integer'
+                nextToken:
+                  $ref: '#/components/schemas/NextToken'
+                searchTerm:
+                  $ref: '#/components/schemas/String'
+                filter:
+                  $ref: '#/components/schemas/CaseFilter'
+                sorts:
+                  $ref: '#/components/schemas/SortList'
+                fields:
+                  $ref: '#/components/schemas/FieldIdentifierList'
+      responses:
+        '200': {}
+        '403':
+          description: |-
+            You do not have sufficient access to perform this action.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '500':
+          description: |-
+            We couldn't process your request because of an issue with the server. Try again later.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerException'
+        '404':
+          description: |-
+            We couldn't find the requested resource. Check that your resources exists and were created in the same Amazon Web Services Region as your request, and try your request again.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+        '429':
+          description: |-
+            The rate has been exceeded for this API. Please try again after a few minutes.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThrottlingException'
+        '400':
+          description: |-
+            The request isn't valid. Check the syntax and try again.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+  /domains/{domainId}/cases/{caseId}/related-items-search:
+    post:
+      operationId: SearchRelatedItems
+      description: |-
+        Searches for related items that are associated with a case.
+
+        If no filters are provided, this returns all related items associated with a case.
+      parameters:
+      - name: domainId
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/DomainId'
+      - name: caseId
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/CaseId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                maxResults:
+                  $ref: '#/components/schemas/Integer'
+                nextToken:
+                  $ref: '#/components/schemas/NextToken'
+                filters:
+                  $ref: '#/components/schemas/RelatedItemFilterList'
+      responses:
+        '200': {}
+        '403':
+          description: |-
+            You do not have sufficient access to perform this action.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '500':
+          description: |-
+            We couldn't process your request because of an issue with the server. Try again later.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerException'
+        '404':
+          description: |-
+            We couldn't find the requested resource. Check that your resources exists and were created in the same Amazon Web Services Region as your request, and try your request again.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+        '429':
+          description: |-
+            The rate has been exceeded for this API. Please try again after a few minutes.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThrottlingException'
+        '400':
+          description: |-
+            The request isn't valid. Check the syntax and try again.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
 components:
   schemas:
+    AccessDeniedException:
+      type: object
+      properties:
+        message:
+          $ref: '#/components/schemas/String'
+      required:
+      - message
+      description: You do not have sufficient access to perform this action.
     Arn:
       type: string
       minLength: 1
@@ -57,9 +2613,61 @@ components:
     AssociationTime:
       type: string
       format: date-time
+    AuditEvent:
+      type: object
+      properties:
+        eventId:
+          allOf:
+          - $ref: '#/components/schemas/AuditEventId'
+          description: Unique identifier of a case audit history event.
+        type:
+          allOf:
+          - $ref: '#/components/schemas/AuditEventType'
+          description: The Type of an audit history event.
+        relatedItemType:
+          allOf:
+          - $ref: '#/components/schemas/RelatedItemType'
+          description: The Type of the related item.
+        performedTime:
+          allOf:
+          - $ref: '#/components/schemas/AuditEventDateTime'
+          description: Time at which an Audit History event took place.
+        fields:
+          allOf:
+          - $ref: '#/components/schemas/AuditEventFieldList'
+          description: A list of Case Audit History event fields.
+        performedBy:
+          allOf:
+          - $ref: '#/components/schemas/AuditEventPerformedBy'
+          description: Information of the user which performed the audit.
+      required:
+      - eventId
+      - type
+      - performedTime
+      - fields
+      description: Represents the content of a particular audit event.
     AuditEventDateTime:
       type: string
       format: date-time
+    AuditEventField:
+      type: object
+      properties:
+        eventFieldId:
+          allOf:
+          - $ref: '#/components/schemas/AuditEventFieldId'
+          description: Unique identifier of field in an Audit History entry.
+        oldValue:
+          allOf:
+          - $ref: '#/components/schemas/AuditEventFieldValueUnion'
+          description: Union of potential field value types.
+        newValue:
+          allOf:
+          - $ref: '#/components/schemas/AuditEventFieldValueUnion'
+          description: Union of potential field value types.
+      required:
+      - eventFieldId
+      - newValue
+      description: Fields for audit event.
     AuditEventFieldId:
       type: string
       minLength: 1
@@ -94,6 +2702,18 @@ components:
       type: string
       minLength: 1
       maxLength: 500
+    AuditEventPerformedBy:
+      type: object
+      properties:
+        user:
+          $ref: '#/components/schemas/UserUnion'
+        iamPrincipalArn:
+          allOf:
+          - $ref: '#/components/schemas/IamPrincipalArn'
+          description: Unique identifier of an IAM role.
+      required:
+      - iamPrincipalArn
+      description: Information of the user which performed the audit.
     AuditEventType:
       type: string
       enum:
@@ -104,6 +2724,19 @@ components:
       type: array
       items:
         $ref: '#/components/schemas/AuditEvent'
+    BasicLayout:
+      type: object
+      properties:
+        topPanel:
+          allOf:
+          - $ref: '#/components/schemas/LayoutSections'
+          description: This represents sections in a panel of the page layout.
+        moreInfo:
+          allOf:
+          - $ref: '#/components/schemas/LayoutSections'
+          description: This represents sections in a tab of the page layout.
+      description: Content specific to `BasicLayout` type. It configures fields in
+        the top panel and More Info tab of agent application.
     BatchGetCaseRuleErrorList:
       type: array
       items:
@@ -112,6 +2745,34 @@ components:
       type: array
       items:
         $ref: '#/components/schemas/GetCaseRuleResponse'
+    BatchGetCaseRuleRequest:
+      type: object
+      properties:
+        domainId:
+          allOf:
+          - $ref: '#/components/schemas/DomainId'
+          description: Unique identifier of a Cases domain.
+        caseRules:
+          allOf:
+          - $ref: '#/components/schemas/CaseRuleIdentifierList'
+          description: List of case rule identifiers.
+      required:
+      - domainId
+      - caseRules
+    BatchGetCaseRuleResponse:
+      type: object
+      properties:
+        caseRules:
+          allOf:
+          - $ref: '#/components/schemas/BatchGetCaseRuleList'
+          description: List of detailed case rule information.
+        errors:
+          allOf:
+          - $ref: '#/components/schemas/BatchGetCaseRuleErrorList'
+          description: List of case rule errors.
+      required:
+      - caseRules
+      - errors
     BatchGetFieldErrorList:
       type: array
       items:
@@ -124,6 +2785,60 @@ components:
       type: array
       items:
         $ref: '#/components/schemas/GetFieldResponse'
+    BatchGetFieldRequest:
+      type: object
+      properties:
+        domainId:
+          allOf:
+          - $ref: '#/components/schemas/DomainId'
+          description: The unique identifier of the Cases domain.
+        fields:
+          allOf:
+          - $ref: '#/components/schemas/BatchGetFieldIdentifierList'
+          description: A list of unique field identifiers.
+      required:
+      - domainId
+      - fields
+    BatchGetFieldResponse:
+      type: object
+      properties:
+        fields:
+          allOf:
+          - $ref: '#/components/schemas/BatchGetFieldList'
+          description: A list of detailed field information.
+        errors:
+          allOf:
+          - $ref: '#/components/schemas/BatchGetFieldErrorList'
+          description: A list of field errors.
+      required:
+      - fields
+      - errors
+    BatchPutFieldOptionsRequest:
+      type: object
+      properties:
+        domainId:
+          allOf:
+          - $ref: '#/components/schemas/DomainId'
+          description: The unique identifier of the Cases domain.
+        fieldId:
+          allOf:
+          - $ref: '#/components/schemas/FieldId'
+          description: The unique identifier of a field.
+        options:
+          allOf:
+          - $ref: '#/components/schemas/FieldOptionsList'
+          description: A list of `FieldOption` objects.
+      required:
+      - domainId
+      - fieldId
+      - options
+    BatchPutFieldOptionsResponse:
+      type: object
+      properties:
+        errors:
+          allOf:
+          - $ref: '#/components/schemas/FieldOptionErrorList'
+          description: A list of field errors.
     BooleanCondition:
       allOf:
       - allOf:
@@ -140,10 +2855,42 @@ components:
       type: array
       items:
         $ref: '#/components/schemas/BooleanCondition'
+    BooleanOperands:
+      type: object
+      properties:
+        operandOne:
+          allOf:
+          - $ref: '#/components/schemas/OperandOne'
+          description: Represents the left hand operand in the condition.
+        operandTwo:
+          allOf:
+          - $ref: '#/components/schemas/OperandTwo'
+          description: Represents the right hand operand in the condition.
+        result:
+          allOf:
+          - $ref: '#/components/schemas/Boolean'
+          description: The value of the outer rule if the condition evaluates to true.
+      required:
+      - operandOne
+      - operandTwo
+      - result
+      description: Boolean operands for a condition. In the Amazon Connect admin website,
+        case rules are known as _case field conditions_. For more information about
+        case field conditions, see [Add case field conditions to a case template](https://docs.aws.amazon.com/connect/latest/adminguide/case-field-conditions.html).
     CaseArn:
       type: string
       minLength: 1
       maxLength: 500
+    CaseEventIncludedData:
+      type: object
+      properties:
+        fields:
+          allOf:
+          - $ref: '#/components/schemas/FieldIdentifierList'
+          description: List of field identifiers.
+      required:
+      - fields
+      description: Details of what case data is published through the case event stream.
     CaseFilter:
       allOf:
       - allOf:
@@ -185,10 +2932,42 @@ components:
           Required rule type, used to indicate whether a field is required.
       description: |-
         Represents what rule type should take place, under what conditions. In the Amazon Connect admin website, case rules are known as _case field conditions_. For more information about case field conditions, see [Add case field conditions to a case template](https://docs.aws.amazon.com/connect/latest/adminguide/case-field-conditions.html).
+    CaseRuleError:
+      type: object
+      properties:
+        id:
+          allOf:
+          - $ref: '#/components/schemas/CaseRuleId'
+          description: The case rule identifier that caused the error.
+        errorCode:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: Error code from getting a case rule.
+        message:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: Error message from getting a case rule.
+      required:
+      - id
+      - errorCode
+      description: Error for batch describe case rules API failure. In the Amazon
+        Connect admin website, case rules are known as _case field conditions_. For
+        more information about case field conditions, see [Add case field conditions
+        to a case template](https://docs.aws.amazon.com/connect/latest/adminguide/case-field-conditions.html).
     CaseRuleId:
       type: string
       minLength: 1
       maxLength: 500
+    CaseRuleIdentifier:
+      type: object
+      properties:
+        id:
+          allOf:
+          - $ref: '#/components/schemas/CaseRuleId'
+          description: Unique identifier of a case rule.
+      required:
+      - id
+      description: Object containing case rule identifier information.
     CaseRuleIdentifierList:
       type: array
       items:
@@ -198,10 +2977,56 @@ components:
       pattern: ^.*[\S]$
       minLength: 1
       maxLength: 100
+    CaseRuleSummary:
+      type: object
+      properties:
+        caseRuleId:
+          allOf:
+          - $ref: '#/components/schemas/CaseRuleId'
+          description: Unique identifier of a case rule.
+        name:
+          allOf:
+          - $ref: '#/components/schemas/CaseRuleName'
+          description: Name of the case rule.
+        caseRuleArn:
+          allOf:
+          - $ref: '#/components/schemas/CaseRuleArn'
+          description: The Amazon Resource Name (ARN) of the case rule.
+        ruleType:
+          allOf:
+          - $ref: '#/components/schemas/RuleType'
+          description: Possible types for a rule.
+        description:
+          allOf:
+          - $ref: '#/components/schemas/CaseRuleDescription'
+          description: Description of a case rule.
+      required:
+      - caseRuleId
+      - name
+      - caseRuleArn
+      - ruleType
+      description: Summary information of this case rule. In the Amazon Connect admin
+        website, case rules are known as _case field conditions_. For more information
+        about case field conditions, see [Add case field conditions to a case template](https://docs.aws.amazon.com/connect/latest/adminguide/case-field-conditions.html).
     CaseRuleSummaryList:
       type: array
       items:
         $ref: '#/components/schemas/CaseRuleSummary'
+    CaseSummary:
+      type: object
+      properties:
+        caseId:
+          allOf:
+          - $ref: '#/components/schemas/CaseId'
+          description: A unique identifier of the case.
+        templateId:
+          allOf:
+          - $ref: '#/components/schemas/TemplateId'
+          description: A unique identifier of a template.
+      required:
+      - caseId
+      - templateId
+      description: Case summary information.
     CaseSummaryList:
       type: array
       items:
@@ -222,13 +3047,359 @@ components:
       type: string
       enum:
       - Text/Plain
+    CommentContent:
+      type: object
+      properties:
+        body:
+          allOf:
+          - $ref: '#/components/schemas/CommentBody'
+          description: Text in the body of a `Comment` on a case.
+        contentType:
+          allOf:
+          - $ref: '#/components/schemas/CommentBodyTextType'
+          description: Type of the text in the box of a `Comment` on a case.
+      required:
+      - body
+      - contentType
+      description: Represents the content of a `Comment` to be returned to agents.
+    CommentFilter:
+      type: object
+      properties: {}
+      description: A filter for related items of type `Comment`.
+    ConflictException:
+      type: object
+      properties:
+        message:
+          $ref: '#/components/schemas/String'
+      required:
+      - message
+      description: The requested operation would cause a conflict with the current
+        state of a service resource associated with the request. Resolve the conflict
+        before retrying this request. See the accompanying error message for details.
     ConnectedToSystemTime:
       type: string
       format: date-time
+    Contact:
+      type: object
+      properties:
+        contactArn:
+          allOf:
+          - $ref: '#/components/schemas/ContactArn'
+          description: A unique identifier of a contact in Amazon Connect.
+      required:
+      - contactArn
+      description: An object that represents an Amazon Connect contact object.
     ContactArn:
       type: string
       minLength: 1
       maxLength: 500
+    ContactContent:
+      type: object
+      properties:
+        contactArn:
+          allOf:
+          - $ref: '#/components/schemas/ContactArn'
+          description: A unique identifier of a contact in Amazon Connect.
+        channel:
+          allOf:
+          - $ref: '#/components/schemas/Channel'
+          description: A list of channels to filter on for related items of type `Contact`.
+        connectedToSystemTime:
+          allOf:
+          - $ref: '#/components/schemas/ConnectedToSystemTime'
+          description: The difference between the `InitiationTimestamp` and the `DisconnectTimestamp`
+            of the contact.
+      required:
+      - contactArn
+      - channel
+      - connectedToSystemTime
+      description: An object that represents a content of an Amazon Connect contact
+        object.
+    ContactFilter:
+      type: object
+      properties:
+        channel:
+          allOf:
+          - $ref: '#/components/schemas/ChannelList'
+          description: A list of channels to filter on for related items of type `Contact`.
+        contactArn:
+          allOf:
+          - $ref: '#/components/schemas/ContactArn'
+          description: A unique identifier of a contact in Amazon Connect.
+      description: A filter for related items of type `Contact`.
+    CreateCaseRequest:
+      type: object
+      properties:
+        domainId:
+          allOf:
+          - $ref: '#/components/schemas/DomainId'
+          description: The unique identifier of the Cases domain.
+        templateId:
+          allOf:
+          - $ref: '#/components/schemas/TemplateId'
+          description: A unique identifier of a template.
+        fields:
+          allOf:
+          - $ref: '#/components/schemas/FieldValueList'
+          description: An array of objects with field ID (matching ListFields/DescribeField)
+            and value union data.
+        clientToken:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: A unique, case-sensitive identifier that you provide to ensure
+            the idempotency of the request. If not provided, the Amazon Web Services
+            SDK populates this field. For more information about idempotency, see
+            [Making retries safe with idempotent APIs](https://aws.amazon.com/builders-library/making-retries-safe-with-idempotent-APIs/).
+        performedBy:
+          $ref: '#/components/schemas/UserUnion'
+      required:
+      - domainId
+      - templateId
+      - fields
+    CreateCaseResponse:
+      type: object
+      properties:
+        caseId:
+          allOf:
+          - $ref: '#/components/schemas/CaseId'
+          description: A unique identifier of the case.
+        caseArn:
+          allOf:
+          - $ref: '#/components/schemas/CaseArn'
+          description: The Amazon Resource Name (ARN) of the case.
+      required:
+      - caseId
+      - caseArn
+    CreateCaseRuleRequest:
+      type: object
+      properties:
+        domainId:
+          allOf:
+          - $ref: '#/components/schemas/DomainId'
+          description: Unique identifier of a Cases domain.
+        name:
+          allOf:
+          - $ref: '#/components/schemas/CaseRuleName'
+          description: Name of the case rule.
+        description:
+          allOf:
+          - $ref: '#/components/schemas/CaseRuleDescription'
+          description: The description of a case rule.
+        rule:
+          allOf:
+          - $ref: '#/components/schemas/CaseRuleDetails'
+          description: Represents what rule type should take place, under what conditions.
+      required:
+      - domainId
+      - name
+      - rule
+    CreateCaseRuleResponse:
+      type: object
+      properties:
+        caseRuleId:
+          allOf:
+          - $ref: '#/components/schemas/CaseRuleId'
+          description: Unique identifier of a case rule.
+        caseRuleArn:
+          allOf:
+          - $ref: '#/components/schemas/CaseRuleArn'
+          description: The Amazon Resource Name (ARN) of a case rule.
+      required:
+      - caseRuleId
+      - caseRuleArn
+    CreateDomainRequest:
+      type: object
+      properties:
+        name:
+          allOf:
+          - $ref: '#/components/schemas/DomainName'
+          description: The name for your Cases domain. It must be unique for your
+            Amazon Web Services account.
+      required:
+      - name
+    CreateDomainResponse:
+      type: object
+      properties:
+        domainId:
+          allOf:
+          - $ref: '#/components/schemas/DomainId'
+          description: The unique identifier of the Cases domain.
+        domainArn:
+          allOf:
+          - $ref: '#/components/schemas/DomainArn'
+          description: The Amazon Resource Name (ARN) for the Cases domain.
+        domainStatus:
+          allOf:
+          - $ref: '#/components/schemas/DomainStatus'
+          description: The status of the domain.
+      required:
+      - domainId
+      - domainArn
+      - domainStatus
+    CreateFieldRequest:
+      type: object
+      properties:
+        domainId:
+          allOf:
+          - $ref: '#/components/schemas/DomainId'
+          description: The unique identifier of the Cases domain.
+        name:
+          allOf:
+          - $ref: '#/components/schemas/FieldName'
+          description: The name of the field.
+        type:
+          allOf:
+          - $ref: '#/components/schemas/FieldType'
+          description: Defines the data type, some system constraints, and default
+            display of the field.
+        description:
+          allOf:
+          - $ref: '#/components/schemas/FieldDescription'
+          description: The description of the field.
+      required:
+      - domainId
+      - name
+      - type
+    CreateFieldResponse:
+      type: object
+      properties:
+        fieldId:
+          allOf:
+          - $ref: '#/components/schemas/FieldId'
+          description: The unique identifier of a field.
+        fieldArn:
+          allOf:
+          - $ref: '#/components/schemas/FieldArn'
+          description: The Amazon Resource Name (ARN) of the field.
+      required:
+      - fieldId
+      - fieldArn
+    CreateLayoutRequest:
+      type: object
+      properties:
+        domainId:
+          allOf:
+          - $ref: '#/components/schemas/DomainId'
+          description: The unique identifier of the Cases domain.
+        name:
+          allOf:
+          - $ref: '#/components/schemas/LayoutName'
+          description: The name of the layout. It must be unique for the Cases domain.
+        content:
+          allOf:
+          - $ref: '#/components/schemas/LayoutContent'
+          description: Information about which fields will be present in the layout,
+            and information about the order of the fields.
+      required:
+      - domainId
+      - name
+      - content
+    CreateLayoutResponse:
+      type: object
+      properties:
+        layoutId:
+          allOf:
+          - $ref: '#/components/schemas/LayoutId'
+          description: The unique identifier of the layout.
+        layoutArn:
+          allOf:
+          - $ref: '#/components/schemas/LayoutArn'
+          description: The Amazon Resource Name (ARN) of the newly created layout.
+      required:
+      - layoutId
+      - layoutArn
+    CreateRelatedItemRequest:
+      type: object
+      properties:
+        domainId:
+          allOf:
+          - $ref: '#/components/schemas/DomainId'
+          description: The unique identifier of the Cases domain.
+        caseId:
+          allOf:
+          - $ref: '#/components/schemas/CaseId'
+          description: A unique identifier of the case.
+        type:
+          allOf:
+          - $ref: '#/components/schemas/RelatedItemType'
+          description: The type of a related item.
+        content:
+          allOf:
+          - $ref: '#/components/schemas/RelatedItemInputContent'
+          description: The content of a related item to be created.
+        performedBy:
+          allOf:
+          - $ref: '#/components/schemas/UserUnion'
+          description: Represents the creator of the related item.
+      required:
+      - domainId
+      - caseId
+      - type
+      - content
+    CreateRelatedItemResponse:
+      type: object
+      properties:
+        relatedItemId:
+          allOf:
+          - $ref: '#/components/schemas/RelatedItemId'
+          description: The unique identifier of the related item.
+        relatedItemArn:
+          allOf:
+          - $ref: '#/components/schemas/RelatedItemArn'
+          description: The Amazon Resource Name (ARN) of the related item.
+      required:
+      - relatedItemId
+      - relatedItemArn
+    CreateTemplateRequest:
+      type: object
+      properties:
+        domainId:
+          allOf:
+          - $ref: '#/components/schemas/DomainId'
+          description: The unique identifier of the Cases domain.
+        name:
+          allOf:
+          - $ref: '#/components/schemas/TemplateName'
+          description: A name for the template. It must be unique per domain.
+        description:
+          allOf:
+          - $ref: '#/components/schemas/TemplateDescription'
+          description: A brief description of the template.
+        layoutConfiguration:
+          allOf:
+          - $ref: '#/components/schemas/LayoutConfiguration'
+          description: Configuration of layouts associated to the template.
+        requiredFields:
+          allOf:
+          - $ref: '#/components/schemas/RequiredFieldList'
+          description: A list of fields that must contain a value for a case to be
+            successfully created with this template.
+        status:
+          allOf:
+          - $ref: '#/components/schemas/TemplateStatus'
+          description: The status of the template.
+        rules:
+          allOf:
+          - $ref: '#/components/schemas/TemplateCaseRuleList'
+          description: A list of case rules (also known as [case field conditions](https://docs.aws.amazon.com/connect/latest/adminguide/case-field-conditions.html))
+            on a template.
+      required:
+      - domainId
+      - name
+    CreateTemplateResponse:
+      type: object
+      properties:
+        templateId:
+          allOf:
+          - $ref: '#/components/schemas/TemplateId'
+          description: A unique identifier of a template.
+        templateArn:
+          allOf:
+          - $ref: '#/components/schemas/TemplateArn'
+          description: The Amazon Resource Name (ARN) of the newly created template.
+      required:
+      - templateId
+      - templateArn
     CreatedTime:
       type: string
       format: date-time
@@ -237,6 +3408,86 @@ components:
       pattern: ^[a-zA-Z0-9_\-\.@:/ ]*[a-zA-Z0-9_\-\.@:/]$
       minLength: 1
       maxLength: 500
+    DeleteCaseRuleRequest:
+      type: object
+      properties:
+        domainId:
+          allOf:
+          - $ref: '#/components/schemas/DomainId'
+          description: Unique identifier of a Cases domain.
+        caseRuleId:
+          allOf:
+          - $ref: '#/components/schemas/CaseRuleId'
+          description: Unique identifier of a case rule.
+      required:
+      - domainId
+      - caseRuleId
+    DeleteCaseRuleResponse:
+      type: object
+      properties: {}
+    DeleteDomainRequest:
+      type: object
+      properties:
+        domainId:
+          allOf:
+          - $ref: '#/components/schemas/DomainId'
+          description: The unique identifier of the Cases domain.
+      required:
+      - domainId
+    DeleteDomainResponse:
+      type: object
+      properties: {}
+    DeleteFieldRequest:
+      type: object
+      properties:
+        domainId:
+          allOf:
+          - $ref: '#/components/schemas/DomainId'
+          description: The unique identifier of the Cases domain.
+        fieldId:
+          allOf:
+          - $ref: '#/components/schemas/FieldId'
+          description: Unique identifier of the field.
+      required:
+      - domainId
+      - fieldId
+    DeleteFieldResponse:
+      type: object
+      properties: {}
+    DeleteLayoutRequest:
+      type: object
+      properties:
+        domainId:
+          allOf:
+          - $ref: '#/components/schemas/DomainId'
+          description: The unique identifier of the Cases domain.
+        layoutId:
+          allOf:
+          - $ref: '#/components/schemas/LayoutId'
+          description: The unique identifier of the layout.
+      required:
+      - domainId
+      - layoutId
+    DeleteLayoutResponse:
+      type: object
+      properties: {}
+    DeleteTemplateRequest:
+      type: object
+      properties:
+        domainId:
+          allOf:
+          - $ref: '#/components/schemas/DomainId'
+          description: The unique identifier of the Cases domain.
+        templateId:
+          allOf:
+          - $ref: '#/components/schemas/TemplateId'
+          description: A unique identifier of a template.
+      required:
+      - domainId
+      - templateId
+    DeleteTemplateResponse:
+      type: object
+      properties: {}
     Deleted:
       type: boolean
       default: false
@@ -259,10 +3510,76 @@ components:
       - Active
       - CreationInProgress
       - CreationFailed
+    DomainSummary:
+      type: object
+      properties:
+        domainId:
+          allOf:
+          - $ref: '#/components/schemas/DomainId'
+          description: The unique identifier of the domain.
+        domainArn:
+          allOf:
+          - $ref: '#/components/schemas/DomainArn'
+          description: The Amazon Resource Name (ARN) of the domain.
+        name:
+          allOf:
+          - $ref: '#/components/schemas/DomainName'
+          description: The name of the domain.
+      required:
+      - domainId
+      - domainArn
+      - name
+      description: Object for the summarized details of the domain.
     DomainSummaryList:
       type: array
       items:
         $ref: '#/components/schemas/DomainSummary'
+    EmptyFieldValue:
+      type: object
+      properties: {}
+      description: 'An empty value. You cannot set `EmptyFieldValue` on a field that
+        is required on a case template.
+
+
+        This structure will never have any data members. It signifies an empty value
+        on a case field.'
+    EmptyOperandValue:
+      type: object
+      properties: {}
+      description: Represents an empty operand value. In the Amazon Connect admin
+        website, case rules are known as _case field conditions_. For more information
+        about case field conditions, see [Add case field conditions to a case template](https://docs.aws.amazon.com/connect/latest/adminguide/case-field-conditions.html).
+    EventBridgeConfiguration:
+      type: object
+      properties:
+        enabled:
+          allOf:
+          - $ref: '#/components/schemas/Boolean'
+          description: Indicates whether the to broadcast case event data to the customer.
+        includedData:
+          allOf:
+          - $ref: '#/components/schemas/EventIncludedData'
+          description: Details of what case and related item data is published through
+            the case event stream.
+      required:
+      - enabled
+      description: Configuration to enable EventBridge case event delivery and determine
+        what data is delivered.
+    EventIncludedData:
+      type: object
+      properties:
+        caseData:
+          allOf:
+          - $ref: '#/components/schemas/CaseEventIncludedData'
+          description: Details of what case data is published through the case event
+            stream.
+        relatedItemData:
+          allOf:
+          - $ref: '#/components/schemas/RelatedItemEventIncludedData'
+          description: Details of what related item data is published through the
+            case event stream.
+      description: Details of what case and related item data is published through
+        the case event stream.
     FieldArn:
       type: string
       minLength: 1
@@ -270,6 +3587,25 @@ components:
     FieldDescription:
       type: string
       maxLength: 255
+    FieldError:
+      type: object
+      properties:
+        id:
+          allOf:
+          - $ref: '#/components/schemas/FieldId'
+          description: The field identifier that caused the error.
+        errorCode:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The error code from getting a field.
+        message:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The error message from getting a field.
+      required:
+      - id
+      - errorCode
+      description: Object for errors on fields.
     FieldFilter:
       allOf:
       - allOf:
@@ -298,14 +3634,48 @@ components:
           Object containing field identifier and value information.
       description: |-
         A filter for fields. Only one value can be provided.
+    FieldGroup:
+      type: object
+      properties:
+        name:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: Name of the field group.
+        fields:
+          allOf:
+          - $ref: '#/components/schemas/FieldList'
+          description: Represents an ordered list containing field related information.
+      required:
+      - fields
+      description: Object for a group of fields and associated properties.
     FieldId:
       type: string
       minLength: 1
       maxLength: 500
+    FieldIdentifier:
+      type: object
+      properties:
+        id:
+          allOf:
+          - $ref: '#/components/schemas/FieldId'
+          description: Unique identifier of a field.
+      required:
+      - id
+      description: Object for unique identifier of a field.
     FieldIdentifierList:
       type: array
       items:
         $ref: '#/components/schemas/FieldIdentifier'
+    FieldItem:
+      type: object
+      properties:
+        id:
+          allOf:
+          - $ref: '#/components/schemas/FieldId'
+          description: Unique identifier of a field.
+      required:
+      - id
+      description: Object for field related information.
     FieldList:
       type: array
       items:
@@ -320,6 +3690,49 @@ components:
       enum:
       - System
       - Custom
+    FieldOption:
+      type: object
+      properties:
+        name:
+          allOf:
+          - $ref: '#/components/schemas/FieldOptionName'
+          description: '`FieldOptionName` has max length 100 and disallows trailing
+            spaces.'
+        value:
+          allOf:
+          - $ref: '#/components/schemas/FieldOptionValue'
+          description: '`FieldOptionValue` has max length 100 and must be alphanumeric
+            with hyphens and underscores.'
+        active:
+          allOf:
+          - $ref: '#/components/schemas/Boolean'
+          description: Describes whether the `FieldOption` is active (displayed) or
+            inactive.
+      required:
+      - name
+      - value
+      - active
+      description: Object for field Options information.
+    FieldOptionError:
+      type: object
+      properties:
+        message:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: Error message from creating or updating field option.
+        errorCode:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: Error code from creating or updating field option.
+        value:
+          allOf:
+          - $ref: '#/components/schemas/FieldOptionValue'
+          description: The field option value that caused the error.
+      required:
+      - message
+      - errorCode
+      - value
+      description: Object for field Options errors.
     FieldOptionErrorList:
       type: array
       items:
@@ -338,6 +3751,36 @@ components:
       type: array
       items:
         $ref: '#/components/schemas/FieldOption'
+    FieldSummary:
+      type: object
+      properties:
+        fieldId:
+          allOf:
+          - $ref: '#/components/schemas/FieldId'
+          description: The unique identifier of a field.
+        fieldArn:
+          allOf:
+          - $ref: '#/components/schemas/FieldArn'
+          description: The Amazon Resource Name (ARN) of the field.
+        name:
+          allOf:
+          - $ref: '#/components/schemas/FieldName'
+          description: Name of the field.
+        type:
+          allOf:
+          - $ref: '#/components/schemas/FieldType'
+          description: The type of a field.
+        namespace:
+          allOf:
+          - $ref: '#/components/schemas/FieldNamespace'
+          description: The namespace of a field.
+      required:
+      - fieldId
+      - fieldArn
+      - name
+      - type
+      - namespace
+      description: Object for the summarized details of the field.
     FieldSummaryList:
       type: array
       items:
@@ -352,6 +3795,21 @@ components:
       - SingleSelect
       - Url
       - User
+    FieldValue:
+      type: object
+      properties:
+        id:
+          allOf:
+          - $ref: '#/components/schemas/FieldId'
+          description: Unique identifier of a field.
+        value:
+          allOf:
+          - $ref: '#/components/schemas/FieldValueUnion'
+          description: Union of potential field value types.
+      required:
+      - id
+      - value
+      description: Object for case field values.
     FieldValueList:
       type: array
       items:
@@ -386,10 +3844,421 @@ components:
       type: string
       minLength: 1
       maxLength: 500
+    FileContent:
+      type: object
+      properties:
+        fileArn:
+          allOf:
+          - $ref: '#/components/schemas/FileArn'
+          description: The Amazon Resource Name (ARN) of a File in Amazon Connect.
+      required:
+      - fileArn
+      description: An object that represents a content of an Amazon Connect file object.
+    FileFilter:
+      type: object
+      properties:
+        fileArn:
+          allOf:
+          - $ref: '#/components/schemas/FileArn'
+          description: The Amazon Resource Name (ARN) of the file.
+      description: A filter for related items of type `File`.
+    GetCaseAuditEventsRequest:
+      type: object
+      properties:
+        caseId:
+          allOf:
+          - $ref: '#/components/schemas/CaseId'
+          description: A unique identifier of the case.
+        domainId:
+          allOf:
+          - $ref: '#/components/schemas/DomainId'
+          description: The unique identifier of the Cases domain.
+        maxResults:
+          allOf:
+          - $ref: '#/components/schemas/Integer'
+          description: The maximum number of audit events to return. The current maximum
+            supported value is 25. This is also the default when no other value is
+            provided.
+        nextToken:
+          allOf:
+          - $ref: '#/components/schemas/NextToken'
+          description: The token for the next set of results. Use the value returned
+            in the previous response in the next request to retrieve the next set
+            of results.
+      required:
+      - caseId
+      - domainId
+    GetCaseAuditEventsResponse:
+      type: object
+      properties:
+        nextToken:
+          allOf:
+          - $ref: '#/components/schemas/NextToken'
+          description: The token for the next set of results. This is null if there
+            are no more results to return.
+        auditEvents:
+          allOf:
+          - $ref: '#/components/schemas/AuditEventsList'
+          description: A list of case audits where each represents a particular edit
+            of the case.
+      required:
+      - auditEvents
+    GetCaseEventConfigurationRequest:
+      type: object
+      properties:
+        domainId:
+          allOf:
+          - $ref: '#/components/schemas/DomainId'
+          description: The unique identifier of the Cases domain.
+      required:
+      - domainId
+    GetCaseEventConfigurationResponse:
+      type: object
+      properties:
+        eventBridge:
+          allOf:
+          - $ref: '#/components/schemas/EventBridgeConfiguration'
+          description: Configuration to enable EventBridge case event delivery and
+            determine what data is delivered.
+      required:
+      - eventBridge
+    GetCaseRequest:
+      type: object
+      properties:
+        caseId:
+          allOf:
+          - $ref: '#/components/schemas/CaseId'
+          description: A unique identifier of the case.
+        domainId:
+          allOf:
+          - $ref: '#/components/schemas/DomainId'
+          description: The unique identifier of the Cases domain.
+        fields:
+          allOf:
+          - $ref: '#/components/schemas/FieldIdentifierList'
+          description: A list of unique field identifiers.
+        nextToken:
+          allOf:
+          - $ref: '#/components/schemas/NextToken'
+          description: The token for the next set of results. Use the value returned
+            in the previous response in the next request to retrieve the next set
+            of results.
+      required:
+      - caseId
+      - domainId
+      - fields
+    GetCaseResponse:
+      type: object
+      properties:
+        fields:
+          allOf:
+          - $ref: '#/components/schemas/FieldValueList'
+          description: A list of detailed field information.
+        templateId:
+          allOf:
+          - $ref: '#/components/schemas/TemplateId'
+          description: A unique identifier of a template.
+        nextToken:
+          allOf:
+          - $ref: '#/components/schemas/NextToken'
+          description: The token for the next set of results. This is null if there
+            are no more results to return.
+        tags:
+          allOf:
+          - $ref: '#/components/schemas/Tags'
+          description: A map of of key-value pairs that represent tags on a resource.
+            Tags are used to organize, track, or control access for this resource.
+      required:
+      - fields
+      - templateId
+    GetCaseRuleResponse:
+      type: object
+      properties:
+        caseRuleId:
+          allOf:
+          - $ref: '#/components/schemas/CaseRuleId'
+          description: Unique identifier of a case rule.
+        name:
+          allOf:
+          - $ref: '#/components/schemas/CaseRuleName'
+          description: Name of the case rule.
+        caseRuleArn:
+          allOf:
+          - $ref: '#/components/schemas/CaseRuleArn'
+          description: The Amazon Resource Name (ARN) of the case rule.
+        rule:
+          allOf:
+          - $ref: '#/components/schemas/CaseRuleDetails'
+          description: Represents what rule type should take place, under what conditions.
+        description:
+          allOf:
+          - $ref: '#/components/schemas/CaseRuleDescription'
+          description: Description of a case rule.
+        deleted:
+          allOf:
+          - $ref: '#/components/schemas/Deleted'
+          description: Indicates whether the resource has been deleted.
+        createdTime:
+          allOf:
+          - $ref: '#/components/schemas/CreatedTime'
+          description: Timestamp when the resource was created.
+        lastModifiedTime:
+          allOf:
+          - $ref: '#/components/schemas/LastModifiedTime'
+          description: Timestamp when the resource was created or last modified.
+        tags:
+          allOf:
+          - $ref: '#/components/schemas/Tags'
+          description: A map of of key-value pairs that represent tags on a resource.
+            Tags are used to organize, track, or control access for this resource.
+      required:
+      - caseRuleId
+      - name
+      - caseRuleArn
+      - rule
+      description: Detailed case rule information. In the Amazon Connect admin website,
+        case rules are known as _case field conditions_. For more information about
+        case field conditions, see [Add case field conditions to a case template](https://docs.aws.amazon.com/connect/latest/adminguide/case-field-conditions.html).
+    GetDomainRequest:
+      type: object
+      properties:
+        domainId:
+          allOf:
+          - $ref: '#/components/schemas/DomainId'
+          description: The unique identifier of the Cases domain.
+      required:
+      - domainId
+    GetDomainResponse:
+      type: object
+      properties:
+        domainId:
+          allOf:
+          - $ref: '#/components/schemas/DomainId'
+          description: The unique identifier of the Cases domain.
+        domainArn:
+          allOf:
+          - $ref: '#/components/schemas/DomainArn'
+          description: The Amazon Resource Name (ARN) for the Cases domain.
+        name:
+          allOf:
+          - $ref: '#/components/schemas/DomainName'
+          description: The name of the Cases domain.
+        createdTime:
+          allOf:
+          - $ref: '#/components/schemas/CreatedTime'
+          description: The timestamp when the Cases domain was created.
+        domainStatus:
+          allOf:
+          - $ref: '#/components/schemas/DomainStatus'
+          description: The status of the Cases domain.
+        tags:
+          allOf:
+          - $ref: '#/components/schemas/Tags'
+          description: A map of of key-value pairs that represent tags on a resource.
+            Tags are used to organize, track, or control access for this resource.
+      required:
+      - domainId
+      - domainArn
+      - name
+      - createdTime
+      - domainStatus
+    GetFieldResponse:
+      type: object
+      properties:
+        fieldId:
+          allOf:
+          - $ref: '#/components/schemas/FieldId'
+          description: Unique identifier of the field.
+        name:
+          allOf:
+          - $ref: '#/components/schemas/FieldName'
+          description: Name of the field.
+        fieldArn:
+          allOf:
+          - $ref: '#/components/schemas/FieldArn'
+          description: The Amazon Resource Name (ARN) of the field.
+        description:
+          allOf:
+          - $ref: '#/components/schemas/FieldDescription'
+          description: Description of the field.
+        type:
+          allOf:
+          - $ref: '#/components/schemas/FieldType'
+          description: Type of the field.
+        namespace:
+          allOf:
+          - $ref: '#/components/schemas/FieldNamespace'
+          description: Namespace of the field.
+        tags:
+          allOf:
+          - $ref: '#/components/schemas/Tags'
+          description: A map of of key-value pairs that represent tags on a resource.
+            Tags are used to organize, track, or control access for this resource.
+        deleted:
+          allOf:
+          - $ref: '#/components/schemas/Deleted'
+          description: Denotes whether or not the resource has been deleted.
+        createdTime:
+          allOf:
+          - $ref: '#/components/schemas/CreatedTime'
+          description: Timestamp at which the resource was created.
+        lastModifiedTime:
+          allOf:
+          - $ref: '#/components/schemas/LastModifiedTime'
+          description: Timestamp at which the resource was created or last modified.
+      required:
+      - fieldId
+      - name
+      - fieldArn
+      - type
+      - namespace
+      description: Object to store detailed field information.
+    GetLayoutRequest:
+      type: object
+      properties:
+        domainId:
+          allOf:
+          - $ref: '#/components/schemas/DomainId'
+          description: The unique identifier of the Cases domain.
+        layoutId:
+          allOf:
+          - $ref: '#/components/schemas/LayoutId'
+          description: The unique identifier of the layout.
+      required:
+      - domainId
+      - layoutId
+    GetLayoutResponse:
+      type: object
+      properties:
+        layoutId:
+          allOf:
+          - $ref: '#/components/schemas/LayoutId'
+          description: The unique identifier of the layout.
+        layoutArn:
+          allOf:
+          - $ref: '#/components/schemas/LayoutArn'
+          description: The Amazon Resource Name (ARN) of the newly created layout.
+        name:
+          allOf:
+          - $ref: '#/components/schemas/LayoutName'
+          description: The name of the layout. It must be unique.
+        content:
+          allOf:
+          - $ref: '#/components/schemas/LayoutContent'
+          description: Information about which fields will be present in the layout,
+            the order of the fields, and read-only attribute of the field.
+        tags:
+          allOf:
+          - $ref: '#/components/schemas/Tags'
+          description: A map of of key-value pairs that represent tags on a resource.
+            Tags are used to organize, track, or control access for this resource.
+        deleted:
+          allOf:
+          - $ref: '#/components/schemas/Deleted'
+          description: Denotes whether or not the resource has been deleted.
+        createdTime:
+          allOf:
+          - $ref: '#/components/schemas/CreatedTime'
+          description: Timestamp at which the resource was created.
+        lastModifiedTime:
+          allOf:
+          - $ref: '#/components/schemas/LastModifiedTime'
+          description: Timestamp at which the resource was created or last modified.
+      required:
+      - layoutId
+      - layoutArn
+      - name
+      - content
+    GetTemplateRequest:
+      type: object
+      properties:
+        domainId:
+          allOf:
+          - $ref: '#/components/schemas/DomainId'
+          description: The unique identifier of the Cases domain.
+        templateId:
+          allOf:
+          - $ref: '#/components/schemas/TemplateId'
+          description: A unique identifier of a template.
+      required:
+      - domainId
+      - templateId
+    GetTemplateResponse:
+      type: object
+      properties:
+        templateId:
+          allOf:
+          - $ref: '#/components/schemas/TemplateId'
+          description: A unique identifier of a template.
+        templateArn:
+          allOf:
+          - $ref: '#/components/schemas/TemplateArn'
+          description: The Amazon Resource Name (ARN) of the template.
+        name:
+          allOf:
+          - $ref: '#/components/schemas/TemplateName'
+          description: The name of the template.
+        description:
+          allOf:
+          - $ref: '#/components/schemas/TemplateDescription'
+          description: A brief description of the template.
+        layoutConfiguration:
+          allOf:
+          - $ref: '#/components/schemas/LayoutConfiguration'
+          description: Configuration of layouts associated to the template.
+        requiredFields:
+          allOf:
+          - $ref: '#/components/schemas/RequiredFieldList'
+          description: A list of fields that must contain a value for a case to be
+            successfully created with this template.
+        tags:
+          allOf:
+          - $ref: '#/components/schemas/Tags'
+          description: A map of of key-value pairs that represent tags on a resource.
+            Tags are used to organize, track, or control access for this resource.
+        status:
+          allOf:
+          - $ref: '#/components/schemas/TemplateStatus'
+          description: The status of the template.
+        deleted:
+          allOf:
+          - $ref: '#/components/schemas/Deleted'
+          description: Denotes whether or not the resource has been deleted.
+        createdTime:
+          allOf:
+          - $ref: '#/components/schemas/CreatedTime'
+          description: Timestamp at which the resource was created.
+        lastModifiedTime:
+          allOf:
+          - $ref: '#/components/schemas/LastModifiedTime'
+          description: Timestamp at which the resource was created or last modified.
+        rules:
+          allOf:
+          - $ref: '#/components/schemas/TemplateCaseRuleList'
+          description: A list of case rules (also known as [case field conditions](https://docs.aws.amazon.com/connect/latest/adminguide/case-field-conditions.html))
+            on a template.
+      required:
+      - templateId
+      - templateArn
+      - name
+      - status
     IamPrincipalArn:
       type: string
       minLength: 1
       maxLength: 500
+    InternalServerException:
+      type: object
+      properties:
+        message:
+          $ref: '#/components/schemas/String'
+        retryAfterSeconds:
+          allOf:
+          - $ref: '#/components/schemas/Integer'
+          description: Advice to clients on when the call can be safely retried.
+      required:
+      - message
+      description: We couldn't process your request because of an issue with the server.
+        Try again later.
     LastModifiedTime:
       type: string
       format: date-time
@@ -397,6 +4266,14 @@ components:
       type: string
       minLength: 1
       maxLength: 500
+    LayoutConfiguration:
+      type: object
+      properties:
+        defaultLayout:
+          allOf:
+          - $ref: '#/components/schemas/LayoutId'
+          description: Unique identifier of a layout.
+      description: Object to store configuration of layouts associated to the template.
     LayoutContent:
       allOf:
       - allOf:
@@ -414,10 +4291,297 @@ components:
       pattern: ^.*[\S]$
       minLength: 1
       maxLength: 100
+    LayoutSections:
+      type: object
+      properties:
+        sections:
+          $ref: '#/components/schemas/SectionsList'
+      description: Ordered list containing different kinds of sections that can be
+        added. A LayoutSections object can only contain one section.
+    LayoutSummary:
+      type: object
+      properties:
+        layoutId:
+          allOf:
+          - $ref: '#/components/schemas/LayoutId'
+          description: The unique identifier for of the layout.
+        layoutArn:
+          allOf:
+          - $ref: '#/components/schemas/LayoutArn'
+          description: The Amazon Resource Name (ARN) of the layout.
+        name:
+          allOf:
+          - $ref: '#/components/schemas/LayoutName'
+          description: The name of the layout.
+      required:
+      - layoutId
+      - layoutArn
+      - name
+      description: Object for the summarized details of the layout.
     LayoutSummaryList:
       type: array
       items:
         $ref: '#/components/schemas/LayoutSummary'
+    ListCaseRulesRequest:
+      type: object
+      properties:
+        domainId:
+          allOf:
+          - $ref: '#/components/schemas/DomainId'
+          description: Unique identifier of a Cases domain.
+        maxResults:
+          allOf:
+          - $ref: '#/components/schemas/MaxResults'
+          description: The maximum number of results to return per page.
+        nextToken:
+          allOf:
+          - $ref: '#/components/schemas/NextToken'
+          description: The token for the next set of results. Use the value returned
+            in the previous response in the next request to retrieve the next set
+            of results.
+      required:
+      - domainId
+    ListCaseRulesResponse:
+      type: object
+      properties:
+        caseRules:
+          allOf:
+          - $ref: '#/components/schemas/CaseRuleSummaryList'
+          description: A list of field summary objects.
+        nextToken:
+          allOf:
+          - $ref: '#/components/schemas/NextToken'
+          description: The token for the next set of results. This is null if there
+            are no more results to return.
+      required:
+      - caseRules
+    ListCasesForContactRequest:
+      type: object
+      properties:
+        domainId:
+          allOf:
+          - $ref: '#/components/schemas/DomainId'
+          description: The unique identifier of the Cases domain.
+        contactArn:
+          allOf:
+          - $ref: '#/components/schemas/ContactArn'
+          description: A unique identifier of a contact in Amazon Connect.
+        maxResults:
+          allOf:
+          - $ref: '#/components/schemas/Integer'
+          description: The maximum number of results to return per page.
+        nextToken:
+          allOf:
+          - $ref: '#/components/schemas/NextToken'
+          description: The token for the next set of results. Use the value returned
+            in the previous response in the next request to retrieve the next set
+            of results.
+      required:
+      - domainId
+      - contactArn
+    ListCasesForContactResponse:
+      type: object
+      properties:
+        cases:
+          allOf:
+          - $ref: '#/components/schemas/CaseSummaryList'
+          description: A list of Case summary information.
+        nextToken:
+          allOf:
+          - $ref: '#/components/schemas/NextToken'
+          description: The token for the next set of results. This is null if there
+            are no more results to return.
+      required:
+      - cases
+    ListDomainsRequest:
+      type: object
+      properties:
+        maxResults:
+          allOf:
+          - $ref: '#/components/schemas/MaxResults'
+          description: The maximum number of results to return per page.
+        nextToken:
+          allOf:
+          - $ref: '#/components/schemas/NextToken'
+          description: The token for the next set of results. Use the value returned
+            in the previous response in the next request to retrieve the next set
+            of results.
+    ListDomainsResponse:
+      type: object
+      properties:
+        domains:
+          allOf:
+          - $ref: '#/components/schemas/DomainSummaryList'
+          description: The Cases domain.
+        nextToken:
+          allOf:
+          - $ref: '#/components/schemas/NextToken'
+          description: The token for the next set of results. This is null if there
+            are no more results to return.
+      required:
+      - domains
+    ListFieldOptionsRequest:
+      type: object
+      properties:
+        domainId:
+          allOf:
+          - $ref: '#/components/schemas/DomainId'
+          description: The unique identifier of the Cases domain.
+        fieldId:
+          allOf:
+          - $ref: '#/components/schemas/FieldId'
+          description: The unique identifier of a field.
+        maxResults:
+          allOf:
+          - $ref: '#/components/schemas/MaxResults'
+          description: The maximum number of results to return per page.
+        nextToken:
+          allOf:
+          - $ref: '#/components/schemas/NextToken'
+          description: The token for the next set of results. Use the value returned
+            in the previous response in the next request to retrieve the next set
+            of results.
+        values:
+          allOf:
+          - $ref: '#/components/schemas/ValuesList'
+          description: A list of `FieldOption` values to filter on for `ListFieldOptions`.
+      required:
+      - domainId
+      - fieldId
+    ListFieldOptionsResponse:
+      type: object
+      properties:
+        options:
+          allOf:
+          - $ref: '#/components/schemas/FieldOptionsList'
+          description: A list of `FieldOption` objects.
+        nextToken:
+          allOf:
+          - $ref: '#/components/schemas/NextToken'
+          description: The token for the next set of results. This is null if there
+            are no more results to return.
+      required:
+      - options
+    ListFieldsRequest:
+      type: object
+      properties:
+        domainId:
+          allOf:
+          - $ref: '#/components/schemas/DomainId'
+          description: The unique identifier of the Cases domain.
+        maxResults:
+          allOf:
+          - $ref: '#/components/schemas/MaxResults'
+          description: The maximum number of results to return per page.
+        nextToken:
+          allOf:
+          - $ref: '#/components/schemas/NextToken'
+          description: The token for the next set of results. Use the value returned
+            in the previous response in the next request to retrieve the next set
+            of results.
+      required:
+      - domainId
+    ListFieldsResponse:
+      type: object
+      properties:
+        fields:
+          allOf:
+          - $ref: '#/components/schemas/FieldSummaryList'
+          description: List of detailed field information.
+        nextToken:
+          allOf:
+          - $ref: '#/components/schemas/NextToken'
+          description: The token for the next set of results. This is null if there
+            are no more results to return.
+      required:
+      - fields
+    ListLayoutsRequest:
+      type: object
+      properties:
+        domainId:
+          allOf:
+          - $ref: '#/components/schemas/DomainId'
+          description: The unique identifier of the Cases domain.
+        maxResults:
+          allOf:
+          - $ref: '#/components/schemas/MaxResults'
+          description: The maximum number of results to return per page.
+        nextToken:
+          allOf:
+          - $ref: '#/components/schemas/NextToken'
+          description: The token for the next set of results. Use the value returned
+            in the previous response in the next request to retrieve the next set
+            of results.
+      required:
+      - domainId
+    ListLayoutsResponse:
+      type: object
+      properties:
+        layouts:
+          allOf:
+          - $ref: '#/components/schemas/LayoutSummaryList'
+          description: The layouts for the domain.
+        nextToken:
+          allOf:
+          - $ref: '#/components/schemas/NextToken'
+          description: The token for the next set of results. This is null if there
+            are no more results to return.
+      required:
+      - layouts
+    ListTagsForResourceRequest:
+      type: object
+      properties:
+        arn:
+          allOf:
+          - $ref: '#/components/schemas/Arn'
+          description: The Amazon Resource Name (ARN)
+      required:
+      - arn
+    ListTagsForResourceResponse:
+      type: object
+      properties:
+        tags:
+          allOf:
+          - $ref: '#/components/schemas/Tags'
+          description: A map of of key-value pairs that represent tags on a resource.
+            Tags are used to organize, track, or control access for this resource.
+    ListTemplatesRequest:
+      type: object
+      properties:
+        domainId:
+          allOf:
+          - $ref: '#/components/schemas/DomainId'
+          description: The unique identifier of the Cases domain.
+        maxResults:
+          allOf:
+          - $ref: '#/components/schemas/MaxResults'
+          description: The maximum number of results to return per page.
+        nextToken:
+          allOf:
+          - $ref: '#/components/schemas/NextToken'
+          description: The token for the next set of results. Use the value returned
+            in the previous response in the next request to retrieve the next set
+            of results.
+        status:
+          allOf:
+          - $ref: '#/components/schemas/TemplateStatusFilters'
+          description: A list of status values to filter on.
+      required:
+      - domainId
+    ListTemplatesResponse:
+      type: object
+      properties:
+        templates:
+          allOf:
+          - $ref: '#/components/schemas/TemplateSummaryList'
+          description: List of template summary objects.
+        nextToken:
+          allOf:
+          - $ref: '#/components/schemas/NextToken'
+          description: The token for the next set of results. This is null if there
+            are no more results to return.
+      required:
+      - templates
     MaxResults:
       type: integer
       minimum: 1
@@ -459,6 +4623,24 @@ components:
       enum:
       - Asc
       - Desc
+    PutCaseEventConfigurationRequest:
+      type: object
+      properties:
+        domainId:
+          allOf:
+          - $ref: '#/components/schemas/DomainId'
+          description: The unique identifier of the Cases domain.
+        eventBridge:
+          allOf:
+          - $ref: '#/components/schemas/EventBridgeConfiguration'
+          description: Configuration to enable EventBridge case event delivery and
+            determine what data is delivered.
+      required:
+      - domainId
+      - eventBridge
+    PutCaseEventConfigurationResponse:
+      type: object
+      properties: {}
     RelatedItemArn:
       type: string
       minLength: 1
@@ -483,6 +4665,18 @@ components:
           Represents the content of an SLA to be returned to agents.
       description: |-
         Represents the content of a particular type of related item.
+    RelatedItemEventIncludedData:
+      type: object
+      properties:
+        includeContent:
+          allOf:
+          - $ref: '#/components/schemas/Boolean'
+          description: Details of what related item data is published through the
+            case event stream.
+      required:
+      - includeContent
+      description: Details of what related item data is published through the case
+        event stream.
     RelatedItemFilterList:
       type: array
       items:
@@ -538,18 +4732,224 @@ components:
           Filter for related items of type `SLA`.
       description: |-
         The list of types of related items and their parameters to use for filtering.
+    RequiredCaseRule:
+      type: object
+      properties:
+        defaultValue:
+          allOf:
+          - $ref: '#/components/schemas/Boolean'
+          description: The value of the rule (that is, whether the field is required)
+            should none of the conditions evaluate to true.
+        conditions:
+          allOf:
+          - $ref: '#/components/schemas/BooleanConditionList'
+          description: List of conditions for the required rule; the first condition
+            to evaluate to true dictates the value of the rule.
+      required:
+      - defaultValue
+      - conditions
+      description: Required rule type, used to indicate whether a field is required.
+        In the Amazon Connect admin website, case rules are known as _case field conditions_.
+        For more information about case field conditions, see [Add case field conditions
+        to a case template](https://docs.aws.amazon.com/connect/latest/adminguide/case-field-conditions.html).
+    RequiredField:
+      type: object
+      properties:
+        fieldId:
+          allOf:
+          - $ref: '#/components/schemas/FieldId'
+          description: Unique identifier of a field.
+      required:
+      - fieldId
+      description: List of fields that must have a value provided to create a case.
     RequiredFieldList:
       type: array
       items:
         $ref: '#/components/schemas/RequiredField'
+    ResourceNotFoundException:
+      type: object
+      properties:
+        message:
+          $ref: '#/components/schemas/String'
+        resourceId:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: Unique identifier of the resource affected.
+        resourceType:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: Type of the resource affected.
+      required:
+      - message
+      - resourceId
+      - resourceType
+      description: We couldn't find the requested resource. Check that your resources
+        exists and were created in the same Amazon Web Services Region as your request,
+        and try your request again.
     RuleType:
       type: string
       enum:
       - Required
+    SearchCasesRequest:
+      type: object
+      properties:
+        domainId:
+          allOf:
+          - $ref: '#/components/schemas/DomainId'
+          description: The unique identifier of the Cases domain.
+        maxResults:
+          allOf:
+          - $ref: '#/components/schemas/Integer'
+          description: The maximum number of cases to return. The current maximum
+            supported value is 25. This is also the default value when no other value
+            is provided.
+        nextToken:
+          allOf:
+          - $ref: '#/components/schemas/NextToken'
+          description: The token for the next set of results. Use the value returned
+            in the previous response in the next request to retrieve the next set
+            of results.
+        searchTerm:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: A word or phrase used to perform a quick search.
+        filter:
+          allOf:
+          - $ref: '#/components/schemas/CaseFilter'
+          description: A list of filter objects.
+        sorts:
+          allOf:
+          - $ref: '#/components/schemas/SortList'
+          description: A list of sorts where each sort specifies a field and their
+            sort order to be applied to the results.
+        fields:
+          allOf:
+          - $ref: '#/components/schemas/FieldIdentifierList'
+          description: The list of field identifiers to be returned as part of the
+            response.
+      required:
+      - domainId
+    SearchCasesResponse:
+      type: object
+      properties:
+        nextToken:
+          allOf:
+          - $ref: '#/components/schemas/NextToken'
+          description: The token for the next set of results. This is null if there
+            are no more results to return.
+        cases:
+          allOf:
+          - $ref: '#/components/schemas/SearchCasesResponseItemList'
+          description: A list of case documents where each case contains the properties
+            `CaseId` and `Fields` where each field is a complex union structure.
+      required:
+      - cases
+    SearchCasesResponseItem:
+      type: object
+      properties:
+        caseId:
+          allOf:
+          - $ref: '#/components/schemas/CaseId'
+          description: A unique identifier of the case.
+        templateId:
+          allOf:
+          - $ref: '#/components/schemas/TemplateId'
+          description: A unique identifier of a template.
+        fields:
+          allOf:
+          - $ref: '#/components/schemas/FieldValueList'
+          description: List of case field values.
+        tags:
+          allOf:
+          - $ref: '#/components/schemas/Tags'
+          description: A map of of key-value pairs that represent tags on a resource.
+            Tags are used to organize, track, or control access for this resource.
+      required:
+      - caseId
+      - templateId
+      - fields
+      description: A list of items that represent cases.
     SearchCasesResponseItemList:
       type: array
       items:
         $ref: '#/components/schemas/SearchCasesResponseItem'
+    SearchRelatedItemsRequest:
+      type: object
+      properties:
+        domainId:
+          allOf:
+          - $ref: '#/components/schemas/DomainId'
+          description: The unique identifier of the Cases domain.
+        caseId:
+          allOf:
+          - $ref: '#/components/schemas/CaseId'
+          description: A unique identifier of the case.
+        maxResults:
+          allOf:
+          - $ref: '#/components/schemas/Integer'
+          description: The maximum number of results to return per page.
+        nextToken:
+          allOf:
+          - $ref: '#/components/schemas/NextToken'
+          description: The token for the next set of results. Use the value returned
+            in the previous response in the next request to retrieve the next set
+            of results.
+        filters:
+          allOf:
+          - $ref: '#/components/schemas/RelatedItemFilterList'
+          description: The list of types of related items and their parameters to
+            use for filtering.
+      required:
+      - domainId
+      - caseId
+    SearchRelatedItemsResponse:
+      type: object
+      properties:
+        nextToken:
+          allOf:
+          - $ref: '#/components/schemas/NextToken'
+          description: The token for the next set of results. This is null if there
+            are no more results to return.
+        relatedItems:
+          allOf:
+          - $ref: '#/components/schemas/SearchRelatedItemsResponseItemList'
+          description: A list of items related to a case.
+      required:
+      - relatedItems
+    SearchRelatedItemsResponseItem:
+      type: object
+      properties:
+        relatedItemId:
+          allOf:
+          - $ref: '#/components/schemas/RelatedItemId'
+          description: Unique identifier of a related item.
+        type:
+          allOf:
+          - $ref: '#/components/schemas/RelatedItemType'
+          description: Type of a related item.
+        associationTime:
+          allOf:
+          - $ref: '#/components/schemas/AssociationTime'
+          description: Time at which a related item was associated with a case.
+        content:
+          allOf:
+          - $ref: '#/components/schemas/RelatedItemContent'
+          description: Represents the content of a particular type of related item.
+        tags:
+          allOf:
+          - $ref: '#/components/schemas/Tags'
+          description: A map of of key-value pairs that represent tags on a resource.
+            Tags are used to organize, track, or control access for this resource.
+        performedBy:
+          allOf:
+          - $ref: '#/components/schemas/UserUnion'
+          description: Represents the creator of the related item.
+      required:
+      - relatedItemId
+      - type
+      - associationTime
+      - content
+      description: A list of items that represent RelatedItems.
     SearchRelatedItemsResponseItemList:
       type: array
       items:
@@ -568,13 +4968,113 @@ components:
         $ref: '#/components/schemas/Section'
       description: <p>Ordered list containing different kinds of sections that can
         be added.</p>
+    ServiceQuotaExceededException:
+      type: object
+      properties:
+        message:
+          $ref: '#/components/schemas/String'
+      required:
+      - message
+      description: The service quota has been exceeded. For a list of service quotas,
+        see [Amazon Connect Service Quotas](https://docs.aws.amazon.com/connect/latest/adminguide/amazon-connect-service-limits.html)
+        in the _Amazon Connect Administrator Guide_.
     SlaCompletionTime:
       type: string
       format: date-time
+    SlaConfiguration:
+      type: object
+      properties:
+        name:
+          allOf:
+          - $ref: '#/components/schemas/SlaName'
+          description: Name of an SLA.
+        type:
+          allOf:
+          - $ref: '#/components/schemas/SlaType'
+          description: Type of SLA.
+        status:
+          allOf:
+          - $ref: '#/components/schemas/SlaStatus'
+          description: Status of an SLA.
+        fieldId:
+          allOf:
+          - $ref: '#/components/schemas/FieldId'
+          description: Unique identifier of a field.
+        targetFieldValues:
+          allOf:
+          - $ref: '#/components/schemas/SlaFieldValueUnionList'
+          description: Represents a list of target field values for the fieldId specified
+            in SlaConfiguration.
+        targetTime:
+          allOf:
+          - $ref: '#/components/schemas/SlaTargetTime'
+          description: Target time by which an SLA should be completed.
+        completionTime:
+          allOf:
+          - $ref: '#/components/schemas/SlaCompletionTime'
+          description: Time at which an SLA was completed.
+      required:
+      - name
+      - type
+      - status
+      - targetTime
+      description: Represents an SLA configuration.
+    SlaContent:
+      type: object
+      properties:
+        slaConfiguration:
+          allOf:
+          - $ref: '#/components/schemas/SlaConfiguration'
+          description: Represents an SLA configuration.
+      required:
+      - slaConfiguration
+      description: Represents the content of an SLA to be returned to agents.
     SlaFieldValueUnionList:
       type: array
       items:
         $ref: '#/components/schemas/FieldValueUnion'
+    SlaFilter:
+      type: object
+      properties:
+        name:
+          allOf:
+          - $ref: '#/components/schemas/SlaName'
+          description: Name of an SLA.
+        status:
+          allOf:
+          - $ref: '#/components/schemas/SlaStatus'
+          description: Status of an SLA.
+      description: A filter for related items of type `SLA`.
+    SlaInputConfiguration:
+      type: object
+      properties:
+        name:
+          allOf:
+          - $ref: '#/components/schemas/SlaName'
+          description: Name of an SLA.
+        type:
+          allOf:
+          - $ref: '#/components/schemas/SlaType'
+          description: Type of SLA.
+        fieldId:
+          allOf:
+          - $ref: '#/components/schemas/FieldId'
+          description: Unique identifier of a field.
+        targetFieldValues:
+          allOf:
+          - $ref: '#/components/schemas/SlaFieldValueUnionList'
+          description: Represents a list of target field values for the fieldId specified
+            in SlaInputConfiguration. The SLA is considered met if any one of these
+            target field values matches the actual field value.
+        targetSlaMinutes:
+          allOf:
+          - $ref: '#/components/schemas/TargetSlaMinutes'
+          description: Target duration in minutes within which an SLA should be completed.
+      required:
+      - name
+      - type
+      - targetSlaMinutes
+      description: Represents the input configuration of an SLA being created.
     SlaInputContent:
       allOf:
       - allOf:
@@ -602,6 +5102,21 @@ components:
       type: string
       enum:
       - CaseField
+    Sort:
+      type: object
+      properties:
+        fieldId:
+          allOf:
+          - $ref: '#/components/schemas/FieldId'
+          description: Unique identifier of a field.
+        sortOrder:
+          allOf:
+          - $ref: '#/components/schemas/Order'
+          description: A structured set of sort terms
+      required:
+      - fieldId
+      - sortOrder
+      description: A structured set of sort terms.
     SortList:
       type: array
       items:
@@ -615,6 +5130,21 @@ components:
       type: array
       items:
         $ref: '#/components/schemas/TagKey'
+    TagResourceRequest:
+      type: object
+      properties:
+        arn:
+          allOf:
+          - $ref: '#/components/schemas/Arn'
+          description: The Amazon Resource Name (ARN)
+        tags:
+          allOf:
+          - $ref: '#/components/schemas/Tags'
+          description: A map of of key-value pairs that represent tags on a resource.
+            Tags are used to organize, track, or control access for this resource.
+      required:
+      - arn
+      - tags
     Tags:
       type: object
       additionalProperties:
@@ -644,6 +5174,24 @@ components:
       pattern: ^.*[\S]$
       minLength: 1
       maxLength: 100
+    TemplateRule:
+      type: object
+      properties:
+        caseRuleId:
+          allOf:
+          - $ref: '#/components/schemas/CaseRuleId'
+          description: Unique identifier of a case rule.
+        fieldId:
+          allOf:
+          - $ref: '#/components/schemas/FieldId'
+          description: Unique identifier of a field.
+      required:
+      - caseRuleId
+      - fieldId
+      description: An association representing a case rule acting upon a field. In
+        the Amazon Connect admin website, case rules are known as _case field conditions_.
+        For more information about case field conditions, see [Add case field conditions
+        to a case template](https://docs.aws.amazon.com/connect/latest/adminguide/case-field-conditions.html).
     TemplateStatus:
       type: string
       enum:
@@ -653,10 +5201,206 @@ components:
       type: array
       items:
         $ref: '#/components/schemas/TemplateStatus'
+    TemplateSummary:
+      type: object
+      properties:
+        templateId:
+          allOf:
+          - $ref: '#/components/schemas/TemplateId'
+          description: The unique identifier for the template.
+        templateArn:
+          allOf:
+          - $ref: '#/components/schemas/TemplateArn'
+          description: The Amazon Resource Name (ARN) of the template.
+        name:
+          allOf:
+          - $ref: '#/components/schemas/TemplateName'
+          description: The template name.
+        status:
+          allOf:
+          - $ref: '#/components/schemas/TemplateStatus'
+          description: The status of the template.
+      required:
+      - templateId
+      - templateArn
+      - name
+      - status
+      description: Template summary information.
     TemplateSummaryList:
       type: array
       items:
         $ref: '#/components/schemas/TemplateSummary'
+    ThrottlingException:
+      type: object
+      properties:
+        message:
+          $ref: '#/components/schemas/String'
+      required:
+      - message
+      description: The rate has been exceeded for this API. Please try again after
+        a few minutes.
+    UntagResourceRequest:
+      type: object
+      properties:
+        arn:
+          allOf:
+          - $ref: '#/components/schemas/Arn'
+          description: The Amazon Resource Name (ARN)
+        tagKeys:
+          allOf:
+          - $ref: '#/components/schemas/TagKeyList'
+          description: List of tag keys.
+      required:
+      - arn
+      - tagKeys
+    UpdateCaseRequest:
+      type: object
+      properties:
+        domainId:
+          allOf:
+          - $ref: '#/components/schemas/DomainId'
+          description: The unique identifier of the Cases domain.
+        caseId:
+          allOf:
+          - $ref: '#/components/schemas/CaseId'
+          description: A unique identifier of the case.
+        fields:
+          allOf:
+          - $ref: '#/components/schemas/FieldValueList'
+          description: An array of objects with `fieldId` (matching ListFields/DescribeField)
+            and value union data, structured identical to `CreateCase`.
+        performedBy:
+          $ref: '#/components/schemas/UserUnion'
+      required:
+      - domainId
+      - caseId
+      - fields
+    UpdateCaseResponse:
+      type: object
+      properties: {}
+    UpdateCaseRuleRequest:
+      type: object
+      properties:
+        domainId:
+          allOf:
+          - $ref: '#/components/schemas/DomainId'
+          description: Unique identifier of a Cases domain.
+        caseRuleId:
+          allOf:
+          - $ref: '#/components/schemas/CaseRuleId'
+          description: Unique identifier of a case rule.
+        name:
+          allOf:
+          - $ref: '#/components/schemas/CaseRuleName'
+          description: Name of the case rule.
+        description:
+          allOf:
+          - $ref: '#/components/schemas/CaseRuleDescription'
+          description: Description of a case rule.
+        rule:
+          allOf:
+          - $ref: '#/components/schemas/CaseRuleDetails'
+          description: Represents what rule type should take place, under what conditions.
+      required:
+      - domainId
+      - caseRuleId
+    UpdateCaseRuleResponse:
+      type: object
+      properties: {}
+    UpdateFieldRequest:
+      type: object
+      properties:
+        domainId:
+          allOf:
+          - $ref: '#/components/schemas/DomainId'
+          description: The unique identifier of the Cases domain.
+        fieldId:
+          allOf:
+          - $ref: '#/components/schemas/FieldId'
+          description: The unique identifier of a field.
+        name:
+          allOf:
+          - $ref: '#/components/schemas/FieldName'
+          description: The name of the field.
+        description:
+          allOf:
+          - $ref: '#/components/schemas/FieldDescription'
+          description: The description of a field.
+      required:
+      - domainId
+      - fieldId
+    UpdateFieldResponse:
+      type: object
+      properties: {}
+    UpdateLayoutRequest:
+      type: object
+      properties:
+        domainId:
+          allOf:
+          - $ref: '#/components/schemas/DomainId'
+          description: The unique identifier of the Cases domain.
+        layoutId:
+          allOf:
+          - $ref: '#/components/schemas/LayoutId'
+          description: The unique identifier of the layout.
+        name:
+          allOf:
+          - $ref: '#/components/schemas/LayoutName'
+          description: The name of the layout. It must be unique per domain.
+        content:
+          allOf:
+          - $ref: '#/components/schemas/LayoutContent'
+          description: Information about which fields will be present in the layout,
+            the order of the fields.
+      required:
+      - domainId
+      - layoutId
+    UpdateLayoutResponse:
+      type: object
+      properties: {}
+    UpdateTemplateRequest:
+      type: object
+      properties:
+        domainId:
+          allOf:
+          - $ref: '#/components/schemas/DomainId'
+          description: The unique identifier of the Cases domain.
+        templateId:
+          allOf:
+          - $ref: '#/components/schemas/TemplateId'
+          description: A unique identifier for the template.
+        name:
+          allOf:
+          - $ref: '#/components/schemas/TemplateName'
+          description: The name of the template. It must be unique per domain.
+        description:
+          allOf:
+          - $ref: '#/components/schemas/TemplateDescription'
+          description: A brief description of the template.
+        layoutConfiguration:
+          allOf:
+          - $ref: '#/components/schemas/LayoutConfiguration'
+          description: Configuration of layouts associated to the template.
+        requiredFields:
+          allOf:
+          - $ref: '#/components/schemas/RequiredFieldList'
+          description: A list of fields that must contain a value for a case to be
+            successfully created with this template.
+        status:
+          allOf:
+          - $ref: '#/components/schemas/TemplateStatus'
+          description: The status of the template.
+        rules:
+          allOf:
+          - $ref: '#/components/schemas/TemplateCaseRuleList'
+          description: A list of case rules (also known as [case field conditions](https://docs.aws.amazon.com/connect/latest/adminguide/case-field-conditions.html))
+            on a template.
+      required:
+      - domainId
+      - templateId
+    UpdateTemplateResponse:
+      type: object
+      properties: {}
     UserArn:
       type: string
       minLength: 1
@@ -673,6 +5417,14 @@ components:
           Any provided entity.
       description: |-
         Represents the entity that performed the action.
+    ValidationException:
+      type: object
+      properties:
+        message:
+          $ref: '#/components/schemas/String'
+      required:
+      - message
+      description: The request isn't valid. Check the syntax and try again.
     Value:
       type: string
       maxLength: 100

@@ -7,7 +7,7 @@ info:
   x-stackql-serviceName: iot_jobs_data_plane
   x-aws-serviceName: iotjobsdataplane
   x-aws-protocol: aws.protocols#restJson1
-  x-dateGenerated: '2025-05-05'
+  x-dateGenerated: '2025-05-07'
   version: '2017-09-29'
   title: AWS IoT Jobs Data Plane
   description: |-
@@ -53,7 +53,311 @@ servers:
       - sa-east-1
       - me-south-1
       default: us-east-1
-paths: {}
+paths:
+  /things/{thingName}/jobs/{jobId}:
+    get:
+      operationId: DescribeJobExecution
+      description: |-
+        Gets details of a job execution.
+
+        Requires permission to access the [DescribeJobExecution](https://docs.aws.amazon.com/service-authorization/latest/reference/list_awsiot.html#awsiot-actions-as-permissions) action.
+      parameters:
+      - name: jobId
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/DescribeJobExecutionJobId'
+      - name: thingName
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/ThingName'
+      - name: includeJobDocument
+        in: query
+        required: false
+        schema:
+          $ref: '#/components/schemas/IncludeJobDocument'
+      - name: executionNumber
+        in: query
+        required: false
+        schema:
+          $ref: '#/components/schemas/ExecutionNumber'
+      responses:
+        '200': {}
+        '400':
+          description: |-
+            The contents of the request were invalid.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InvalidRequestException'
+        '404':
+          description: |-
+            The specified resource does not exist.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+        '503':
+          description: |-
+            The service is temporarily unavailable.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServiceUnavailableException'
+        '410':
+          description: |-
+            The job is in a terminal state.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TerminalStateException'
+        '429':
+          description: |-
+            The rate exceeds the limit.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThrottlingException'
+    post:
+      operationId: UpdateJobExecution
+      description: |-
+        Updates the status of a job execution.
+
+        Requires permission to access the [UpdateJobExecution](https://docs.aws.amazon.com/service-authorization/latest/reference/list_awsiotjobsdataplane.html) action.
+      parameters:
+      - name: jobId
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/JobId'
+      - name: thingName
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/ThingName'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                status:
+                  $ref: '#/components/schemas/JobExecutionStatus'
+                statusDetails:
+                  $ref: '#/components/schemas/DetailsMap'
+                stepTimeoutInMinutes:
+                  $ref: '#/components/schemas/StepTimeoutInMinutes'
+                expectedVersion:
+                  $ref: '#/components/schemas/ExpectedVersion'
+                includeJobExecutionState:
+                  $ref: '#/components/schemas/IncludeExecutionState'
+                includeJobDocument:
+                  $ref: '#/components/schemas/IncludeJobDocument'
+                executionNumber:
+                  $ref: '#/components/schemas/ExecutionNumber'
+      responses:
+        '200': {}
+        '400':
+          description: |-
+            The contents of the request were invalid.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InvalidRequestException'
+        '409':
+          description: |-
+            An update attempted to change the job execution to a state that is invalid because of the job execution's current state (for example, an attempt to change a request in state SUCCESS to state IN_PROGRESS). In this case, the body of the error message also contains the executionState field.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InvalidStateTransitionException'
+        '404':
+          description: |-
+            The specified resource does not exist.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+        '503':
+          description: |-
+            The service is temporarily unavailable.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServiceUnavailableException'
+        '429':
+          description: |-
+            The rate exceeds the limit.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThrottlingException'
+  /things/{thingName}/jobs:
+    get:
+      operationId: GetPendingJobExecutions
+      description: |-
+        Gets the list of all jobs for a thing that are not in a terminal status.
+
+        Requires permission to access the [GetPendingJobExecutions](https://docs.aws.amazon.com/service-authorization/latest/reference/list_awsiot.html#awsiot-actions-as-permissions) action.
+      parameters:
+      - name: thingName
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/ThingName'
+      responses:
+        '200': {}
+        '400':
+          description: |-
+            The contents of the request were invalid.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InvalidRequestException'
+        '404':
+          description: |-
+            The specified resource does not exist.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+        '503':
+          description: |-
+            The service is temporarily unavailable.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServiceUnavailableException'
+        '429':
+          description: |-
+            The rate exceeds the limit.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThrottlingException'
+  /command-executions:
+    post:
+      operationId: StartCommandExecution
+      description: |-
+        Using the command created with the `CreateCommand` API, start a command execution on a specific device.
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                targetArn:
+                  $ref: '#/components/schemas/TargetArn'
+                commandArn:
+                  $ref: '#/components/schemas/CommandArn'
+                parameters:
+                  $ref: '#/components/schemas/CommandExecutionParameterMap'
+                executionTimeoutSeconds:
+                  $ref: '#/components/schemas/CommandExecutionTimeoutInSeconds'
+                clientToken:
+                  $ref: '#/components/schemas/ClientRequestTokenV2'
+      responses:
+        '200': {}
+        '409':
+          description: |-
+            A conflict has occurred when performing the API request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConflictException'
+        '500':
+          description: |-
+            An internal server error occurred when performing the API request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerException'
+        '404':
+          description: |-
+            The specified resource does not exist.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+        '402':
+          description: |-
+            The service quota has been exceeded for this request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServiceQuotaExceededException'
+        '429':
+          description: |-
+            The rate exceeds the limit.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThrottlingException'
+        '400':
+          description: |-
+            A validation error occurred when performing the API request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+  /things/{thingName}/jobs/$next:
+    put:
+      operationId: StartNextPendingJobExecution
+      description: |-
+        Gets and starts the next pending (status IN_PROGRESS or QUEUED) job execution for a thing.
+
+        Requires permission to access the [StartNextPendingJobExecution](https://docs.aws.amazon.com/service-authorization/latest/reference/list_awsiot.html#awsiot-actions-as-permissions) action.
+      parameters:
+      - name: thingName
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/ThingName'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                statusDetails:
+                  $ref: '#/components/schemas/DetailsMap'
+                stepTimeoutInMinutes:
+                  $ref: '#/components/schemas/StepTimeoutInMinutes'
+      responses:
+        '200': {}
+        '400':
+          description: |-
+            The contents of the request were invalid.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InvalidRequestException'
+        '404':
+          description: |-
+            The specified resource does not exist.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+        '503':
+          description: |-
+            The service is temporarily unavailable.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServiceUnavailableException'
+        '429':
+          description: |-
+            The rate exceeds the limit.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThrottlingException'
 components:
   schemas:
     ApproximateSecondsBeforeTimedOut:
@@ -68,6 +372,14 @@ components:
       minLength: 1
     BooleanParameterValue:
       type: boolean
+    CertificateValidationException:
+      type: object
+      properties:
+        message:
+          allOf:
+          - $ref: '#/components/schemas/errorMessage'
+          description: Additional information about the exception.
+      description: The certificate is invalid.
     ClientRequestTokenV2:
       type: string
       pattern: ^[\x21-\x7E]+$
@@ -93,9 +405,91 @@ components:
       pattern: ^[.$a-zA-Z0-9_-]+$
       minLength: 1
       maxLength: 192
+    CommandParameterValue:
+      type: object
+      properties:
+        S:
+          allOf:
+          - $ref: '#/components/schemas/StringParameterValue'
+          description: 'An attribute of type String. For example:
+
+
+            `"S": "Hello"`'
+        B:
+          allOf:
+          - $ref: '#/components/schemas/BooleanParameterValue'
+          description: 'An attribute of type Boolean. For example:
+
+
+            `"BOOL": true`'
+        I:
+          allOf:
+          - $ref: '#/components/schemas/IntegerParameterValue'
+          description: An attribute of type Integer (Thirty-Two Bits).
+        L:
+          allOf:
+          - $ref: '#/components/schemas/LongParameterValue'
+          description: An attribute of type Long.
+        D:
+          allOf:
+          - $ref: '#/components/schemas/DoubleParameterValue'
+          description: An attribute of type Double (Sixty-Four Bits).
+        BIN:
+          allOf:
+          - $ref: '#/components/schemas/BinaryParameterValue'
+          description: An attribute of type Binary.
+        UL:
+          allOf:
+          - $ref: '#/components/schemas/UnsignedLongParameterValue'
+          description: An attribute of type Unsigned Long.
+      description: The list of values used to describe a specific command parameter.
+    ConflictException:
+      type: object
+      properties:
+        message:
+          $ref: '#/components/schemas/errorMessage'
+        resourceId:
+          allOf:
+          - $ref: '#/components/schemas/resourceId'
+          description: A conflict occurred while performing the API request on the
+            resource ID.
+      description: A conflict has occurred when performing the API request.
     DescribeJobExecutionJobId:
       type: string
       pattern: ^[a-zA-Z0-9_-]+|^\$next$
+    DescribeJobExecutionRequest:
+      type: object
+      properties:
+        jobId:
+          allOf:
+          - $ref: '#/components/schemas/DescribeJobExecutionJobId'
+          description: The unique identifier assigned to this job when it was created.
+        thingName:
+          allOf:
+          - $ref: '#/components/schemas/ThingName'
+          description: The thing name associated with the device the job execution
+            is running on.
+        includeJobDocument:
+          allOf:
+          - $ref: '#/components/schemas/IncludeJobDocument'
+          description: Optional. Unless set to false, the response contains the job
+            document. The default is true.
+        executionNumber:
+          allOf:
+          - $ref: '#/components/schemas/ExecutionNumber'
+          description: Optional. A number that identifies a particular job execution
+            on a particular device. If not specified, the latest job execution is
+            returned.
+      required:
+      - jobId
+      - thingName
+    DescribeJobExecutionResponse:
+      type: object
+      properties:
+        execution:
+          allOf:
+          - $ref: '#/components/schemas/JobExecution'
+          description: Contains data about a job execution.
     DetailsKey:
       type: string
       pattern: ^[a-zA-Z0-9:_-]+$
@@ -118,16 +512,145 @@ components:
     ExpectedVersion:
       type: integer
       format: int64
+    GetPendingJobExecutionsRequest:
+      type: object
+      properties:
+        thingName:
+          allOf:
+          - $ref: '#/components/schemas/ThingName'
+          description: The name of the thing that is executing the job.
+      required:
+      - thingName
+    GetPendingJobExecutionsResponse:
+      type: object
+      properties:
+        inProgressJobs:
+          allOf:
+          - $ref: '#/components/schemas/JobExecutionSummaryList'
+          description: A list of JobExecutionSummary objects with status IN_PROGRESS.
+        queuedJobs:
+          allOf:
+          - $ref: '#/components/schemas/JobExecutionSummaryList'
+          description: A list of JobExecutionSummary objects with status QUEUED.
     IncludeExecutionState:
       type: boolean
     IncludeJobDocument:
       type: boolean
     IntegerParameterValue:
       type: integer
+    InternalServerException:
+      type: object
+      properties:
+        message:
+          $ref: '#/components/schemas/errorMessage'
+      description: An internal server error occurred when performing the API request.
+    InvalidRequestException:
+      type: object
+      properties:
+        message:
+          allOf:
+          - $ref: '#/components/schemas/errorMessage'
+          description: The message for the exception.
+      description: The contents of the request were invalid.
+    InvalidStateTransitionException:
+      type: object
+      properties:
+        message:
+          $ref: '#/components/schemas/errorMessage'
+      description: An update attempted to change the job execution to a state that
+        is invalid because of the job execution's current state (for example, an attempt
+        to change a request in state SUCCESS to state IN_PROGRESS). In this case,
+        the body of the error message also contains the executionState field.
     JobDocument:
       type: string
       minLength: 0
       maxLength: 32768
+    JobExecution:
+      type: object
+      properties:
+        jobId:
+          allOf:
+          - $ref: '#/components/schemas/JobId'
+          description: The unique identifier you assigned to this job when it was
+            created.
+        thingName:
+          allOf:
+          - $ref: '#/components/schemas/ThingName'
+          description: The name of the thing that is executing the job.
+        status:
+          allOf:
+          - $ref: '#/components/schemas/JobExecutionStatus'
+          description: 'The status of the job execution. Can be one of: "QUEUED",
+            "IN_PROGRESS", "FAILED", "SUCCESS", "CANCELED", "TIMED_OUT", "REJECTED",
+            or "REMOVED".'
+        statusDetails:
+          allOf:
+          - $ref: '#/components/schemas/DetailsMap'
+          description: 'A collection of name/value pairs that describe the status
+            of the job execution.
+
+
+            The maximum length of the value in the name/value pair is 1,024 characters.'
+        queuedAt:
+          allOf:
+          - $ref: '#/components/schemas/QueuedAt'
+          description: The time, in seconds since the epoch, when the job execution
+            was enqueued.
+        startedAt:
+          allOf:
+          - $ref: '#/components/schemas/StartedAt'
+          description: The time, in seconds since the epoch, when the job execution
+            was started.
+        lastUpdatedAt:
+          allOf:
+          - $ref: '#/components/schemas/LastUpdatedAt'
+          description: The time, in seconds since the epoch, when the job execution
+            was last updated.
+        approximateSecondsBeforeTimedOut:
+          allOf:
+          - $ref: '#/components/schemas/ApproximateSecondsBeforeTimedOut'
+          description: The estimated number of seconds that remain before the job
+            execution status will be changed to `TIMED_OUT`. The actual job execution
+            timeout can occur up to 60 seconds later than the estimated duration.
+        versionNumber:
+          allOf:
+          - $ref: '#/components/schemas/VersionNumber'
+          description: The version of the job execution. Job execution versions are
+            incremented each time they are updated by a device.
+        executionNumber:
+          allOf:
+          - $ref: '#/components/schemas/ExecutionNumber'
+          description: A number that identifies a particular job execution on a particular
+            device. It can be used later in commands that return or update job execution
+            information.
+        jobDocument:
+          allOf:
+          - $ref: '#/components/schemas/JobDocument'
+          description: The content of the job document.
+      description: Contains data about a job execution.
+    JobExecutionState:
+      type: object
+      properties:
+        status:
+          allOf:
+          - $ref: '#/components/schemas/JobExecutionStatus'
+          description: 'The status of the job execution. Can be one of: "QUEUED",
+            "IN_PROGRESS", "FAILED", "SUCCESS", "CANCELED", "TIMED_OUT", "REJECTED",
+            or "REMOVED".'
+        statusDetails:
+          allOf:
+          - $ref: '#/components/schemas/DetailsMap'
+          description: 'A collection of name/value pairs that describe the status
+            of the job execution.
+
+
+            The maximum length of the value in the name/value pair is 1,024 characters.'
+        versionNumber:
+          allOf:
+          - $ref: '#/components/schemas/VersionNumber'
+          description: The version of the job execution. Job execution versions are
+            incremented each time they are updated by a device.
+      description: Contains data about the state of a job execution.
     JobExecutionStatus:
       type: string
       enum:
@@ -139,6 +662,40 @@ components:
       - REJECTED
       - REMOVED
       - CANCELED
+    JobExecutionSummary:
+      type: object
+      properties:
+        jobId:
+          allOf:
+          - $ref: '#/components/schemas/JobId'
+          description: The unique identifier you assigned to this job when it was
+            created.
+        queuedAt:
+          allOf:
+          - $ref: '#/components/schemas/QueuedAt'
+          description: The time, in seconds since the epoch, when the job execution
+            was enqueued.
+        startedAt:
+          allOf:
+          - $ref: '#/components/schemas/StartedAt'
+          description: The time, in seconds since the epoch, when the job execution
+            started.
+        lastUpdatedAt:
+          allOf:
+          - $ref: '#/components/schemas/LastUpdatedAt'
+          description: The time, in seconds since the epoch, when the job execution
+            was last updated.
+        versionNumber:
+          allOf:
+          - $ref: '#/components/schemas/VersionNumber'
+          description: The version of the job execution. Job execution versions are
+            incremented each time IoT Jobs receives an update from a device.
+        executionNumber:
+          allOf:
+          - $ref: '#/components/schemas/ExecutionNumber'
+          description: A number that identifies a particular job execution on a particular
+            device.
+      description: Contains a subset of information about a job execution.
     JobExecutionSummaryList:
       type: array
       items:
@@ -159,6 +716,110 @@ components:
       type: integer
       format: int64
       default: 0
+    ResourceNotFoundException:
+      type: object
+      properties:
+        message:
+          allOf:
+          - $ref: '#/components/schemas/errorMessage'
+          description: The message for the exception.
+      description: The specified resource does not exist.
+    ServiceQuotaExceededException:
+      type: object
+      properties:
+        message:
+          $ref: '#/components/schemas/errorMessage'
+      description: The service quota has been exceeded for this request.
+    ServiceUnavailableException:
+      type: object
+      properties:
+        message:
+          allOf:
+          - $ref: '#/components/schemas/errorMessage'
+          description: The message for the exception.
+      description: The service is temporarily unavailable.
+    StartCommandExecutionRequest:
+      type: object
+      properties:
+        targetArn:
+          allOf:
+          - $ref: '#/components/schemas/TargetArn'
+          description: The Amazon Resource Number (ARN) of the device where the command
+            execution is occurring.
+        commandArn:
+          allOf:
+          - $ref: '#/components/schemas/CommandArn'
+          description: The Amazon Resource Number (ARN) of the command. For example,
+            `arn:aws:iot:::command/`
+        parameters:
+          allOf:
+          - $ref: '#/components/schemas/CommandExecutionParameterMap'
+          description: A list of parameters that are required by the `StartCommandExecution`
+            API when performing the command on a device.
+        executionTimeoutSeconds:
+          allOf:
+          - $ref: '#/components/schemas/CommandExecutionTimeoutInSeconds'
+          description: Specifies the amount of time in second the device has to finish
+            the command execution. A timer is started as soon as the command execution
+            is created. If the command execution status is not set to another terminal
+            state before the timer expires, it will automatically update to `TIMED_OUT`.
+        clientToken:
+          allOf:
+          - $ref: '#/components/schemas/ClientRequestTokenV2'
+          description: The client token is used to implement idempotency. It ensures
+            that the request completes no more than one time. If you retry a request
+            with the same token and the same parameters, the request will complete
+            successfully. However, if you retry the request using the same token but
+            different parameters, an HTTP 409 conflict occurs. If you omit this value,
+            Amazon Web Services SDKs will automatically generate a unique client request.
+      required:
+      - targetArn
+      - commandArn
+    StartCommandExecutionResponse:
+      type: object
+      properties:
+        executionId:
+          allOf:
+          - $ref: '#/components/schemas/CommandExecutionId'
+          description: A unique identifier for the command execution.
+    StartNextPendingJobExecutionRequest:
+      type: object
+      properties:
+        thingName:
+          allOf:
+          - $ref: '#/components/schemas/ThingName'
+          description: The name of the thing associated with the device.
+        statusDetails:
+          allOf:
+          - $ref: '#/components/schemas/DetailsMap'
+          description: 'A collection of name/value pairs that describe the status
+            of the job execution. If not specified, the statusDetails are unchanged.
+
+
+            The maximum length of the value in the name/value pair is 1,024 characters.'
+        stepTimeoutInMinutes:
+          allOf:
+          - $ref: '#/components/schemas/StepTimeoutInMinutes'
+          description: 'Specifies the amount of time this device has to finish execution
+            of this job. If the job execution status is not set to a terminal state
+            before this timer expires, or before the timer is reset (by calling `UpdateJobExecution`,
+            setting the status to `IN_PROGRESS`, and specifying a new timeout value
+            in field `stepTimeoutInMinutes`) the job execution status will be automatically
+            set to `TIMED_OUT`. Note that setting the step timeout has no effect on
+            the in progress timeout that may have been specified when the job was
+            created (`CreateJob` using field `timeoutConfig`).
+
+
+            Valid values for this parameter range from 1 to 10080 (1 minute to 7 days).'
+      required:
+      - thingName
+    StartNextPendingJobExecutionResponse:
+      type: object
+      properties:
+        execution:
+          allOf:
+          - $ref: '#/components/schemas/JobExecution'
+          description: A JobExecution object.
     StartedAt:
       type: integer
       format: int64
@@ -172,16 +833,120 @@ components:
       type: string
       minLength: 0
       maxLength: 2048
+    TerminalStateException:
+      type: object
+      properties:
+        message:
+          $ref: '#/components/schemas/errorMessage'
+      description: The job is in a terminal state.
     ThingName:
       type: string
       pattern: ^[a-zA-Z0-9:_-]+$
       minLength: 1
       maxLength: 128
+    ThrottlingException:
+      type: object
+      properties:
+        message:
+          allOf:
+          - $ref: '#/components/schemas/errorMessage'
+          description: The message associated with the exception.
+        payload:
+          allOf:
+          - $ref: '#/components/schemas/BinaryBlob'
+          description: The payload associated with the exception.
+      description: The rate exceeds the limit.
     UnsignedLongParameterValue:
       type: string
       pattern: ^[0-9]*$
       minLength: 1
       maxLength: 20
+    UpdateJobExecutionRequest:
+      type: object
+      properties:
+        jobId:
+          allOf:
+          - $ref: '#/components/schemas/JobId'
+          description: The unique identifier assigned to this job when it was created.
+        thingName:
+          allOf:
+          - $ref: '#/components/schemas/ThingName'
+          description: The name of the thing associated with the device.
+        status:
+          allOf:
+          - $ref: '#/components/schemas/JobExecutionStatus'
+          description: The new status for the job execution (IN_PROGRESS, FAILED,
+            SUCCESS, or REJECTED). This must be specified on every update.
+        statusDetails:
+          allOf:
+          - $ref: '#/components/schemas/DetailsMap'
+          description: 'Optional. A collection of name/value pairs that describe the
+            status of the job execution. If not specified, the statusDetails are unchanged.
+
+
+            The maximum length of the value in the name/value pair is 1,024 characters.'
+        stepTimeoutInMinutes:
+          allOf:
+          - $ref: '#/components/schemas/StepTimeoutInMinutes'
+          description: 'Specifies the amount of time this device has to finish execution
+            of this job. If the job execution status is not set to a terminal state
+            before this timer expires, or before the timer is reset (by again calling
+            `UpdateJobExecution`, setting the status to `IN_PROGRESS`, and specifying
+            a new timeout value in this field) the job execution status will be automatically
+            set to `TIMED_OUT`. Note that setting or resetting the step timeout has
+            no effect on the in progress timeout that may have been specified when
+            the job was created (`CreateJob` using field `timeoutConfig`).
+
+
+            Valid values for this parameter range from 1 to 10080 (1 minute to 7 days).
+            A value of -1 is also valid and will cancel the current step timer (created
+            by an earlier use of `UpdateJobExecutionRequest`).'
+        expectedVersion:
+          allOf:
+          - $ref: '#/components/schemas/ExpectedVersion'
+          description: Optional. The expected current version of the job execution.
+            Each time you update the job execution, its version is incremented. If
+            the version of the job execution stored in Jobs does not match, the update
+            is rejected with a VersionMismatch error, and an ErrorResponse that contains
+            the current job execution status data is returned. (This makes it unnecessary
+            to perform a separate DescribeJobExecution request in order to obtain
+            the job execution status data.)
+        includeJobExecutionState:
+          allOf:
+          - $ref: '#/components/schemas/IncludeExecutionState'
+          description: Optional. When included and set to true, the response contains
+            the JobExecutionState data. The default is false.
+        includeJobDocument:
+          allOf:
+          - $ref: '#/components/schemas/IncludeJobDocument'
+          description: Optional. When set to true, the response contains the job document.
+            The default is false.
+        executionNumber:
+          allOf:
+          - $ref: '#/components/schemas/ExecutionNumber'
+          description: Optional. A number that identifies a particular job execution
+            on a particular device.
+      required:
+      - jobId
+      - thingName
+      - status
+    UpdateJobExecutionResponse:
+      type: object
+      properties:
+        executionState:
+          allOf:
+          - $ref: '#/components/schemas/JobExecutionState'
+          description: A JobExecutionState object.
+        jobDocument:
+          allOf:
+          - $ref: '#/components/schemas/JobDocument'
+          description: The contents of the Job Documents.
+    ValidationException:
+      type: object
+      properties:
+        message:
+          $ref: '#/components/schemas/errorMessage'
+      description: A validation error occurred when performing the API request.
     VersionNumber:
       type: integer
       format: int64

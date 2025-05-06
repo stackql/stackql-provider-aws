@@ -7,7 +7,7 @@ info:
   x-stackql-serviceName: transcribe_streaming
   x-aws-serviceName: transcribestreaming
   x-aws-protocol: aws.protocols#restJson1
-  x-dateGenerated: '2025-05-05'
+  x-dateGenerated: '2025-05-07'
   version: '2017-10-26'
   title: Amazon Transcribe Streaming Service
   description: |-
@@ -51,9 +51,573 @@ servers:
       - sa-east-1
       - me-south-1
       default: us-east-1
-paths: {}
+paths:
+  /medical-scribe-stream/{SessionId}:
+    get:
+      operationId: GetMedicalScribeStream
+      description: |-
+        Provides details about the specified Amazon Web Services HealthScribe streaming session. To view the status of the streaming session, check the `StreamStatus` field in the response. To get the details of post-stream analytics, including its status, check the `PostStreamAnalyticsResult` field in the response.
+      parameters:
+      - name: SessionId
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/SessionId'
+      responses:
+        '200': {}
+        '400':
+          description: |-
+            One or more arguments to the `StartStreamTranscription`, `StartMedicalStreamTranscription`, or `StartCallAnalyticsStreamTranscription` operation was not valid. For example, `MediaEncoding` or `LanguageCode` used unsupported values. Check the specified parameters and try your request again.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequestException'
+        '500':
+          description: |-
+            A problem occurred while processing the audio. Amazon Transcribe terminated processing.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalFailureException'
+        '429':
+          description: |-
+            Your client has exceeded one of the Amazon Transcribe limits. This is typically the audio length limit. Break your audio stream into smaller chunks and try your request again.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LimitExceededException'
+        '404':
+          description: |-
+            The request references a resource which doesn't exist.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+  /call-analytics-stream-transcription:
+    post:
+      operationId: StartCallAnalyticsStreamTranscription
+      description: |-
+        Starts a bidirectional HTTP/2 or WebSocket stream where audio is streamed to Amazon Transcribe and the transcription results are streamed to your application. Use this operation for [Call Analytics](https://docs.aws.amazon.com/transcribe/latest/dg/call-analytics.html) transcriptions.
+
+        The following parameters are required:
+
+          * `language-code`
+
+          * `media-encoding`
+
+          * `sample-rate`
+
+        For more information on streaming with Amazon Transcribe, see [Transcribing streaming audio](https://docs.aws.amazon.com/transcribe/latest/dg/streaming.html).
+      parameters:
+      - name: x-amzn-transcribe-language-code
+        in: header
+        required: true
+        schema:
+          $ref: '#/components/schemas/CallAnalyticsLanguageCode'
+      - name: x-amzn-transcribe-sample-rate
+        in: header
+        required: true
+        schema:
+          $ref: '#/components/schemas/MediaSampleRateHertz'
+      - name: x-amzn-transcribe-media-encoding
+        in: header
+        required: true
+        schema:
+          $ref: '#/components/schemas/MediaEncoding'
+      - name: x-amzn-transcribe-vocabulary-name
+        in: header
+        required: false
+        schema:
+          $ref: '#/components/schemas/VocabularyName'
+      - name: x-amzn-transcribe-session-id
+        in: header
+        required: false
+        schema:
+          $ref: '#/components/schemas/SessionId'
+      - name: x-amzn-transcribe-vocabulary-filter-name
+        in: header
+        required: false
+        schema:
+          $ref: '#/components/schemas/VocabularyFilterName'
+      - name: x-amzn-transcribe-vocabulary-filter-method
+        in: header
+        required: false
+        schema:
+          $ref: '#/components/schemas/VocabularyFilterMethod'
+      - name: x-amzn-transcribe-language-model-name
+        in: header
+        required: false
+        schema:
+          $ref: '#/components/schemas/ModelName'
+      - name: x-amzn-transcribe-enable-partial-results-stabilization
+        in: header
+        required: false
+        schema:
+          $ref: '#/components/schemas/Boolean'
+      - name: x-amzn-transcribe-partial-results-stability
+        in: header
+        required: false
+        schema:
+          $ref: '#/components/schemas/PartialResultsStability'
+      - name: x-amzn-transcribe-content-identification-type
+        in: header
+        required: false
+        schema:
+          $ref: '#/components/schemas/ContentIdentificationType'
+      - name: x-amzn-transcribe-content-redaction-type
+        in: header
+        required: false
+        schema:
+          $ref: '#/components/schemas/ContentRedactionType'
+      - name: x-amzn-transcribe-pii-entity-types
+        in: header
+        required: false
+        schema:
+          $ref: '#/components/schemas/PiiEntityTypes'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                AudioStream:
+                  $ref: '#/components/schemas/AudioStream'
+      responses:
+        '200': {}
+        '400':
+          description: |-
+            One or more arguments to the `StartStreamTranscription`, `StartMedicalStreamTranscription`, or `StartCallAnalyticsStreamTranscription` operation was not valid. For example, `MediaEncoding` or `LanguageCode` used unsupported values. Check the specified parameters and try your request again.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequestException'
+        '409':
+          description: |-
+            A new stream started with the same session ID. The current stream has been terminated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConflictException'
+        '500':
+          description: |-
+            A problem occurred while processing the audio. Amazon Transcribe terminated processing.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalFailureException'
+        '429':
+          description: |-
+            Your client has exceeded one of the Amazon Transcribe limits. This is typically the audio length limit. Break your audio stream into smaller chunks and try your request again.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LimitExceededException'
+        '503':
+          description: |-
+            The service is currently unavailable. Try your request later.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServiceUnavailableException'
+  /medical-scribe-stream:
+    post:
+      operationId: StartMedicalScribeStream
+      description: |-
+        Starts a bidirectional HTTP/2 stream, where audio is streamed to Amazon Web Services HealthScribe and the transcription results are streamed to your application.
+
+        When you start a stream, you first specify the stream configuration in a `MedicalScribeConfigurationEvent`. This event includes channel definitions, encryption settings, and post-stream analytics settings, such as the output configuration for aggregated transcript and clinical note generation. These are additional streaming session configurations beyond those provided in your initial start request headers. Whether you are starting a new session or resuming an existing session, your first event must be a `MedicalScribeConfigurationEvent`.
+
+        After you send a `MedicalScribeConfigurationEvent`, you start `AudioEvents` and Amazon Web Services HealthScribe responds with real-time transcription results. When you are finished, to start processing the results with the post-stream analytics, send a `MedicalScribeSessionControlEvent` with a `Type` of `END_OF_SESSION` and Amazon Web Services HealthScribe starts the analytics.
+
+        You can pause or resume streaming. To pause streaming, complete the input stream without sending the `MedicalScribeSessionControlEvent`. To resume streaming, call the `StartMedicalScribeStream` and specify the same SessionId you used to start the stream.
+
+        The following parameters are required:
+
+          * `language-code`
+
+          * `media-encoding`
+
+          * `media-sample-rate-hertz`
+
+        For more information on streaming with Amazon Web Services HealthScribe, see [Amazon Web Services HealthScribe](https://docs.aws.amazon.com/transcribe/latest/dg/health-scribe-streaming.html).
+      parameters:
+      - name: x-amzn-transcribe-session-id
+        in: header
+        required: false
+        schema:
+          $ref: '#/components/schemas/SessionId'
+      - name: x-amzn-transcribe-language-code
+        in: header
+        required: true
+        schema:
+          $ref: '#/components/schemas/MedicalScribeLanguageCode'
+      - name: x-amzn-transcribe-sample-rate
+        in: header
+        required: true
+        schema:
+          $ref: '#/components/schemas/MedicalScribeMediaSampleRateHertz'
+      - name: x-amzn-transcribe-media-encoding
+        in: header
+        required: true
+        schema:
+          $ref: '#/components/schemas/MedicalScribeMediaEncoding'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                InputStream:
+                  $ref: '#/components/schemas/MedicalScribeInputStream'
+      responses:
+        '200': {}
+        '400':
+          description: |-
+            One or more arguments to the `StartStreamTranscription`, `StartMedicalStreamTranscription`, or `StartCallAnalyticsStreamTranscription` operation was not valid. For example, `MediaEncoding` or `LanguageCode` used unsupported values. Check the specified parameters and try your request again.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequestException'
+        '409':
+          description: |-
+            A new stream started with the same session ID. The current stream has been terminated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConflictException'
+        '500':
+          description: |-
+            A problem occurred while processing the audio. Amazon Transcribe terminated processing.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalFailureException'
+        '429':
+          description: |-
+            Your client has exceeded one of the Amazon Transcribe limits. This is typically the audio length limit. Break your audio stream into smaller chunks and try your request again.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LimitExceededException'
+        '503':
+          description: |-
+            The service is currently unavailable. Try your request later.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServiceUnavailableException'
+  /medical-stream-transcription:
+    post:
+      operationId: StartMedicalStreamTranscription
+      description: |-
+        Starts a bidirectional HTTP/2 or WebSocket stream where audio is streamed to Amazon Transcribe Medical and the transcription results are streamed to your application.
+
+        The following parameters are required:
+
+          * `language-code`
+
+          * `media-encoding`
+
+          * `sample-rate`
+
+        For more information on streaming with Amazon Transcribe Medical, see [Transcribing streaming audio](https://docs.aws.amazon.com/transcribe/latest/dg/streaming.html).
+      parameters:
+      - name: x-amzn-transcribe-language-code
+        in: header
+        required: true
+        schema:
+          $ref: '#/components/schemas/LanguageCode'
+      - name: x-amzn-transcribe-sample-rate
+        in: header
+        required: true
+        schema:
+          $ref: '#/components/schemas/MediaSampleRateHertz'
+      - name: x-amzn-transcribe-media-encoding
+        in: header
+        required: true
+        schema:
+          $ref: '#/components/schemas/MediaEncoding'
+      - name: x-amzn-transcribe-vocabulary-name
+        in: header
+        required: false
+        schema:
+          $ref: '#/components/schemas/VocabularyName'
+      - name: x-amzn-transcribe-specialty
+        in: header
+        required: true
+        schema:
+          $ref: '#/components/schemas/Specialty'
+      - name: x-amzn-transcribe-type
+        in: header
+        required: true
+        schema:
+          $ref: '#/components/schemas/Type'
+      - name: x-amzn-transcribe-show-speaker-label
+        in: header
+        required: false
+        schema:
+          $ref: '#/components/schemas/Boolean'
+      - name: x-amzn-transcribe-session-id
+        in: header
+        required: false
+        schema:
+          $ref: '#/components/schemas/SessionId'
+      - name: x-amzn-transcribe-enable-channel-identification
+        in: header
+        required: false
+        schema:
+          $ref: '#/components/schemas/Boolean'
+      - name: x-amzn-transcribe-number-of-channels
+        in: header
+        required: false
+        schema:
+          $ref: '#/components/schemas/NumberOfChannels'
+      - name: x-amzn-transcribe-content-identification-type
+        in: header
+        required: false
+        schema:
+          $ref: '#/components/schemas/MedicalContentIdentificationType'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                AudioStream:
+                  $ref: '#/components/schemas/AudioStream'
+      responses:
+        '200': {}
+        '400':
+          description: |-
+            One or more arguments to the `StartStreamTranscription`, `StartMedicalStreamTranscription`, or `StartCallAnalyticsStreamTranscription` operation was not valid. For example, `MediaEncoding` or `LanguageCode` used unsupported values. Check the specified parameters and try your request again.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequestException'
+        '409':
+          description: |-
+            A new stream started with the same session ID. The current stream has been terminated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConflictException'
+        '500':
+          description: |-
+            A problem occurred while processing the audio. Amazon Transcribe terminated processing.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalFailureException'
+        '429':
+          description: |-
+            Your client has exceeded one of the Amazon Transcribe limits. This is typically the audio length limit. Break your audio stream into smaller chunks and try your request again.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LimitExceededException'
+        '503':
+          description: |-
+            The service is currently unavailable. Try your request later.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServiceUnavailableException'
+  /stream-transcription:
+    post:
+      operationId: StartStreamTranscription
+      description: |-
+        Starts a bidirectional HTTP/2 or WebSocket stream where audio is streamed to Amazon Transcribe and the transcription results are streamed to your application.
+
+        The following parameters are required:
+
+          * `language-code` or `identify-language` or `identify-multiple-language`
+
+          * `media-encoding`
+
+          * `sample-rate`
+
+        For more information on streaming with Amazon Transcribe, see [Transcribing streaming audio](https://docs.aws.amazon.com/transcribe/latest/dg/streaming.html).
+      parameters:
+      - name: x-amzn-transcribe-language-code
+        in: header
+        required: false
+        schema:
+          $ref: '#/components/schemas/LanguageCode'
+      - name: x-amzn-transcribe-sample-rate
+        in: header
+        required: true
+        schema:
+          $ref: '#/components/schemas/MediaSampleRateHertz'
+      - name: x-amzn-transcribe-media-encoding
+        in: header
+        required: true
+        schema:
+          $ref: '#/components/schemas/MediaEncoding'
+      - name: x-amzn-transcribe-vocabulary-name
+        in: header
+        required: false
+        schema:
+          $ref: '#/components/schemas/VocabularyName'
+      - name: x-amzn-transcribe-session-id
+        in: header
+        required: false
+        schema:
+          $ref: '#/components/schemas/SessionId'
+      - name: x-amzn-transcribe-vocabulary-filter-name
+        in: header
+        required: false
+        schema:
+          $ref: '#/components/schemas/VocabularyFilterName'
+      - name: x-amzn-transcribe-vocabulary-filter-method
+        in: header
+        required: false
+        schema:
+          $ref: '#/components/schemas/VocabularyFilterMethod'
+      - name: x-amzn-transcribe-show-speaker-label
+        in: header
+        required: false
+        schema:
+          $ref: '#/components/schemas/Boolean'
+      - name: x-amzn-transcribe-enable-channel-identification
+        in: header
+        required: false
+        schema:
+          $ref: '#/components/schemas/Boolean'
+      - name: x-amzn-transcribe-number-of-channels
+        in: header
+        required: false
+        schema:
+          $ref: '#/components/schemas/NumberOfChannels'
+      - name: x-amzn-transcribe-enable-partial-results-stabilization
+        in: header
+        required: false
+        schema:
+          $ref: '#/components/schemas/Boolean'
+      - name: x-amzn-transcribe-partial-results-stability
+        in: header
+        required: false
+        schema:
+          $ref: '#/components/schemas/PartialResultsStability'
+      - name: x-amzn-transcribe-content-identification-type
+        in: header
+        required: false
+        schema:
+          $ref: '#/components/schemas/ContentIdentificationType'
+      - name: x-amzn-transcribe-content-redaction-type
+        in: header
+        required: false
+        schema:
+          $ref: '#/components/schemas/ContentRedactionType'
+      - name: x-amzn-transcribe-pii-entity-types
+        in: header
+        required: false
+        schema:
+          $ref: '#/components/schemas/PiiEntityTypes'
+      - name: x-amzn-transcribe-language-model-name
+        in: header
+        required: false
+        schema:
+          $ref: '#/components/schemas/ModelName'
+      - name: x-amzn-transcribe-identify-language
+        in: header
+        required: false
+        schema:
+          $ref: '#/components/schemas/Boolean'
+      - name: x-amzn-transcribe-language-options
+        in: header
+        required: false
+        schema:
+          $ref: '#/components/schemas/LanguageOptions'
+      - name: x-amzn-transcribe-preferred-language
+        in: header
+        required: false
+        schema:
+          $ref: '#/components/schemas/LanguageCode'
+      - name: x-amzn-transcribe-identify-multiple-languages
+        in: header
+        required: false
+        schema:
+          $ref: '#/components/schemas/Boolean'
+      - name: x-amzn-transcribe-vocabulary-names
+        in: header
+        required: false
+        schema:
+          $ref: '#/components/schemas/VocabularyNames'
+      - name: x-amzn-transcribe-vocabulary-filter-names
+        in: header
+        required: false
+        schema:
+          $ref: '#/components/schemas/VocabularyFilterNames'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                AudioStream:
+                  $ref: '#/components/schemas/AudioStream'
+      responses:
+        '200': {}
+        '400':
+          description: |-
+            One or more arguments to the `StartStreamTranscription`, `StartMedicalStreamTranscription`, or `StartCallAnalyticsStreamTranscription` operation was not valid. For example, `MediaEncoding` or `LanguageCode` used unsupported values. Check the specified parameters and try your request again.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequestException'
+        '409':
+          description: |-
+            A new stream started with the same session ID. The current stream has been terminated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConflictException'
+        '500':
+          description: |-
+            A problem occurred while processing the audio. Amazon Transcribe terminated processing.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalFailureException'
+        '429':
+          description: |-
+            Your client has exceeded one of the Amazon Transcribe limits. This is typically the audio length limit. Break your audio stream into smaller chunks and try your request again.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LimitExceededException'
+        '503':
+          description: |-
+            The service is currently unavailable. Try your request later.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServiceUnavailableException'
 components:
   schemas:
+    Alternative:
+      type: object
+      properties:
+        Transcript:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: Contains transcribed text.
+        Items:
+          allOf:
+          - $ref: '#/components/schemas/ItemList'
+          description: Contains words, phrases, or punctuation marks in your transcription
+            output.
+        Entities:
+          allOf:
+          - $ref: '#/components/schemas/EntityList'
+          description: Contains entities identified as personally identifiable information
+            (PII) in your transcription output.
+      description: A list of possible alternative transcriptions for the input audio.
+        Each alternative may contain one or more of `Items`, `Entities`, or `Transcript`.
     AlternativeList:
       type: array
       items:
@@ -61,6 +625,35 @@ components:
     AudioChunk:
       type: string
       format: byte
+    AudioEvent:
+      type: object
+      properties:
+        AudioChunk:
+          allOf:
+          - $ref: '#/components/schemas/AudioChunk'
+          description: 'An audio blob containing the next segment of audio from your
+            application, with a maximum duration of 1 second. The maximum size in
+            bytes varies based on audio properties.
+
+
+            Find recommended size in [Transcribing streaming best practices](https://docs.aws.amazon.com/transcribe/latest/dg/streaming.html#best-practices).
+
+
+            Size calculation: `Duration (s) * Sample Rate (Hz) * Number of Channels
+            * 2 (Bytes per Sample)`
+
+
+            For example, a 1-second chunk of 16 kHz, 2-channel, 16-bit audio would
+            be `1 * 16000 * 2 * 2 = 64000 bytes`.
+
+
+            For 8 kHz, 1-channel, 16-bit audio, a 1-second chunk would be `1 * 8000
+            * 1 * 2 = 16000 bytes`.'
+      description: 'A wrapper for your audio chunks. Your audio stream consists of
+        one or more audio events, which consist of one or more audio chunks.
+
+
+        For more information, see [Event stream encoding](https://docs.aws.amazon.com/transcribe/latest/dg/event-stream.html).'
     AudioStream:
       allOf:
       - allOf:
@@ -77,6 +670,15 @@ components:
         An encoded stream of audio blobs. Audio streams are encoded as either HTTP/2 or WebSocket data frames.
 
         For more information, see [Transcribing streaming audio](https://docs.aws.amazon.com/transcribe/latest/dg/streaming.html).
+    BadRequestException:
+      type: object
+      properties:
+        Message:
+          $ref: '#/components/schemas/String'
+      description: One or more arguments to the `StartStreamTranscription`, `StartMedicalStreamTranscription`,
+        or `StartCallAnalyticsStreamTranscription` operation was not valid. For example,
+        `MediaEncoding` or `LanguageCode` used unsupported values. Check the specified
+        parameters and try your request again.
     Boolean:
       type: boolean
       default: false
@@ -85,10 +687,96 @@ components:
       pattern: ^[a-z0-9][\.\-a-z0-9]{1,61}[a-z0-9]$
       minLength: 0
       maxLength: 64
+    CallAnalyticsEntity:
+      type: object
+      properties:
+        BeginOffsetMillis:
+          allOf:
+          - $ref: '#/components/schemas/Long'
+          description: The time, in milliseconds, from the beginning of the audio
+            stream to the start of the identified entity.
+        EndOffsetMillis:
+          allOf:
+          - $ref: '#/components/schemas/Long'
+          description: The time, in milliseconds, from the beginning of the audio
+            stream to the end of the identified entity.
+        Category:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The category of information identified. For example, `PII`.
+        Type:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The type of PII identified. For example, `NAME` or `CREDIT_DEBIT_NUMBER`.
+        Content:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The word or words that represent the identified entity.
+        Confidence:
+          allOf:
+          - $ref: '#/components/schemas/Confidence'
+          description: 'The confidence score associated with the identification of
+            an entity in your transcript.
+
+
+            Confidence scores are values between 0 and 1. A larger value indicates
+            a higher probability that the identified entity correctly matches the
+            entity spoken in your media.'
+      description: Contains entities identified as personally identifiable information
+        (PII) in your transcription output, along with various associated attributes.
+        Examples include category, confidence score, content, type, and start and
+        end times.
     CallAnalyticsEntityList:
       type: array
       items:
         $ref: '#/components/schemas/CallAnalyticsEntity'
+    CallAnalyticsItem:
+      type: object
+      properties:
+        BeginOffsetMillis:
+          allOf:
+          - $ref: '#/components/schemas/Long'
+          description: The time, in milliseconds, from the beginning of the audio
+            stream to the start of the identified item.
+        EndOffsetMillis:
+          allOf:
+          - $ref: '#/components/schemas/Long'
+          description: The time, in milliseconds, from the beginning of the audio
+            stream to the end of the identified item.
+        Type:
+          allOf:
+          - $ref: '#/components/schemas/ItemType'
+          description: 'The type of item identified. Options are: `PRONUNCIATION`
+            (spoken words) and `PUNCTUATION`.'
+        Content:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The word or punctuation that was transcribed.
+        Confidence:
+          allOf:
+          - $ref: '#/components/schemas/Confidence'
+          description: 'The confidence score associated with a word or phrase in your
+            transcript.
+
+
+            Confidence scores are values between 0 and 1. A larger value indicates
+            a higher probability that the identified item correctly matches the item
+            spoken in your media.'
+        VocabularyFilterMatch:
+          allOf:
+          - $ref: '#/components/schemas/Boolean'
+          description: Indicates whether the specified item matches a word in the
+            vocabulary filter included in your Call Analytics request. If `true`,
+            there is a vocabulary filter match.
+        Stable:
+          allOf:
+          - $ref: '#/components/schemas/Stable'
+          description: If partial result stabilization is enabled, `Stable` indicates
+            whether the specified item is stable (`true`) or if it may change when
+            the segment is complete (`false`).
+      description: A word, phrase, or punctuation mark in your Call Analytics transcription
+        output, along with various associated attributes, such as confidence score,
+        type, and start and end times.
     CallAnalyticsItemList:
       type: array
       items:
@@ -127,6 +815,40 @@ components:
         - $ref: '#/components/schemas/ServiceUnavailableException'
       description: |-
         Contains detailed information about your real-time Call Analytics session. These details are provided in the `UtteranceEvent` and `CategoryEvent` objects.
+    CategoryEvent:
+      type: object
+      properties:
+        MatchedCategories:
+          allOf:
+          - $ref: '#/components/schemas/StringList'
+          description: Lists the categories that were matched in your audio segment.
+        MatchedDetails:
+          allOf:
+          - $ref: '#/components/schemas/MatchedCategoryDetails'
+          description: Contains information about the matched categories, including
+            category names and timestamps.
+      description: Provides information on any `TranscriptFilterType` categories that
+        matched your transcription output. Matches are identified for each segment
+        upon completion of that segment.
+    ChannelDefinition:
+      type: object
+      properties:
+        ChannelId:
+          allOf:
+          - $ref: '#/components/schemas/ChannelId'
+          description: Specify the audio channel you want to define.
+        ParticipantRole:
+          allOf:
+          - $ref: '#/components/schemas/ParticipantRole'
+          description: Specify the speaker you want to define. Omitting this parameter
+            is equivalent to specifying both participants.
+      required:
+      - ChannelId
+      - ParticipantRole
+      description: Makes it possible to specify which speaker is on which audio channel.
+        For example, if your agent is the first participant to speak, you would set
+        `ChannelId` to `0` (to indicate the first channel) and `ParticipantRole` to
+        `AGENT` (to indicate that it's the agent speaking).
     ChannelDefinitions:
       type: array
       items:
@@ -136,6 +858,88 @@ components:
       default: 0
       minimum: 0
       maximum: 1
+    CharacterOffsets:
+      type: object
+      properties:
+        Begin:
+          allOf:
+          - $ref: '#/components/schemas/Integer'
+          description: Provides the character count of the first character where a
+            match is identified. For example, the first character associated with
+            an issue or a category match in a segment transcript.
+        End:
+          allOf:
+          - $ref: '#/components/schemas/Integer'
+          description: Provides the character count of the last character where a
+            match is identified. For example, the last character associated with an
+            issue or a category match in a segment transcript.
+      description: Provides the location, using character count, in your transcript
+        where a match is identified. For example, the location of an issue or a category
+        match within a segment.
+    ClinicalNoteGenerationResult:
+      type: object
+      properties:
+        ClinicalNoteOutputLocation:
+          allOf:
+          - $ref: '#/components/schemas/Uri'
+          description: Holds the Amazon S3 URI for the output Clinical Note.
+        TranscriptOutputLocation:
+          allOf:
+          - $ref: '#/components/schemas/Uri'
+          description: Holds the Amazon S3 URI for the output Transcript.
+        Status:
+          allOf:
+          - $ref: '#/components/schemas/ClinicalNoteGenerationStatus'
+          description: "The status of the clinical note generation.\n\nPossible Values:\n\
+            \n  * `IN_PROGRESS`\n\n  * `FAILED`\n\n  * `COMPLETED`\n\nAfter audio\
+            \ streaming finishes, and you send a `MedicalScribeSessionControlEvent`\
+            \ event (with END_OF_SESSION as the Type), the status is set to `IN_PROGRESS`.\
+            \ If the status is `COMPLETED`, the analytics completed successfully,\
+            \ and you can find the results at the locations specified in `ClinicalNoteOutputLocation`\
+            \ and `TranscriptOutputLocation`. If the status is `FAILED`, `FailureReason`\
+            \ provides details about the failure."
+        FailureReason:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: If `ClinicalNoteGenerationResult` is `FAILED`, information
+            about why it failed.
+      description: The details for clinical note generation, including status, and
+        output locations for clinical note and aggregated transcript if the analytics
+        completed, or failure reason if the analytics failed.
+    ClinicalNoteGenerationSettings:
+      type: object
+      properties:
+        OutputBucketName:
+          allOf:
+          - $ref: '#/components/schemas/BucketName'
+          description: 'The name of the Amazon S3 bucket where you want the output
+            of Amazon Web Services HealthScribe post-stream analytics stored. Don''t
+            include the `S3://` prefix of the specified bucket.
+
+
+            HealthScribe outputs transcript and clinical note files under the prefix:
+            `S3://$output-bucket-name/healthscribe-streaming/session-id/post-stream-analytics/clinical-notes`
+
+
+            The role `ResourceAccessRoleArn` specified in the `MedicalScribeConfigurationEvent`
+            must have permission to use the specified location. You can change Amazon
+            S3 permissions using the [ Amazon Web Services Management Console ](https://console.aws.amazon.com/s3).
+            See also [Permissions Required for IAM User Roles ](https://docs.aws.amazon.com/transcribe/latest/dg/security_iam_id-based-policy-examples.html#auth-role-iam-user)
+            .'
+        NoteTemplate:
+          allOf:
+          - $ref: '#/components/schemas/MedicalScribeNoteTemplate'
+          description: "Specify one of the following templates to use for the clinical\
+            \ note summary. The default is `HISTORY_AND_PHYSICAL`.\n\n  * HISTORY_AND_PHYSICAL:\
+            \ Provides summaries for key sections of the clinical documentation. Sections\
+            \ include Chief Complaint, History of Present Illness, Review of Systems,\
+            \ Past Medical History, Assessment, and Plan.\n\n  * GIRPP: Provides summaries\
+            \ based on the patients progress toward goals. Sections include Goal,\
+            \ Intervention, Response, Progress, and Plan."
+      required:
+      - OutputBucketName
+      description: The output configuration for aggregated transcript and clinical
+        note generation.
     ClinicalNoteGenerationStatus:
       type: string
       enum:
@@ -145,6 +949,33 @@ components:
     Confidence:
       type: number
       format: double
+    ConfigurationEvent:
+      type: object
+      properties:
+        ChannelDefinitions:
+          allOf:
+          - $ref: '#/components/schemas/ChannelDefinitions'
+          description: Indicates which speaker is on which audio channel.
+        PostCallAnalyticsSettings:
+          allOf:
+          - $ref: '#/components/schemas/PostCallAnalyticsSettings'
+          description: 'Provides additional optional settings for your Call Analytics
+            post-call request, including encryption and output locations for your
+            redacted transcript.
+
+
+            `PostCallAnalyticsSettings` provides you with the same insights as a Call
+            Analytics post-call transcription. Refer to [Post-call analytics](https://docs.aws.amazon.com/transcribe/latest/dg/tca-post-call.html)
+            for more information on this feature.'
+      description: Allows you to set audio channel definitions and post-call analytics
+        settings.
+    ConflictException:
+      type: object
+      properties:
+        Message:
+          $ref: '#/components/schemas/String'
+      description: A new stream started with the same session ID. The current stream
+        has been terminated.
     ContentIdentificationType:
       type: string
       enum:
@@ -165,10 +996,67 @@ components:
       type: number
       format: double
       default: 0
+    Entity:
+      type: object
+      properties:
+        StartTime:
+          allOf:
+          - $ref: '#/components/schemas/Double'
+          description: The start time, in milliseconds, of the utterance that was
+            identified as PII.
+        EndTime:
+          allOf:
+          - $ref: '#/components/schemas/Double'
+          description: The end time, in milliseconds, of the utterance that was identified
+            as PII.
+        Category:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The category of information identified. The only category is
+            `PII`.
+        Type:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The type of PII identified. For example, `NAME` or `CREDIT_DEBIT_NUMBER`.
+        Content:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The word or words identified as PII.
+        Confidence:
+          allOf:
+          - $ref: '#/components/schemas/Confidence'
+          description: 'The confidence score associated with the identified PII entity
+            in your audio.
+
+
+            Confidence scores are values between 0 and 1. A larger value indicates
+            a higher probability that the identified entity correctly matches the
+            entity spoken in your media.'
+      description: Contains entities identified as personally identifiable information
+        (PII) in your transcription output, along with various associated attributes.
+        Examples include category, confidence score, type, stability score, and start
+        and end times.
     EntityList:
       type: array
       items:
         $ref: '#/components/schemas/Entity'
+    GetMedicalScribeStreamRequest:
+      type: object
+      properties:
+        SessionId:
+          allOf:
+          - $ref: '#/components/schemas/SessionId'
+          description: The identifier of the HealthScribe streaming session you want
+            information about.
+      required:
+      - SessionId
+    GetMedicalScribeStreamResponse:
+      type: object
+      properties:
+        MedicalScribeStreamDetails:
+          allOf:
+          - $ref: '#/components/schemas/MedicalScribeStreamDetails'
+          description: Provides details about a HealthScribe streaming session.
     IamRoleArn:
       type: string
       pattern: ^arn:(aws|aws-cn|aws-us-gov|aws-iso-{0,1}[a-z]{0,1}):iam::[0-9]{0,63}:role/[A-Za-z0-9:_/+=,@.-]{0,1024}$
@@ -176,10 +1064,76 @@ components:
       maxLength: 2048
     Integer:
       type: integer
+    InternalFailureException:
+      type: object
+      properties:
+        Message:
+          $ref: '#/components/schemas/String'
+      description: A problem occurred while processing the audio. Amazon Transcribe
+        terminated processing.
+    IssueDetected:
+      type: object
+      properties:
+        CharacterOffsets:
+          allOf:
+          - $ref: '#/components/schemas/CharacterOffsets'
+          description: Provides the timestamps that identify when in an audio segment
+            the specified issue occurs.
+      description: Lists the issues that were identified in your audio segment.
     IssuesDetected:
       type: array
       items:
         $ref: '#/components/schemas/IssueDetected'
+    Item:
+      type: object
+      properties:
+        StartTime:
+          allOf:
+          - $ref: '#/components/schemas/Double'
+          description: The start time, in milliseconds, of the transcribed item.
+        EndTime:
+          allOf:
+          - $ref: '#/components/schemas/Double'
+          description: The end time, in milliseconds, of the transcribed item.
+        Type:
+          allOf:
+          - $ref: '#/components/schemas/ItemType'
+          description: 'The type of item identified. Options are: `PRONUNCIATION`
+            (spoken words) and `PUNCTUATION`.'
+        Content:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The word or punctuation that was transcribed.
+        VocabularyFilterMatch:
+          allOf:
+          - $ref: '#/components/schemas/Boolean'
+          description: Indicates whether the specified item matches a word in the
+            vocabulary filter included in your request. If `true`, there is a vocabulary
+            filter match.
+        Speaker:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: If speaker partitioning is enabled, `Speaker` labels the speaker
+            of the specified item.
+        Confidence:
+          allOf:
+          - $ref: '#/components/schemas/Confidence'
+          description: 'The confidence score associated with a word or phrase in your
+            transcript.
+
+
+            Confidence scores are values between 0 and 1. A larger value indicates
+            a higher probability that the identified item correctly matches the item
+            spoken in your media.'
+        Stable:
+          allOf:
+          - $ref: '#/components/schemas/Stable'
+          description: If partial result stabilization is enabled, `Stable` indicates
+            whether the specified item is stable (`true`) or if it may change when
+            the segment is complete (`false`).
+      description: A word, phrase, or punctuation mark in your transcription output,
+        along with various associated attributes, such as confidence score, type,
+        and start and end times.
     ItemList:
       type: array
       items:
@@ -264,6 +1218,31 @@ components:
       pattern: ^[a-zA-Z-,]+$
       minLength: 1
       maxLength: 200
+    LanguageWithScore:
+      type: object
+      properties:
+        LanguageCode:
+          allOf:
+          - $ref: '#/components/schemas/LanguageCode'
+          description: The language code of the identified language.
+        Score:
+          allOf:
+          - $ref: '#/components/schemas/Double'
+          description: The confidence score associated with the identified language
+            code. Confidence scores are values between zero and one; larger values
+            indicate a higher confidence in the identified language.
+      description: The language code that represents the language identified in your
+        audio, including the associated confidence score. If you enabled channel identification
+        in your request and each channel contained a different language, you will
+        have more than one `LanguageWithScore` result.
+    LimitExceededException:
+      type: object
+      properties:
+        Message:
+          $ref: '#/components/schemas/String'
+      description: Your client has exceeded one of the Amazon Transcribe limits. This
+        is typically the audio length limit. Break your audio stream into smaller
+        chunks and try your request again.
     Long:
       type: integer
       format: int64
@@ -281,6 +1260,25 @@ components:
       type: integer
       minimum: 8000
       maximum: 48000
+    MedicalAlternative:
+      type: object
+      properties:
+        Transcript:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: Contains transcribed text.
+        Items:
+          allOf:
+          - $ref: '#/components/schemas/MedicalItemList'
+          description: Contains words, phrases, or punctuation marks in your transcription
+            output.
+        Entities:
+          allOf:
+          - $ref: '#/components/schemas/MedicalEntityList'
+          description: Contains entities identified as personal health information
+            (PHI) in your transcription output.
+      description: A list of possible alternative transcriptions for the input audio.
+        Each alternative may contain one or more of `Items`, `Entities`, or `Transcript`.
     MedicalAlternativeList:
       type: array
       items:
@@ -289,18 +1287,190 @@ components:
       type: string
       enum:
       - PHI
+    MedicalEntity:
+      type: object
+      properties:
+        StartTime:
+          allOf:
+          - $ref: '#/components/schemas/Double'
+          description: The start time, in milliseconds, of the utterance that was
+            identified as PHI.
+        EndTime:
+          allOf:
+          - $ref: '#/components/schemas/Double'
+          description: The end time, in milliseconds, of the utterance that was identified
+            as PHI.
+        Category:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The category of information identified. The only category is
+            `PHI`.
+        Content:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The word or words identified as PHI.
+        Confidence:
+          allOf:
+          - $ref: '#/components/schemas/Confidence'
+          description: 'The confidence score associated with the identified PHI entity
+            in your audio.
+
+
+            Confidence scores are values between 0 and 1. A larger value indicates
+            a higher probability that the identified entity correctly matches the
+            entity spoken in your media.'
+      description: Contains entities identified as personal health information (PHI)
+        in your transcription output, along with various associated attributes. Examples
+        include category, confidence score, type, stability score, and start and end
+        times.
     MedicalEntityList:
       type: array
       items:
         $ref: '#/components/schemas/MedicalEntity'
+    MedicalItem:
+      type: object
+      properties:
+        StartTime:
+          allOf:
+          - $ref: '#/components/schemas/Double'
+          description: The start time, in milliseconds, of the transcribed item.
+        EndTime:
+          allOf:
+          - $ref: '#/components/schemas/Double'
+          description: The end time, in milliseconds, of the transcribed item.
+        Type:
+          allOf:
+          - $ref: '#/components/schemas/ItemType'
+          description: 'The type of item identified. Options are: `PRONUNCIATION`
+            (spoken words) and `PUNCTUATION`.'
+        Content:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The word or punctuation that was transcribed.
+        Confidence:
+          allOf:
+          - $ref: '#/components/schemas/Confidence'
+          description: 'The confidence score associated with a word or phrase in your
+            transcript.
+
+
+            Confidence scores are values between 0 and 1. A larger value indicates
+            a higher probability that the identified item correctly matches the item
+            spoken in your media.'
+        Speaker:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: If speaker partitioning is enabled, `Speaker` labels the speaker
+            of the specified item.
+      description: A word, phrase, or punctuation mark in your transcription output,
+        along with various associated attributes, such as confidence score, type,
+        and start and end times.
     MedicalItemList:
       type: array
       items:
         $ref: '#/components/schemas/MedicalItem'
+    MedicalResult:
+      type: object
+      properties:
+        ResultId:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: Provides a unique identifier for the `Result`.
+        StartTime:
+          allOf:
+          - $ref: '#/components/schemas/Double'
+          description: The start time, in milliseconds, of the `Result`.
+        EndTime:
+          allOf:
+          - $ref: '#/components/schemas/Double'
+          description: The end time, in milliseconds, of the `Result`.
+        IsPartial:
+          allOf:
+          - $ref: '#/components/schemas/Boolean'
+          description: 'Indicates if the segment is complete.
+
+
+            If `IsPartial` is `true`, the segment is not complete. If `IsPartial`
+            is `false`, the segment is complete.'
+        Alternatives:
+          allOf:
+          - $ref: '#/components/schemas/MedicalAlternativeList'
+          description: A list of possible alternative transcriptions for the input
+            audio. Each alternative may contain one or more of `Items`, `Entities`,
+            or `Transcript`.
+        ChannelId:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: Indicates the channel identified for the `Result`.
+      description: 'The `Result` associated with a ``.
+
+
+        Contains a set of transcription results from one or more audio segments, along
+        with additional information per your request parameters. This can include
+        information relating to alternative transcriptions, channel identification,
+        partial result stabilization, language identification, and other transcription-related
+        data.'
     MedicalResultList:
       type: array
       items:
         $ref: '#/components/schemas/MedicalResult'
+    MedicalScribeAudioEvent:
+      type: object
+      properties:
+        AudioChunk:
+          allOf:
+          - $ref: '#/components/schemas/AudioChunk'
+          description: 'An audio blob containing the next segment of audio from your
+            application, with a maximum duration of 1 second. The maximum size in
+            bytes varies based on audio properties.
+
+
+            Find recommended size in [Transcribing streaming best practices](https://docs.aws.amazon.com/transcribe/latest/dg/streaming.html#best-practices).
+
+
+            Size calculation: `Duration (s) * Sample Rate (Hz) * Number of Channels
+            * 2 (Bytes per Sample)`
+
+
+            For example, a 1-second chunk of 16 kHz, 2-channel, 16-bit audio would
+            be `1 * 16000 * 2 * 2 = 64000 bytes`.
+
+
+            For 8 kHz, 1-channel, 16-bit audio, a 1-second chunk would be `1 * 8000
+            * 1 * 2 = 16000 bytes`.'
+      required:
+      - AudioChunk
+      description: 'A wrapper for your audio chunks
+
+
+        For more information, see [Event stream encoding](https://docs.aws.amazon.com/transcribe/latest/dg/event-stream.html).'
+    MedicalScribeChannelDefinition:
+      type: object
+      properties:
+        ChannelId:
+          allOf:
+          - $ref: '#/components/schemas/MedicalScribeChannelId'
+          description: Specify the audio channel you want to define.
+        ParticipantRole:
+          allOf:
+          - $ref: '#/components/schemas/MedicalScribeParticipantRole'
+          description: Specify the participant that you want to flag. The allowed
+            options are `CLINICIAN` and `PATIENT`.
+      required:
+      - ChannelId
+      - ParticipantRole
+      description: 'Makes it possible to specify which speaker is on which channel.
+        For example, if the clinician is the first participant to speak, you would
+        set the `ChannelId` of the first `ChannelDefinition` in the list to `0` (to
+        indicate the first channel) and `ParticipantRole` to `CLINICIAN` (to indicate
+        that it''s the clinician speaking). Then you would set the `ChannelId` of
+        the second `ChannelDefinition` in the list to `1` (to indicate the second
+        channel) and `ParticipantRole` to `PATIENT` (to indicate that it''s the patient
+        speaking).
+
+
+        If you don''t specify a channel definition, HealthScribe will diarize the
+        transcription and identify speaker roles for each speaker.'
     MedicalScribeChannelDefinitions:
       type: array
       items:
@@ -310,6 +1480,115 @@ components:
       default: 0
       minimum: 0
       maximum: 1
+    MedicalScribeConfigurationEvent:
+      type: object
+      properties:
+        VocabularyName:
+          allOf:
+          - $ref: '#/components/schemas/VocabularyName'
+          description: Specify the name of the custom vocabulary you want to use for
+            your streaming session. Custom vocabulary names are case-sensitive.
+        VocabularyFilterName:
+          allOf:
+          - $ref: '#/components/schemas/VocabularyFilterName'
+          description: 'Specify the name of the custom vocabulary filter you want
+            to include in your streaming session. Custom vocabulary filter names are
+            case-sensitive.
+
+
+            If you include `VocabularyFilterName` in the `MedicalScribeConfigurationEvent`,
+            you must also include `VocabularyFilterMethod`.'
+        VocabularyFilterMethod:
+          allOf:
+          - $ref: '#/components/schemas/MedicalScribeVocabularyFilterMethod'
+          description: 'Specify how you want your custom vocabulary filter applied
+            to the streaming session.
+
+
+            To replace words with `***`, specify `mask`.
+
+
+            To delete words, specify `remove`.
+
+
+            To flag words without changing them, specify `tag`.'
+        ResourceAccessRoleArn:
+          allOf:
+          - $ref: '#/components/schemas/IamRoleArn'
+          description: 'The Amazon Resource Name (ARN) of an IAM role that has permissions
+            to access the Amazon S3 output bucket you specified, and use your KMS
+            key if supplied. If the role that you specify doesn’t have the appropriate
+            permissions, your request fails.
+
+
+            IAM role ARNs have the format `arn:partition:iam::account:role/role-name-with-path`.
+            For example: `arn:aws:iam::111122223333:role/Admin`.
+
+
+            For more information, see [Amazon Web Services HealthScribe](https://docs.aws.amazon.com/transcribe/latest/dg/health-scribe-streaming.html).'
+        ChannelDefinitions:
+          allOf:
+          - $ref: '#/components/schemas/MedicalScribeChannelDefinitions'
+          description: Specify which speaker is on which audio channel.
+        EncryptionSettings:
+          allOf:
+          - $ref: '#/components/schemas/MedicalScribeEncryptionSettings'
+          description: Specify the encryption settings for your streaming session.
+        PostStreamAnalyticsSettings:
+          allOf:
+          - $ref: '#/components/schemas/MedicalScribePostStreamAnalyticsSettings'
+          description: Specify settings for post-stream analytics.
+      required:
+      - ResourceAccessRoleArn
+      - PostStreamAnalyticsSettings
+      description: 'Specify details to configure the streaming session, including
+        channel definitions, encryption settings, post-stream analytics settings,
+        resource access role ARN and vocabulary settings.
+
+
+        Whether you are starting a new session or resuming an existing session, your
+        first event must be a `MedicalScribeConfigurationEvent`. If you are resuming
+        a session, then this event must have the same configurations that you provided
+        to start the session.'
+    MedicalScribeEncryptionSettings:
+      type: object
+      properties:
+        KmsEncryptionContext:
+          allOf:
+          - $ref: '#/components/schemas/KMSEncryptionContextMap'
+          description: A map of plain text, non-secret key:value pairs, known as encryption
+            context pairs, that provide an added layer of security for your data.
+            For more information, see [KMSencryption context ](https://docs.aws.amazon.com/transcribe/latest/dg/key-management.html#kms-context)
+            and [Asymmetric keys in KMS ](https://docs.aws.amazon.com/transcribe/latest/dg/symmetric-asymmetric.html).
+        KmsKeyId:
+          allOf:
+          - $ref: '#/components/schemas/KMSKeyId'
+          description: "The ID of the KMS key you want to use for your streaming session.\
+            \ You can specify its KMS key ID, key Amazon Resource Name (ARN), alias\
+            \ name, or alias ARN. When using an alias name, prefix it with `\"alias/\"\
+            `. To specify a KMS key in a different Amazon Web Services account, you\
+            \ must use the key ARN or alias ARN.\n\nFor example:\n\n  * Key ID: 1234abcd-12ab-34cd-56ef-1234567890ab\n\
+            \n  * Key ARN: arn:aws:kms:us-east-2:111122223333:key/1234abcd-12ab-34cd-56ef-1234567890ab\n\
+            \n  * Alias name: alias/ExampleAlias\n\n  * Alias ARN: arn:aws:kms:us-east-2:111122223333:alias/ExampleAlias\
+            \ \n\nTo get the key ID and key ARN for a KMS key, use the [ListKeys](https://docs.aws.amazon.com/kms/latest/APIReference/API_ListKeys.html)\
+            \ or [DescribeKey](https://docs.aws.amazon.com/kms/latest/APIReference/API_DescribeKey.html)\
+            \ KMS API operations. To get the alias name and alias ARN, use [ListKeys](https://docs.aws.amazon.com/kms/latest/APIReference/API_ListAliases.html)\
+            \ API operation."
+      required:
+      - KmsKeyId
+      description: 'Contains encryption related settings to be used for data encryption
+        with Key Management Service, including KmsEncryptionContext and KmsKeyId.
+        The KmsKeyId is required, while KmsEncryptionContext is optional for additional
+        layer of security.
+
+
+        By default, Amazon Web Services HealthScribe provides encryption at rest to
+        protect sensitive customer data using Amazon S3-managed keys. HealthScribe
+        uses the KMS key you specify as a second layer of encryption.
+
+
+        Your `ResourceAccessRoleArn` must permission to use your KMS key. For more
+        information, see [Data Encryption at rest for Amazon Web Services HealthScribe](https://docs.aws.amazon.com/transcribe/latest/dg/health-scribe-encryption.html).'
     MedicalScribeInputStream:
       allOf:
       - allOf:
@@ -358,6 +1637,25 @@ components:
       enum:
       - PATIENT
       - CLINICIAN
+    MedicalScribePostStreamAnalyticsResult:
+      type: object
+      properties:
+        ClinicalNoteGenerationResult:
+          allOf:
+          - $ref: '#/components/schemas/ClinicalNoteGenerationResult'
+          description: Provides the Clinical Note Generation result for post-stream
+            analytics.
+      description: Contains details for the result of post-stream analytics.
+    MedicalScribePostStreamAnalyticsSettings:
+      type: object
+      properties:
+        ClinicalNoteGenerationSettings:
+          allOf:
+          - $ref: '#/components/schemas/ClinicalNoteGenerationSettings'
+          description: Specify settings for the post-stream clinical note generation.
+      required:
+      - ClinicalNoteGenerationSettings
+      description: The settings for post-stream analytics.
     MedicalScribeResultStream:
       allOf:
       - allOf:
@@ -376,10 +1674,106 @@ components:
         - $ref: '#/components/schemas/ServiceUnavailableException'
       description: |-
         Result stream where you will receive the output events. The details are provided in the `MedicalScribeTranscriptEvent` object.
+    MedicalScribeSessionControlEvent:
+      type: object
+      properties:
+        Type:
+          allOf:
+          - $ref: '#/components/schemas/MedicalScribeSessionControlEventType'
+          description: "The type of `MedicalScribeSessionControlEvent`.\n\nPossible\
+            \ Values:\n\n  * `END_OF_SESSION` \\- Indicates the audio streaming is\
+            \ complete. After you send an END_OF_SESSION event, Amazon Web Services\
+            \ HealthScribe starts the post-stream analytics. The session can't be\
+            \ resumed after this event is sent. After Amazon Web Services HealthScribe\
+            \ processes the event, the real-time `StreamStatus` is `COMPLETED`. You\
+            \ get the `StreamStatus` and other stream details with the [GetMedicalScribeStream](https://docs.aws.amazon.com/transcribe/latest/APIReference/API_streaming_GetMedicalScribeStream.html)\
+            \ API operation. For more information about different streaming statuses,\
+            \ see the `StreamStatus` description in the [MedicalScribeStreamDetails](https://docs.aws.amazon.com/transcribe/latest/APIReference/API_streaming_MedicalScribeStreamDetails.html)."
+      required:
+      - Type
+      description: Specify the lifecycle of your streaming session.
     MedicalScribeSessionControlEventType:
       type: string
       enum:
       - END_OF_SESSION
+    MedicalScribeStreamDetails:
+      type: object
+      properties:
+        SessionId:
+          allOf:
+          - $ref: '#/components/schemas/SessionId'
+          description: The identifier of the HealthScribe streaming session.
+        StreamCreatedAt:
+          allOf:
+          - $ref: '#/components/schemas/DateTime'
+          description: The date and time when the HealthScribe streaming session was
+            created.
+        StreamEndedAt:
+          allOf:
+          - $ref: '#/components/schemas/DateTime'
+          description: The date and time when the HealthScribe streaming session was
+            ended.
+        LanguageCode:
+          allOf:
+          - $ref: '#/components/schemas/MedicalScribeLanguageCode'
+          description: The Language Code of the HealthScribe streaming session.
+        MediaSampleRateHertz:
+          allOf:
+          - $ref: '#/components/schemas/MedicalScribeMediaSampleRateHertz'
+          description: The sample rate (in hertz) of the HealthScribe streaming session.
+        MediaEncoding:
+          allOf:
+          - $ref: '#/components/schemas/MedicalScribeMediaEncoding'
+          description: The Media Encoding of the HealthScribe streaming session.
+        VocabularyName:
+          allOf:
+          - $ref: '#/components/schemas/VocabularyName'
+          description: The vocabulary name of the HealthScribe streaming session.
+        VocabularyFilterName:
+          allOf:
+          - $ref: '#/components/schemas/VocabularyFilterName'
+          description: The name of the vocabulary filter used for the HealthScribe
+            streaming session .
+        VocabularyFilterMethod:
+          allOf:
+          - $ref: '#/components/schemas/MedicalScribeVocabularyFilterMethod'
+          description: The method of the vocabulary filter for the HealthScribe streaming
+            session.
+        ResourceAccessRoleArn:
+          allOf:
+          - $ref: '#/components/schemas/IamRoleArn'
+          description: The Amazon Resource Name (ARN) of the role used in the HealthScribe
+            streaming session.
+        ChannelDefinitions:
+          allOf:
+          - $ref: '#/components/schemas/MedicalScribeChannelDefinitions'
+          description: The Channel Definitions of the HealthScribe streaming session.
+        EncryptionSettings:
+          allOf:
+          - $ref: '#/components/schemas/MedicalScribeEncryptionSettings'
+          description: The Encryption Settings of the HealthScribe streaming session.
+        StreamStatus:
+          allOf:
+          - $ref: '#/components/schemas/MedicalScribeStreamStatus'
+          description: "The streaming status of the HealthScribe streaming session.\n\
+            \nPossible Values:\n\n  * `IN_PROGRESS`\n\n  * `PAUSED`\n\n  * `FAILED`\n\
+            \n  * `COMPLETED`\n\nThis status is specific to real-time streaming. A\
+            \ `COMPLETED` status doesn't mean that the post-stream analytics is complete.\
+            \ To get status of an analytics result, check the `Status` field for the\
+            \ analytics result within the `MedicalScribePostStreamAnalyticsResult`.\
+            \ For example, you can view the status of the `ClinicalNoteGenerationResult`."
+        PostStreamAnalyticsSettings:
+          allOf:
+          - $ref: '#/components/schemas/MedicalScribePostStreamAnalyticsSettings'
+          description: The post-stream analytics settings of the HealthScribe streaming
+            session.
+        PostStreamAnalyticsResult:
+          allOf:
+          - $ref: '#/components/schemas/MedicalScribePostStreamAnalyticsResult'
+          description: The result of post-stream analytics for the HealthScribe streaming
+            session.
+      description: Contains details about a Amazon Web Services HealthScribe streaming
+        session.
     MedicalScribeStreamStatus:
       type: string
       enum:
@@ -387,6 +1781,57 @@ components:
       - PAUSED
       - FAILED
       - COMPLETED
+    MedicalScribeTranscriptEvent:
+      type: object
+      properties:
+        TranscriptSegment:
+          allOf:
+          - $ref: '#/components/schemas/MedicalScribeTranscriptSegment'
+          description: The `TranscriptSegment` associated with a `MedicalScribeTranscriptEvent`.
+      description: 'The event associated with `MedicalScribeResultStream`.
+
+
+        Contains `MedicalScribeTranscriptSegment`, which contains segment related
+        information.'
+    MedicalScribeTranscriptItem:
+      type: object
+      properties:
+        BeginAudioTime:
+          allOf:
+          - $ref: '#/components/schemas/Double'
+          description: The start time, in milliseconds, of the transcribed item.
+        EndAudioTime:
+          allOf:
+          - $ref: '#/components/schemas/Double'
+          description: The end time, in milliseconds, of the transcribed item.
+        Type:
+          allOf:
+          - $ref: '#/components/schemas/MedicalScribeTranscriptItemType'
+          description: 'The type of item identified. Options are: `PRONUNCIATION`
+            (spoken words) and `PUNCTUATION`.'
+        Confidence:
+          allOf:
+          - $ref: '#/components/schemas/Confidence'
+          description: 'The confidence score associated with a word or phrase in your
+            transcript.
+
+
+            Confidence scores are values between 0 and 1. A larger value indicates
+            a higher probability that the identified item correctly matches the item
+            spoken in your media.'
+        Content:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The word, phrase or punctuation mark that was transcribed.
+        VocabularyFilterMatch:
+          allOf:
+          - $ref: '#/components/schemas/NullableBoolean'
+          description: Indicates whether the specified item matches a word in the
+            vocabulary filter included in your configuration event. If `true`, there
+            is a vocabulary filter match.
+      description: A word, phrase, or punctuation mark in your transcription output,
+        along with various associated attributes, such as confidence score, type,
+        and start and end times.
     MedicalScribeTranscriptItemList:
       type: array
       items:
@@ -396,12 +1841,86 @@ components:
       enum:
       - pronunciation
       - punctuation
+    MedicalScribeTranscriptSegment:
+      type: object
+      properties:
+        SegmentId:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The identifier of the segment.
+        BeginAudioTime:
+          allOf:
+          - $ref: '#/components/schemas/Double'
+          description: The start time, in milliseconds, of the segment.
+        EndAudioTime:
+          allOf:
+          - $ref: '#/components/schemas/Double'
+          description: The end time, in milliseconds, of the segment.
+        Content:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: Contains transcribed text of the segment.
+        Items:
+          allOf:
+          - $ref: '#/components/schemas/MedicalScribeTranscriptItemList'
+          description: Contains words, phrases, or punctuation marks in your segment.
+        IsPartial:
+          allOf:
+          - $ref: '#/components/schemas/Boolean'
+          description: 'Indicates if the segment is complete.
+
+
+            If `IsPartial` is `true`, the segment is not complete. If `IsPartial`
+            is `false`, the segment is complete.'
+        ChannelId:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: 'Indicates which audio channel is associated with the `MedicalScribeTranscriptSegment`.
+
+
+            If `MedicalScribeChannelDefinition` is not provided in the `MedicalScribeConfigurationEvent`,
+            then this field will not be included.'
+      description: Contains a set of transcription results, along with additional
+        information of the segment.
     MedicalScribeVocabularyFilterMethod:
       type: string
       enum:
       - remove
       - mask
       - tag
+    MedicalTranscript:
+      type: object
+      properties:
+        Results:
+          allOf:
+          - $ref: '#/components/schemas/MedicalResultList'
+          description: Contains a set of transcription results from one or more audio
+            segments, along with additional information per your request parameters.
+            This can include information relating to alternative transcriptions, channel
+            identification, partial result stabilization, language identification,
+            and other transcription-related data.
+      description: 'The `MedicalTranscript` associated with a ``.
+
+
+        `MedicalTranscript` contains `Results`, which contains a set of transcription
+        results from one or more audio segments, along with additional information
+        per your request parameters.'
+    MedicalTranscriptEvent:
+      type: object
+      properties:
+        Transcript:
+          allOf:
+          - $ref: '#/components/schemas/MedicalTranscript'
+          description: Contains `Results`, which contains a set of transcription results
+            from one or more audio segments, along with additional information per
+            your request parameters. This can include information relating to alternative
+            transcriptions, channel identification, partial result stabilization,
+            language identification, and other transcription-related data.
+      description: 'The `MedicalTranscriptEvent` associated with a `MedicalTranscriptResultStream`.
+
+
+        Contains a set of transcription results from one or more audio segments, along
+        with additional information per your request parameters.'
     MedicalTranscriptResultStream:
       allOf:
       - allOf:
@@ -453,8 +1972,143 @@ components:
       pattern: ^[A-Z_, ]+$
       minLength: 1
       maxLength: 300
+    PointsOfInterest:
+      type: object
+      properties:
+        TimestampRanges:
+          allOf:
+          - $ref: '#/components/schemas/TimestampRanges'
+          description: Contains the timestamp ranges (start time through end time)
+            of matched categories and rules.
+      description: Contains the timestamps of matched categories.
+    PostCallAnalyticsSettings:
+      type: object
+      properties:
+        OutputLocation:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: "The Amazon S3 location where you want your Call Analytics\
+            \ post-call transcription output stored. You can use any of the following\
+            \ formats to specify the output location:\n\n  1. s3://DOC-EXAMPLE-BUCKET\n\
+            \n  2. s3://DOC-EXAMPLE-BUCKET/my-output-folder/\n\n  3. s3://DOC-EXAMPLE-BUCKET/my-output-folder/my-call-analytics-job.json"
+        DataAccessRoleArn:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: 'The Amazon Resource Name (ARN) of an IAM role that has permissions
+            to access the Amazon S3 bucket that contains your input files. If the
+            role that you specify doesn’t have the appropriate permissions to access
+            the specified Amazon S3 location, your request fails.
+
+
+            IAM role ARNs have the format `arn:partition:iam::account:role/role-name-with-path`.
+            For example: `arn:aws:iam::111122223333:role/Admin`. For more information,
+            see [IAM ARNs](https://docs.aws.amazon.com/IAM/latest/UserGuide/reference_identifiers.html#identifiers-arns).'
+        ContentRedactionOutput:
+          allOf:
+          - $ref: '#/components/schemas/ContentRedactionOutput'
+          description: 'Specify whether you want only a redacted transcript or both
+            a redacted and an unredacted transcript. If you choose redacted and unredacted,
+            two JSON files are generated and stored in the Amazon S3 output location
+            you specify.
+
+
+            Note that to include `ContentRedactionOutput` in your request, you must
+            enable content redaction (`ContentRedactionType`).'
+        OutputEncryptionKMSKeyId:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: "The KMS key you want to use to encrypt your Call Analytics\
+            \ post-call output.\n\nIf using a key located in the **current** Amazon\
+            \ Web Services account, you can specify your KMS key in one of four ways:\n\
+            \n  1. Use the KMS key ID itself. For example, `1234abcd-12ab-34cd-56ef-1234567890ab`.\n\
+            \n  2. Use an alias for the KMS key ID. For example, `alias/ExampleAlias`.\n\
+            \n  3. Use the Amazon Resource Name (ARN) for the KMS key ID. For example,\
+            \ `arn:aws:kms:region:account-ID:key/1234abcd-12ab-34cd-56ef-1234567890ab`.\n\
+            \n  4. Use the ARN for the KMS key alias. For example, `arn:aws:kms:region:account-ID:alias/ExampleAlias`.\n\
+            \nIf using a key located in a **different** Amazon Web Services account\
+            \ than the current Amazon Web Services account, you can specify your KMS\
+            \ key in one of two ways:\n\n  1. Use the ARN for the KMS key ID. For\
+            \ example, `arn:aws:kms:region:account-ID:key/1234abcd-12ab-34cd-56ef-1234567890ab`.\n\
+            \n  2. Use the ARN for the KMS key alias. For example, `arn:aws:kms:region:account-ID:alias/ExampleAlias`.\n\
+            \nNote that the role making the request must have permission to use the\
+            \ specified KMS key."
+      required:
+      - OutputLocation
+      - DataAccessRoleArn
+      description: 'Allows you to specify additional settings for your Call Analytics
+        post-call request, including output locations for your redacted transcript,
+        which IAM role to use, and which encryption key to use.
+
+
+        `DataAccessRoleArn` and `OutputLocation` are required fields.
+
+
+        `PostCallAnalyticsSettings` provides you with the same insights as a Call
+        Analytics post-call transcription. Refer to [Post-call analytics](https://docs.aws.amazon.com/transcribe/latest/dg/tca-post-call.html)
+        for more information on this feature.'
     RequestId:
       type: string
+    ResourceNotFoundException:
+      type: object
+      properties:
+        Message:
+          $ref: '#/components/schemas/String'
+      description: The request references a resource which doesn't exist.
+    Result:
+      type: object
+      properties:
+        ResultId:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: Provides a unique identifier for the `Result`.
+        StartTime:
+          allOf:
+          - $ref: '#/components/schemas/Double'
+          description: The start time, in milliseconds, of the `Result`.
+        EndTime:
+          allOf:
+          - $ref: '#/components/schemas/Double'
+          description: The end time, in milliseconds, of the `Result`.
+        IsPartial:
+          allOf:
+          - $ref: '#/components/schemas/Boolean'
+          description: 'Indicates if the segment is complete.
+
+
+            If `IsPartial` is `true`, the segment is not complete. If `IsPartial`
+            is `false`, the segment is complete.'
+        Alternatives:
+          allOf:
+          - $ref: '#/components/schemas/AlternativeList'
+          description: A list of possible alternative transcriptions for the input
+            audio. Each alternative may contain one or more of `Items`, `Entities`,
+            or `Transcript`.
+        ChannelId:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: Indicates which audio channel is associated with the `Result`.
+        LanguageCode:
+          allOf:
+          - $ref: '#/components/schemas/LanguageCode'
+          description: The language code that represents the language spoken in your
+            audio stream.
+        LanguageIdentification:
+          allOf:
+          - $ref: '#/components/schemas/LanguageIdentification'
+          description: 'The language code of the dominant language identified in your
+            stream.
+
+
+            If you enabled channel identification and each channel of your audio contains
+            a different language, you may have more than one result.'
+      description: 'The `Result` associated with a ``.
+
+
+        Contains a set of transcription results from one or more audio segments, along
+        with additional information per your request parameters. This can include
+        information relating to alternative transcriptions, channel identification,
+        partial result stabilization, language identification, and other transcription-related
+        data.'
     ResultList:
       type: array
       items:
@@ -466,6 +2120,12 @@ components:
       - NEGATIVE
       - MIXED
       - NEUTRAL
+    ServiceUnavailableException:
+      type: object
+      properties:
+        Message:
+          $ref: '#/components/schemas/String'
+      description: The service is currently unavailable. Try your request later.
     SessionId:
       type: string
       pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
@@ -482,16 +2142,1016 @@ components:
       - UROLOGY
     Stable:
       type: boolean
+    StartCallAnalyticsStreamTranscriptionRequest:
+      type: object
+      properties:
+        LanguageCode:
+          allOf:
+          - $ref: '#/components/schemas/CallAnalyticsLanguageCode'
+          description: 'Specify the language code that represents the language spoken
+            in your audio.
+
+
+            For a list of languages supported with real-time Call Analytics, refer
+            to the [Supported languages](https://docs.aws.amazon.com/transcribe/latest/dg/supported-languages.html)
+            table.'
+        MediaSampleRateHertz:
+          allOf:
+          - $ref: '#/components/schemas/MediaSampleRateHertz'
+          description: The sample rate of the input audio (in hertz). Low-quality
+            audio, such as telephone audio, is typically around 8,000 Hz. High-quality
+            audio typically ranges from 16,000 Hz to 48,000 Hz. Note that the sample
+            rate you specify must match that of your audio.
+        MediaEncoding:
+          allOf:
+          - $ref: '#/components/schemas/MediaEncoding'
+          description: "Specify the encoding of your input audio. Supported formats\
+            \ are:\n\n  * FLAC\n\n  * OPUS-encoded audio in an Ogg container\n\n \
+            \ * PCM (only signed 16-bit little-endian audio formats, which does not\
+            \ include WAV)\n\nFor more information, see [Media formats](https://docs.aws.amazon.com/transcribe/latest/dg/how-input.html#how-input-audio)."
+        VocabularyName:
+          allOf:
+          - $ref: '#/components/schemas/VocabularyName'
+          description: 'Specify the name of the custom vocabulary that you want to
+            use when processing your transcription. Note that vocabulary names are
+            case sensitive.
+
+
+            If the language of the specified custom vocabulary doesn''t match the
+            language identified in your media, the custom vocabulary is not applied
+            to your transcription.
+
+
+            For more information, see [Custom vocabularies](https://docs.aws.amazon.com/transcribe/latest/dg/custom-vocabulary.html).'
+        SessionId:
+          allOf:
+          - $ref: '#/components/schemas/SessionId'
+          description: Specify a name for your Call Analytics transcription session.
+            If you don't include this parameter in your request, Amazon Transcribe
+            generates an ID and returns it in the response.
+        AudioStream:
+          allOf:
+          - $ref: '#/components/schemas/AudioStream'
+          description: 'An encoded stream of audio blobs. Audio streams are encoded
+            as either HTTP/2 or WebSocket data frames.
+
+
+            For more information, see [Transcribing streaming audio](https://docs.aws.amazon.com/transcribe/latest/dg/streaming.html).'
+        VocabularyFilterName:
+          allOf:
+          - $ref: '#/components/schemas/VocabularyFilterName'
+          description: 'Specify the name of the custom vocabulary filter that you
+            want to use when processing your transcription. Note that vocabulary filter
+            names are case sensitive.
+
+
+            If the language of the specified custom vocabulary filter doesn''t match
+            the language identified in your media, the vocabulary filter is not applied
+            to your transcription.
+
+
+            For more information, see [Using vocabulary filtering with unwanted words](https://docs.aws.amazon.com/transcribe/latest/dg/vocabulary-filtering.html).'
+        VocabularyFilterMethod:
+          allOf:
+          - $ref: '#/components/schemas/VocabularyFilterMethod'
+          description: 'Specify how you want your vocabulary filter applied to your
+            transcript.
+
+
+            To replace words with `***`, choose `mask`.
+
+
+            To delete words, choose `remove`.
+
+
+            To flag words without changing them, choose `tag`.'
+        LanguageModelName:
+          allOf:
+          - $ref: '#/components/schemas/ModelName'
+          description: 'Specify the name of the custom language model that you want
+            to use when processing your transcription. Note that language model names
+            are case sensitive.
+
+
+            The language of the specified language model must match the language code
+            you specify in your transcription request. If the languages don''t match,
+            the custom language model isn''t applied. There are no errors or warnings
+            associated with a language mismatch.
+
+
+            For more information, see [Custom language models](https://docs.aws.amazon.com/transcribe/latest/dg/custom-language-models.html).'
+        EnablePartialResultsStabilization:
+          allOf:
+          - $ref: '#/components/schemas/Boolean'
+          description: Enables partial result stabilization for your transcription.
+            Partial result stabilization can reduce latency in your output, but may
+            impact accuracy. For more information, see [Partial-result stabilization](https://docs.aws.amazon.com/transcribe/latest/dg/streaming.html#streaming-partial-result-stabilization).
+        PartialResultsStability:
+          allOf:
+          - $ref: '#/components/schemas/PartialResultsStability'
+          description: 'Specify the level of stability to use when you enable partial
+            results stabilization (`EnablePartialResultsStabilization`).
+
+
+            Low stability provides the highest accuracy. High stability transcribes
+            faster, but with slightly lower accuracy.
+
+
+            For more information, see [Partial-result stabilization](https://docs.aws.amazon.com/transcribe/latest/dg/streaming.html#streaming-partial-result-stabilization).'
+        ContentIdentificationType:
+          allOf:
+          - $ref: '#/components/schemas/ContentIdentificationType'
+          description: 'Labels all personally identifiable information (PII) identified
+            in your transcript.
+
+
+            Content identification is performed at the segment level; PII specified
+            in `PiiEntityTypes` is flagged upon complete transcription of an audio
+            segment. If you don''t include `PiiEntityTypes` in your request, all PII
+            is identified.
+
+
+            You can’t set `ContentIdentificationType` and `ContentRedactionType` in
+            the same request. If you set both, your request returns a `BadRequestException`.
+
+
+            For more information, see [Redacting or identifying personally identifiable
+            information](https://docs.aws.amazon.com/transcribe/latest/dg/pii-redaction.html).'
+        ContentRedactionType:
+          allOf:
+          - $ref: '#/components/schemas/ContentRedactionType'
+          description: 'Redacts all personally identifiable information (PII) identified
+            in your transcript.
+
+
+            Content redaction is performed at the segment level; PII specified in
+            `PiiEntityTypes` is redacted upon complete transcription of an audio segment.
+            If you don''t include `PiiEntityTypes` in your request, all PII is redacted.
+
+
+            You can’t set `ContentRedactionType` and `ContentIdentificationType` in
+            the same request. If you set both, your request returns a `BadRequestException`.
+
+
+            For more information, see [Redacting or identifying personally identifiable
+            information](https://docs.aws.amazon.com/transcribe/latest/dg/pii-redaction.html).'
+        PiiEntityTypes:
+          allOf:
+          - $ref: '#/components/schemas/PiiEntityTypes'
+          description: 'Specify which types of personally identifiable information
+            (PII) you want to redact in your transcript. You can include as many types
+            as you''d like, or you can select `ALL`.
+
+
+            Values must be comma-separated and can include: `ADDRESS`, `BANK_ACCOUNT_NUMBER`,
+            `BANK_ROUTING`, `CREDIT_DEBIT_CVV`, `CREDIT_DEBIT_EXPIRY`, `CREDIT_DEBIT_NUMBER`,
+            `EMAIL`, `NAME`, `PHONE`, `PIN`, `SSN`, or `ALL`.
+
+
+            Note that if you include `PiiEntityTypes` in your request, you must also
+            include `ContentIdentificationType` or `ContentRedactionType`.
+
+
+            If you include `ContentRedactionType` or `ContentIdentificationType` in
+            your request, but do not include `PiiEntityTypes`, all PII is redacted
+            or identified.'
+      required:
+      - LanguageCode
+      - MediaSampleRateHertz
+      - MediaEncoding
+      - AudioStream
+    StartCallAnalyticsStreamTranscriptionResponse:
+      type: object
+      properties:
+        RequestId:
+          allOf:
+          - $ref: '#/components/schemas/RequestId'
+          description: Provides the identifier for your real-time Call Analytics request.
+        LanguageCode:
+          allOf:
+          - $ref: '#/components/schemas/CallAnalyticsLanguageCode'
+          description: Provides the language code that you specified in your Call
+            Analytics request.
+        MediaSampleRateHertz:
+          allOf:
+          - $ref: '#/components/schemas/MediaSampleRateHertz'
+          description: Provides the sample rate that you specified in your Call Analytics
+            request.
+        MediaEncoding:
+          allOf:
+          - $ref: '#/components/schemas/MediaEncoding'
+          description: Provides the media encoding you specified in your Call Analytics
+            request.
+        VocabularyName:
+          allOf:
+          - $ref: '#/components/schemas/VocabularyName'
+          description: Provides the name of the custom vocabulary that you specified
+            in your Call Analytics request.
+        SessionId:
+          allOf:
+          - $ref: '#/components/schemas/SessionId'
+          description: Provides the identifier for your Call Analytics transcription
+            session.
+        CallAnalyticsTranscriptResultStream:
+          allOf:
+          - $ref: '#/components/schemas/CallAnalyticsTranscriptResultStream'
+          description: Provides detailed information about your real-time Call Analytics
+            session.
+        VocabularyFilterName:
+          allOf:
+          - $ref: '#/components/schemas/VocabularyFilterName'
+          description: Provides the name of the custom vocabulary filter that you
+            specified in your Call Analytics request.
+        VocabularyFilterMethod:
+          allOf:
+          - $ref: '#/components/schemas/VocabularyFilterMethod'
+          description: Provides the vocabulary filtering method used in your Call
+            Analytics transcription.
+        LanguageModelName:
+          allOf:
+          - $ref: '#/components/schemas/ModelName'
+          description: Provides the name of the custom language model that you specified
+            in your Call Analytics request.
+        EnablePartialResultsStabilization:
+          allOf:
+          - $ref: '#/components/schemas/Boolean'
+          description: Shows whether partial results stabilization was enabled for
+            your Call Analytics transcription.
+        PartialResultsStability:
+          allOf:
+          - $ref: '#/components/schemas/PartialResultsStability'
+          description: Provides the stabilization level used for your transcription.
+        ContentIdentificationType:
+          allOf:
+          - $ref: '#/components/schemas/ContentIdentificationType'
+          description: Shows whether content identification was enabled for your Call
+            Analytics transcription.
+        ContentRedactionType:
+          allOf:
+          - $ref: '#/components/schemas/ContentRedactionType'
+          description: Shows whether content redaction was enabled for your Call Analytics
+            transcription.
+        PiiEntityTypes:
+          allOf:
+          - $ref: '#/components/schemas/PiiEntityTypes'
+          description: Lists the PII entity types you specified in your Call Analytics
+            request.
+    StartMedicalScribeStreamRequest:
+      type: object
+      properties:
+        SessionId:
+          allOf:
+          - $ref: '#/components/schemas/SessionId'
+          description: Specify an identifier for your streaming session (in UUID format).
+            If you don't include a SessionId in your request, Amazon Web Services
+            HealthScribe generates an ID and returns it in the response.
+        LanguageCode:
+          allOf:
+          - $ref: '#/components/schemas/MedicalScribeLanguageCode'
+          description: Specify the language code for your HealthScribe streaming session.
+        MediaSampleRateHertz:
+          allOf:
+          - $ref: '#/components/schemas/MedicalScribeMediaSampleRateHertz'
+          description: Specify the sample rate of the input audio (in hertz). Amazon
+            Web Services HealthScribe supports a range from 16,000 Hz to 48,000 Hz.
+            The sample rate you specify must match that of your audio.
+        MediaEncoding:
+          allOf:
+          - $ref: '#/components/schemas/MedicalScribeMediaEncoding'
+          description: "Specify the encoding used for the input audio.\n\nSupported\
+            \ formats are:\n\n  * FLAC\n\n  * OPUS-encoded audio in an Ogg container\n\
+            \n  * PCM (only signed 16-bit little-endian audio formats, which does\
+            \ not include WAV) \n\nFor more information, see [Media formats](https://docs.aws.amazon.com/transcribe/latest/dg/how-input.html#how-input-audio)."
+        InputStream:
+          allOf:
+          - $ref: '#/components/schemas/MedicalScribeInputStream'
+          description: 'Specify the input stream where you will send events in real
+            time.
+
+
+            The first element of the input stream must be a `MedicalScribeConfigurationEvent`.'
+      required:
+      - LanguageCode
+      - MediaSampleRateHertz
+      - MediaEncoding
+      - InputStream
+    StartMedicalScribeStreamResponse:
+      type: object
+      properties:
+        SessionId:
+          allOf:
+          - $ref: '#/components/schemas/SessionId'
+          description: 'The identifier (in UUID format) for your streaming session.
+
+
+            If you already started streaming, this is same ID as the one you specified
+            in your initial `StartMedicalScribeStreamRequest`.'
+        RequestId:
+          allOf:
+          - $ref: '#/components/schemas/RequestId'
+          description: The unique identifier for your streaming request.
+        LanguageCode:
+          allOf:
+          - $ref: '#/components/schemas/MedicalScribeLanguageCode'
+          description: The Language Code that you specified in your request. Same
+            as provided in the `StartMedicalScribeStreamRequest`.
+        MediaSampleRateHertz:
+          allOf:
+          - $ref: '#/components/schemas/MedicalScribeMediaSampleRateHertz'
+          description: The sample rate (in hertz) that you specified in your request.
+            Same as provided in the `StartMedicalScribeStreamRequest`
+        MediaEncoding:
+          allOf:
+          - $ref: '#/components/schemas/MedicalScribeMediaEncoding'
+          description: The Media Encoding you specified in your request. Same as provided
+            in the `StartMedicalScribeStreamRequest`
+        ResultStream:
+          allOf:
+          - $ref: '#/components/schemas/MedicalScribeResultStream'
+          description: The result stream where you will receive the output events.
+    StartMedicalStreamTranscriptionRequest:
+      type: object
+      properties:
+        LanguageCode:
+          allOf:
+          - $ref: '#/components/schemas/LanguageCode'
+          description: 'Specify the language code that represents the language spoken
+            in your audio.
+
+
+            Amazon Transcribe Medical only supports US English (`en-US`).'
+        MediaSampleRateHertz:
+          allOf:
+          - $ref: '#/components/schemas/MediaSampleRateHertz'
+          description: The sample rate of the input audio (in hertz). Amazon Transcribe
+            Medical supports a range from 16,000 Hz to 48,000 Hz. Note that the sample
+            rate you specify must match that of your audio.
+        MediaEncoding:
+          allOf:
+          - $ref: '#/components/schemas/MediaEncoding'
+          description: "Specify the encoding used for the input audio. Supported formats\
+            \ are:\n\n  * FLAC\n\n  * OPUS-encoded audio in an Ogg container\n\n \
+            \ * PCM (only signed 16-bit little-endian audio formats, which does not\
+            \ include WAV)\n\nFor more information, see [Media formats](https://docs.aws.amazon.com/transcribe/latest/dg/how-input.html#how-input-audio)."
+        VocabularyName:
+          allOf:
+          - $ref: '#/components/schemas/VocabularyName'
+          description: Specify the name of the custom vocabulary that you want to
+            use when processing your transcription. Note that vocabulary names are
+            case sensitive.
+        Specialty:
+          allOf:
+          - $ref: '#/components/schemas/Specialty'
+          description: Specify the medical specialty contained in your audio.
+        Type:
+          allOf:
+          - $ref: '#/components/schemas/Type'
+          description: Specify the type of input audio. For example, choose `DICTATION`
+            for a provider dictating patient notes and `CONVERSATION` for a dialogue
+            between a patient and a medical professional.
+        ShowSpeakerLabel:
+          allOf:
+          - $ref: '#/components/schemas/Boolean'
+          description: 'Enables speaker partitioning (diarization) in your transcription
+            output. Speaker partitioning labels the speech from individual speakers
+            in your media file.
+
+
+            For more information, see [Partitioning speakers (diarization)](https://docs.aws.amazon.com/transcribe/latest/dg/diarization.html).'
+        SessionId:
+          allOf:
+          - $ref: '#/components/schemas/SessionId'
+          description: Specify a name for your transcription session. If you don't
+            include this parameter in your request, Amazon Transcribe Medical generates
+            an ID and returns it in the response.
+        AudioStream:
+          $ref: '#/components/schemas/AudioStream'
+        EnableChannelIdentification:
+          allOf:
+          - $ref: '#/components/schemas/Boolean'
+          description: 'Enables channel identification in multi-channel audio.
+
+
+            Channel identification transcribes the audio on each channel independently,
+            then appends the output for each channel into one transcript.
+
+
+            If you have multi-channel audio and do not enable channel identification,
+            your audio is transcribed in a continuous manner and your transcript is
+            not separated by channel.
+
+
+            If you include `EnableChannelIdentification` in your request, you must
+            also include `NumberOfChannels`.
+
+
+            For more information, see [Transcribing multi-channel audio](https://docs.aws.amazon.com/transcribe/latest/dg/channel-id.html).'
+        NumberOfChannels:
+          allOf:
+          - $ref: '#/components/schemas/NumberOfChannels'
+          description: 'Specify the number of channels in your audio stream. This
+            value must be `2`, as only two channels are supported. If your audio doesn''t
+            contain multiple channels, do not include this parameter in your request.
+
+
+            If you include `NumberOfChannels` in your request, you must also include
+            `EnableChannelIdentification`.'
+        ContentIdentificationType:
+          allOf:
+          - $ref: '#/components/schemas/MedicalContentIdentificationType'
+          description: 'Labels all personal health information (PHI) identified in
+            your transcript.
+
+
+            Content identification is performed at the segment level; PHI is flagged
+            upon complete transcription of an audio segment.
+
+
+            For more information, see [Identifying personal health information (PHI)
+            in a transcription](https://docs.aws.amazon.com/transcribe/latest/dg/phi-id.html).'
+      required:
+      - LanguageCode
+      - MediaSampleRateHertz
+      - MediaEncoding
+      - Specialty
+      - Type
+      - AudioStream
+    StartMedicalStreamTranscriptionResponse:
+      type: object
+      properties:
+        RequestId:
+          allOf:
+          - $ref: '#/components/schemas/RequestId'
+          description: Provides the identifier for your streaming request.
+        LanguageCode:
+          allOf:
+          - $ref: '#/components/schemas/LanguageCode'
+          description: Provides the language code that you specified in your request.
+            This must be `en-US`.
+        MediaSampleRateHertz:
+          allOf:
+          - $ref: '#/components/schemas/MediaSampleRateHertz'
+          description: Provides the sample rate that you specified in your request.
+        MediaEncoding:
+          allOf:
+          - $ref: '#/components/schemas/MediaEncoding'
+          description: Provides the media encoding you specified in your request.
+        VocabularyName:
+          allOf:
+          - $ref: '#/components/schemas/VocabularyName'
+          description: Provides the name of the custom vocabulary that you specified
+            in your request.
+        Specialty:
+          allOf:
+          - $ref: '#/components/schemas/Specialty'
+          description: Provides the medical specialty that you specified in your request.
+        Type:
+          allOf:
+          - $ref: '#/components/schemas/Type'
+          description: Provides the type of audio you specified in your request.
+        ShowSpeakerLabel:
+          allOf:
+          - $ref: '#/components/schemas/Boolean'
+          description: Shows whether speaker partitioning was enabled for your transcription.
+        SessionId:
+          allOf:
+          - $ref: '#/components/schemas/SessionId'
+          description: Provides the identifier for your transcription session.
+        TranscriptResultStream:
+          allOf:
+          - $ref: '#/components/schemas/MedicalTranscriptResultStream'
+          description: Provides detailed information about your streaming session.
+        EnableChannelIdentification:
+          allOf:
+          - $ref: '#/components/schemas/Boolean'
+          description: Shows whether channel identification was enabled for your transcription.
+        NumberOfChannels:
+          allOf:
+          - $ref: '#/components/schemas/NumberOfChannels'
+          description: Provides the number of channels that you specified in your
+            request.
+        ContentIdentificationType:
+          allOf:
+          - $ref: '#/components/schemas/MedicalContentIdentificationType'
+          description: Shows whether content identification was enabled for your transcription.
+    StartStreamTranscriptionRequest:
+      type: object
+      properties:
+        LanguageCode:
+          allOf:
+          - $ref: '#/components/schemas/LanguageCode'
+          description: 'Specify the language code that represents the language spoken
+            in your audio.
+
+
+            If you''re unsure of the language spoken in your audio, consider using
+            `IdentifyLanguage` to enable automatic language identification.
+
+
+            For a list of languages supported with Amazon Transcribe streaming, refer
+            to the [Supported languages](https://docs.aws.amazon.com/transcribe/latest/dg/supported-languages.html)
+            table.'
+        MediaSampleRateHertz:
+          allOf:
+          - $ref: '#/components/schemas/MediaSampleRateHertz'
+          description: The sample rate of the input audio (in hertz). Low-quality
+            audio, such as telephone audio, is typically around 8,000 Hz. High-quality
+            audio typically ranges from 16,000 Hz to 48,000 Hz. Note that the sample
+            rate you specify must match that of your audio.
+        MediaEncoding:
+          allOf:
+          - $ref: '#/components/schemas/MediaEncoding'
+          description: "Specify the encoding of your input audio. Supported formats\
+            \ are:\n\n  * FLAC\n\n  * OPUS-encoded audio in an Ogg container\n\n \
+            \ * PCM (only signed 16-bit little-endian audio formats, which does not\
+            \ include WAV)\n\nFor more information, see [Media formats](https://docs.aws.amazon.com/transcribe/latest/dg/how-input.html#how-input-audio)."
+        VocabularyName:
+          allOf:
+          - $ref: '#/components/schemas/VocabularyName'
+          description: 'Specify the name of the custom vocabulary that you want to
+            use when processing your transcription. Note that vocabulary names are
+            case sensitive.
+
+
+            If the language of the specified custom vocabulary doesn''t match the
+            language identified in your media, the custom vocabulary is not applied
+            to your transcription.
+
+
+            This parameter is **not** intended for use with the `IdentifyLanguage`
+            parameter. If you''re including `IdentifyLanguage` in your request and
+            want to use one or more custom vocabularies with your transcription, use
+            the `VocabularyNames` parameter instead.
+
+
+            For more information, see [Custom vocabularies](https://docs.aws.amazon.com/transcribe/latest/dg/custom-vocabulary.html).'
+        SessionId:
+          allOf:
+          - $ref: '#/components/schemas/SessionId'
+          description: Specify a name for your transcription session. If you don't
+            include this parameter in your request, Amazon Transcribe generates an
+            ID and returns it in the response.
+        AudioStream:
+          allOf:
+          - $ref: '#/components/schemas/AudioStream'
+          description: 'An encoded stream of audio blobs. Audio streams are encoded
+            as either HTTP/2 or WebSocket data frames.
+
+
+            For more information, see [Transcribing streaming audio](https://docs.aws.amazon.com/transcribe/latest/dg/streaming.html).'
+        VocabularyFilterName:
+          allOf:
+          - $ref: '#/components/schemas/VocabularyFilterName'
+          description: 'Specify the name of the custom vocabulary filter that you
+            want to use when processing your transcription. Note that vocabulary filter
+            names are case sensitive.
+
+
+            If the language of the specified custom vocabulary filter doesn''t match
+            the language identified in your media, the vocabulary filter is not applied
+            to your transcription.
+
+
+            This parameter is **not** intended for use with the `IdentifyLanguage`
+            parameter. If you''re including `IdentifyLanguage` in your request and
+            want to use one or more vocabulary filters with your transcription, use
+            the `VocabularyFilterNames` parameter instead.
+
+
+            For more information, see [Using vocabulary filtering with unwanted words](https://docs.aws.amazon.com/transcribe/latest/dg/vocabulary-filtering.html).'
+        VocabularyFilterMethod:
+          allOf:
+          - $ref: '#/components/schemas/VocabularyFilterMethod'
+          description: 'Specify how you want your vocabulary filter applied to your
+            transcript.
+
+
+            To replace words with `***`, choose `mask`.
+
+
+            To delete words, choose `remove`.
+
+
+            To flag words without changing them, choose `tag`.'
+        ShowSpeakerLabel:
+          allOf:
+          - $ref: '#/components/schemas/Boolean'
+          description: 'Enables speaker partitioning (diarization) in your transcription
+            output. Speaker partitioning labels the speech from individual speakers
+            in your media file.
+
+
+            For more information, see [Partitioning speakers (diarization)](https://docs.aws.amazon.com/transcribe/latest/dg/diarization.html).'
+        EnableChannelIdentification:
+          allOf:
+          - $ref: '#/components/schemas/Boolean'
+          description: 'Enables channel identification in multi-channel audio.
+
+
+            Channel identification transcribes the audio on each channel independently,
+            then appends the output for each channel into one transcript.
+
+
+            If you have multi-channel audio and do not enable channel identification,
+            your audio is transcribed in a continuous manner and your transcript is
+            not separated by channel.
+
+
+            If you include `EnableChannelIdentification` in your request, you must
+            also include `NumberOfChannels`.
+
+
+            For more information, see [Transcribing multi-channel audio](https://docs.aws.amazon.com/transcribe/latest/dg/channel-id.html).'
+        NumberOfChannels:
+          allOf:
+          - $ref: '#/components/schemas/NumberOfChannels'
+          description: 'Specify the number of channels in your audio stream. This
+            value must be `2`, as only two channels are supported. If your audio doesn''t
+            contain multiple channels, do not include this parameter in your request.
+
+
+            If you include `NumberOfChannels` in your request, you must also include
+            `EnableChannelIdentification`.'
+        EnablePartialResultsStabilization:
+          allOf:
+          - $ref: '#/components/schemas/Boolean'
+          description: Enables partial result stabilization for your transcription.
+            Partial result stabilization can reduce latency in your output, but may
+            impact accuracy. For more information, see [Partial-result stabilization](https://docs.aws.amazon.com/transcribe/latest/dg/streaming.html#streaming-partial-result-stabilization).
+        PartialResultsStability:
+          allOf:
+          - $ref: '#/components/schemas/PartialResultsStability'
+          description: 'Specify the level of stability to use when you enable partial
+            results stabilization (`EnablePartialResultsStabilization`).
+
+
+            Low stability provides the highest accuracy. High stability transcribes
+            faster, but with slightly lower accuracy.
+
+
+            For more information, see [Partial-result stabilization](https://docs.aws.amazon.com/transcribe/latest/dg/streaming.html#streaming-partial-result-stabilization).'
+        ContentIdentificationType:
+          allOf:
+          - $ref: '#/components/schemas/ContentIdentificationType'
+          description: 'Labels all personally identifiable information (PII) identified
+            in your transcript.
+
+
+            Content identification is performed at the segment level; PII specified
+            in `PiiEntityTypes` is flagged upon complete transcription of an audio
+            segment. If you don''t include `PiiEntityTypes` in your request, all PII
+            is identified.
+
+
+            You can’t set `ContentIdentificationType` and `ContentRedactionType` in
+            the same request. If you set both, your request returns a `BadRequestException`.
+
+
+            For more information, see [Redacting or identifying personally identifiable
+            information](https://docs.aws.amazon.com/transcribe/latest/dg/pii-redaction.html).'
+        ContentRedactionType:
+          allOf:
+          - $ref: '#/components/schemas/ContentRedactionType'
+          description: 'Redacts all personally identifiable information (PII) identified
+            in your transcript.
+
+
+            Content redaction is performed at the segment level; PII specified in
+            `PiiEntityTypes` is redacted upon complete transcription of an audio segment.
+            If you don''t include `PiiEntityTypes` in your request, all PII is redacted.
+
+
+            You can’t set `ContentRedactionType` and `ContentIdentificationType` in
+            the same request. If you set both, your request returns a `BadRequestException`.
+
+
+            For more information, see [Redacting or identifying personally identifiable
+            information](https://docs.aws.amazon.com/transcribe/latest/dg/pii-redaction.html).'
+        PiiEntityTypes:
+          allOf:
+          - $ref: '#/components/schemas/PiiEntityTypes'
+          description: 'Specify which types of personally identifiable information
+            (PII) you want to redact in your transcript. You can include as many types
+            as you''d like, or you can select `ALL`.
+
+
+            Values must be comma-separated and can include: `ADDRESS`, `BANK_ACCOUNT_NUMBER`,
+            `BANK_ROUTING`, `CREDIT_DEBIT_CVV`, `CREDIT_DEBIT_EXPIRY`, `CREDIT_DEBIT_NUMBER`,
+            `EMAIL`, `NAME`, `PHONE`, `PIN`, `SSN`, or `ALL`.
+
+
+            Note that if you include `PiiEntityTypes` in your request, you must also
+            include `ContentIdentificationType` or `ContentRedactionType`.
+
+
+            If you include `ContentRedactionType` or `ContentIdentificationType` in
+            your request, but do not include `PiiEntityTypes`, all PII is redacted
+            or identified.'
+        LanguageModelName:
+          allOf:
+          - $ref: '#/components/schemas/ModelName'
+          description: 'Specify the name of the custom language model that you want
+            to use when processing your transcription. Note that language model names
+            are case sensitive.
+
+
+            The language of the specified language model must match the language code
+            you specify in your transcription request. If the languages don''t match,
+            the custom language model isn''t applied. There are no errors or warnings
+            associated with a language mismatch.
+
+
+            For more information, see [Custom language models](https://docs.aws.amazon.com/transcribe/latest/dg/custom-language-models.html).'
+        IdentifyLanguage:
+          allOf:
+          - $ref: '#/components/schemas/Boolean'
+          description: 'Enables automatic language identification for your transcription.
+
+
+            If you include `IdentifyLanguage`, you must include a list of language
+            codes, using `LanguageOptions`, that you think may be present in your
+            audio stream.
+
+
+            You can also include a preferred language using `PreferredLanguage`. Adding
+            a preferred language can help Amazon Transcribe identify the language
+            faster than if you omit this parameter.
+
+
+            If you have multi-channel audio that contains different languages on each
+            channel, and you''ve enabled channel identification, automatic language
+            identification identifies the dominant language on each audio channel.
+
+
+            Note that you must include either `LanguageCode` or `IdentifyLanguage`
+            or `IdentifyMultipleLanguages` in your request. If you include more than
+            one of these parameters, your transcription job fails.
+
+
+            Streaming language identification can''t be combined with custom language
+            models or redaction.'
+        LanguageOptions:
+          allOf:
+          - $ref: '#/components/schemas/LanguageOptions'
+          description: 'Specify two or more language codes that represent the languages
+            you think may be present in your media; including more than five is not
+            recommended.
+
+
+            Including language options can improve the accuracy of language identification.
+
+
+            If you include `LanguageOptions` in your request, you must also include
+            `IdentifyLanguage` or `IdentifyMultipleLanguages`.
+
+
+            For a list of languages supported with Amazon Transcribe streaming, refer
+            to the [Supported languages](https://docs.aws.amazon.com/transcribe/latest/dg/supported-languages.html)
+            table.
+
+
+            You can only include one language dialect per language per stream. For
+            example, you cannot include `en-US` and `en-AU` in the same request.'
+        PreferredLanguage:
+          allOf:
+          - $ref: '#/components/schemas/LanguageCode'
+          description: 'Specify a preferred language from the subset of languages
+            codes you specified in `LanguageOptions`.
+
+
+            You can only use this parameter if you''ve included `IdentifyLanguage`
+            and `LanguageOptions` in your request.'
+        IdentifyMultipleLanguages:
+          allOf:
+          - $ref: '#/components/schemas/Boolean'
+          description: 'Enables automatic multi-language identification in your transcription
+            job request. Use this parameter if your stream contains more than one
+            language. If your stream contains only one language, use IdentifyLanguage
+            instead.
+
+
+            If you include `IdentifyMultipleLanguages`, you must include a list of
+            language codes, using `LanguageOptions`, that you think may be present
+            in your stream.
+
+
+            If you want to apply a custom vocabulary or a custom vocabulary filter
+            to your automatic multiple language identification request, include `VocabularyNames`
+            or `VocabularyFilterNames`.
+
+
+            Note that you must include one of `LanguageCode`, `IdentifyLanguage`,
+            or `IdentifyMultipleLanguages` in your request. If you include more than
+            one of these parameters, your transcription job fails.'
+        VocabularyNames:
+          allOf:
+          - $ref: '#/components/schemas/VocabularyNames'
+          description: 'Specify the names of the custom vocabularies that you want
+            to use when processing your transcription. Note that vocabulary names
+            are case sensitive.
+
+
+            If none of the languages of the specified custom vocabularies match the
+            language identified in your media, your job fails.
+
+
+            This parameter is only intended for use **with** the `IdentifyLanguage`
+            parameter. If you''re **not** including `IdentifyLanguage` in your request
+            and want to use a custom vocabulary with your transcription, use the `VocabularyName`
+            parameter instead.
+
+
+            For more information, see [Custom vocabularies](https://docs.aws.amazon.com/transcribe/latest/dg/custom-vocabulary.html).'
+        VocabularyFilterNames:
+          allOf:
+          - $ref: '#/components/schemas/VocabularyFilterNames'
+          description: 'Specify the names of the custom vocabulary filters that you
+            want to use when processing your transcription. Note that vocabulary filter
+            names are case sensitive.
+
+
+            If none of the languages of the specified custom vocabulary filters match
+            the language identified in your media, your job fails.
+
+
+            This parameter is only intended for use **with** the `IdentifyLanguage`
+            parameter. If you''re **not** including `IdentifyLanguage` in your request
+            and want to use a custom vocabulary filter with your transcription, use
+            the `VocabularyFilterName` parameter instead.
+
+
+            For more information, see [Using vocabulary filtering with unwanted words](https://docs.aws.amazon.com/transcribe/latest/dg/vocabulary-filtering.html).'
+      required:
+      - MediaSampleRateHertz
+      - MediaEncoding
+      - AudioStream
+    StartStreamTranscriptionResponse:
+      type: object
+      properties:
+        RequestId:
+          allOf:
+          - $ref: '#/components/schemas/RequestId'
+          description: Provides the identifier for your streaming request.
+        LanguageCode:
+          allOf:
+          - $ref: '#/components/schemas/LanguageCode'
+          description: Provides the language code that you specified in your request.
+        MediaSampleRateHertz:
+          allOf:
+          - $ref: '#/components/schemas/MediaSampleRateHertz'
+          description: Provides the sample rate that you specified in your request.
+        MediaEncoding:
+          allOf:
+          - $ref: '#/components/schemas/MediaEncoding'
+          description: Provides the media encoding you specified in your request.
+        VocabularyName:
+          allOf:
+          - $ref: '#/components/schemas/VocabularyName'
+          description: Provides the name of the custom vocabulary that you specified
+            in your request.
+        SessionId:
+          allOf:
+          - $ref: '#/components/schemas/SessionId'
+          description: Provides the identifier for your transcription session.
+        TranscriptResultStream:
+          allOf:
+          - $ref: '#/components/schemas/TranscriptResultStream'
+          description: Provides detailed information about your streaming session.
+        VocabularyFilterName:
+          allOf:
+          - $ref: '#/components/schemas/VocabularyFilterName'
+          description: Provides the name of the custom vocabulary filter that you
+            specified in your request.
+        VocabularyFilterMethod:
+          allOf:
+          - $ref: '#/components/schemas/VocabularyFilterMethod'
+          description: Provides the vocabulary filtering method used in your transcription.
+        ShowSpeakerLabel:
+          allOf:
+          - $ref: '#/components/schemas/Boolean'
+          description: Shows whether speaker partitioning was enabled for your transcription.
+        EnableChannelIdentification:
+          allOf:
+          - $ref: '#/components/schemas/Boolean'
+          description: Shows whether channel identification was enabled for your transcription.
+        NumberOfChannels:
+          allOf:
+          - $ref: '#/components/schemas/NumberOfChannels'
+          description: Provides the number of channels that you specified in your
+            request.
+        EnablePartialResultsStabilization:
+          allOf:
+          - $ref: '#/components/schemas/Boolean'
+          description: Shows whether partial results stabilization was enabled for
+            your transcription.
+        PartialResultsStability:
+          allOf:
+          - $ref: '#/components/schemas/PartialResultsStability'
+          description: Provides the stabilization level used for your transcription.
+        ContentIdentificationType:
+          allOf:
+          - $ref: '#/components/schemas/ContentIdentificationType'
+          description: Shows whether content identification was enabled for your transcription.
+        ContentRedactionType:
+          allOf:
+          - $ref: '#/components/schemas/ContentRedactionType'
+          description: Shows whether content redaction was enabled for your transcription.
+        PiiEntityTypes:
+          allOf:
+          - $ref: '#/components/schemas/PiiEntityTypes'
+          description: Lists the PII entity types you specified in your request.
+        LanguageModelName:
+          allOf:
+          - $ref: '#/components/schemas/ModelName'
+          description: Provides the name of the custom language model that you specified
+            in your request.
+        IdentifyLanguage:
+          allOf:
+          - $ref: '#/components/schemas/Boolean'
+          description: Shows whether automatic language identification was enabled
+            for your transcription.
+        LanguageOptions:
+          allOf:
+          - $ref: '#/components/schemas/LanguageOptions'
+          description: Provides the language codes that you specified in your request.
+        PreferredLanguage:
+          allOf:
+          - $ref: '#/components/schemas/LanguageCode'
+          description: Provides the preferred language that you specified in your
+            request.
+        IdentifyMultipleLanguages:
+          allOf:
+          - $ref: '#/components/schemas/Boolean'
+          description: Shows whether automatic multi-language identification was enabled
+            for your transcription.
+        VocabularyNames:
+          allOf:
+          - $ref: '#/components/schemas/VocabularyNames'
+          description: Provides the names of the custom vocabularies that you specified
+            in your request.
+        VocabularyFilterNames:
+          allOf:
+          - $ref: '#/components/schemas/VocabularyFilterNames'
+          description: Provides the names of the custom vocabulary filters that you
+            specified in your request.
     String:
       type: string
     StringList:
       type: array
       items:
         $ref: '#/components/schemas/String'
+    TimestampRange:
+      type: object
+      properties:
+        BeginOffsetMillis:
+          allOf:
+          - $ref: '#/components/schemas/Long'
+          description: The time, in milliseconds, from the beginning of the audio
+            stream to the start of the category match.
+        EndOffsetMillis:
+          allOf:
+          - $ref: '#/components/schemas/Long'
+          description: The time, in milliseconds, from the beginning of the audio
+            stream to the end of the category match.
+      description: Contains the timestamp range (start time through end time) of a
+        matched category.
     TimestampRanges:
       type: array
       items:
         $ref: '#/components/schemas/TimestampRange'
+    Transcript:
+      type: object
+      properties:
+        Results:
+          allOf:
+          - $ref: '#/components/schemas/ResultList'
+          description: Contains a set of transcription results from one or more audio
+            segments, along with additional information per your request parameters.
+            This can include information relating to alternative transcriptions, channel
+            identification, partial result stabilization, language identification,
+            and other transcription-related data.
+      description: 'The `Transcript` associated with a ``.
+
+
+        `Transcript` contains `Results`, which contains a set of transcription results
+        from one or more audio segments, along with additional information per your
+        request parameters.'
+    TranscriptEvent:
+      type: object
+      properties:
+        Transcript:
+          allOf:
+          - $ref: '#/components/schemas/Transcript'
+          description: Contains `Results`, which contains a set of transcription results
+            from one or more audio segments, along with additional information per
+            your request parameters. This can include information relating to alternative
+            transcriptions, channel identification, partial result stabilization,
+            language identification, and other transcription-related data.
+      description: 'The `TranscriptEvent` associated with a `TranscriptResultStream`.
+
+
+        Contains a set of transcription results from one or more audio segments, along
+        with additional information per your request parameters.'
     TranscriptResultStream:
       allOf:
       - allOf:
@@ -530,6 +3190,60 @@ components:
       pattern: ^(s3://|http(s*)://).+$
       minLength: 1
       maxLength: 2000
+    UtteranceEvent:
+      type: object
+      properties:
+        UtteranceId:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The unique identifier that is associated with the specified
+            `UtteranceEvent`.
+        IsPartial:
+          allOf:
+          - $ref: '#/components/schemas/Boolean'
+          description: Indicates whether the segment in the `UtteranceEvent` is complete
+            (`FALSE`) or partial (`TRUE`).
+        ParticipantRole:
+          allOf:
+          - $ref: '#/components/schemas/ParticipantRole'
+          description: Provides the role of the speaker for each audio channel, either
+            `CUSTOMER` or `AGENT`.
+        BeginOffsetMillis:
+          allOf:
+          - $ref: '#/components/schemas/Long'
+          description: The time, in milliseconds, from the beginning of the audio
+            stream to the start of the `UtteranceEvent`.
+        EndOffsetMillis:
+          allOf:
+          - $ref: '#/components/schemas/Long'
+          description: The time, in milliseconds, from the beginning of the audio
+            stream to the start of the `UtteranceEvent`.
+        Transcript:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: Contains transcribed text.
+        Items:
+          allOf:
+          - $ref: '#/components/schemas/CallAnalyticsItemList'
+          description: Contains words, phrases, or punctuation marks that are associated
+            with the specified `UtteranceEvent`.
+        Entities:
+          allOf:
+          - $ref: '#/components/schemas/CallAnalyticsEntityList'
+          description: Contains entities identified as personally identifiable information
+            (PII) in your transcription output.
+        Sentiment:
+          allOf:
+          - $ref: '#/components/schemas/Sentiment'
+          description: Provides the sentiment that was detected in the specified segment.
+        IssuesDetected:
+          allOf:
+          - $ref: '#/components/schemas/IssuesDetected'
+          description: Provides the issue that was detected in the specified segment.
+      description: Contains set of transcription results from one or more audio segments,
+        along with additional information about the parameters included in your request.
+        For example, channel definitions, partial result stabilization, sentiment,
+        and issue detection.
     VocabularyFilterMethod:
       type: string
       enum:

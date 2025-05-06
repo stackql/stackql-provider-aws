@@ -7,7 +7,7 @@ info:
   x-stackql-serviceName: route53profiles
   x-aws-serviceName: route53profiles
   x-aws-protocol: aws.protocols#restJson1
-  x-dateGenerated: '2025-05-05'
+  x-dateGenerated: '2025-05-07'
   version: '2018-05-10'
   title: Route 53 Profiles
   description: |-
@@ -43,9 +43,430 @@ servers:
       - sa-east-1
       - me-south-1
       default: us-east-1
-paths: {}
+paths:
+  /profileassociation:
+    post:
+      operationId: AssociateProfile
+      description: |-
+        Associates a Route 53 Profiles profile with a VPC. A VPC can have only one Profile associated with it, but a Profile can be associated with 1000 of VPCs (and you can request a higher quota). For more information, see <https://docs.aws.amazon.com/Route53/latest/DeveloperGuide/DNSLimitations.html#limits-api-entities>.
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                ProfileId:
+                  $ref: '#/components/schemas/ResourceId'
+                ResourceId:
+                  $ref: '#/components/schemas/ResourceId'
+                Name:
+                  $ref: '#/components/schemas/Name'
+                Tags:
+                  $ref: '#/components/schemas/TagList'
+      responses:
+        '200': {}
+        '400':
+          description: |-
+            You have provided an invalid command.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+  /profileresourceassociation:
+    post:
+      operationId: AssociateResourceToProfile
+      description: |-
+        Associates a DNS reource configuration to a Route 53 Profile.
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                ProfileId:
+                  $ref: '#/components/schemas/ResourceId'
+                ResourceArn:
+                  $ref: '#/components/schemas/Arn'
+                Name:
+                  $ref: '#/components/schemas/Name'
+                ResourceProperties:
+                  $ref: '#/components/schemas/ResourceProperties'
+      responses:
+        '200': {}
+        '400':
+          description: |-
+            You have provided an invalid command.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+  /profile:
+    post:
+      operationId: CreateProfile
+      description: |-
+        Creates an empty Route 53 Profile.
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                Name:
+                  $ref: '#/components/schemas/Name'
+                ClientToken:
+                  $ref: '#/components/schemas/CreatorRequestId'
+                Tags:
+                  $ref: '#/components/schemas/TagList'
+      responses:
+        '200': {}
+        '400':
+          description: |-
+            You have provided an invalid command.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+  /profile/{ProfileId}:
+    delete:
+      operationId: DeleteProfile
+      description: |-
+        Deletes the specified Route 53 Profile. Before you can delete a profile, you must first disassociate it from all VPCs.
+      parameters:
+      - name: ProfileId
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/ResourceId'
+      responses:
+        '200': {}
+        '400':
+          description: |-
+            You have provided an invalid command.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+    get:
+      operationId: GetProfile
+      description: |-
+        Returns information about a specified Route 53 Profile, such as whether whether the Profile is shared, and the current status of the Profile.
+      parameters:
+      - name: ProfileId
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/ResourceId'
+      responses:
+        '200': {}
+        '400':
+          description: |-
+            You have provided an invalid command.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+  /profileassociation/Profileid/{ProfileId}/resourceid/{ResourceId}:
+    delete:
+      operationId: DisassociateProfile
+      description: |-
+        Dissociates a specified Route 53 Profile from the specified VPC.
+      parameters:
+      - name: ProfileId
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/ResourceId'
+      - name: ResourceId
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/ResourceId'
+      responses:
+        '200': {}
+        '400':
+          description: |-
+            You have provided an invalid command.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+  /profileresourceassociation/profileid/{ProfileId}/resourcearn/{ResourceArn}:
+    delete:
+      operationId: DisassociateResourceFromProfile
+      description: |-
+        Dissoaciated a specified resource, from the Route 53 Profile.
+      parameters:
+      - name: ProfileId
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/ResourceId'
+      - name: ResourceArn
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/Arn'
+      responses:
+        '200': {}
+        '400':
+          description: |-
+            You have provided an invalid command.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+  /profileassociation/{ProfileAssociationId}:
+    get:
+      operationId: GetProfileAssociation
+      description: |-
+        Retrieves a Route 53 Profile association for a VPC. A VPC can have only one Profile association, but a Profile can be associated with up to 5000 VPCs.
+      parameters:
+      - name: ProfileAssociationId
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/ResourceId'
+      responses:
+        '200': {}
+        '400':
+          description: |-
+            You have provided an invalid command.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+  /profileresourceassociation/{ProfileResourceAssociationId}:
+    get:
+      operationId: GetProfileResourceAssociation
+      description: |-
+        Returns information about a specified Route 53 Profile resource association.
+      parameters:
+      - name: ProfileResourceAssociationId
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/ResourceId'
+      responses:
+        '200': {}
+        '400':
+          description: |-
+            You have provided an invalid command.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+    patch:
+      operationId: UpdateProfileResourceAssociation
+      description: |-
+        Updates the specified Route 53 Profile resourse association.
+      parameters:
+      - name: ProfileResourceAssociationId
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/ResourceId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                Name:
+                  $ref: '#/components/schemas/Name'
+                ResourceProperties:
+                  $ref: '#/components/schemas/ResourceProperties'
+      responses:
+        '200': {}
+        '400':
+          description: |-
+            You have provided an invalid command.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+  /profileassociations:
+    get:
+      operationId: ListProfileAssociations
+      description: |-
+        Lists all the VPCs that the specified Route 53 Profile is associated with.
+      parameters:
+      - name: resourceId
+        in: query
+        required: false
+        schema:
+          $ref: '#/components/schemas/ResourceId'
+      - name: profileId
+        in: query
+        required: false
+        schema:
+          $ref: '#/components/schemas/ResourceId'
+      - name: maxResults
+        in: query
+        required: false
+        schema:
+          $ref: '#/components/schemas/MaxResults'
+      - name: nextToken
+        in: query
+        required: false
+        schema:
+          $ref: '#/components/schemas/NextToken'
+      responses:
+        '200': {}
+        '400':
+          description: |-
+            You have provided an invalid command.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+  /profileresourceassociations/profileid/{ProfileId}:
+    get:
+      operationId: ListProfileResourceAssociations
+      description: |-
+        Lists all the resource associations for the specified Route 53 Profile.
+      parameters:
+      - name: ProfileId
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/ResourceId'
+      - name: resourceType
+        in: query
+        required: false
+        schema:
+          $ref: '#/components/schemas/String'
+      - name: maxResults
+        in: query
+        required: false
+        schema:
+          $ref: '#/components/schemas/MaxResults'
+      - name: nextToken
+        in: query
+        required: false
+        schema:
+          $ref: '#/components/schemas/NextToken'
+      responses:
+        '200': {}
+        '400':
+          description: |-
+            You have provided an invalid command.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+  /profiles:
+    get:
+      operationId: ListProfiles
+      description: |-
+        Lists all the Route 53 Profiles associated with your Amazon Web Services account.
+      parameters:
+      - name: maxResults
+        in: query
+        required: false
+        schema:
+          $ref: '#/components/schemas/MaxResults'
+      - name: nextToken
+        in: query
+        required: false
+        schema:
+          $ref: '#/components/schemas/NextToken'
+      responses:
+        '200': {}
+        '400':
+          description: |-
+            You have provided an invalid command.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+  /tags/{ResourceArn}:
+    get:
+      operationId: ListTagsForResource
+      description: |-
+        Lists the tags that you associated with the specified resource.
+      parameters:
+      - name: ResourceArn
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/Arn'
+      responses:
+        '200': {}
+        '400':
+          description: |-
+            You have provided an invalid command.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+    post:
+      operationId: TagResource
+      description: |-
+        Adds one or more tags to a specified resource.
+      parameters:
+      - name: ResourceArn
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/Arn'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                Tags:
+                  $ref: '#/components/schemas/TagMap'
+      responses:
+        '204': {}
+        '400':
+          description: |-
+            You have provided an invalid command.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+    delete:
+      operationId: UntagResource
+      description: |-
+        Removes one or more tags from a specified resource.
+      parameters:
+      - name: ResourceArn
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/Arn'
+      - name: tagKeys
+        in: query
+        required: true
+        schema:
+          $ref: '#/components/schemas/TagKeyList'
+      responses:
+        '204': {}
+        '400':
+          description: |-
+            You have provided an invalid command.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
 components:
   schemas:
+    AccessDeniedException:
+      type: object
+      properties:
+        Message:
+          $ref: '#/components/schemas/ExceptionMessage'
+      description: The current account doesn't have the IAM permissions required to
+        perform the specified operation.
     AccountId:
       type: string
       minLength: 12
@@ -54,12 +475,421 @@ components:
       type: string
       minLength: 1
       maxLength: 255
+    AssociateProfileRequest:
+      type: object
+      properties:
+        ProfileId:
+          allOf:
+          - $ref: '#/components/schemas/ResourceId'
+          description: ID of the Profile.
+        ResourceId:
+          allOf:
+          - $ref: '#/components/schemas/ResourceId'
+          description: The ID of the VPC.
+        Name:
+          allOf:
+          - $ref: '#/components/schemas/Name'
+          description: A name for the association.
+        Tags:
+          allOf:
+          - $ref: '#/components/schemas/TagList'
+          description: A list of the tag keys and values that you want to identify
+            the Profile association.
+      required:
+      - ProfileId
+      - ResourceId
+      - Name
+    AssociateProfileResponse:
+      type: object
+      properties:
+        ProfileAssociation:
+          allOf:
+          - $ref: '#/components/schemas/ProfileAssociation'
+          description: The association that you just created. The association has
+            an ID that you can use to identify it in other requests, like update and
+            delete.
+    AssociateResourceToProfileRequest:
+      type: object
+      properties:
+        ProfileId:
+          allOf:
+          - $ref: '#/components/schemas/ResourceId'
+          description: ID of the Profile.
+        ResourceArn:
+          allOf:
+          - $ref: '#/components/schemas/Arn'
+          description: Amazon resource number, ARN, of the DNS resource.
+        Name:
+          allOf:
+          - $ref: '#/components/schemas/Name'
+          description: Name for the resource association.
+        ResourceProperties:
+          allOf:
+          - $ref: '#/components/schemas/ResourceProperties'
+          description: 'If you are adding a DNS Firewall rule group, include also
+            a priority. The priority indicates the processing order for the rule groups,
+            starting with the priority assinged the lowest value.
+
+
+            The allowed values for priority are between 100 and 9900.'
+      required:
+      - ProfileId
+      - ResourceArn
+      - Name
+    AssociateResourceToProfileResponse:
+      type: object
+      properties:
+        ProfileResourceAssociation:
+          allOf:
+          - $ref: '#/components/schemas/ProfileResourceAssociation'
+          description: Infromation about the `AssociateResourceToProfile`, including
+            a status message.
+    ConflictException:
+      type: object
+      properties:
+        Message:
+          $ref: '#/components/schemas/ExceptionMessage'
+      description: The request you submitted conflicts with an existing request.
+    CreateProfileRequest:
+      type: object
+      properties:
+        Name:
+          allOf:
+          - $ref: '#/components/schemas/Name'
+          description: A name for the Profile.
+        ClientToken:
+          allOf:
+          - $ref: '#/components/schemas/CreatorRequestId'
+          description: '`ClientToken` is an idempotency token that ensures a call
+            to `CreateProfile` completes only once. You choose the value to pass.
+            For example, an issue might prevent you from getting a response from `CreateProfile`.
+            In this case, safely retry your call to `CreateProfile` by using the same
+            `CreateProfile` parameter value.'
+        Tags:
+          allOf:
+          - $ref: '#/components/schemas/TagList'
+          description: A list of the tag keys and values that you want to associate
+            with the Route 53 Profile.
+      required:
+      - Name
+      - ClientToken
+    CreateProfileResponse:
+      type: object
+      properties:
+        Profile:
+          allOf:
+          - $ref: '#/components/schemas/Profile'
+          description: The Profile that you just created.
     CreatorRequestId:
       type: string
       minLength: 1
       maxLength: 255
+    DeleteProfileRequest:
+      type: object
+      properties:
+        ProfileId:
+          allOf:
+          - $ref: '#/components/schemas/ResourceId'
+          description: The ID of the Profile that you want to delete.
+      required:
+      - ProfileId
+    DeleteProfileResponse:
+      type: object
+      properties:
+        Profile:
+          allOf:
+          - $ref: '#/components/schemas/Profile'
+          description: Information about the `DeleteProfile` request, including the
+            status of the request.
+    DisassociateProfileRequest:
+      type: object
+      properties:
+        ProfileId:
+          allOf:
+          - $ref: '#/components/schemas/ResourceId'
+          description: ID of the Profile.
+        ResourceId:
+          allOf:
+          - $ref: '#/components/schemas/ResourceId'
+          description: The ID of the VPC.
+      required:
+      - ProfileId
+      - ResourceId
+    DisassociateProfileResponse:
+      type: object
+      properties:
+        ProfileAssociation:
+          allOf:
+          - $ref: '#/components/schemas/ProfileAssociation'
+          description: Information about the `DisassociateProfile` request.
+    DisassociateResourceFromProfileRequest:
+      type: object
+      properties:
+        ProfileId:
+          allOf:
+          - $ref: '#/components/schemas/ResourceId'
+          description: The ID of the Profile.
+        ResourceArn:
+          allOf:
+          - $ref: '#/components/schemas/Arn'
+          description: The Amazon Resource Name (ARN) of the resource.
+      required:
+      - ProfileId
+      - ResourceArn
+    DisassociateResourceFromProfileResponse:
+      type: object
+      properties:
+        ProfileResourceAssociation:
+          allOf:
+          - $ref: '#/components/schemas/ProfileResourceAssociation'
+          description: Information about the `DisassociateResourceFromProfile` request,
+            including the status of the request.
     ExceptionMessage:
       type: string
+    GetProfileAssociationRequest:
+      type: object
+      properties:
+        ProfileAssociationId:
+          allOf:
+          - $ref: '#/components/schemas/ResourceId'
+          description: The identifier of the association you want to get information
+            about.
+      required:
+      - ProfileAssociationId
+    GetProfileAssociationResponse:
+      type: object
+      properties:
+        ProfileAssociation:
+          allOf:
+          - $ref: '#/components/schemas/ProfileAssociation'
+          description: Information about the Profile association that you specified
+            in a `GetProfileAssociation` request.
+    GetProfileRequest:
+      type: object
+      properties:
+        ProfileId:
+          allOf:
+          - $ref: '#/components/schemas/ResourceId'
+          description: ID of the Profile.
+      required:
+      - ProfileId
+    GetProfileResourceAssociationRequest:
+      type: object
+      properties:
+        ProfileResourceAssociationId:
+          allOf:
+          - $ref: '#/components/schemas/ResourceId'
+          description: The ID of the profile resource association that you want to
+            get information about.
+      required:
+      - ProfileResourceAssociationId
+    GetProfileResourceAssociationResponse:
+      type: object
+      properties:
+        ProfileResourceAssociation:
+          allOf:
+          - $ref: '#/components/schemas/ProfileResourceAssociation'
+          description: Information about the Profile resource association that you
+            specified in a `GetProfileResourceAssociation` request.
+    GetProfileResponse:
+      type: object
+      properties:
+        Profile:
+          allOf:
+          - $ref: '#/components/schemas/Profile'
+          description: Information about the Profile, including the status of the
+            Profile.
+    InternalServiceErrorException:
+      type: object
+      properties:
+        Message:
+          $ref: '#/components/schemas/ExceptionMessage'
+      description: An internal server error occured. Retry your request.
+    InvalidNextTokenException:
+      type: object
+      properties:
+        Message:
+          $ref: '#/components/schemas/String'
+      description: The `NextToken` you provided isn;t valid.
+    InvalidParameterException:
+      type: object
+      properties:
+        Message:
+          $ref: '#/components/schemas/ExceptionMessage'
+        FieldName:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The parameter field name for the invalid parameter exception.
+      required:
+      - Message
+      description: One or more parameters in this request are not valid.
+    LimitExceededException:
+      type: object
+      properties:
+        Message:
+          $ref: '#/components/schemas/String'
+        ResourceType:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The resource type that caused the limits to be exceeded.
+      description: The request caused one or more limits to be exceeded.
+    ListProfileAssociationsRequest:
+      type: object
+      properties:
+        ResourceId:
+          allOf:
+          - $ref: '#/components/schemas/ResourceId'
+          description: ID of the VPC.
+        ProfileId:
+          allOf:
+          - $ref: '#/components/schemas/ResourceId'
+          description: ID of the Profile.
+        MaxResults:
+          allOf:
+          - $ref: '#/components/schemas/MaxResults'
+          description: 'The maximum number of objects that you want to return for
+            this request. If more objects are available, in the response, a `NextToken`
+            value, which you can use in a subsequent call to get the next batch of
+            objects, is provided.
+
+
+            If you don''t specify a value for `MaxResults`, up to 100 objects are
+            returned.'
+        NextToken:
+          allOf:
+          - $ref: '#/components/schemas/NextToken'
+          description: 'For the first call to this list request, omit this value.
+
+
+            When you request a list of objects, at most the number of objects specified
+            by `MaxResults` is returned. If more objects are available for retrieval,
+            a `NextToken` value is returned in the response. To retrieve the next
+            batch of objects, use the token that was returned for the prior request
+            in your next request.'
+    ListProfileAssociationsResponse:
+      type: object
+      properties:
+        ProfileAssociations:
+          allOf:
+          - $ref: '#/components/schemas/ProfileAssociations'
+          description: A complex type that containts settings information about the
+            profile's VPC associations.
+        NextToken:
+          allOf:
+          - $ref: '#/components/schemas/NextToken'
+          description: If more than `MaxResults` profile associations match the specified
+            criteria, you can submit another `ListProfileAssociations` request to
+            get the next group of results. In the next request, specify the value
+            of `NextToken` from the previous response.
+    ListProfileResourceAssociationsRequest:
+      type: object
+      properties:
+        ProfileId:
+          allOf:
+          - $ref: '#/components/schemas/ResourceId'
+          description: The ID of the Profile.
+        ResourceType:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: ID of a resource if you want information on only one type.
+        MaxResults:
+          allOf:
+          - $ref: '#/components/schemas/MaxResults'
+          description: 'The maximum number of objects that you want to return for
+            this request. If more objects are available, in the response, a `NextToken`
+            value, which you can use in a subsequent call to get the next batch of
+            objects, is provided.
+
+
+            If you don''t specify a value for `MaxResults`, up to 100 objects are
+            returned.'
+        NextToken:
+          allOf:
+          - $ref: '#/components/schemas/NextToken'
+          description: 'For the first call to this list request, omit this value.
+
+
+            When you request a list of objects, at most the number of objects specified
+            by `MaxResults` is returned. If more objects are available for retrieval,
+            a `NextToken` value is returned in the response. To retrieve the next
+            batch of objects, use the token that was returned for the prior request
+            in your next request.'
+      required:
+      - ProfileId
+    ListProfileResourceAssociationsResponse:
+      type: object
+      properties:
+        ProfileResourceAssociations:
+          allOf:
+          - $ref: '#/components/schemas/ProfileResourceAssociations'
+          description: Information about the profile resource association that you
+            specified in a `GetProfileResourceAssociation` request.
+        NextToken:
+          allOf:
+          - $ref: '#/components/schemas/NextToken'
+          description: If more than `MaxResults` resource associations match the specified
+            criteria, you can submit another `ListProfileResourceAssociations` request
+            to get the next group of results. In the next request, specify the value
+            of `NextToken` from the previous response.
+    ListProfilesRequest:
+      type: object
+      properties:
+        MaxResults:
+          allOf:
+          - $ref: '#/components/schemas/MaxResults'
+          description: 'The maximum number of objects that you want to return for
+            this request. If more objects are available, in the response, a `NextToken`
+            value, which you can use in a subsequent call to get the next batch of
+            objects, is provided.
+
+
+            If you don''t specify a value for `MaxResults`, up to 100 objects are
+            returned.'
+        NextToken:
+          allOf:
+          - $ref: '#/components/schemas/NextToken'
+          description: 'For the first call to this list request, omit this value.
+
+
+            When you request a list of objects, at most the number of objects specified
+            by `MaxResults` is returned. If more objects are available for retrieval,
+            a `NextToken` value is returned in the response. To retrieve the next
+            batch of objects, use the token that was returned for the prior request
+            in your next request.'
+    ListProfilesResponse:
+      type: object
+      properties:
+        ProfileSummaries:
+          allOf:
+          - $ref: '#/components/schemas/ProfileSummaryList'
+          description: Summary information about the Profiles.
+        NextToken:
+          allOf:
+          - $ref: '#/components/schemas/NextToken'
+          description: If more than `MaxResults` resource associations match the specified
+            criteria, you can submit another `ListProfiles` request to get the next
+            group of results. In the next request, specify the value of `NextToken`
+            from the previous response.
+    ListTagsForResourceRequest:
+      type: object
+      properties:
+        ResourceArn:
+          allOf:
+          - $ref: '#/components/schemas/Arn'
+          description: The Amazon Resource Name (ARN) for the resource that you want
+            to list the tags for.
+      required:
+      - ResourceArn
+    ListTagsForResourceResponse:
+      type: object
+      properties:
+        Tags:
+          allOf:
+          - $ref: '#/components/schemas/TagMap'
+          description: The tags that are associated with the resource that you specified
+            in the `ListTagsForResource` request.
+      required:
+      - Tags
     MaxResults:
       type: integer
       minimum: 1
@@ -71,10 +901,154 @@ components:
       maxLength: 64
     NextToken:
       type: string
+    Profile:
+      type: object
+      properties:
+        Id:
+          allOf:
+          - $ref: '#/components/schemas/ResourceId'
+          description: ID of the Profile.
+        Arn:
+          allOf:
+          - $ref: '#/components/schemas/Arn'
+          description: The Amazon Resource Name (ARN) of the Profile.
+        Name:
+          allOf:
+          - $ref: '#/components/schemas/Name'
+          description: Name of the Profile.
+        OwnerId:
+          allOf:
+          - $ref: '#/components/schemas/AccountId'
+          description: Amazon Web Services account ID of the Profile owner.
+        Status:
+          allOf:
+          - $ref: '#/components/schemas/ProfileStatus'
+          description: The status for the Profile.
+        StatusMessage:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: Status message that includes additiona information about the
+            Profile.
+        ShareStatus:
+          allOf:
+          - $ref: '#/components/schemas/ShareStatus'
+          description: Sharing status for the Profile.
+        CreationTime:
+          allOf:
+          - $ref: '#/components/schemas/Rfc3339Timestamp'
+          description: The date and time that the Profile was created, in Unix time
+            format and Coordinated Universal Time (UTC).
+        ModificationTime:
+          allOf:
+          - $ref: '#/components/schemas/Rfc3339Timestamp'
+          description: The date and time that the Profile was modified, in Unix time
+            format and Coordinated Universal Time (UTC).
+        ClientToken:
+          allOf:
+          - $ref: '#/components/schemas/CreatorRequestId'
+          description: The `ClientToken` value that was assigned when the Profile
+            was created.
+      description: A complex type that includes settings for a Route 53 Profile.
+    ProfileAssociation:
+      type: object
+      properties:
+        Id:
+          allOf:
+          - $ref: '#/components/schemas/ResourceId'
+          description: ID of the Profile association.
+        Name:
+          allOf:
+          - $ref: '#/components/schemas/Name'
+          description: Name of the Profile association.
+        OwnerId:
+          allOf:
+          - $ref: '#/components/schemas/AccountId'
+          description: Amazon Web Services account ID of the Profile association owner.
+        ProfileId:
+          allOf:
+          - $ref: '#/components/schemas/ResourceId'
+          description: ID of the Profile.
+        ResourceId:
+          allOf:
+          - $ref: '#/components/schemas/ResourceId'
+          description: The Amazon Resource Name (ARN) of the VPC.
+        Status:
+          allOf:
+          - $ref: '#/components/schemas/ProfileStatus'
+          description: Status of the Profile association.
+        StatusMessage:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: Additional information about the Profile association.
+        CreationTime:
+          allOf:
+          - $ref: '#/components/schemas/Rfc3339Timestamp'
+          description: The date and time that the Profile association was created,
+            in Unix time format and Coordinated Universal Time (UTC).
+        ModificationTime:
+          allOf:
+          - $ref: '#/components/schemas/Rfc3339Timestamp'
+          description: The date and time that the Profile association was modified,
+            in Unix time format and Coordinated Universal Time (UTC).
+      description: An association between a Route 53 Profile and a VPC.
     ProfileAssociations:
       type: array
       items:
         $ref: '#/components/schemas/ProfileAssociation'
+    ProfileResourceAssociation:
+      type: object
+      properties:
+        Id:
+          allOf:
+          - $ref: '#/components/schemas/ResourceId'
+          description: ID of the Profile resource association.
+        Name:
+          allOf:
+          - $ref: '#/components/schemas/Name'
+          description: Name of the Profile resource association.
+        OwnerId:
+          allOf:
+          - $ref: '#/components/schemas/AccountId'
+          description: Amazon Web Services account ID of the Profile resource association
+            owner.
+        ProfileId:
+          allOf:
+          - $ref: '#/components/schemas/ResourceId'
+          description: Profile ID of the Profile that the resources are associated
+            with.
+        ResourceArn:
+          allOf:
+          - $ref: '#/components/schemas/Arn'
+          description: The Amazon Resource Name (ARN) of the resource association.
+        ResourceType:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: Resource type, such as a private hosted zone, or DNS Firewall
+            rule group.
+        ResourceProperties:
+          allOf:
+          - $ref: '#/components/schemas/ResourceProperties'
+          description: If the DNS resource is a DNS Firewall rule group, this indicates
+            the priority.
+        Status:
+          allOf:
+          - $ref: '#/components/schemas/ProfileStatus'
+          description: Status of the Profile resource association.
+        StatusMessage:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: Additional information about the Profile resource association.
+        CreationTime:
+          allOf:
+          - $ref: '#/components/schemas/Rfc3339Timestamp'
+          description: The date and time that the Profile resource association was
+            created, in Unix time format and Coordinated Universal Time (UTC).
+        ModificationTime:
+          allOf:
+          - $ref: '#/components/schemas/Rfc3339Timestamp'
+          description: The date and time that the Profile resource association was
+            modified, in Unix time format and Coordinated Universal Time (UTC).
+      description: The association between a Route 53 Profile and resources.
     ProfileResourceAssociations:
       type: array
       items:
@@ -88,14 +1062,54 @@ components:
       - CREATING
       - DELETED
       - FAILED
+    ProfileSummary:
+      type: object
+      properties:
+        Id:
+          allOf:
+          - $ref: '#/components/schemas/ResourceId'
+          description: ID of the Profile.
+        Arn:
+          allOf:
+          - $ref: '#/components/schemas/Arn'
+          description: The Amazon Resource Name (ARN) of the Profile.
+        Name:
+          allOf:
+          - $ref: '#/components/schemas/Name'
+          description: Name of the Profile.
+        ShareStatus:
+          allOf:
+          - $ref: '#/components/schemas/ShareStatus'
+          description: Share status of the Profile.
+      description: Summary information about a Route 53 Profile.
     ProfileSummaryList:
       type: array
       items:
         $ref: '#/components/schemas/ProfileSummary'
+    ResourceExistsException:
+      type: object
+      properties:
+        Message:
+          $ref: '#/components/schemas/String'
+        ResourceType:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The resource type that caused the resource exists exception.
+      description: The resource you are trying to associate, has already been associated.
     ResourceId:
       type: string
       minLength: 1
       maxLength: 64
+    ResourceNotFoundException:
+      type: object
+      properties:
+        Message:
+          $ref: '#/components/schemas/String'
+        ResourceType:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The resource type that caused the resource not found exception.
+      description: The resource you are associating is not found.
     ResourceProperties:
       type: string
     Rfc3339Timestamp:
@@ -109,6 +1123,21 @@ components:
       - SHARED_BY_ME
     String:
       type: string
+    Tag:
+      type: object
+      properties:
+        Key:
+          allOf:
+          - $ref: '#/components/schemas/TagKey'
+          description: Key associated with the `Tag`.
+        Value:
+          allOf:
+          - $ref: '#/components/schemas/TagValue'
+          description: Value for the Tag.
+      required:
+      - Key
+      - Value
+      description: Tag for the Profile.
     TagKey:
       type: string
       minLength: 1
@@ -125,7 +1154,85 @@ components:
       type: object
       additionalProperties:
         $ref: '#/components/schemas/TagValue'
+    TagResourceRequest:
+      type: object
+      properties:
+        ResourceArn:
+          allOf:
+          - $ref: '#/components/schemas/Arn'
+          description: The Amazon Resource Name (ARN) for the resource that you want
+            to add tags to.
+        Tags:
+          allOf:
+          - $ref: '#/components/schemas/TagMap'
+          description: The tags that you want to add to the specified resource.
+      required:
+      - ResourceArn
+      - Tags
+    TagResourceResponse:
+      type: object
+      properties: {}
     TagValue:
       type: string
       minLength: 0
       maxLength: 256
+    ThrottlingException:
+      type: object
+      properties:
+        Message:
+          $ref: '#/components/schemas/ExceptionMessage'
+      description: The request was throttled. Try again in a few minutes.
+    UntagResourceRequest:
+      type: object
+      properties:
+        ResourceArn:
+          allOf:
+          - $ref: '#/components/schemas/Arn'
+          description: The Amazon Resource Name (ARN) for the resource that you want
+            to remove tags from.
+        TagKeys:
+          allOf:
+          - $ref: '#/components/schemas/TagKeyList'
+          description: The tags that you want to remove to the specified resource.
+      required:
+      - ResourceArn
+      - TagKeys
+    UntagResourceResponse:
+      type: object
+      properties: {}
+    UpdateProfileResourceAssociationRequest:
+      type: object
+      properties:
+        ProfileResourceAssociationId:
+          allOf:
+          - $ref: '#/components/schemas/ResourceId'
+          description: ID of the resource association.
+        Name:
+          allOf:
+          - $ref: '#/components/schemas/Name'
+          description: Name of the resource association.
+        ResourceProperties:
+          allOf:
+          - $ref: '#/components/schemas/ResourceProperties'
+          description: 'If you are adding a DNS Firewall rule group, include also
+            a priority. The priority indicates the processing order for the rule groups,
+            starting with the priority assinged the lowest value.
+
+
+            The allowed values for priority are between 100 and 9900.'
+      required:
+      - ProfileResourceAssociationId
+    UpdateProfileResourceAssociationResponse:
+      type: object
+      properties:
+        ProfileResourceAssociation:
+          allOf:
+          - $ref: '#/components/schemas/ProfileResourceAssociation'
+          description: Information about the `UpdateProfileResourceAssociation` request,
+            including a status message.
+    ValidationException:
+      type: object
+      properties:
+        Message:
+          $ref: '#/components/schemas/ExceptionMessage'
+      description: You have provided an invalid command.

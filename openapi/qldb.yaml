@@ -7,7 +7,7 @@ info:
   x-stackql-serviceName: qldb
   x-aws-serviceName: qldb
   x-aws-protocol: aws.protocols#restJson1
-  x-dateGenerated: '2025-05-05'
+  x-dateGenerated: '2025-05-07'
   version: '2019-01-02'
   title: Amazon QLDB
   description: |-
@@ -43,7 +43,748 @@ servers:
       - sa-east-1
       - me-south-1
       default: us-east-1
-paths: {}
+paths:
+  /ledgers/{LedgerName}/journal-kinesis-streams/{StreamId}:
+    delete:
+      operationId: CancelJournalKinesisStream
+      description: |-
+        Ends a given Amazon QLDB journal stream. Before a stream can be canceled, its current status must be `ACTIVE`.
+
+        You can't restart a stream after you cancel it. Canceled QLDB stream resources are subject to a 7-day retention period, so they are automatically deleted after this limit expires.
+      parameters:
+      - name: LedgerName
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/LedgerName'
+      - name: StreamId
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/UniqueId'
+      responses:
+        '200': {}
+        '400':
+          description: |-
+            One or more parameters in the request aren't valid.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InvalidParameterException'
+        '404':
+          description: |-
+            The specified resource doesn't exist.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+        '412':
+          description: |-
+            The operation failed because a condition wasn't satisfied in advance.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourcePreconditionNotMetException'
+    get:
+      operationId: DescribeJournalKinesisStream
+      description: |-
+        Returns detailed information about a given Amazon QLDB journal stream. The output includes the Amazon Resource Name (ARN), stream name, current status, creation time, and the parameters of the original stream creation request.
+
+        This action does not return any expired journal streams. For more information, see [Expiration for terminal streams](https://docs.aws.amazon.com/qldb/latest/developerguide/streams.create.html#streams.create.states.expiration) in the _Amazon QLDB Developer Guide_.
+      parameters:
+      - name: LedgerName
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/LedgerName'
+      - name: StreamId
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/UniqueId'
+      responses:
+        '200': {}
+        '400':
+          description: |-
+            One or more parameters in the request aren't valid.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InvalidParameterException'
+        '404':
+          description: |-
+            The specified resource doesn't exist.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+        '412':
+          description: |-
+            The operation failed because a condition wasn't satisfied in advance.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourcePreconditionNotMetException'
+  /ledgers:
+    post:
+      operationId: CreateLedger
+      description: |-
+        Creates a new ledger in your Amazon Web Services account in the current Region.
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                Name:
+                  $ref: '#/components/schemas/LedgerName'
+                Tags:
+                  $ref: '#/components/schemas/Tags'
+                PermissionsMode:
+                  $ref: '#/components/schemas/PermissionsMode'
+                DeletionProtection:
+                  $ref: '#/components/schemas/DeletionProtection'
+                KmsKey:
+                  $ref: '#/components/schemas/KmsKey'
+      responses:
+        '200': {}
+        '400':
+          description: |-
+            You have reached the limit on the maximum number of resources allowed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LimitExceededException'
+        '409':
+          description: |-
+            The specified resource can't be modified at this time.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceInUseException'
+    get:
+      operationId: ListLedgers
+      description: |-
+        Returns all ledgers that are associated with the current Amazon Web Services account and Region.
+
+        This action returns a maximum of `MaxResults` items and is paginated so that you can retrieve all the items by calling `ListLedgers` multiple times.
+      parameters:
+      - name: max_results
+        in: query
+        required: false
+        schema:
+          $ref: '#/components/schemas/MaxResults'
+      - name: next_token
+        in: query
+        required: false
+        schema:
+          $ref: '#/components/schemas/NextToken'
+      responses:
+        '200': {}
+  /ledgers/{Name}:
+    delete:
+      operationId: DeleteLedger
+      description: |-
+        Deletes a ledger and all of its contents. This action is irreversible.
+
+        If deletion protection is enabled, you must first disable it before you can delete the ledger. You can disable it by calling the `UpdateLedger` operation to set this parameter to `false`.
+      parameters:
+      - name: Name
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/LedgerName'
+      responses:
+        '200': {}
+        '400':
+          description: |-
+            One or more parameters in the request aren't valid.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InvalidParameterException'
+        '409':
+          description: |-
+            The specified resource can't be modified at this time.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceInUseException'
+        '404':
+          description: |-
+            The specified resource doesn't exist.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+        '412':
+          description: |-
+            The operation failed because a condition wasn't satisfied in advance.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourcePreconditionNotMetException'
+    get:
+      operationId: DescribeLedger
+      description: |-
+        Returns information about a ledger, including its state, permissions mode, encryption at rest settings, and when it was created.
+      parameters:
+      - name: Name
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/LedgerName'
+      responses:
+        '200': {}
+        '400':
+          description: |-
+            One or more parameters in the request aren't valid.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InvalidParameterException'
+        '404':
+          description: |-
+            The specified resource doesn't exist.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+    patch:
+      operationId: UpdateLedger
+      description: |-
+        Updates properties on a ledger.
+      parameters:
+      - name: Name
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/LedgerName'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                DeletionProtection:
+                  $ref: '#/components/schemas/DeletionProtection'
+                KmsKey:
+                  $ref: '#/components/schemas/KmsKey'
+      responses:
+        '200': {}
+        '400':
+          description: |-
+            One or more parameters in the request aren't valid.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InvalidParameterException'
+        '404':
+          description: |-
+            The specified resource doesn't exist.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+  /ledgers/{Name}/journal-s3-exports/{ExportId}:
+    get:
+      operationId: DescribeJournalS3Export
+      description: |-
+        Returns information about a journal export job, including the ledger name, export ID, creation time, current status, and the parameters of the original export creation request.
+
+        This action does not return any expired export jobs. For more information, see [Export job expiration](https://docs.aws.amazon.com/qldb/latest/developerguide/export-journal.request.html#export-journal.request.expiration) in the _Amazon QLDB Developer Guide_.
+
+        If the export job with the given `ExportId` doesn't exist, then throws `ResourceNotFoundException`.
+
+        If the ledger with the given `Name` doesn't exist, then throws `ResourceNotFoundException`.
+      parameters:
+      - name: Name
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/LedgerName'
+      - name: ExportId
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/UniqueId'
+      responses:
+        '200': {}
+        '404':
+          description: |-
+            The specified resource doesn't exist.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+  /ledgers/{Name}/journal-s3-exports:
+    post:
+      operationId: ExportJournalToS3
+      description: |-
+        Exports journal contents within a date and time range from a ledger into a specified Amazon Simple Storage Service (Amazon S3) bucket. A journal export job can write the data objects in either the text or binary representation of Amazon Ion format, or in _JSON Lines_ text format.
+
+        If the ledger with the given `Name` doesn't exist, then throws `ResourceNotFoundException`.
+
+        If the ledger with the given `Name` is in `CREATING` status, then throws `ResourcePreconditionNotMetException`.
+
+        You can initiate up to two concurrent journal export requests for each ledger. Beyond this limit, journal export requests throw `LimitExceededException`.
+      parameters:
+      - name: Name
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/LedgerName'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                InclusiveStartTime:
+                  $ref: '#/components/schemas/Timestamp'
+                ExclusiveEndTime:
+                  $ref: '#/components/schemas/Timestamp'
+                S3ExportConfiguration:
+                  $ref: '#/components/schemas/S3ExportConfiguration'
+                RoleArn:
+                  $ref: '#/components/schemas/Arn'
+                OutputFormat:
+                  $ref: '#/components/schemas/OutputFormat'
+      responses:
+        '200': {}
+        '404':
+          description: |-
+            The specified resource doesn't exist.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+        '412':
+          description: |-
+            The operation failed because a condition wasn't satisfied in advance.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourcePreconditionNotMetException'
+    get:
+      operationId: ListJournalS3ExportsForLedger
+      description: |-
+        Returns all journal export jobs for a specified ledger.
+
+        This action returns a maximum of `MaxResults` items, and is paginated so that you can retrieve all the items by calling `ListJournalS3ExportsForLedger` multiple times.
+
+        This action does not return any expired export jobs. For more information, see [Export job expiration](https://docs.aws.amazon.com/qldb/latest/developerguide/export-journal.request.html#export-journal.request.expiration) in the _Amazon QLDB Developer Guide_.
+      parameters:
+      - name: Name
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/LedgerName'
+      - name: max_results
+        in: query
+        required: false
+        schema:
+          $ref: '#/components/schemas/MaxResults'
+      - name: next_token
+        in: query
+        required: false
+        schema:
+          $ref: '#/components/schemas/NextToken'
+      responses:
+        '200': {}
+  /ledgers/{Name}/block:
+    post:
+      operationId: GetBlock
+      description: |-
+        Returns a block object at a specified address in a journal. Also returns a proof of the specified block for verification if `DigestTipAddress` is provided.
+
+        For information about the data contents in a block, see [Journal contents](https://docs.aws.amazon.com/qldb/latest/developerguide/journal-contents.html) in the _Amazon QLDB Developer Guide_.
+
+        If the specified ledger doesn't exist or is in `DELETING` status, then throws `ResourceNotFoundException`.
+
+        If the specified ledger is in `CREATING` status, then throws `ResourcePreconditionNotMetException`.
+
+        If no block exists with the specified address, then throws `InvalidParameterException`.
+      parameters:
+      - name: Name
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/LedgerName'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                BlockAddress:
+                  $ref: '#/components/schemas/ValueHolder'
+                DigestTipAddress:
+                  $ref: '#/components/schemas/ValueHolder'
+      responses:
+        '200': {}
+        '400':
+          description: |-
+            One or more parameters in the request aren't valid.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InvalidParameterException'
+        '404':
+          description: |-
+            The specified resource doesn't exist.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+        '412':
+          description: |-
+            The operation failed because a condition wasn't satisfied in advance.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourcePreconditionNotMetException'
+  /ledgers/{Name}/digest:
+    post:
+      operationId: GetDigest
+      description: |-
+        Returns the digest of a ledger at the latest committed block in the journal. The response includes a 256-bit hash value and a block address.
+      parameters:
+      - name: Name
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/LedgerName'
+      responses:
+        '200': {}
+        '400':
+          description: |-
+            One or more parameters in the request aren't valid.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InvalidParameterException'
+        '404':
+          description: |-
+            The specified resource doesn't exist.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+        '412':
+          description: |-
+            The operation failed because a condition wasn't satisfied in advance.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourcePreconditionNotMetException'
+  /ledgers/{Name}/revision:
+    post:
+      operationId: GetRevision
+      description: |-
+        Returns a revision data object for a specified document ID and block address. Also returns a proof of the specified revision for verification if `DigestTipAddress` is provided.
+      parameters:
+      - name: Name
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/LedgerName'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                BlockAddress:
+                  $ref: '#/components/schemas/ValueHolder'
+                DocumentId:
+                  $ref: '#/components/schemas/UniqueId'
+                DigestTipAddress:
+                  $ref: '#/components/schemas/ValueHolder'
+      responses:
+        '200': {}
+        '400':
+          description: |-
+            One or more parameters in the request aren't valid.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InvalidParameterException'
+        '404':
+          description: |-
+            The specified resource doesn't exist.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+        '412':
+          description: |-
+            The operation failed because a condition wasn't satisfied in advance.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourcePreconditionNotMetException'
+  /ledgers/{LedgerName}/journal-kinesis-streams:
+    get:
+      operationId: ListJournalKinesisStreamsForLedger
+      description: |-
+        Returns all Amazon QLDB journal streams for a given ledger.
+
+        This action does not return any expired journal streams. For more information, see [Expiration for terminal streams](https://docs.aws.amazon.com/qldb/latest/developerguide/streams.create.html#streams.create.states.expiration) in the _Amazon QLDB Developer Guide_.
+
+        This action returns a maximum of `MaxResults` items. It is paginated so that you can retrieve all the items by calling `ListJournalKinesisStreamsForLedger` multiple times.
+      parameters:
+      - name: LedgerName
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/LedgerName'
+      - name: max_results
+        in: query
+        required: false
+        schema:
+          $ref: '#/components/schemas/MaxResults'
+      - name: next_token
+        in: query
+        required: false
+        schema:
+          $ref: '#/components/schemas/NextToken'
+      responses:
+        '200': {}
+        '400':
+          description: |-
+            One or more parameters in the request aren't valid.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InvalidParameterException'
+        '404':
+          description: |-
+            The specified resource doesn't exist.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+        '412':
+          description: |-
+            The operation failed because a condition wasn't satisfied in advance.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourcePreconditionNotMetException'
+    post:
+      operationId: StreamJournalToKinesis
+      description: |-
+        Creates a journal stream for a given Amazon QLDB ledger. The stream captures every document revision that is committed to the ledger's journal and delivers the data to a specified Amazon Kinesis Data Streams resource.
+      parameters:
+      - name: LedgerName
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/LedgerName'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                RoleArn:
+                  $ref: '#/components/schemas/Arn'
+                Tags:
+                  $ref: '#/components/schemas/Tags'
+                InclusiveStartTime:
+                  $ref: '#/components/schemas/Timestamp'
+                ExclusiveEndTime:
+                  $ref: '#/components/schemas/Timestamp'
+                KinesisConfiguration:
+                  $ref: '#/components/schemas/KinesisConfiguration'
+                StreamName:
+                  $ref: '#/components/schemas/StreamName'
+      responses:
+        '200': {}
+        '400':
+          description: |-
+            One or more parameters in the request aren't valid.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InvalidParameterException'
+        '404':
+          description: |-
+            The specified resource doesn't exist.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+        '412':
+          description: |-
+            The operation failed because a condition wasn't satisfied in advance.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourcePreconditionNotMetException'
+  /journal-s3-exports:
+    get:
+      operationId: ListJournalS3Exports
+      description: |-
+        Returns all journal export jobs for all ledgers that are associated with the current Amazon Web Services account and Region.
+
+        This action returns a maximum of `MaxResults` items, and is paginated so that you can retrieve all the items by calling `ListJournalS3Exports` multiple times.
+
+        This action does not return any expired export jobs. For more information, see [Export job expiration](https://docs.aws.amazon.com/qldb/latest/developerguide/export-journal.request.html#export-journal.request.expiration) in the _Amazon QLDB Developer Guide_.
+      parameters:
+      - name: max_results
+        in: query
+        required: false
+        schema:
+          $ref: '#/components/schemas/MaxResults'
+      - name: next_token
+        in: query
+        required: false
+        schema:
+          $ref: '#/components/schemas/NextToken'
+      responses:
+        '200': {}
+  /tags/{ResourceArn}:
+    get:
+      operationId: ListTagsForResource
+      description: |-
+        Returns all tags for a specified Amazon QLDB resource.
+      parameters:
+      - name: ResourceArn
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/Arn'
+      responses:
+        '200': {}
+        '400':
+          description: |-
+            One or more parameters in the request aren't valid.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InvalidParameterException'
+        '404':
+          description: |-
+            The specified resource doesn't exist.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+    post:
+      operationId: TagResource
+      description: |-
+        Adds one or more tags to a specified Amazon QLDB resource.
+
+        A resource can have up to 50 tags. If you try to create more than 50 tags for a resource, your request fails and returns an error.
+      parameters:
+      - name: ResourceArn
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/Arn'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                Tags:
+                  $ref: '#/components/schemas/Tags'
+      responses:
+        '200': {}
+        '400':
+          description: |-
+            One or more parameters in the request aren't valid.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InvalidParameterException'
+        '404':
+          description: |-
+            The specified resource doesn't exist.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+    delete:
+      operationId: UntagResource
+      description: |-
+        Removes one or more tags from a specified Amazon QLDB resource. You can specify up to 50 tag keys to remove.
+      parameters:
+      - name: ResourceArn
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/Arn'
+      - name: tagKeys
+        in: query
+        required: true
+        schema:
+          $ref: '#/components/schemas/TagKeyList'
+      responses:
+        '200': {}
+        '400':
+          description: |-
+            One or more parameters in the request aren't valid.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InvalidParameterException'
+        '404':
+          description: |-
+            The specified resource doesn't exist.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+  /ledgers/{Name}/permissions-mode:
+    patch:
+      operationId: UpdateLedgerPermissionsMode
+      description: |-
+        Updates the permissions mode of a ledger.
+
+        Before you switch to the `STANDARD` permissions mode, you must first create all required IAM policies and table tags to avoid disruption to your users. To learn more, see [Migrating to the standard permissions mode](https://docs.aws.amazon.com/qldb/latest/developerguide/ledger-management.basics.html#ledger-mgmt.basics.update-permissions.migrating) in the _Amazon QLDB Developer Guide_.
+      parameters:
+      - name: Name
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/LedgerName'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                PermissionsMode:
+                  $ref: '#/components/schemas/PermissionsMode'
+      responses:
+        '200': {}
+        '400':
+          description: |-
+            One or more parameters in the request aren't valid.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InvalidParameterException'
+        '404':
+          description: |-
+            The specified resource doesn't exist.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
 components:
   schemas:
     Arn:
@@ -52,8 +793,259 @@ components:
       maxLength: 1600
     Boolean:
       type: boolean
+    CancelJournalKinesisStreamRequest:
+      type: object
+      properties:
+        LedgerName:
+          allOf:
+          - $ref: '#/components/schemas/LedgerName'
+          description: The name of the ledger.
+        StreamId:
+          allOf:
+          - $ref: '#/components/schemas/UniqueId'
+          description: The UUID (represented in Base62-encoded text) of the QLDB journal
+            stream to be canceled.
+      required:
+      - LedgerName
+      - StreamId
+    CancelJournalKinesisStreamResponse:
+      type: object
+      properties:
+        StreamId:
+          allOf:
+          - $ref: '#/components/schemas/UniqueId'
+          description: The UUID (Base62-encoded text) of the canceled QLDB journal
+            stream.
+    CreateLedgerRequest:
+      type: object
+      properties:
+        Name:
+          allOf:
+          - $ref: '#/components/schemas/LedgerName'
+          description: 'The name of the ledger that you want to create. The name must
+            be unique among all of the ledgers in your Amazon Web Services account
+            in the current Region.
+
+
+            Naming constraints for ledger names are defined in [Quotas in Amazon QLDB](https://docs.aws.amazon.com/qldb/latest/developerguide/limits.html#limits.naming)
+            in the _Amazon QLDB Developer Guide_.'
+        Tags:
+          allOf:
+          - $ref: '#/components/schemas/Tags'
+          description: The key-value pairs to add as tags to the ledger that you want
+            to create. Tag keys are case sensitive. Tag values are case sensitive
+            and can be null.
+        PermissionsMode:
+          allOf:
+          - $ref: '#/components/schemas/PermissionsMode'
+          description: "The permissions mode to assign to the ledger that you want\
+            \ to create. This parameter can have one of the following values:\n\n\
+            \  * `ALLOW_ALL`: A legacy permissions mode that enables access control\
+            \ with API-level granularity for ledgers.\n\nThis mode allows users who\
+            \ have the `SendCommand` API permission for this ledger to run all PartiQL\
+            \ commands (hence, `ALLOW_ALL`) on any tables in the specified ledger.\
+            \ This mode disregards any table-level or command-level IAM permissions\
+            \ policies that you create for the ledger.\n\n  * `STANDARD`: (_Recommended_)\
+            \ A permissions mode that enables access control with finer granularity\
+            \ for ledgers, tables, and PartiQL commands.\n\nBy default, this mode\
+            \ denies all user requests to run any PartiQL commands on any tables in\
+            \ this ledger. To allow PartiQL commands to run, you must create IAM permissions\
+            \ policies for specific table resources and PartiQL actions, in addition\
+            \ to the `SendCommand` API permission for the ledger. For information,\
+            \ see [Getting started with the standard permissions mode](https://docs.aws.amazon.com/qldb/latest/developerguide/getting-started-standard-mode.html)\
+            \ in the _Amazon QLDB Developer Guide_.\n\nWe strongly recommend using\
+            \ the `STANDARD` permissions mode to maximize the security of your ledger\
+            \ data."
+        DeletionProtection:
+          allOf:
+          - $ref: '#/components/schemas/DeletionProtection'
+          description: 'Specifies whether the ledger is protected from being deleted
+            by any user. If not defined during ledger creation, this feature is enabled
+            (`true`) by default.
+
+
+            If deletion protection is enabled, you must first disable it before you
+            can delete the ledger. You can disable it by calling the `UpdateLedger`
+            operation to set this parameter to `false`.'
+        KmsKey:
+          allOf:
+          - $ref: '#/components/schemas/KmsKey'
+          description: "The key in Key Management Service (KMS) to use for encryption\
+            \ of data at rest in the ledger. For more information, see [Encryption\
+            \ at rest](https://docs.aws.amazon.com/qldb/latest/developerguide/encryption-at-rest.html)\
+            \ in the _Amazon QLDB Developer Guide_.\n\nUse one of the following options\
+            \ to specify this parameter:\n\n  * `AWS_OWNED_KMS_KEY`: Use an KMS key\
+            \ that is owned and managed by Amazon Web Services on your behalf.\n\n\
+            \  * **Undefined** : By default, use an Amazon Web Services owned KMS\
+            \ key.\n\n  * **A valid symmetric customer managed KMS key** : Use the\
+            \ specified symmetric encryption KMS key in your account that you create,\
+            \ own, and manage.\n\nAmazon QLDB does not support asymmetric keys. For\
+            \ more information, see [Using symmetric and asymmetric keys](https://docs.aws.amazon.com/kms/latest/developerguide/symmetric-asymmetric.html)\
+            \ in the _Key Management Service Developer Guide_.\n\nTo specify a customer\
+            \ managed KMS key, you can use its key ID, Amazon Resource Name (ARN),\
+            \ alias name, or alias ARN. When using an alias name, prefix it with `\"\
+            alias/\"`. To specify a key in a different Amazon Web Services account,\
+            \ you must use the key ARN or alias ARN.\n\nFor example:\n\n  * Key ID:\
+            \ `1234abcd-12ab-34cd-56ef-1234567890ab`\n\n  * Key ARN: `arn:aws:kms:us-east-2:111122223333:key/1234abcd-12ab-34cd-56ef-1234567890ab`\n\
+            \n  * Alias name: `alias/ExampleAlias`\n\n  * Alias ARN: `arn:aws:kms:us-east-2:111122223333:alias/ExampleAlias`\n\
+            \nFor more information, see [Key identifiers (KeyId)](https://docs.aws.amazon.com/kms/latest/developerguide/concepts.html#key-id)\
+            \ in the _Key Management Service Developer Guide_."
+      required:
+      - Name
+      - PermissionsMode
+    CreateLedgerResponse:
+      type: object
+      properties:
+        Name:
+          allOf:
+          - $ref: '#/components/schemas/LedgerName'
+          description: The name of the ledger.
+        Arn:
+          allOf:
+          - $ref: '#/components/schemas/Arn'
+          description: The Amazon Resource Name (ARN) for the ledger.
+        State:
+          allOf:
+          - $ref: '#/components/schemas/LedgerState'
+          description: The current status of the ledger.
+        CreationDateTime:
+          allOf:
+          - $ref: '#/components/schemas/Timestamp'
+          description: The date and time, in epoch time format, when the ledger was
+            created. (Epoch time format is the number of seconds elapsed since 12:00:00
+            AM January 1, 1970 UTC.)
+        PermissionsMode:
+          allOf:
+          - $ref: '#/components/schemas/PermissionsMode'
+          description: The permissions mode of the ledger that you created.
+        DeletionProtection:
+          allOf:
+          - $ref: '#/components/schemas/DeletionProtection'
+          description: 'Specifies whether the ledger is protected from being deleted
+            by any user. If not defined during ledger creation, this feature is enabled
+            (`true`) by default.
+
+
+            If deletion protection is enabled, you must first disable it before you
+            can delete the ledger. You can disable it by calling the `UpdateLedger`
+            operation to set this parameter to `false`.'
+        KmsKeyArn:
+          allOf:
+          - $ref: '#/components/schemas/Arn'
+          description: The ARN of the customer managed KMS key that the ledger uses
+            for encryption at rest. If this parameter is undefined, the ledger uses
+            an Amazon Web Services owned KMS key for encryption.
+    DeleteLedgerRequest:
+      type: object
+      properties:
+        Name:
+          allOf:
+          - $ref: '#/components/schemas/LedgerName'
+          description: The name of the ledger that you want to delete.
+      required:
+      - Name
     DeletionProtection:
       type: boolean
+    DescribeJournalKinesisStreamRequest:
+      type: object
+      properties:
+        LedgerName:
+          allOf:
+          - $ref: '#/components/schemas/LedgerName'
+          description: The name of the ledger.
+        StreamId:
+          allOf:
+          - $ref: '#/components/schemas/UniqueId'
+          description: The UUID (represented in Base62-encoded text) of the QLDB journal
+            stream to describe.
+      required:
+      - LedgerName
+      - StreamId
+    DescribeJournalKinesisStreamResponse:
+      type: object
+      properties:
+        Stream:
+          allOf:
+          - $ref: '#/components/schemas/JournalKinesisStreamDescription'
+          description: Information about the QLDB journal stream returned by a `DescribeJournalS3Export`
+            request.
+    DescribeJournalS3ExportRequest:
+      type: object
+      properties:
+        Name:
+          allOf:
+          - $ref: '#/components/schemas/LedgerName'
+          description: The name of the ledger.
+        ExportId:
+          allOf:
+          - $ref: '#/components/schemas/UniqueId'
+          description: The UUID (represented in Base62-encoded text) of the journal
+            export job to describe.
+      required:
+      - Name
+      - ExportId
+    DescribeJournalS3ExportResponse:
+      type: object
+      properties:
+        ExportDescription:
+          allOf:
+          - $ref: '#/components/schemas/JournalS3ExportDescription'
+          description: Information about the journal export job returned by a `DescribeJournalS3Export`
+            request.
+      required:
+      - ExportDescription
+    DescribeLedgerRequest:
+      type: object
+      properties:
+        Name:
+          allOf:
+          - $ref: '#/components/schemas/LedgerName'
+          description: The name of the ledger that you want to describe.
+      required:
+      - Name
+    DescribeLedgerResponse:
+      type: object
+      properties:
+        Name:
+          allOf:
+          - $ref: '#/components/schemas/LedgerName'
+          description: The name of the ledger.
+        Arn:
+          allOf:
+          - $ref: '#/components/schemas/Arn'
+          description: The Amazon Resource Name (ARN) for the ledger.
+        State:
+          allOf:
+          - $ref: '#/components/schemas/LedgerState'
+          description: The current status of the ledger.
+        CreationDateTime:
+          allOf:
+          - $ref: '#/components/schemas/Timestamp'
+          description: The date and time, in epoch time format, when the ledger was
+            created. (Epoch time format is the number of seconds elapsed since 12:00:00
+            AM January 1, 1970 UTC.)
+        PermissionsMode:
+          allOf:
+          - $ref: '#/components/schemas/PermissionsMode'
+          description: The permissions mode of the ledger.
+        DeletionProtection:
+          allOf:
+          - $ref: '#/components/schemas/DeletionProtection'
+          description: 'Specifies whether the ledger is protected from being deleted
+            by any user. If not defined during ledger creation, this feature is enabled
+            (`true`) by default.
+
+
+            If deletion protection is enabled, you must first disable it before you
+            can delete the ledger. You can disable it by calling the `UpdateLedger`
+            operation to set this parameter to `false`.'
+        EncryptionDescription:
+          allOf:
+          - $ref: '#/components/schemas/LedgerEncryptionDescription'
+          description: Information about the encryption of data at rest in the ledger.
+            This includes the current status, the KMS key, and when the key became
+            inaccessible (in the case of an error). If this parameter is undefined,
+            the ledger uses an Amazon Web Services owned KMS key for encryption.
     Digest:
       type: string
       format: byte
@@ -72,28 +1064,450 @@ components:
       - IAM_PERMISSION_REVOKED
     ErrorMessage:
       type: string
+    ExportJournalToS3Request:
+      type: object
+      properties:
+        Name:
+          allOf:
+          - $ref: '#/components/schemas/LedgerName'
+          description: The name of the ledger.
+        InclusiveStartTime:
+          allOf:
+          - $ref: '#/components/schemas/Timestamp'
+          description: 'The inclusive start date and time for the range of journal
+            contents to export.
+
+
+            The `InclusiveStartTime` must be in `ISO 8601` date and time format and
+            in Universal Coordinated Time (UTC). For example: `2019-06-13T21:36:34Z`.
+
+
+            The `InclusiveStartTime` must be before `ExclusiveEndTime`.
+
+
+            If you provide an `InclusiveStartTime` that is before the ledger''s `CreationDateTime`,
+            Amazon QLDB defaults it to the ledger''s `CreationDateTime`.'
+        ExclusiveEndTime:
+          allOf:
+          - $ref: '#/components/schemas/Timestamp'
+          description: 'The exclusive end date and time for the range of journal contents
+            to export.
+
+
+            The `ExclusiveEndTime` must be in `ISO 8601` date and time format and
+            in Universal Coordinated Time (UTC). For example: `2019-06-13T21:36:34Z`.
+
+
+            The `ExclusiveEndTime` must be less than or equal to the current UTC date
+            and time.'
+        S3ExportConfiguration:
+          allOf:
+          - $ref: '#/components/schemas/S3ExportConfiguration'
+          description: The configuration settings of the Amazon S3 bucket destination
+            for your export request.
+        RoleArn:
+          allOf:
+          - $ref: '#/components/schemas/Arn'
+          description: "The Amazon Resource Name (ARN) of the IAM role that grants\
+            \ QLDB permissions for a journal export job to do the following:\n\n \
+            \ * Write objects into your Amazon S3 bucket.\n\n  * (Optional) Use your\
+            \ customer managed key in Key Management Service (KMS) for server-side\
+            \ encryption of your exported data.\n\nTo pass a role to QLDB when requesting\
+            \ a journal export, you must have permissions to perform the `iam:PassRole`\
+            \ action on the IAM role resource. This is required for all journal export\
+            \ requests."
+        OutputFormat:
+          allOf:
+          - $ref: '#/components/schemas/OutputFormat'
+          description: 'The output format of your exported journal data. A journal
+            export job can write the data objects in either the text or binary representation
+            of [Amazon Ion](https://docs.aws.amazon.com/qldb/latest/developerguide/ion.html)
+            format, or in [JSON Lines](https://jsonlines.org/) text format.
+
+
+            Default: `ION_TEXT`
+
+
+            In JSON Lines format, each journal block in an exported data object is
+            a valid JSON object that is delimited by a newline. You can use this format
+            to directly integrate JSON exports with analytics tools such as Amazon
+            Athena and Glue because these services can parse newline-delimited JSON
+            automatically.'
+      required:
+      - Name
+      - InclusiveStartTime
+      - ExclusiveEndTime
+      - S3ExportConfiguration
+      - RoleArn
+    ExportJournalToS3Response:
+      type: object
+      properties:
+        ExportId:
+          allOf:
+          - $ref: '#/components/schemas/UniqueId'
+          description: 'The UUID (represented in Base62-encoded text) that QLDB assigns
+            to each journal export job.
+
+
+            To describe your export request and check the status of the job, you can
+            use `ExportId` to call `DescribeJournalS3Export`.'
+      required:
+      - ExportId
     ExportStatus:
       type: string
       enum:
       - IN_PROGRESS
       - COMPLETED
       - CANCELLED
+    GetBlockRequest:
+      type: object
+      properties:
+        Name:
+          allOf:
+          - $ref: '#/components/schemas/LedgerName'
+          description: The name of the ledger.
+        BlockAddress:
+          allOf:
+          - $ref: '#/components/schemas/ValueHolder'
+          description: 'The location of the block that you want to request. An address
+            is an Amazon Ion structure that has two fields: `strandId` and `sequenceNo`.
+
+
+            For example: `{strandId:"BlFTjlSXze9BIh1KOszcE3",sequenceNo:14}`.'
+        DigestTipAddress:
+          allOf:
+          - $ref: '#/components/schemas/ValueHolder'
+          description: 'The latest block location covered by the digest for which
+            to request a proof. An address is an Amazon Ion structure that has two
+            fields: `strandId` and `sequenceNo`.
+
+
+            For example: `{strandId:"BlFTjlSXze9BIh1KOszcE3",sequenceNo:49}`.'
+      required:
+      - Name
+      - BlockAddress
+    GetBlockResponse:
+      type: object
+      properties:
+        Block:
+          allOf:
+          - $ref: '#/components/schemas/ValueHolder'
+          description: The block data object in Amazon Ion format.
+        Proof:
+          allOf:
+          - $ref: '#/components/schemas/ValueHolder'
+          description: The proof object in Amazon Ion format returned by a `GetBlock`
+            request. A proof contains the list of hash values required to recalculate
+            the specified digest using a Merkle tree, starting with the specified
+            block.
+      required:
+      - Block
+    GetDigestRequest:
+      type: object
+      properties:
+        Name:
+          allOf:
+          - $ref: '#/components/schemas/LedgerName'
+          description: The name of the ledger.
+      required:
+      - Name
+    GetDigestResponse:
+      type: object
+      properties:
+        Digest:
+          allOf:
+          - $ref: '#/components/schemas/Digest'
+          description: The 256-bit hash value representing the digest returned by
+            a `GetDigest` request.
+        DigestTipAddress:
+          allOf:
+          - $ref: '#/components/schemas/ValueHolder'
+          description: 'The latest block location covered by the digest that you requested.
+            An address is an Amazon Ion structure that has two fields: `strandId`
+            and `sequenceNo`.'
+      required:
+      - Digest
+      - DigestTipAddress
+    GetRevisionRequest:
+      type: object
+      properties:
+        Name:
+          allOf:
+          - $ref: '#/components/schemas/LedgerName'
+          description: The name of the ledger.
+        BlockAddress:
+          allOf:
+          - $ref: '#/components/schemas/ValueHolder'
+          description: 'The block location of the document revision to be verified.
+            An address is an Amazon Ion structure that has two fields: `strandId`
+            and `sequenceNo`.
+
+
+            For example: `{strandId:"BlFTjlSXze9BIh1KOszcE3",sequenceNo:14}`.'
+        DocumentId:
+          allOf:
+          - $ref: '#/components/schemas/UniqueId'
+          description: The UUID (represented in Base62-encoded text) of the document
+            to be verified.
+        DigestTipAddress:
+          allOf:
+          - $ref: '#/components/schemas/ValueHolder'
+          description: 'The latest block location covered by the digest for which
+            to request a proof. An address is an Amazon Ion structure that has two
+            fields: `strandId` and `sequenceNo`.
+
+
+            For example: `{strandId:"BlFTjlSXze9BIh1KOszcE3",sequenceNo:49}`.'
+      required:
+      - Name
+      - BlockAddress
+      - DocumentId
+    GetRevisionResponse:
+      type: object
+      properties:
+        Proof:
+          allOf:
+          - $ref: '#/components/schemas/ValueHolder'
+          description: The proof object in Amazon Ion format returned by a `GetRevision`
+            request. A proof contains the list of hash values that are required to
+            recalculate the specified digest using a Merkle tree, starting with the
+            specified document revision.
+        Revision:
+          allOf:
+          - $ref: '#/components/schemas/ValueHolder'
+          description: The document revision data object in Amazon Ion format.
+      required:
+      - Revision
+    InvalidParameterException:
+      type: object
+      properties:
+        Message:
+          $ref: '#/components/schemas/ErrorMessage'
+        ParameterName:
+          allOf:
+          - $ref: '#/components/schemas/ParameterName'
+          description: The name of the invalid parameter.
+      description: One or more parameters in the request aren't valid.
     IonText:
       type: string
       minLength: 1
       maxLength: 1048576
+    JournalKinesisStreamDescription:
+      type: object
+      properties:
+        LedgerName:
+          allOf:
+          - $ref: '#/components/schemas/LedgerName'
+          description: The name of the ledger.
+        CreationTime:
+          allOf:
+          - $ref: '#/components/schemas/Timestamp'
+          description: The date and time, in epoch time format, when the QLDB journal
+            stream was created. (Epoch time format is the number of seconds elapsed
+            since 12:00:00 AM January 1, 1970 UTC.)
+        InclusiveStartTime:
+          allOf:
+          - $ref: '#/components/schemas/Timestamp'
+          description: The inclusive start date and time from which to start streaming
+            journal data.
+        ExclusiveEndTime:
+          allOf:
+          - $ref: '#/components/schemas/Timestamp'
+          description: The exclusive date and time that specifies when the stream
+            ends. If this parameter is undefined, the stream runs indefinitely until
+            you cancel it.
+        RoleArn:
+          allOf:
+          - $ref: '#/components/schemas/Arn'
+          description: The Amazon Resource Name (ARN) of the IAM role that grants
+            QLDB permissions for a journal stream to write data records to a Kinesis
+            Data Streams resource.
+        StreamId:
+          allOf:
+          - $ref: '#/components/schemas/UniqueId'
+          description: The UUID (represented in Base62-encoded text) of the QLDB journal
+            stream.
+        Arn:
+          allOf:
+          - $ref: '#/components/schemas/Arn'
+          description: The Amazon Resource Name (ARN) of the QLDB journal stream.
+        Status:
+          allOf:
+          - $ref: '#/components/schemas/StreamStatus'
+          description: The current state of the QLDB journal stream.
+        KinesisConfiguration:
+          allOf:
+          - $ref: '#/components/schemas/KinesisConfiguration'
+          description: The configuration settings of the Amazon Kinesis Data Streams
+            destination for a QLDB journal stream.
+        ErrorCause:
+          allOf:
+          - $ref: '#/components/schemas/ErrorCause'
+          description: The error message that describes the reason that a stream has
+            a status of `IMPAIRED` or `FAILED`. This is not applicable to streams
+            that have other status values.
+        StreamName:
+          allOf:
+          - $ref: '#/components/schemas/StreamName'
+          description: The user-defined name of the QLDB journal stream.
+      required:
+      - LedgerName
+      - RoleArn
+      - StreamId
+      - Status
+      - KinesisConfiguration
+      - StreamName
+      description: Information about an Amazon QLDB journal stream, including the
+        Amazon Resource Name (ARN), stream name, creation time, current status, and
+        the parameters of the original stream creation request.
     JournalKinesisStreamDescriptionList:
       type: array
       items:
         $ref: '#/components/schemas/JournalKinesisStreamDescription'
+    JournalS3ExportDescription:
+      type: object
+      properties:
+        LedgerName:
+          allOf:
+          - $ref: '#/components/schemas/LedgerName'
+          description: The name of the ledger.
+        ExportId:
+          allOf:
+          - $ref: '#/components/schemas/UniqueId'
+          description: The UUID (represented in Base62-encoded text) of the journal
+            export job.
+        ExportCreationTime:
+          allOf:
+          - $ref: '#/components/schemas/Timestamp'
+          description: The date and time, in epoch time format, when the export job
+            was created. (Epoch time format is the number of seconds elapsed since
+            12:00:00 AM January 1, 1970 UTC.)
+        Status:
+          allOf:
+          - $ref: '#/components/schemas/ExportStatus'
+          description: The current state of the journal export job.
+        InclusiveStartTime:
+          allOf:
+          - $ref: '#/components/schemas/Timestamp'
+          description: The inclusive start date and time for the range of journal
+            contents that was specified in the original export request.
+        ExclusiveEndTime:
+          allOf:
+          - $ref: '#/components/schemas/Timestamp'
+          description: The exclusive end date and time for the range of journal contents
+            that was specified in the original export request.
+        S3ExportConfiguration:
+          $ref: '#/components/schemas/S3ExportConfiguration'
+        RoleArn:
+          allOf:
+          - $ref: '#/components/schemas/Arn'
+          description: "The Amazon Resource Name (ARN) of the IAM role that grants\
+            \ QLDB permissions for a journal export job to do the following:\n\n \
+            \ * Write objects into your Amazon Simple Storage Service (Amazon S3)\
+            \ bucket.\n\n  * (Optional) Use your customer managed key in Key Management\
+            \ Service (KMS) for server-side encryption of your exported data."
+        OutputFormat:
+          allOf:
+          - $ref: '#/components/schemas/OutputFormat'
+          description: The output format of the exported journal data.
+      required:
+      - LedgerName
+      - ExportId
+      - ExportCreationTime
+      - Status
+      - InclusiveStartTime
+      - ExclusiveEndTime
+      - S3ExportConfiguration
+      - RoleArn
+      description: Information about a journal export job, including the ledger name,
+        export ID, creation time, current status, and the parameters of the original
+        export creation request.
     JournalS3ExportList:
       type: array
       items:
         $ref: '#/components/schemas/JournalS3ExportDescription'
+    KinesisConfiguration:
+      type: object
+      properties:
+        StreamArn:
+          allOf:
+          - $ref: '#/components/schemas/Arn'
+          description: The Amazon Resource Name (ARN) of the Kinesis Data Streams
+            resource.
+        AggregationEnabled:
+          allOf:
+          - $ref: '#/components/schemas/Boolean'
+          description: 'Enables QLDB to publish multiple data records in a single
+            Kinesis Data Streams record, increasing the number of records sent per
+            API call.
+
+
+            Default: `True`
+
+
+            Record aggregation has important implications for processing records and
+            requires de-aggregation in your stream consumer. To learn more, see [KPL
+            Key Concepts](https://docs.aws.amazon.com/streams/latest/dev/kinesis-kpl-concepts.html)
+            and [Consumer De-aggregation](https://docs.aws.amazon.com/streams/latest/dev/kinesis-kpl-consumer-deaggregation.html)
+            in the _Amazon Kinesis Data Streams Developer Guide_.'
+      required:
+      - StreamArn
+      description: The configuration settings of the Amazon Kinesis Data Streams destination
+        for an Amazon QLDB journal stream.
     KmsKey:
       type: string
       minLength: 0
       maxLength: 1600
+    LedgerEncryptionDescription:
+      type: object
+      properties:
+        KmsKeyArn:
+          allOf:
+          - $ref: '#/components/schemas/Arn'
+          description: The Amazon Resource Name (ARN) of the customer managed KMS
+            key that the ledger uses for encryption at rest. If this parameter is
+            undefined, the ledger uses an Amazon Web Services owned KMS key for encryption.
+            It will display `AWS_OWNED_KMS_KEY` when updating the ledger's encryption
+            configuration to the Amazon Web Services owned KMS key.
+        EncryptionStatus:
+          allOf:
+          - $ref: '#/components/schemas/EncryptionStatus'
+          description: "The current state of encryption at rest for the ledger. This\
+            \ can be one of the following values:\n\n  * `ENABLED`: Encryption is\
+            \ fully enabled using the specified key.\n\n  * `UPDATING`: The ledger\
+            \ is actively processing the specified key change.\n\nKey changes in QLDB\
+            \ are asynchronous. The ledger is fully accessible without any performance\
+            \ impact while the key change is being processed. The amount of time it\
+            \ takes to update a key varies depending on the ledger size.\n\n  * `KMS_KEY_INACCESSIBLE`:\
+            \ The specified customer managed KMS key is not accessible, and the ledger\
+            \ is impaired. Either the key was disabled or deleted, or the grants on\
+            \ the key were revoked. When a ledger is impaired, it is not accessible\
+            \ and does not accept any read or write requests.\n\nAn impaired ledger\
+            \ automatically returns to an active state after you restore the grants\
+            \ on the key, or re-enable the key that was disabled. However, deleting\
+            \ a customer managed KMS key is irreversible. After a key is deleted,\
+            \ you can no longer access the ledgers that are protected with that key,\
+            \ and the data becomes unrecoverable permanently."
+        InaccessibleKmsKeyDateTime:
+          allOf:
+          - $ref: '#/components/schemas/Timestamp'
+          description: 'The date and time, in epoch time format, when the KMS key
+            first became inaccessible, in the case of an error. (Epoch time format
+            is the number of seconds that have elapsed since 12:00:00 AM January 1,
+            1970 UTC.)
+
+
+            This parameter is undefined if the KMS key is accessible.'
+      required:
+      - KmsKeyArn
+      - EncryptionStatus
+      description: 'Information about the encryption of data at rest in an Amazon
+        QLDB ledger. This includes the current status, the key in Key Management Service
+        (KMS), and when the key became inaccessible (in the case of an error).
+
+
+        For more information, see [Encryption at rest](https://docs.aws.amazon.com/qldb/latest/developerguide/encryption-at-rest.html)
+        in the _Amazon QLDB Developer Guide_.'
     LedgerList:
       type: array
       items:
@@ -110,6 +1524,193 @@ components:
       - ACTIVE
       - DELETING
       - DELETED
+    LedgerSummary:
+      type: object
+      properties:
+        Name:
+          allOf:
+          - $ref: '#/components/schemas/LedgerName'
+          description: The name of the ledger.
+        State:
+          allOf:
+          - $ref: '#/components/schemas/LedgerState'
+          description: The current status of the ledger.
+        CreationDateTime:
+          allOf:
+          - $ref: '#/components/schemas/Timestamp'
+          description: The date and time, in epoch time format, when the ledger was
+            created. (Epoch time format is the number of seconds elapsed since 12:00:00
+            AM January 1, 1970 UTC.)
+      description: Information about a ledger, including its name, state, and when
+        it was created.
+    LimitExceededException:
+      type: object
+      properties:
+        Message:
+          $ref: '#/components/schemas/ErrorMessage'
+        ResourceType:
+          allOf:
+          - $ref: '#/components/schemas/ResourceType'
+          description: The type of resource.
+      description: You have reached the limit on the maximum number of resources allowed.
+    ListJournalKinesisStreamsForLedgerRequest:
+      type: object
+      properties:
+        LedgerName:
+          allOf:
+          - $ref: '#/components/schemas/LedgerName'
+          description: The name of the ledger.
+        MaxResults:
+          allOf:
+          - $ref: '#/components/schemas/MaxResults'
+          description: The maximum number of results to return in a single `ListJournalKinesisStreamsForLedger`
+            request. (The actual number of results returned might be fewer.)
+        NextToken:
+          allOf:
+          - $ref: '#/components/schemas/NextToken'
+          description: A pagination token, indicating that you want to retrieve the
+            next page of results. If you received a value for `NextToken` in the response
+            from a previous `ListJournalKinesisStreamsForLedger` call, you should
+            use that value as input here.
+      required:
+      - LedgerName
+    ListJournalKinesisStreamsForLedgerResponse:
+      type: object
+      properties:
+        Streams:
+          allOf:
+          - $ref: '#/components/schemas/JournalKinesisStreamDescriptionList'
+          description: The QLDB journal streams that are currently associated with
+            the given ledger.
+        NextToken:
+          allOf:
+          - $ref: '#/components/schemas/NextToken'
+          description: "* If `NextToken` is empty, the last page of results has been\
+            \ processed and there are no more results to be retrieved.\n\n  * If `NextToken`\
+            \ is _not_ empty, more results are available. To retrieve the next page\
+            \ of results, use the value of `NextToken` in a subsequent `ListJournalKinesisStreamsForLedger`\
+            \ call."
+    ListJournalS3ExportsForLedgerRequest:
+      type: object
+      properties:
+        Name:
+          allOf:
+          - $ref: '#/components/schemas/LedgerName'
+          description: The name of the ledger.
+        MaxResults:
+          allOf:
+          - $ref: '#/components/schemas/MaxResults'
+          description: The maximum number of results to return in a single `ListJournalS3ExportsForLedger`
+            request. (The actual number of results returned might be fewer.)
+        NextToken:
+          allOf:
+          - $ref: '#/components/schemas/NextToken'
+          description: A pagination token, indicating that you want to retrieve the
+            next page of results. If you received a value for `NextToken` in the response
+            from a previous `ListJournalS3ExportsForLedger` call, then you should
+            use that value as input here.
+      required:
+      - Name
+    ListJournalS3ExportsForLedgerResponse:
+      type: object
+      properties:
+        JournalS3Exports:
+          allOf:
+          - $ref: '#/components/schemas/JournalS3ExportList'
+          description: The journal export jobs that are currently associated with
+            the specified ledger.
+        NextToken:
+          allOf:
+          - $ref: '#/components/schemas/NextToken'
+          description: "* If `NextToken` is empty, then the last page of results has\
+            \ been processed and there are no more results to be retrieved.\n\n  *\
+            \ If `NextToken` is _not_ empty, then there are more results available.\
+            \ To retrieve the next page of results, use the value of `NextToken` in\
+            \ a subsequent `ListJournalS3ExportsForLedger` call."
+    ListJournalS3ExportsRequest:
+      type: object
+      properties:
+        MaxResults:
+          allOf:
+          - $ref: '#/components/schemas/MaxResults'
+          description: The maximum number of results to return in a single `ListJournalS3Exports`
+            request. (The actual number of results returned might be fewer.)
+        NextToken:
+          allOf:
+          - $ref: '#/components/schemas/NextToken'
+          description: A pagination token, indicating that you want to retrieve the
+            next page of results. If you received a value for `NextToken` in the response
+            from a previous `ListJournalS3Exports` call, then you should use that
+            value as input here.
+    ListJournalS3ExportsResponse:
+      type: object
+      properties:
+        JournalS3Exports:
+          allOf:
+          - $ref: '#/components/schemas/JournalS3ExportList'
+          description: The journal export jobs for all ledgers that are associated
+            with the current Amazon Web Services account and Region.
+        NextToken:
+          allOf:
+          - $ref: '#/components/schemas/NextToken'
+          description: "* If `NextToken` is empty, then the last page of results has\
+            \ been processed and there are no more results to be retrieved.\n\n  *\
+            \ If `NextToken` is _not_ empty, then there are more results available.\
+            \ To retrieve the next page of results, use the value of `NextToken` in\
+            \ a subsequent `ListJournalS3Exports` call."
+    ListLedgersRequest:
+      type: object
+      properties:
+        MaxResults:
+          allOf:
+          - $ref: '#/components/schemas/MaxResults'
+          description: The maximum number of results to return in a single `ListLedgers`
+            request. (The actual number of results returned might be fewer.)
+        NextToken:
+          allOf:
+          - $ref: '#/components/schemas/NextToken'
+          description: A pagination token, indicating that you want to retrieve the
+            next page of results. If you received a value for `NextToken` in the response
+            from a previous `ListLedgers` call, then you should use that value as
+            input here.
+    ListLedgersResponse:
+      type: object
+      properties:
+        Ledgers:
+          allOf:
+          - $ref: '#/components/schemas/LedgerList'
+          description: The ledgers that are associated with the current Amazon Web
+            Services account and Region.
+        NextToken:
+          allOf:
+          - $ref: '#/components/schemas/NextToken'
+          description: "A pagination token, indicating whether there are more results\
+            \ available:\n\n  * If `NextToken` is empty, then the last page of results\
+            \ has been processed and there are no more results to be retrieved.\n\n\
+            \  * If `NextToken` is _not_ empty, then there are more results available.\
+            \ To retrieve the next page of results, use the value of `NextToken` in\
+            \ a subsequent `ListLedgers` call."
+    ListTagsForResourceRequest:
+      type: object
+      properties:
+        ResourceArn:
+          allOf:
+          - $ref: '#/components/schemas/Arn'
+          description: 'The Amazon Resource Name (ARN) for which to list the tags.
+            For example:
+
+
+            `arn:aws:qldb:us-east-1:123456789012:ledger/exampleLedger`'
+      required:
+      - ResourceArn
+    ListTagsForResourceResponse:
+      type: object
+      properties:
+        Tags:
+          allOf:
+          - $ref: '#/components/schemas/Tags'
+          description: The tags that are currently associated with the specified Amazon
+            QLDB resource.
     MaxResults:
       type: integer
       minimum: 1
@@ -132,8 +1733,64 @@ components:
       enum:
       - ALLOW_ALL
       - STANDARD
+    ResourceAlreadyExistsException:
+      type: object
+      properties:
+        Message:
+          $ref: '#/components/schemas/ErrorMessage'
+        ResourceType:
+          allOf:
+          - $ref: '#/components/schemas/ResourceType'
+          description: The type of resource.
+        ResourceName:
+          allOf:
+          - $ref: '#/components/schemas/ResourceName'
+          description: The name of the resource.
+      description: The specified resource already exists.
+    ResourceInUseException:
+      type: object
+      properties:
+        Message:
+          $ref: '#/components/schemas/ErrorMessage'
+        ResourceType:
+          allOf:
+          - $ref: '#/components/schemas/ResourceType'
+          description: The type of resource.
+        ResourceName:
+          allOf:
+          - $ref: '#/components/schemas/ResourceName'
+          description: The name of the resource.
+      description: The specified resource can't be modified at this time.
     ResourceName:
       type: string
+    ResourceNotFoundException:
+      type: object
+      properties:
+        Message:
+          $ref: '#/components/schemas/ErrorMessage'
+        ResourceType:
+          allOf:
+          - $ref: '#/components/schemas/ResourceType'
+          description: The type of resource.
+        ResourceName:
+          allOf:
+          - $ref: '#/components/schemas/ResourceName'
+          description: The name of the resource.
+      description: The specified resource doesn't exist.
+    ResourcePreconditionNotMetException:
+      type: object
+      properties:
+        Message:
+          $ref: '#/components/schemas/ErrorMessage'
+        ResourceType:
+          allOf:
+          - $ref: '#/components/schemas/ResourceType'
+          description: The type of resource.
+        ResourceName:
+          allOf:
+          - $ref: '#/components/schemas/ResourceName'
+          description: The name of the resource.
+      description: The operation failed because a condition wasn't satisfied in advance.
     ResourceType:
       type: string
     S3Bucket:
@@ -141,6 +1798,68 @@ components:
       pattern: ^[A-Za-z-0-9-_.]+$
       minLength: 3
       maxLength: 255
+    S3EncryptionConfiguration:
+      type: object
+      properties:
+        ObjectEncryptionType:
+          allOf:
+          - $ref: '#/components/schemas/S3ObjectEncryptionType'
+          description: 'The Amazon S3 object encryption type.
+
+
+            To learn more about server-side encryption options in Amazon S3, see [Protecting
+            Data Using Server-Side Encryption](https://docs.aws.amazon.com/AmazonS3/latest/dev/serv-side-encryption.html)
+            in the _Amazon S3 Developer Guide_.'
+        KmsKeyArn:
+          allOf:
+          - $ref: '#/components/schemas/Arn'
+          description: 'The Amazon Resource Name (ARN) of a symmetric encryption key
+            in Key Management Service (KMS). Amazon S3 does not support asymmetric
+            KMS keys.
+
+
+            You must provide a `KmsKeyArn` if you specify `SSE_KMS` as the `ObjectEncryptionType`.
+
+
+            `KmsKeyArn` is not required if you specify `SSE_S3` as the `ObjectEncryptionType`.'
+      required:
+      - ObjectEncryptionType
+      description: The encryption settings that are used by a journal export job to
+        write data in an Amazon Simple Storage Service (Amazon S3) bucket.
+    S3ExportConfiguration:
+      type: object
+      properties:
+        Bucket:
+          allOf:
+          - $ref: '#/components/schemas/S3Bucket'
+          description: 'The Amazon S3 bucket name in which a journal export job writes
+            the journal contents.
+
+
+            The bucket name must comply with the Amazon S3 bucket naming conventions.
+            For more information, see [Bucket Restrictions and Limitations](https://docs.aws.amazon.com/AmazonS3/latest/dev/BucketRestrictions.html)
+            in the _Amazon S3 Developer Guide_.'
+        Prefix:
+          allOf:
+          - $ref: '#/components/schemas/S3Prefix'
+          description: "The prefix for the Amazon S3 bucket in which a journal export\
+            \ job writes the journal contents.\n\nThe prefix must comply with Amazon\
+            \ S3 key naming rules and restrictions. For more information, see [Object\
+            \ Key and Metadata](https://docs.aws.amazon.com/AmazonS3/latest/dev/UsingMetadata.html)\
+            \ in the _Amazon S3 Developer Guide_.\n\nThe following are examples of\
+            \ valid `Prefix` values:\n\n  * `JournalExports-ForMyLedger/Testing/`\n\
+            \n  * `JournalExports`\n\n  * `My:Tests/`"
+        EncryptionConfiguration:
+          allOf:
+          - $ref: '#/components/schemas/S3EncryptionConfiguration'
+          description: The encryption settings that are used by a journal export job
+            to write data in an Amazon S3 bucket.
+      required:
+      - Bucket
+      - Prefix
+      - EncryptionConfiguration
+      description: The Amazon Simple Storage Service (Amazon S3) bucket location in
+        which a journal export job writes the journal contents.
     S3ObjectEncryptionType:
       type: string
       enum:
@@ -151,6 +1870,83 @@ components:
       type: string
       minLength: 0
       maxLength: 128
+    StreamJournalToKinesisRequest:
+      type: object
+      properties:
+        LedgerName:
+          allOf:
+          - $ref: '#/components/schemas/LedgerName'
+          description: The name of the ledger.
+        RoleArn:
+          allOf:
+          - $ref: '#/components/schemas/Arn'
+          description: 'The Amazon Resource Name (ARN) of the IAM role that grants
+            QLDB permissions for a journal stream to write data records to a Kinesis
+            Data Streams resource.
+
+
+            To pass a role to QLDB when requesting a journal stream, you must have
+            permissions to perform the `iam:PassRole` action on the IAM role resource.
+            This is required for all journal stream requests.'
+        Tags:
+          allOf:
+          - $ref: '#/components/schemas/Tags'
+          description: The key-value pairs to add as tags to the stream that you want
+            to create. Tag keys are case sensitive. Tag values are case sensitive
+            and can be null.
+        InclusiveStartTime:
+          allOf:
+          - $ref: '#/components/schemas/Timestamp'
+          description: 'The inclusive start date and time from which to start streaming
+            journal data. This parameter must be in `ISO 8601` date and time format
+            and in Universal Coordinated Time (UTC). For example: `2019-06-13T21:36:34Z`.
+
+
+            The `InclusiveStartTime` cannot be in the future and must be before `ExclusiveEndTime`.
+
+
+            If you provide an `InclusiveStartTime` that is before the ledger''s `CreationDateTime`,
+            QLDB effectively defaults it to the ledger''s `CreationDateTime`.'
+        ExclusiveEndTime:
+          allOf:
+          - $ref: '#/components/schemas/Timestamp'
+          description: 'The exclusive date and time that specifies when the stream
+            ends. If you don''t define this parameter, the stream runs indefinitely
+            until you cancel it.
+
+
+            The `ExclusiveEndTime` must be in `ISO 8601` date and time format and
+            in Universal Coordinated Time (UTC). For example: `2019-06-13T21:36:34Z`.'
+        KinesisConfiguration:
+          allOf:
+          - $ref: '#/components/schemas/KinesisConfiguration'
+          description: The configuration settings of the Kinesis Data Streams destination
+            for your stream request.
+        StreamName:
+          allOf:
+          - $ref: '#/components/schemas/StreamName'
+          description: 'The name that you want to assign to the QLDB journal stream.
+            User-defined names can help identify and indicate the purpose of a stream.
+
+
+            Your stream name must be unique among other _active_ streams for a given
+            ledger. Stream names have the same naming constraints as ledger names,
+            as defined in [Quotas in Amazon QLDB](https://docs.aws.amazon.com/qldb/latest/developerguide/limits.html#limits.naming)
+            in the _Amazon QLDB Developer Guide_.'
+      required:
+      - LedgerName
+      - RoleArn
+      - InclusiveStartTime
+      - KinesisConfiguration
+      - StreamName
+    StreamJournalToKinesisResponse:
+      type: object
+      properties:
+        StreamId:
+          allOf:
+          - $ref: '#/components/schemas/UniqueId'
+          description: The UUID (represented in Base62-encoded text) that QLDB assigns
+            to each QLDB journal stream.
     StreamName:
       type: string
       pattern: ^(?!^.*--)(?!^[0-9]+$)(?!^-)(?!.*-$)^[A-Za-z0-9-]+$
@@ -172,6 +1968,30 @@ components:
       type: array
       items:
         $ref: '#/components/schemas/TagKey'
+    TagResourceRequest:
+      type: object
+      properties:
+        ResourceArn:
+          allOf:
+          - $ref: '#/components/schemas/Arn'
+          description: 'The Amazon Resource Name (ARN) to which you want to add the
+            tags. For example:
+
+
+            `arn:aws:qldb:us-east-1:123456789012:ledger/exampleLedger`'
+        Tags:
+          allOf:
+          - $ref: '#/components/schemas/Tags'
+          description: The key-value pairs to add as tags to the specified QLDB resource.
+            Tag keys are case sensitive. If you specify a key that already exists
+            for the resource, your request fails and returns an error. Tag values
+            are case sensitive and can be null.
+      required:
+      - ResourceArn
+      - Tags
+    TagResourceResponse:
+      type: object
+      properties: {}
     TagValue:
       type: string
       minLength: 0
@@ -188,3 +2008,160 @@ components:
       pattern: ^[A-Za-z-0-9]+$
       minLength: 22
       maxLength: 22
+    UntagResourceRequest:
+      type: object
+      properties:
+        ResourceArn:
+          allOf:
+          - $ref: '#/components/schemas/Arn'
+          description: 'The Amazon Resource Name (ARN) from which to remove the tags.
+            For example:
+
+
+            `arn:aws:qldb:us-east-1:123456789012:ledger/exampleLedger`'
+        TagKeys:
+          allOf:
+          - $ref: '#/components/schemas/TagKeyList'
+          description: The list of tag keys to remove.
+      required:
+      - ResourceArn
+      - TagKeys
+    UntagResourceResponse:
+      type: object
+      properties: {}
+    UpdateLedgerPermissionsModeRequest:
+      type: object
+      properties:
+        Name:
+          allOf:
+          - $ref: '#/components/schemas/LedgerName'
+          description: The name of the ledger.
+        PermissionsMode:
+          allOf:
+          - $ref: '#/components/schemas/PermissionsMode'
+          description: "The permissions mode to assign to the ledger. This parameter\
+            \ can have one of the following values:\n\n  * `ALLOW_ALL`: A legacy permissions\
+            \ mode that enables access control with API-level granularity for ledgers.\n\
+            \nThis mode allows users who have the `SendCommand` API permission for\
+            \ this ledger to run all PartiQL commands (hence, `ALLOW_ALL`) on any\
+            \ tables in the specified ledger. This mode disregards any table-level\
+            \ or command-level IAM permissions policies that you create for the ledger.\n\
+            \n  * `STANDARD`: (_Recommended_) A permissions mode that enables access\
+            \ control with finer granularity for ledgers, tables, and PartiQL commands.\n\
+            \nBy default, this mode denies all user requests to run any PartiQL commands\
+            \ on any tables in this ledger. To allow PartiQL commands to run, you\
+            \ must create IAM permissions policies for specific table resources and\
+            \ PartiQL actions, in addition to the `SendCommand` API permission for\
+            \ the ledger. For information, see [Getting started with the standard\
+            \ permissions mode](https://docs.aws.amazon.com/qldb/latest/developerguide/getting-started-standard-mode.html)\
+            \ in the _Amazon QLDB Developer Guide_.\n\nWe strongly recommend using\
+            \ the `STANDARD` permissions mode to maximize the security of your ledger\
+            \ data."
+      required:
+      - Name
+      - PermissionsMode
+    UpdateLedgerPermissionsModeResponse:
+      type: object
+      properties:
+        Name:
+          allOf:
+          - $ref: '#/components/schemas/LedgerName'
+          description: The name of the ledger.
+        Arn:
+          allOf:
+          - $ref: '#/components/schemas/Arn'
+          description: The Amazon Resource Name (ARN) for the ledger.
+        PermissionsMode:
+          allOf:
+          - $ref: '#/components/schemas/PermissionsMode'
+          description: The current permissions mode of the ledger.
+    UpdateLedgerRequest:
+      type: object
+      properties:
+        Name:
+          allOf:
+          - $ref: '#/components/schemas/LedgerName'
+          description: The name of the ledger.
+        DeletionProtection:
+          allOf:
+          - $ref: '#/components/schemas/DeletionProtection'
+          description: 'Specifies whether the ledger is protected from being deleted
+            by any user. If not defined during ledger creation, this feature is enabled
+            (`true`) by default.
+
+
+            If deletion protection is enabled, you must first disable it before you
+            can delete the ledger. You can disable it by calling the `UpdateLedger`
+            operation to set this parameter to `false`.'
+        KmsKey:
+          allOf:
+          - $ref: '#/components/schemas/KmsKey'
+          description: "The key in Key Management Service (KMS) to use for encryption\
+            \ of data at rest in the ledger. For more information, see [Encryption\
+            \ at rest](https://docs.aws.amazon.com/qldb/latest/developerguide/encryption-at-rest.html)\
+            \ in the _Amazon QLDB Developer Guide_.\n\nUse one of the following options\
+            \ to specify this parameter:\n\n  * `AWS_OWNED_KMS_KEY`: Use an KMS key\
+            \ that is owned and managed by Amazon Web Services on your behalf.\n\n\
+            \  * **Undefined** : Make no changes to the KMS key of the ledger.\n\n\
+            \  * **A valid symmetric customer managed KMS key** : Use the specified\
+            \ symmetric encryption KMS key in your account that you create, own, and\
+            \ manage.\n\nAmazon QLDB does not support asymmetric keys. For more information,\
+            \ see [Using symmetric and asymmetric keys](https://docs.aws.amazon.com/kms/latest/developerguide/symmetric-asymmetric.html)\
+            \ in the _Key Management Service Developer Guide_.\n\nTo specify a customer\
+            \ managed KMS key, you can use its key ID, Amazon Resource Name (ARN),\
+            \ alias name, or alias ARN. When using an alias name, prefix it with `\"\
+            alias/\"`. To specify a key in a different Amazon Web Services account,\
+            \ you must use the key ARN or alias ARN.\n\nFor example:\n\n  * Key ID:\
+            \ `1234abcd-12ab-34cd-56ef-1234567890ab`\n\n  * Key ARN: `arn:aws:kms:us-east-2:111122223333:key/1234abcd-12ab-34cd-56ef-1234567890ab`\n\
+            \n  * Alias name: `alias/ExampleAlias`\n\n  * Alias ARN: `arn:aws:kms:us-east-2:111122223333:alias/ExampleAlias`\n\
+            \nFor more information, see [Key identifiers (KeyId)](https://docs.aws.amazon.com/kms/latest/developerguide/concepts.html#key-id)\
+            \ in the _Key Management Service Developer Guide_."
+      required:
+      - Name
+    UpdateLedgerResponse:
+      type: object
+      properties:
+        Name:
+          allOf:
+          - $ref: '#/components/schemas/LedgerName'
+          description: The name of the ledger.
+        Arn:
+          allOf:
+          - $ref: '#/components/schemas/Arn'
+          description: The Amazon Resource Name (ARN) for the ledger.
+        State:
+          allOf:
+          - $ref: '#/components/schemas/LedgerState'
+          description: The current status of the ledger.
+        CreationDateTime:
+          allOf:
+          - $ref: '#/components/schemas/Timestamp'
+          description: The date and time, in epoch time format, when the ledger was
+            created. (Epoch time format is the number of seconds elapsed since 12:00:00
+            AM January 1, 1970 UTC.)
+        DeletionProtection:
+          allOf:
+          - $ref: '#/components/schemas/DeletionProtection'
+          description: 'Specifies whether the ledger is protected from being deleted
+            by any user. If not defined during ledger creation, this feature is enabled
+            (`true`) by default.
+
+
+            If deletion protection is enabled, you must first disable it before you
+            can delete the ledger. You can disable it by calling the `UpdateLedger`
+            operation to set this parameter to `false`.'
+        EncryptionDescription:
+          allOf:
+          - $ref: '#/components/schemas/LedgerEncryptionDescription'
+          description: Information about the encryption of data at rest in the ledger.
+            This includes the current status, the KMS key, and when the key became
+            inaccessible (in the case of an error).
+    ValueHolder:
+      type: object
+      properties:
+        IonText:
+          allOf:
+          - $ref: '#/components/schemas/IonText'
+          description: An Amazon Ion plaintext value contained in a `ValueHolder`
+            structure.
+      description: A structure that can contain a value in multiple encoding formats.

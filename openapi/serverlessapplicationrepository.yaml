@@ -7,7 +7,7 @@ info:
   x-stackql-serviceName: serverlessapplicationrepository
   x-aws-serviceName: serverlessapplicationrepository
   x-aws-protocol: aws.protocols#restJson1
-  x-dateGenerated: '2025-05-05'
+  x-dateGenerated: '2025-05-07'
   version: '2017-09-08'
   title: AWSServerlessApplicationRepository
   description: "The AWS Serverless Application Repository makes it easy for developers\
@@ -64,9 +64,964 @@ servers:
       - sa-east-1
       - me-south-1
       default: us-east-1
-paths: {}
+paths:
+  /applications:
+    post:
+      operationId: CreateApplication
+      description: |-
+        Creates an application, optionally including an AWS SAM file to create the first application version in the same call.
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                Author:
+                  $ref: '#/components/schemas/__string'
+                Description:
+                  $ref: '#/components/schemas/__string'
+                HomePageUrl:
+                  $ref: '#/components/schemas/__string'
+                Labels:
+                  $ref: '#/components/schemas/__listOf__string'
+                LicenseBody:
+                  $ref: '#/components/schemas/__string'
+                LicenseUrl:
+                  $ref: '#/components/schemas/__string'
+                Name:
+                  $ref: '#/components/schemas/__string'
+                ReadmeBody:
+                  $ref: '#/components/schemas/__string'
+                ReadmeUrl:
+                  $ref: '#/components/schemas/__string'
+                SemanticVersion:
+                  $ref: '#/components/schemas/__string'
+                SourceCodeArchiveUrl:
+                  $ref: '#/components/schemas/__string'
+                SourceCodeUrl:
+                  $ref: '#/components/schemas/__string'
+                SpdxLicenseId:
+                  $ref: '#/components/schemas/__string'
+                TemplateBody:
+                  $ref: '#/components/schemas/__string'
+                TemplateUrl:
+                  $ref: '#/components/schemas/__string'
+      responses:
+        '201': {}
+        '400':
+          description: |-
+            One of the parameters in the request is invalid.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequestException'
+        '409':
+          description: |-
+            The resource already exists.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConflictException'
+        '403':
+          description: |-
+            The client is not authenticated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ForbiddenException'
+        '500':
+          description: |-
+            The AWS Serverless Application Repository service encountered an internal error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerErrorException'
+        '429':
+          description: |-
+            The client is sending more than the allowed number of requests per unit of time.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TooManyRequestsException'
+    get:
+      operationId: ListApplications
+      description: |-
+        Lists applications owned by the requester.
+      parameters:
+      - name: maxItems
+        in: query
+        required: false
+        schema:
+          $ref: '#/components/schemas/MaxItems'
+      - name: nextToken
+        in: query
+        required: false
+        schema:
+          $ref: '#/components/schemas/__string'
+      responses:
+        '200': {}
+        '400':
+          description: |-
+            One of the parameters in the request is invalid.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequestException'
+        '403':
+          description: |-
+            The client is not authenticated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ForbiddenException'
+        '500':
+          description: |-
+            The AWS Serverless Application Repository service encountered an internal error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerErrorException'
+        '404':
+          description: |-
+            The resource (for example, an access policy statement) specified in the request doesn't exist.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFoundException'
+  /applications/{ApplicationId}/versions/{SemanticVersion}:
+    put:
+      operationId: CreateApplicationVersion
+      description: |-
+        Creates an application version.
+      parameters:
+      - name: ApplicationId
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/__string'
+      - name: SemanticVersion
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/__string'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                SourceCodeArchiveUrl:
+                  $ref: '#/components/schemas/__string'
+                SourceCodeUrl:
+                  $ref: '#/components/schemas/__string'
+                TemplateBody:
+                  $ref: '#/components/schemas/__string'
+                TemplateUrl:
+                  $ref: '#/components/schemas/__string'
+      responses:
+        '201': {}
+        '400':
+          description: |-
+            One of the parameters in the request is invalid.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequestException'
+        '409':
+          description: |-
+            The resource already exists.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConflictException'
+        '403':
+          description: |-
+            The client is not authenticated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ForbiddenException'
+        '500':
+          description: |-
+            The AWS Serverless Application Repository service encountered an internal error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerErrorException'
+        '429':
+          description: |-
+            The client is sending more than the allowed number of requests per unit of time.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TooManyRequestsException'
+  /applications/{ApplicationId}/changesets:
+    post:
+      operationId: CreateCloudFormationChangeSet
+      description: |-
+        Creates an AWS CloudFormation change set for the given application.
+      parameters:
+      - name: ApplicationId
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/__string'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                Capabilities:
+                  $ref: '#/components/schemas/__listOf__string'
+                ChangeSetName:
+                  $ref: '#/components/schemas/__string'
+                ClientToken:
+                  $ref: '#/components/schemas/__string'
+                Description:
+                  $ref: '#/components/schemas/__string'
+                NotificationArns:
+                  $ref: '#/components/schemas/__listOf__string'
+                ParameterOverrides:
+                  $ref: '#/components/schemas/__listOfParameterValue'
+                ResourceTypes:
+                  $ref: '#/components/schemas/__listOf__string'
+                RollbackConfiguration:
+                  $ref: '#/components/schemas/RollbackConfiguration'
+                SemanticVersion:
+                  $ref: '#/components/schemas/__string'
+                StackName:
+                  $ref: '#/components/schemas/__string'
+                Tags:
+                  $ref: '#/components/schemas/__listOfTag'
+                TemplateId:
+                  $ref: '#/components/schemas/__string'
+      responses:
+        '201': {}
+        '400':
+          description: |-
+            One of the parameters in the request is invalid.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequestException'
+        '403':
+          description: |-
+            The client is not authenticated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ForbiddenException'
+        '500':
+          description: |-
+            The AWS Serverless Application Repository service encountered an internal error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerErrorException'
+        '429':
+          description: |-
+            The client is sending more than the allowed number of requests per unit of time.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TooManyRequestsException'
+  /applications/{ApplicationId}/templates:
+    post:
+      operationId: CreateCloudFormationTemplate
+      description: |-
+        Creates an AWS CloudFormation template.
+      parameters:
+      - name: ApplicationId
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/__string'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                SemanticVersion:
+                  $ref: '#/components/schemas/__string'
+      responses:
+        '201': {}
+        '400':
+          description: |-
+            One of the parameters in the request is invalid.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequestException'
+        '403':
+          description: |-
+            The client is not authenticated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ForbiddenException'
+        '500':
+          description: |-
+            The AWS Serverless Application Repository service encountered an internal error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerErrorException'
+        '404':
+          description: |-
+            The resource (for example, an access policy statement) specified in the request doesn't exist.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFoundException'
+        '429':
+          description: |-
+            The client is sending more than the allowed number of requests per unit of time.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TooManyRequestsException'
+  /applications/{ApplicationId}:
+    delete:
+      operationId: DeleteApplication
+      description: |-
+        Deletes the specified application.
+      parameters:
+      - name: ApplicationId
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/__string'
+      responses:
+        '204': {}
+        '400':
+          description: |-
+            One of the parameters in the request is invalid.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequestException'
+        '409':
+          description: |-
+            The resource already exists.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConflictException'
+        '403':
+          description: |-
+            The client is not authenticated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ForbiddenException'
+        '500':
+          description: |-
+            The AWS Serverless Application Repository service encountered an internal error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerErrorException'
+        '404':
+          description: |-
+            The resource (for example, an access policy statement) specified in the request doesn't exist.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFoundException'
+        '429':
+          description: |-
+            The client is sending more than the allowed number of requests per unit of time.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TooManyRequestsException'
+    get:
+      operationId: GetApplication
+      description: |-
+        Gets the specified application.
+      parameters:
+      - name: ApplicationId
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/__string'
+      - name: semanticVersion
+        in: query
+        required: false
+        schema:
+          $ref: '#/components/schemas/__string'
+      responses:
+        '200': {}
+        '400':
+          description: |-
+            One of the parameters in the request is invalid.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequestException'
+        '403':
+          description: |-
+            The client is not authenticated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ForbiddenException'
+        '500':
+          description: |-
+            The AWS Serverless Application Repository service encountered an internal error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerErrorException'
+        '404':
+          description: |-
+            The resource (for example, an access policy statement) specified in the request doesn't exist.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFoundException'
+        '429':
+          description: |-
+            The client is sending more than the allowed number of requests per unit of time.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TooManyRequestsException'
+    patch:
+      operationId: UpdateApplication
+      description: |-
+        Updates the specified application.
+      parameters:
+      - name: ApplicationId
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/__string'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                Author:
+                  $ref: '#/components/schemas/__string'
+                Description:
+                  $ref: '#/components/schemas/__string'
+                HomePageUrl:
+                  $ref: '#/components/schemas/__string'
+                Labels:
+                  $ref: '#/components/schemas/__listOf__string'
+                ReadmeBody:
+                  $ref: '#/components/schemas/__string'
+                ReadmeUrl:
+                  $ref: '#/components/schemas/__string'
+      responses:
+        '200': {}
+        '400':
+          description: |-
+            One of the parameters in the request is invalid.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequestException'
+        '409':
+          description: |-
+            The resource already exists.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConflictException'
+        '403':
+          description: |-
+            The client is not authenticated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ForbiddenException'
+        '500':
+          description: |-
+            The AWS Serverless Application Repository service encountered an internal error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerErrorException'
+        '404':
+          description: |-
+            The resource (for example, an access policy statement) specified in the request doesn't exist.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFoundException'
+        '429':
+          description: |-
+            The client is sending more than the allowed number of requests per unit of time.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TooManyRequestsException'
+  /applications/{ApplicationId}/policy:
+    get:
+      operationId: GetApplicationPolicy
+      description: |-
+        Retrieves the policy for the application.
+      parameters:
+      - name: ApplicationId
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/__string'
+      responses:
+        '200': {}
+        '400':
+          description: |-
+            One of the parameters in the request is invalid.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequestException'
+        '403':
+          description: |-
+            The client is not authenticated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ForbiddenException'
+        '500':
+          description: |-
+            The AWS Serverless Application Repository service encountered an internal error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerErrorException'
+        '404':
+          description: |-
+            The resource (for example, an access policy statement) specified in the request doesn't exist.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFoundException'
+        '429':
+          description: |-
+            The client is sending more than the allowed number of requests per unit of time.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TooManyRequestsException'
+    put:
+      operationId: PutApplicationPolicy
+      description: |-
+        Sets the permission policy for an application. For the list of actions supported for this operation, see [Application Permissions](https://docs.aws.amazon.com/serverlessrepo/latest/devguide/access-control-resource-based.html#application-permissions) .
+      parameters:
+      - name: ApplicationId
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/__string'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                Statements:
+                  $ref: '#/components/schemas/__listOfApplicationPolicyStatement'
+      responses:
+        '200': {}
+        '400':
+          description: |-
+            One of the parameters in the request is invalid.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequestException'
+        '403':
+          description: |-
+            The client is not authenticated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ForbiddenException'
+        '500':
+          description: |-
+            The AWS Serverless Application Repository service encountered an internal error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerErrorException'
+        '404':
+          description: |-
+            The resource (for example, an access policy statement) specified in the request doesn't exist.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFoundException'
+        '429':
+          description: |-
+            The client is sending more than the allowed number of requests per unit of time.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TooManyRequestsException'
+  /applications/{ApplicationId}/templates/{TemplateId}:
+    get:
+      operationId: GetCloudFormationTemplate
+      description: |-
+        Gets the specified AWS CloudFormation template.
+      parameters:
+      - name: ApplicationId
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/__string'
+      - name: TemplateId
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/__string'
+      responses:
+        '200': {}
+        '400':
+          description: |-
+            One of the parameters in the request is invalid.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequestException'
+        '403':
+          description: |-
+            The client is not authenticated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ForbiddenException'
+        '500':
+          description: |-
+            The AWS Serverless Application Repository service encountered an internal error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerErrorException'
+        '404':
+          description: |-
+            The resource (for example, an access policy statement) specified in the request doesn't exist.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFoundException'
+        '429':
+          description: |-
+            The client is sending more than the allowed number of requests per unit of time.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TooManyRequestsException'
+  /applications/{ApplicationId}/dependencies:
+    get:
+      operationId: ListApplicationDependencies
+      description: |-
+        Retrieves the list of applications nested in the containing application.
+      parameters:
+      - name: ApplicationId
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/__string'
+      - name: maxItems
+        in: query
+        required: false
+        schema:
+          $ref: '#/components/schemas/MaxItems'
+      - name: nextToken
+        in: query
+        required: false
+        schema:
+          $ref: '#/components/schemas/__string'
+      - name: semanticVersion
+        in: query
+        required: false
+        schema:
+          $ref: '#/components/schemas/__string'
+      responses:
+        '200': {}
+        '400':
+          description: |-
+            One of the parameters in the request is invalid.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequestException'
+        '403':
+          description: |-
+            The client is not authenticated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ForbiddenException'
+        '500':
+          description: |-
+            The AWS Serverless Application Repository service encountered an internal error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerErrorException'
+        '404':
+          description: |-
+            The resource (for example, an access policy statement) specified in the request doesn't exist.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFoundException'
+        '429':
+          description: |-
+            The client is sending more than the allowed number of requests per unit of time.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TooManyRequestsException'
+  /applications/{ApplicationId}/versions:
+    get:
+      operationId: ListApplicationVersions
+      description: |-
+        Lists versions for the specified application.
+      parameters:
+      - name: ApplicationId
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/__string'
+      - name: maxItems
+        in: query
+        required: false
+        schema:
+          $ref: '#/components/schemas/MaxItems'
+      - name: nextToken
+        in: query
+        required: false
+        schema:
+          $ref: '#/components/schemas/__string'
+      responses:
+        '200': {}
+        '400':
+          description: |-
+            One of the parameters in the request is invalid.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequestException'
+        '403':
+          description: |-
+            The client is not authenticated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ForbiddenException'
+        '500':
+          description: |-
+            The AWS Serverless Application Repository service encountered an internal error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerErrorException'
+        '404':
+          description: |-
+            The resource (for example, an access policy statement) specified in the request doesn't exist.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFoundException'
+        '429':
+          description: |-
+            The client is sending more than the allowed number of requests per unit of time.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TooManyRequestsException'
+  /applications/{ApplicationId}/unshare:
+    post:
+      operationId: UnshareApplication
+      description: |-
+        Unshares an application from an AWS Organization.
+
+        This operation can be called only from the organization's master account.
+      parameters:
+      - name: ApplicationId
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/__string'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                OrganizationId:
+                  $ref: '#/components/schemas/__string'
+      responses:
+        '204': {}
+        '400':
+          description: |-
+            One of the parameters in the request is invalid.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequestException'
+        '403':
+          description: |-
+            The client is not authenticated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ForbiddenException'
+        '500':
+          description: |-
+            The AWS Serverless Application Repository service encountered an internal error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerErrorException'
+        '404':
+          description: |-
+            The resource (for example, an access policy statement) specified in the request doesn't exist.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFoundException'
+        '429':
+          description: |-
+            The client is sending more than the allowed number of requests per unit of time.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TooManyRequestsException'
 components:
   schemas:
+    ApplicationDependencySummary:
+      type: object
+      properties:
+        ApplicationId:
+          allOf:
+          - $ref: '#/components/schemas/__string'
+          description: The Amazon Resource Name (ARN) of the nested application.
+        SemanticVersion:
+          allOf:
+          - $ref: '#/components/schemas/__string'
+          description: The semantic version of the nested application.
+      required:
+      - ApplicationId
+      - SemanticVersion
+      description: A nested application summary.
+    ApplicationPolicyStatement:
+      type: object
+      properties:
+        Actions:
+          allOf:
+          - $ref: '#/components/schemas/__listOf__string'
+          description: For the list of actions supported for this operation, see [Application
+            Permissions](https://docs.aws.amazon.com/serverlessrepo/latest/devguide/access-control-resource-based.html#application-permissions).
+        PrincipalOrgIDs:
+          allOf:
+          - $ref: '#/components/schemas/__listOf__string'
+          description: An array of PrinciplalOrgIDs, which corresponds to AWS IAM
+            [aws:PrincipalOrgID](https://docs.aws.amazon.com/IAM/latest/UserGuide/reference_policies_condition-keys.html#principal-org-id)
+            global condition key.
+        Principals:
+          allOf:
+          - $ref: '#/components/schemas/__listOf__string'
+          description: An array of AWS account IDs, or * to make the application public.
+        StatementId:
+          allOf:
+          - $ref: '#/components/schemas/__string'
+          description: A unique ID for the statement.
+      required:
+      - Actions
+      - Principals
+      description: Policy statement applied to the application.
+    ApplicationSummary:
+      type: object
+      properties:
+        ApplicationId:
+          allOf:
+          - $ref: '#/components/schemas/__string'
+          description: The application Amazon Resource Name (ARN).
+        Author:
+          allOf:
+          - $ref: '#/components/schemas/__string'
+          description: 'The name of the author publishing the app.
+
+
+            Minimum length=1. Maximum length=127.
+
+
+            Pattern "^[a-z0-9](([a-z0-9]|-(?!-))*[a-z0-9])?$";'
+        CreationTime:
+          allOf:
+          - $ref: '#/components/schemas/__string'
+          description: The date and time this resource was created.
+        Description:
+          allOf:
+          - $ref: '#/components/schemas/__string'
+          description: 'The description of the application.
+
+
+            Minimum length=1. Maximum length=256'
+        HomePageUrl:
+          allOf:
+          - $ref: '#/components/schemas/__string'
+          description: A URL with more information about the application, for example
+            the location of your GitHub repository for the application.
+        Labels:
+          allOf:
+          - $ref: '#/components/schemas/__listOf__string'
+          description: 'Labels to improve discovery of apps in search results.
+
+
+            Minimum length=1. Maximum length=127. Maximum number of labels: 10
+
+
+            Pattern: "^[a-zA-Z0-9+\\\\-_:\\\/@]+$";'
+        Name:
+          allOf:
+          - $ref: '#/components/schemas/__string'
+          description: 'The name of the application.
+
+
+            Minimum length=1. Maximum length=140
+
+
+            Pattern: "[a-zA-Z0-9\\\\-]+";'
+        SpdxLicenseId:
+          allOf:
+          - $ref: '#/components/schemas/__string'
+          description: A valid identifier from <https://spdx.org/licenses/>.
+      required:
+      - ApplicationId
+      - Author
+      - Description
+      - Name
+      description: Summary of details about the application.
+    BadRequestException:
+      type: object
+      properties:
+        ErrorCode:
+          allOf:
+          - $ref: '#/components/schemas/__string'
+          description: '400'
+        Message:
+          allOf:
+          - $ref: '#/components/schemas/__string'
+          description: One of the parameters in the request is invalid.
+      description: One of the parameters in the request is invalid.
     Capability:
       type: string
       enum:
@@ -75,16 +1030,1379 @@ components:
       - CAPABILITY_AUTO_EXPAND
       - CAPABILITY_RESOURCE_POLICY
       description: <p>Values that must be specified in order to deploy some applications.</p>
+    ConflictException:
+      type: object
+      properties:
+        ErrorCode:
+          allOf:
+          - $ref: '#/components/schemas/__string'
+          description: '409'
+        Message:
+          allOf:
+          - $ref: '#/components/schemas/__string'
+          description: The resource already exists.
+      description: The resource already exists.
+    CreateApplicationRequest:
+      type: object
+      properties:
+        Author:
+          allOf:
+          - $ref: '#/components/schemas/__string'
+          description: 'The name of the author publishing the app.
+
+
+            Minimum length=1. Maximum length=127.
+
+
+            Pattern "^[a-z0-9](([a-z0-9]|-(?!-))*[a-z0-9])?$";'
+        Description:
+          allOf:
+          - $ref: '#/components/schemas/__string'
+          description: 'The description of the application.
+
+
+            Minimum length=1. Maximum length=256'
+        HomePageUrl:
+          allOf:
+          - $ref: '#/components/schemas/__string'
+          description: A URL with more information about the application, for example
+            the location of your GitHub repository for the application.
+        Labels:
+          allOf:
+          - $ref: '#/components/schemas/__listOf__string'
+          description: 'Labels to improve discovery of apps in search results.
+
+
+            Minimum length=1. Maximum length=127. Maximum number of labels: 10
+
+
+            Pattern: "^[a-zA-Z0-9+\\\\-_:\\\/@]+$";'
+        LicenseBody:
+          allOf:
+          - $ref: '#/components/schemas/__string'
+          description: 'A local text file that contains the license of the app that
+            matches the spdxLicenseID value of your application. The file has the
+            format file://<path>/<filename>.
+
+
+            Maximum size 5 MB
+
+
+            You can specify only one of licenseBody and licenseUrl; otherwise, an
+            error results.'
+        LicenseUrl:
+          allOf:
+          - $ref: '#/components/schemas/__string'
+          description: 'A link to the S3 object that contains the license of the app
+            that matches the spdxLicenseID value of your application.
+
+
+            Maximum size 5 MB
+
+
+            You can specify only one of licenseBody and licenseUrl; otherwise, an
+            error results.'
+        Name:
+          allOf:
+          - $ref: '#/components/schemas/__string'
+          description: 'The name of the application that you want to publish.
+
+
+            Minimum length=1. Maximum length=140
+
+
+            Pattern: "[a-zA-Z0-9\\\\-]+";'
+        ReadmeBody:
+          allOf:
+          - $ref: '#/components/schemas/__string'
+          description: 'A local text readme file in Markdown language that contains
+            a more detailed description of the application and how it works. The file
+            has the format file://<path>/<filename>.
+
+
+            Maximum size 5 MB
+
+
+            You can specify only one of readmeBody and readmeUrl; otherwise, an error
+            results.'
+        ReadmeUrl:
+          allOf:
+          - $ref: '#/components/schemas/__string'
+          description: 'A link to the S3 object in Markdown language that contains
+            a more detailed description of the application and how it works.
+
+
+            Maximum size 5 MB
+
+
+            You can specify only one of readmeBody and readmeUrl; otherwise, an error
+            results.'
+        SemanticVersion:
+          allOf:
+          - $ref: '#/components/schemas/__string'
+          description: 'The semantic version of the application:
+
+
+            <https://semver.org/>'
+        SourceCodeArchiveUrl:
+          allOf:
+          - $ref: '#/components/schemas/__string'
+          description: 'A link to the S3 object that contains the ZIP archive of the
+            source code for this version of your application.
+
+
+            Maximum size 50 MB'
+        SourceCodeUrl:
+          allOf:
+          - $ref: '#/components/schemas/__string'
+          description: A link to a public repository for the source code of your application,
+            for example the URL of a specific GitHub commit.
+        SpdxLicenseId:
+          allOf:
+          - $ref: '#/components/schemas/__string'
+          description: A valid identifier from <https://spdx.org/licenses/>.
+        TemplateBody:
+          allOf:
+          - $ref: '#/components/schemas/__string'
+          description: 'The local raw packaged AWS SAM template file of your application.
+            The file has the format file://<path>/<filename>.
+
+
+            You can specify only one of templateBody and templateUrl; otherwise an
+            error results.'
+        TemplateUrl:
+          allOf:
+          - $ref: '#/components/schemas/__string'
+          description: 'A link to the S3 object containing the packaged AWS SAM template
+            of your application.
+
+
+            You can specify only one of templateBody and templateUrl; otherwise an
+            error results.'
+      required:
+      - Author
+      - Description
+      - Name
+    CreateApplicationResponse:
+      type: object
+      properties:
+        ApplicationId:
+          allOf:
+          - $ref: '#/components/schemas/__string'
+          description: The application Amazon Resource Name (ARN).
+        Author:
+          allOf:
+          - $ref: '#/components/schemas/__string'
+          description: 'The name of the author publishing the app.
+
+
+            Minimum length=1. Maximum length=127.
+
+
+            Pattern "^[a-z0-9](([a-z0-9]|-(?!-))*[a-z0-9])?$";'
+        CreationTime:
+          allOf:
+          - $ref: '#/components/schemas/__string'
+          description: The date and time this resource was created.
+        Description:
+          allOf:
+          - $ref: '#/components/schemas/__string'
+          description: 'The description of the application.
+
+
+            Minimum length=1. Maximum length=256'
+        HomePageUrl:
+          allOf:
+          - $ref: '#/components/schemas/__string'
+          description: A URL with more information about the application, for example
+            the location of your GitHub repository for the application.
+        IsVerifiedAuthor:
+          allOf:
+          - $ref: '#/components/schemas/__boolean'
+          description: Whether the author of this application has been verified. This
+            means means that AWS has made a good faith review, as a reasonable and
+            prudent service provider, of the information provided by the requester
+            and has confirmed that the requester's identity is as claimed.
+        Labels:
+          allOf:
+          - $ref: '#/components/schemas/__listOf__string'
+          description: 'Labels to improve discovery of apps in search results.
+
+
+            Minimum length=1. Maximum length=127. Maximum number of labels: 10
+
+
+            Pattern: "^[a-zA-Z0-9+\\\\-_:\\\/@]+$";'
+        LicenseUrl:
+          allOf:
+          - $ref: '#/components/schemas/__string'
+          description: 'A link to a license file of the app that matches the spdxLicenseID
+            value of your application.
+
+
+            Maximum size 5 MB'
+        Name:
+          allOf:
+          - $ref: '#/components/schemas/__string'
+          description: 'The name of the application.
+
+
+            Minimum length=1. Maximum length=140
+
+
+            Pattern: "[a-zA-Z0-9\\\\-]+";'
+        ReadmeUrl:
+          allOf:
+          - $ref: '#/components/schemas/__string'
+          description: 'A link to the readme file in Markdown language that contains
+            a more detailed description of the application and how it works.
+
+
+            Maximum size 5 MB'
+        SpdxLicenseId:
+          allOf:
+          - $ref: '#/components/schemas/__string'
+          description: A valid identifier from https://spdx.org/licenses/.
+        VerifiedAuthorUrl:
+          allOf:
+          - $ref: '#/components/schemas/__string'
+          description: The URL to the public profile of a verified author. This URL
+            is submitted by the author.
+        Version:
+          allOf:
+          - $ref: '#/components/schemas/Version'
+          description: Version information about the application.
+    CreateApplicationVersionRequest:
+      type: object
+      properties:
+        ApplicationId:
+          allOf:
+          - $ref: '#/components/schemas/__string'
+          description: The Amazon Resource Name (ARN) of the application.
+        SemanticVersion:
+          allOf:
+          - $ref: '#/components/schemas/__string'
+          description: The semantic version of the new version.
+        SourceCodeArchiveUrl:
+          allOf:
+          - $ref: '#/components/schemas/__string'
+          description: 'A link to the S3 object that contains the ZIP archive of the
+            source code for this version of your application.
+
+
+            Maximum size 50 MB'
+        SourceCodeUrl:
+          allOf:
+          - $ref: '#/components/schemas/__string'
+          description: A link to a public repository for the source code of your application,
+            for example the URL of a specific GitHub commit.
+        TemplateBody:
+          allOf:
+          - $ref: '#/components/schemas/__string'
+          description: The raw packaged AWS SAM template of your application.
+        TemplateUrl:
+          allOf:
+          - $ref: '#/components/schemas/__string'
+          description: A link to the packaged AWS SAM template of your application.
+      required:
+      - ApplicationId
+      - SemanticVersion
+    CreateApplicationVersionResponse:
+      type: object
+      properties:
+        ApplicationId:
+          allOf:
+          - $ref: '#/components/schemas/__string'
+          description: The application Amazon Resource Name (ARN).
+        CreationTime:
+          allOf:
+          - $ref: '#/components/schemas/__string'
+          description: The date and time this resource was created.
+        ParameterDefinitions:
+          allOf:
+          - $ref: '#/components/schemas/__listOfParameterDefinition'
+          description: An array of parameter types supported by the application.
+        RequiredCapabilities:
+          allOf:
+          - $ref: '#/components/schemas/__listOfCapability'
+          description: 'A list of values that you must specify before you can deploy
+            certain applications. Some applications might include resources that can
+            affect permissions in your AWS account, for example, by creating new AWS
+            Identity and Access Management (IAM) users. For those applications, you
+            must explicitly acknowledge their capabilities by specifying this parameter.
+
+
+            The only valid values are CAPABILITY_IAM, CAPABILITY_NAMED_IAM, CAPABILITY_RESOURCE_POLICY,
+            and CAPABILITY_AUTO_EXPAND.
+
+
+            The following resources require you to specify CAPABILITY_IAM or CAPABILITY_NAMED_IAM:
+            [AWS::IAM::Group](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-iam-group.html),
+            [AWS::IAM::InstanceProfile](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-iam-instanceprofile.html),
+            [AWS::IAM::Policy](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-iam-policy.html),
+            and [AWS::IAM::Role](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-iam-role.html).
+            If the application contains IAM resources, you can specify either CAPABILITY_IAM
+            or CAPABILITY_NAMED_IAM. If the application contains IAM resources with
+            custom names, you must specify CAPABILITY_NAMED_IAM.
+
+
+            The following resources require you to specify CAPABILITY_RESOURCE_POLICY:
+            [AWS::Lambda::Permission](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-permission.html),
+            [AWS::IAM:Policy](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-iam-policy.html),
+            [AWS::ApplicationAutoScaling::ScalingPolicy](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-applicationautoscaling-scalingpolicy.html),
+            [AWS::S3::BucketPolicy](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-s3-policy.html),
+            [AWS::SQS::QueuePolicy](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-sqs-policy.html),
+            and [AWS::SNS::TopicPolicy](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-sns-policy.html).
+
+
+            Applications that contain one or more nested applications require you
+            to specify CAPABILITY_AUTO_EXPAND.
+
+
+            If your application template contains any of the above resources, we recommend
+            that you review all permissions associated with the application before
+            deploying. If you don''t specify this parameter for an application that
+            requires capabilities, the call will fail.'
+        ResourcesSupported:
+          allOf:
+          - $ref: '#/components/schemas/__boolean'
+          description: Whether all of the AWS resources contained in this application
+            are supported in the region in which it is being retrieved.
+        SemanticVersion:
+          allOf:
+          - $ref: '#/components/schemas/__string'
+          description: 'The semantic version of the application:
+
+
+            <https://semver.org/>'
+        SourceCodeArchiveUrl:
+          allOf:
+          - $ref: '#/components/schemas/__string'
+          description: 'A link to the S3 object that contains the ZIP archive of the
+            source code for this version of your application.
+
+
+            Maximum size 50 MB'
+        SourceCodeUrl:
+          allOf:
+          - $ref: '#/components/schemas/__string'
+          description: A link to a public repository for the source code of your application,
+            for example the URL of a specific GitHub commit.
+        TemplateUrl:
+          allOf:
+          - $ref: '#/components/schemas/__string'
+          description: A link to the packaged AWS SAM template of your application.
+    CreateCloudFormationChangeSetRequest:
+      type: object
+      properties:
+        ApplicationId:
+          allOf:
+          - $ref: '#/components/schemas/__string'
+          description: The Amazon Resource Name (ARN) of the application.
+        Capabilities:
+          allOf:
+          - $ref: '#/components/schemas/__listOf__string'
+          description: 'A list of values that you must specify before you can deploy
+            certain applications. Some applications might include resources that can
+            affect permissions in your AWS account, for example, by creating new AWS
+            Identity and Access Management (IAM) users. For those applications, you
+            must explicitly acknowledge their capabilities by specifying this parameter.
+
+
+            The only valid values are CAPABILITY_IAM, CAPABILITY_NAMED_IAM, CAPABILITY_RESOURCE_POLICY,
+            and CAPABILITY_AUTO_EXPAND.
+
+
+            The following resources require you to specify CAPABILITY_IAM or CAPABILITY_NAMED_IAM:
+            [AWS::IAM::Group](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-iam-group.html),
+            [AWS::IAM::InstanceProfile](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-iam-instanceprofile.html),
+            [AWS::IAM::Policy](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-iam-policy.html),
+            and [AWS::IAM::Role](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-iam-role.html).
+            If the application contains IAM resources, you can specify either CAPABILITY_IAM
+            or CAPABILITY_NAMED_IAM. If the application contains IAM resources with
+            custom names, you must specify CAPABILITY_NAMED_IAM.
+
+
+            The following resources require you to specify CAPABILITY_RESOURCE_POLICY:
+            [AWS::Lambda::Permission](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-permission.html),
+            [AWS::IAM:Policy](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-iam-policy.html),
+            [AWS::ApplicationAutoScaling::ScalingPolicy](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-applicationautoscaling-scalingpolicy.html),
+            [AWS::S3::BucketPolicy](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-s3-policy.html),
+            [AWS::SQS::QueuePolicy](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-sqs-policy.html),
+            and [AWS::SNS:TopicPolicy](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-sns-policy.html).
+
+
+            Applications that contain one or more nested applications require you
+            to specify CAPABILITY_AUTO_EXPAND.
+
+
+            If your application template contains any of the above resources, we recommend
+            that you review all permissions associated with the application before
+            deploying. If you don''t specify this parameter for an application that
+            requires capabilities, the call will fail.'
+        ChangeSetName:
+          allOf:
+          - $ref: '#/components/schemas/__string'
+          description: This property corresponds to the parameter of the same name
+            for the _AWS CloudFormation[CreateChangeSet](https://docs.aws.amazon.com/goto/WebAPI/cloudformation-2010-05-15/CreateChangeSet)
+            _ API.
+        ClientToken:
+          allOf:
+          - $ref: '#/components/schemas/__string'
+          description: This property corresponds to the parameter of the same name
+            for the _AWS CloudFormation[CreateChangeSet](https://docs.aws.amazon.com/goto/WebAPI/cloudformation-2010-05-15/CreateChangeSet)
+            _ API.
+        Description:
+          allOf:
+          - $ref: '#/components/schemas/__string'
+          description: This property corresponds to the parameter of the same name
+            for the _AWS CloudFormation[CreateChangeSet](https://docs.aws.amazon.com/goto/WebAPI/cloudformation-2010-05-15/CreateChangeSet)
+            _ API.
+        NotificationArns:
+          allOf:
+          - $ref: '#/components/schemas/__listOf__string'
+          description: This property corresponds to the parameter of the same name
+            for the _AWS CloudFormation[CreateChangeSet](https://docs.aws.amazon.com/goto/WebAPI/cloudformation-2010-05-15/CreateChangeSet)
+            _ API.
+        ParameterOverrides:
+          allOf:
+          - $ref: '#/components/schemas/__listOfParameterValue'
+          description: A list of parameter values for the parameters of the application.
+        ResourceTypes:
+          allOf:
+          - $ref: '#/components/schemas/__listOf__string'
+          description: This property corresponds to the parameter of the same name
+            for the _AWS CloudFormation[CreateChangeSet](https://docs.aws.amazon.com/goto/WebAPI/cloudformation-2010-05-15/CreateChangeSet)
+            _ API.
+        RollbackConfiguration:
+          allOf:
+          - $ref: '#/components/schemas/RollbackConfiguration'
+          description: This property corresponds to the parameter of the same name
+            for the _AWS CloudFormation[CreateChangeSet](https://docs.aws.amazon.com/goto/WebAPI/cloudformation-2010-05-15/CreateChangeSet)
+            _ API.
+        SemanticVersion:
+          allOf:
+          - $ref: '#/components/schemas/__string'
+          description: 'The semantic version of the application:
+
+
+            <https://semver.org/>'
+        StackName:
+          allOf:
+          - $ref: '#/components/schemas/__string'
+          description: This property corresponds to the parameter of the same name
+            for the _AWS CloudFormation[CreateChangeSet](https://docs.aws.amazon.com/goto/WebAPI/cloudformation-2010-05-15/CreateChangeSet)
+            _ API.
+        Tags:
+          allOf:
+          - $ref: '#/components/schemas/__listOfTag'
+          description: This property corresponds to the parameter of the same name
+            for the _AWS CloudFormation[CreateChangeSet](https://docs.aws.amazon.com/goto/WebAPI/cloudformation-2010-05-15/CreateChangeSet)
+            _ API.
+        TemplateId:
+          allOf:
+          - $ref: '#/components/schemas/__string'
+          description: 'The UUID returned by CreateCloudFormationTemplate.
+
+
+            Pattern: [0-9a-fA-F]{8}\\-[0-9a-fA-F]{4}\\-[0-9a-fA-F]{4}\\-[0-9a-fA-F]{4}\\-[0-9a-fA-F]{12}'
+      required:
+      - ApplicationId
+      - StackName
+    CreateCloudFormationChangeSetResponse:
+      type: object
+      properties:
+        ApplicationId:
+          allOf:
+          - $ref: '#/components/schemas/__string'
+          description: The application Amazon Resource Name (ARN).
+        ChangeSetId:
+          allOf:
+          - $ref: '#/components/schemas/__string'
+          description: 'The Amazon Resource Name (ARN) of the change set.
+
+
+            Length constraints: Minimum length of 1.
+
+
+            Pattern: ARN:[-a-zA-Z0-9:/]*'
+        SemanticVersion:
+          allOf:
+          - $ref: '#/components/schemas/__string'
+          description: 'The semantic version of the application:
+
+
+            <https://semver.org/>'
+        StackId:
+          allOf:
+          - $ref: '#/components/schemas/__string'
+          description: The unique ID of the stack.
+    CreateCloudFormationTemplateRequest:
+      type: object
+      properties:
+        ApplicationId:
+          allOf:
+          - $ref: '#/components/schemas/__string'
+          description: The Amazon Resource Name (ARN) of the application.
+        SemanticVersion:
+          allOf:
+          - $ref: '#/components/schemas/__string'
+          description: 'The semantic version of the application:
+
+
+            <https://semver.org/>'
+      required:
+      - ApplicationId
+    CreateCloudFormationTemplateResponse:
+      type: object
+      properties:
+        ApplicationId:
+          allOf:
+          - $ref: '#/components/schemas/__string'
+          description: The application Amazon Resource Name (ARN).
+        CreationTime:
+          allOf:
+          - $ref: '#/components/schemas/__string'
+          description: The date and time this resource was created.
+        ExpirationTime:
+          allOf:
+          - $ref: '#/components/schemas/__string'
+          description: The date and time this template expires. Templates expire 1
+            hour after creation.
+        SemanticVersion:
+          allOf:
+          - $ref: '#/components/schemas/__string'
+          description: 'The semantic version of the application:
+
+
+            <https://semver.org/>'
+        Status:
+          allOf:
+          - $ref: '#/components/schemas/Status'
+          description: 'Status of the template creation workflow.
+
+
+            Possible values: PREPARING | ACTIVE | EXPIRED'
+        TemplateId:
+          allOf:
+          - $ref: '#/components/schemas/__string'
+          description: 'The UUID returned by CreateCloudFormationTemplate.
+
+
+            Pattern: [0-9a-fA-F]{8}\\-[0-9a-fA-F]{4}\\-[0-9a-fA-F]{4}\\-[0-9a-fA-F]{4}\\-[0-9a-fA-F]{12}'
+        TemplateUrl:
+          allOf:
+          - $ref: '#/components/schemas/__string'
+          description: A link to the template that can be used to deploy the application
+            using AWS CloudFormation.
+    DeleteApplicationRequest:
+      type: object
+      properties:
+        ApplicationId:
+          allOf:
+          - $ref: '#/components/schemas/__string'
+          description: The Amazon Resource Name (ARN) of the application.
+      required:
+      - ApplicationId
+    ForbiddenException:
+      type: object
+      properties:
+        ErrorCode:
+          allOf:
+          - $ref: '#/components/schemas/__string'
+          description: '403'
+        Message:
+          allOf:
+          - $ref: '#/components/schemas/__string'
+          description: The client is not authenticated.
+      description: The client is not authenticated.
+    GetApplicationPolicyRequest:
+      type: object
+      properties:
+        ApplicationId:
+          allOf:
+          - $ref: '#/components/schemas/__string'
+          description: The Amazon Resource Name (ARN) of the application.
+      required:
+      - ApplicationId
+    GetApplicationPolicyResponse:
+      type: object
+      properties:
+        Statements:
+          allOf:
+          - $ref: '#/components/schemas/__listOfApplicationPolicyStatement'
+          description: An array of policy statements applied to the application.
+    GetApplicationRequest:
+      type: object
+      properties:
+        ApplicationId:
+          allOf:
+          - $ref: '#/components/schemas/__string'
+          description: The Amazon Resource Name (ARN) of the application.
+        SemanticVersion:
+          allOf:
+          - $ref: '#/components/schemas/__string'
+          description: The semantic version of the application to get.
+      required:
+      - ApplicationId
+    GetApplicationResponse:
+      type: object
+      properties:
+        ApplicationId:
+          allOf:
+          - $ref: '#/components/schemas/__string'
+          description: The application Amazon Resource Name (ARN).
+        Author:
+          allOf:
+          - $ref: '#/components/schemas/__string'
+          description: 'The name of the author publishing the app.
+
+
+            Minimum length=1. Maximum length=127.
+
+
+            Pattern "^[a-z0-9](([a-z0-9]|-(?!-))*[a-z0-9])?$";'
+        CreationTime:
+          allOf:
+          - $ref: '#/components/schemas/__string'
+          description: The date and time this resource was created.
+        Description:
+          allOf:
+          - $ref: '#/components/schemas/__string'
+          description: 'The description of the application.
+
+
+            Minimum length=1. Maximum length=256'
+        HomePageUrl:
+          allOf:
+          - $ref: '#/components/schemas/__string'
+          description: A URL with more information about the application, for example
+            the location of your GitHub repository for the application.
+        IsVerifiedAuthor:
+          allOf:
+          - $ref: '#/components/schemas/__boolean'
+          description: Whether the author of this application has been verified. This
+            means means that AWS has made a good faith review, as a reasonable and
+            prudent service provider, of the information provided by the requester
+            and has confirmed that the requester's identity is as claimed.
+        Labels:
+          allOf:
+          - $ref: '#/components/schemas/__listOf__string'
+          description: 'Labels to improve discovery of apps in search results.
+
+
+            Minimum length=1. Maximum length=127. Maximum number of labels: 10
+
+
+            Pattern: "^[a-zA-Z0-9+\\\\-_:\\\/@]+$";'
+        LicenseUrl:
+          allOf:
+          - $ref: '#/components/schemas/__string'
+          description: 'A link to a license file of the app that matches the spdxLicenseID
+            value of your application.
+
+
+            Maximum size 5 MB'
+        Name:
+          allOf:
+          - $ref: '#/components/schemas/__string'
+          description: 'The name of the application.
+
+
+            Minimum length=1. Maximum length=140
+
+
+            Pattern: "[a-zA-Z0-9\\\\-]+";'
+        ReadmeUrl:
+          allOf:
+          - $ref: '#/components/schemas/__string'
+          description: 'A link to the readme file in Markdown language that contains
+            a more detailed description of the application and how it works.
+
+
+            Maximum size 5 MB'
+        SpdxLicenseId:
+          allOf:
+          - $ref: '#/components/schemas/__string'
+          description: A valid identifier from https://spdx.org/licenses/.
+        VerifiedAuthorUrl:
+          allOf:
+          - $ref: '#/components/schemas/__string'
+          description: The URL to the public profile of a verified author. This URL
+            is submitted by the author.
+        Version:
+          allOf:
+          - $ref: '#/components/schemas/Version'
+          description: Version information about the application.
+    GetCloudFormationTemplateRequest:
+      type: object
+      properties:
+        ApplicationId:
+          allOf:
+          - $ref: '#/components/schemas/__string'
+          description: The Amazon Resource Name (ARN) of the application.
+        TemplateId:
+          allOf:
+          - $ref: '#/components/schemas/__string'
+          description: 'The UUID returned by CreateCloudFormationTemplate.
+
+
+            Pattern: [0-9a-fA-F]{8}\\-[0-9a-fA-F]{4}\\-[0-9a-fA-F]{4}\\-[0-9a-fA-F]{4}\\-[0-9a-fA-F]{12}'
+      required:
+      - ApplicationId
+      - TemplateId
+    GetCloudFormationTemplateResponse:
+      type: object
+      properties:
+        ApplicationId:
+          allOf:
+          - $ref: '#/components/schemas/__string'
+          description: The application Amazon Resource Name (ARN).
+        CreationTime:
+          allOf:
+          - $ref: '#/components/schemas/__string'
+          description: The date and time this resource was created.
+        ExpirationTime:
+          allOf:
+          - $ref: '#/components/schemas/__string'
+          description: The date and time this template expires. Templates expire 1
+            hour after creation.
+        SemanticVersion:
+          allOf:
+          - $ref: '#/components/schemas/__string'
+          description: 'The semantic version of the application:
+
+
+            <https://semver.org/>'
+        Status:
+          allOf:
+          - $ref: '#/components/schemas/Status'
+          description: 'Status of the template creation workflow.
+
+
+            Possible values: PREPARING | ACTIVE | EXPIRED'
+        TemplateId:
+          allOf:
+          - $ref: '#/components/schemas/__string'
+          description: 'The UUID returned by CreateCloudFormationTemplate.
+
+
+            Pattern: [0-9a-fA-F]{8}\\-[0-9a-fA-F]{4}\\-[0-9a-fA-F]{4}\\-[0-9a-fA-F]{4}\\-[0-9a-fA-F]{12}'
+        TemplateUrl:
+          allOf:
+          - $ref: '#/components/schemas/__string'
+          description: A link to the template that can be used to deploy the application
+            using AWS CloudFormation.
+    InternalServerErrorException:
+      type: object
+      properties:
+        ErrorCode:
+          allOf:
+          - $ref: '#/components/schemas/__string'
+          description: '500'
+        Message:
+          allOf:
+          - $ref: '#/components/schemas/__string'
+          description: The AWS Serverless Application Repository service encountered
+            an internal error.
+      description: The AWS Serverless Application Repository service encountered an
+        internal error.
+    ListApplicationDependenciesRequest:
+      type: object
+      properties:
+        ApplicationId:
+          allOf:
+          - $ref: '#/components/schemas/__string'
+          description: The Amazon Resource Name (ARN) of the application.
+        MaxItems:
+          allOf:
+          - $ref: '#/components/schemas/MaxItems'
+          description: The total number of items to return.
+        NextToken:
+          allOf:
+          - $ref: '#/components/schemas/__string'
+          description: A token to specify where to start paginating.
+        SemanticVersion:
+          allOf:
+          - $ref: '#/components/schemas/__string'
+          description: The semantic version of the application to get.
+      required:
+      - ApplicationId
+    ListApplicationDependenciesResponse:
+      type: object
+      properties:
+        Dependencies:
+          allOf:
+          - $ref: '#/components/schemas/__listOfApplicationDependencySummary'
+          description: An array of application summaries nested in the application.
+        NextToken:
+          allOf:
+          - $ref: '#/components/schemas/__string'
+          description: The token to request the next page of results.
+    ListApplicationVersionsRequest:
+      type: object
+      properties:
+        ApplicationId:
+          allOf:
+          - $ref: '#/components/schemas/__string'
+          description: The Amazon Resource Name (ARN) of the application.
+        MaxItems:
+          allOf:
+          - $ref: '#/components/schemas/MaxItems'
+          description: The total number of items to return.
+        NextToken:
+          allOf:
+          - $ref: '#/components/schemas/__string'
+          description: A token to specify where to start paginating.
+      required:
+      - ApplicationId
+    ListApplicationVersionsResponse:
+      type: object
+      properties:
+        NextToken:
+          allOf:
+          - $ref: '#/components/schemas/__string'
+          description: The token to request the next page of results.
+        Versions:
+          allOf:
+          - $ref: '#/components/schemas/__listOfVersionSummary'
+          description: An array of version summaries for the application.
+    ListApplicationsRequest:
+      type: object
+      properties:
+        MaxItems:
+          allOf:
+          - $ref: '#/components/schemas/MaxItems'
+          description: The total number of items to return.
+        NextToken:
+          allOf:
+          - $ref: '#/components/schemas/__string'
+          description: A token to specify where to start paginating.
+    ListApplicationsResponse:
+      type: object
+      properties:
+        Applications:
+          allOf:
+          - $ref: '#/components/schemas/__listOfApplicationSummary'
+          description: An array of application summaries.
+        NextToken:
+          allOf:
+          - $ref: '#/components/schemas/__string'
+          description: The token to request the next page of results.
     MaxItems:
       type: integer
       minimum: 1
       maximum: 100
+    NotFoundException:
+      type: object
+      properties:
+        ErrorCode:
+          allOf:
+          - $ref: '#/components/schemas/__string'
+          description: '404'
+        Message:
+          allOf:
+          - $ref: '#/components/schemas/__string'
+          description: The resource (for example, an access policy statement) specified
+            in the request doesn't exist.
+      description: The resource (for example, an access policy statement) specified
+        in the request doesn't exist.
+    ParameterDefinition:
+      type: object
+      properties:
+        AllowedPattern:
+          allOf:
+          - $ref: '#/components/schemas/__string'
+          description: A regular expression that represents the patterns to allow
+            for String types.
+        AllowedValues:
+          allOf:
+          - $ref: '#/components/schemas/__listOf__string'
+          description: An array containing the list of values allowed for the parameter.
+        ConstraintDescription:
+          allOf:
+          - $ref: '#/components/schemas/__string'
+          description: 'A string that explains a constraint when the constraint is
+            violated. For example, without a constraint description, a parameter that
+            has an allowed pattern of [A-Za-z0-9]+ displays the following error message
+            when the user specifies an invalid value:
+
+
+            Malformed input-Parameter MyParameter must match pattern [A-Za-z0-9]+
+
+
+            By adding a constraint description, such as "must contain only uppercase
+            and lowercase letters and numbers," you can display the following customized
+            error message:
+
+
+            Malformed input-Parameter MyParameter must contain only uppercase and
+            lowercase letters and numbers.'
+        DefaultValue:
+          allOf:
+          - $ref: '#/components/schemas/__string'
+          description: A value of the appropriate type for the template to use if
+            no value is specified when a stack is created. If you define constraints
+            for the parameter, you must specify a value that adheres to those constraints.
+        Description:
+          allOf:
+          - $ref: '#/components/schemas/__string'
+          description: A string of up to 4,000 characters that describes the parameter.
+        MaxLength:
+          allOf:
+          - $ref: '#/components/schemas/__integer'
+          description: An integer value that determines the largest number of characters
+            that you want to allow for String types.
+        MaxValue:
+          allOf:
+          - $ref: '#/components/schemas/__integer'
+          description: A numeric value that determines the largest numeric value that
+            you want to allow for Number types.
+        MinLength:
+          allOf:
+          - $ref: '#/components/schemas/__integer'
+          description: An integer value that determines the smallest number of characters
+            that you want to allow for String types.
+        MinValue:
+          allOf:
+          - $ref: '#/components/schemas/__integer'
+          description: A numeric value that determines the smallest numeric value
+            that you want to allow for Number types.
+        Name:
+          allOf:
+          - $ref: '#/components/schemas/__string'
+          description: The name of the parameter.
+        NoEcho:
+          allOf:
+          - $ref: '#/components/schemas/__boolean'
+          description: Whether to mask the parameter value whenever anyone makes a
+            call that describes the stack. If you set the value to true, the parameter
+            value is masked with asterisks (*****).
+        ReferencedByResources:
+          allOf:
+          - $ref: '#/components/schemas/__listOf__string'
+          description: A list of AWS SAM resources that use this parameter.
+        Type:
+          allOf:
+          - $ref: '#/components/schemas/__string'
+          description: "The type of the parameter.\n\nValid values: String | Number\
+            \ | List<Number> | CommaDelimitedList \n\nString: A literal string.\n\n\
+            For example, users can specify \"MyUserName\".\n\nNumber: An integer or\
+            \ float. AWS CloudFormation validates the parameter value as a number.\
+            \ However, when you use the parameter elsewhere in your template (for\
+            \ example, by using the Ref intrinsic function), the parameter value becomes\
+            \ a string.\n\nFor example, users might specify \"8888\".\n\nList<Number>:\
+            \ An array of integers or floats that are separated by commas. AWS CloudFormation\
+            \ validates the parameter value as numbers. However, when you use the\
+            \ parameter elsewhere in your template (for example, by using the Ref\
+            \ intrinsic function), the parameter value becomes a list of strings.\n\
+            \nFor example, users might specify \"80,20\", and then Ref results in\
+            \ [\"80\",\"20\"].\n\nCommaDelimitedList: An array of literal strings\
+            \ that are separated by commas. The total number of strings should be\
+            \ one more than the total number of commas. Also, each member string is\
+            \ space-trimmed.\n\nFor example, users might specify \"test,dev,prod\"\
+            , and then Ref results in [\"test\",\"dev\",\"prod\"]."
+      required:
+      - Name
+      - ReferencedByResources
+      description: Parameters supported by the application.
+    ParameterValue:
+      type: object
+      properties:
+        Name:
+          allOf:
+          - $ref: '#/components/schemas/__string'
+          description: The key associated with the parameter. If you don't specify
+            a key and value for a particular parameter, AWS CloudFormation uses the
+            default value that is specified in your template.
+        Value:
+          allOf:
+          - $ref: '#/components/schemas/__string'
+          description: The input value associated with the parameter.
+      required:
+      - Name
+      - Value
+      description: Parameter value of the application.
+    PutApplicationPolicyRequest:
+      type: object
+      properties:
+        ApplicationId:
+          allOf:
+          - $ref: '#/components/schemas/__string'
+          description: The Amazon Resource Name (ARN) of the application.
+        Statements:
+          allOf:
+          - $ref: '#/components/schemas/__listOfApplicationPolicyStatement'
+          description: An array of policy statements applied to the application.
+      required:
+      - ApplicationId
+      - Statements
+    PutApplicationPolicyResponse:
+      type: object
+      properties:
+        Statements:
+          allOf:
+          - $ref: '#/components/schemas/__listOfApplicationPolicyStatement'
+          description: An array of policy statements applied to the application.
+    RollbackConfiguration:
+      type: object
+      properties:
+        MonitoringTimeInMinutes:
+          allOf:
+          - $ref: '#/components/schemas/__integer'
+          description: This property corresponds to the content of the same name for
+            the _AWS CloudFormation[RollbackConfiguration](https://docs.aws.amazon.com/goto/WebAPI/cloudformation-2010-05-15/RollbackConfiguration)
+            _ Data Type.
+        RollbackTriggers:
+          allOf:
+          - $ref: '#/components/schemas/__listOfRollbackTrigger'
+          description: This property corresponds to the content of the same name for
+            the _AWS CloudFormation[RollbackConfiguration](https://docs.aws.amazon.com/goto/WebAPI/cloudformation-2010-05-15/RollbackConfiguration)
+            _ Data Type.
+      description: This property corresponds to the _AWS CloudFormation[RollbackConfiguration](https://docs.aws.amazon.com/goto/WebAPI/cloudformation-2010-05-15/RollbackConfiguration)
+        _ Data Type.
+    RollbackTrigger:
+      type: object
+      properties:
+        Arn:
+          allOf:
+          - $ref: '#/components/schemas/__string'
+          description: This property corresponds to the content of the same name for
+            the _AWS CloudFormation[RollbackTrigger](https://docs.aws.amazon.com/goto/WebAPI/cloudformation-2010-05-15/RollbackTrigger)
+            _ Data Type.
+        Type:
+          allOf:
+          - $ref: '#/components/schemas/__string'
+          description: This property corresponds to the content of the same name for
+            the _AWS CloudFormation[RollbackTrigger](https://docs.aws.amazon.com/goto/WebAPI/cloudformation-2010-05-15/RollbackTrigger)
+            _ Data Type.
+      required:
+      - Arn
+      - Type
+      description: This property corresponds to the _AWS CloudFormation[RollbackTrigger](https://docs.aws.amazon.com/goto/WebAPI/cloudformation-2010-05-15/RollbackTrigger)
+        _ Data Type.
     Status:
       type: string
       enum:
       - PREPARING
       - ACTIVE
       - EXPIRED
+    Tag:
+      type: object
+      properties:
+        Key:
+          allOf:
+          - $ref: '#/components/schemas/__string'
+          description: This property corresponds to the content of the same name for
+            the _AWS CloudFormation[Tag](https://docs.aws.amazon.com/goto/WebAPI/cloudformation-2010-05-15/Tag)
+            _ Data Type.
+        Value:
+          allOf:
+          - $ref: '#/components/schemas/__string'
+          description: This property corresponds to the content of the same name for
+            the _AWS CloudFormation[ Tag](https://docs.aws.amazon.com/goto/WebAPI/cloudformation-2010-05-15/Tag)
+            _ Data Type.
+      required:
+      - Key
+      - Value
+      description: This property corresponds to the _AWS CloudFormation[Tag](https://docs.aws.amazon.com/goto/WebAPI/cloudformation-2010-05-15/Tag)
+        _ Data Type.
+    TooManyRequestsException:
+      type: object
+      properties:
+        ErrorCode:
+          allOf:
+          - $ref: '#/components/schemas/__string'
+          description: '429'
+        Message:
+          allOf:
+          - $ref: '#/components/schemas/__string'
+          description: The client is sending more than the allowed number of requests
+            per unit of time.
+      description: The client is sending more than the allowed number of requests
+        per unit of time.
+    UnshareApplicationRequest:
+      type: object
+      properties:
+        ApplicationId:
+          allOf:
+          - $ref: '#/components/schemas/__string'
+          description: The Amazon Resource Name (ARN) of the application.
+        OrganizationId:
+          allOf:
+          - $ref: '#/components/schemas/__string'
+          description: The AWS Organization ID to unshare the application from.
+      required:
+      - ApplicationId
+      - OrganizationId
+    UpdateApplicationRequest:
+      type: object
+      properties:
+        ApplicationId:
+          allOf:
+          - $ref: '#/components/schemas/__string'
+          description: The Amazon Resource Name (ARN) of the application.
+        Author:
+          allOf:
+          - $ref: '#/components/schemas/__string'
+          description: 'The name of the author publishing the app.
+
+
+            Minimum length=1. Maximum length=127.
+
+
+            Pattern "^[a-z0-9](([a-z0-9]|-(?!-))*[a-z0-9])?$";'
+        Description:
+          allOf:
+          - $ref: '#/components/schemas/__string'
+          description: 'The description of the application.
+
+
+            Minimum length=1. Maximum length=256'
+        HomePageUrl:
+          allOf:
+          - $ref: '#/components/schemas/__string'
+          description: A URL with more information about the application, for example
+            the location of your GitHub repository for the application.
+        Labels:
+          allOf:
+          - $ref: '#/components/schemas/__listOf__string'
+          description: 'Labels to improve discovery of apps in search results.
+
+
+            Minimum length=1. Maximum length=127. Maximum number of labels: 10
+
+
+            Pattern: "^[a-zA-Z0-9+\\\\-_:\\\/@]+$";'
+        ReadmeBody:
+          allOf:
+          - $ref: '#/components/schemas/__string'
+          description: 'A text readme file in Markdown language that contains a more
+            detailed description of the application and how it works.
+
+
+            Maximum size 5 MB'
+        ReadmeUrl:
+          allOf:
+          - $ref: '#/components/schemas/__string'
+          description: 'A link to the readme file in Markdown language that contains
+            a more detailed description of the application and how it works.
+
+
+            Maximum size 5 MB'
+      required:
+      - ApplicationId
+    UpdateApplicationResponse:
+      type: object
+      properties:
+        ApplicationId:
+          allOf:
+          - $ref: '#/components/schemas/__string'
+          description: The application Amazon Resource Name (ARN).
+        Author:
+          allOf:
+          - $ref: '#/components/schemas/__string'
+          description: 'The name of the author publishing the app.
+
+
+            Minimum length=1. Maximum length=127.
+
+
+            Pattern "^[a-z0-9](([a-z0-9]|-(?!-))*[a-z0-9])?$";'
+        CreationTime:
+          allOf:
+          - $ref: '#/components/schemas/__string'
+          description: The date and time this resource was created.
+        Description:
+          allOf:
+          - $ref: '#/components/schemas/__string'
+          description: 'The description of the application.
+
+
+            Minimum length=1. Maximum length=256'
+        HomePageUrl:
+          allOf:
+          - $ref: '#/components/schemas/__string'
+          description: A URL with more information about the application, for example
+            the location of your GitHub repository for the application.
+        IsVerifiedAuthor:
+          allOf:
+          - $ref: '#/components/schemas/__boolean'
+          description: Whether the author of this application has been verified. This
+            means means that AWS has made a good faith review, as a reasonable and
+            prudent service provider, of the information provided by the requester
+            and has confirmed that the requester's identity is as claimed.
+        Labels:
+          allOf:
+          - $ref: '#/components/schemas/__listOf__string'
+          description: 'Labels to improve discovery of apps in search results.
+
+
+            Minimum length=1. Maximum length=127. Maximum number of labels: 10
+
+
+            Pattern: "^[a-zA-Z0-9+\\\\-_:\\\/@]+$";'
+        LicenseUrl:
+          allOf:
+          - $ref: '#/components/schemas/__string'
+          description: 'A link to a license file of the app that matches the spdxLicenseID
+            value of your application.
+
+
+            Maximum size 5 MB'
+        Name:
+          allOf:
+          - $ref: '#/components/schemas/__string'
+          description: 'The name of the application.
+
+
+            Minimum length=1. Maximum length=140
+
+
+            Pattern: "[a-zA-Z0-9\\\\-]+";'
+        ReadmeUrl:
+          allOf:
+          - $ref: '#/components/schemas/__string'
+          description: 'A link to the readme file in Markdown language that contains
+            a more detailed description of the application and how it works.
+
+
+            Maximum size 5 MB'
+        SpdxLicenseId:
+          allOf:
+          - $ref: '#/components/schemas/__string'
+          description: A valid identifier from https://spdx.org/licenses/.
+        VerifiedAuthorUrl:
+          allOf:
+          - $ref: '#/components/schemas/__string'
+          description: The URL to the public profile of a verified author. This URL
+            is submitted by the author.
+        Version:
+          allOf:
+          - $ref: '#/components/schemas/Version'
+          description: Version information about the application.
+    Version:
+      type: object
+      properties:
+        ApplicationId:
+          allOf:
+          - $ref: '#/components/schemas/__string'
+          description: The application Amazon Resource Name (ARN).
+        CreationTime:
+          allOf:
+          - $ref: '#/components/schemas/__string'
+          description: The date and time this resource was created.
+        ParameterDefinitions:
+          allOf:
+          - $ref: '#/components/schemas/__listOfParameterDefinition'
+          description: An array of parameter types supported by the application.
+        RequiredCapabilities:
+          allOf:
+          - $ref: '#/components/schemas/__listOfCapability'
+          description: 'A list of values that you must specify before you can deploy
+            certain applications. Some applications might include resources that can
+            affect permissions in your AWS account, for example, by creating new AWS
+            Identity and Access Management (IAM) users. For those applications, you
+            must explicitly acknowledge their capabilities by specifying this parameter.
+
+
+            The only valid values are CAPABILITY_IAM, CAPABILITY_NAMED_IAM, CAPABILITY_RESOURCE_POLICY,
+            and CAPABILITY_AUTO_EXPAND.
+
+
+            The following resources require you to specify CAPABILITY_IAM or CAPABILITY_NAMED_IAM:
+            [AWS::IAM::Group](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-iam-group.html),
+            [AWS::IAM::InstanceProfile](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-iam-instanceprofile.html),
+            [AWS::IAM::Policy](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-iam-policy.html),
+            and [AWS::IAM::Role](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-iam-role.html).
+            If the application contains IAM resources, you can specify either CAPABILITY_IAM
+            or CAPABILITY_NAMED_IAM. If the application contains IAM resources with
+            custom names, you must specify CAPABILITY_NAMED_IAM.
+
+
+            The following resources require you to specify CAPABILITY_RESOURCE_POLICY:
+            [AWS::Lambda::Permission](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-permission.html),
+            [AWS::IAM:Policy](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-iam-policy.html),
+            [AWS::ApplicationAutoScaling::ScalingPolicy](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-applicationautoscaling-scalingpolicy.html),
+            [AWS::S3::BucketPolicy](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-s3-policy.html),
+            [AWS::SQS::QueuePolicy](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-sqs-policy.html),
+            and [AWS::SNS::TopicPolicy](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-sns-policy.html).
+
+
+            Applications that contain one or more nested applications require you
+            to specify CAPABILITY_AUTO_EXPAND.
+
+
+            If your application template contains any of the above resources, we recommend
+            that you review all permissions associated with the application before
+            deploying. If you don''t specify this parameter for an application that
+            requires capabilities, the call will fail.'
+        ResourcesSupported:
+          allOf:
+          - $ref: '#/components/schemas/__boolean'
+          description: Whether all of the AWS resources contained in this application
+            are supported in the region in which it is being retrieved.
+        SemanticVersion:
+          allOf:
+          - $ref: '#/components/schemas/__string'
+          description: 'The semantic version of the application:
+
+
+            <https://semver.org/>'
+        SourceCodeArchiveUrl:
+          allOf:
+          - $ref: '#/components/schemas/__string'
+          description: 'A link to the S3 object that contains the ZIP archive of the
+            source code for this version of your application.
+
+
+            Maximum size 50 MB'
+        SourceCodeUrl:
+          allOf:
+          - $ref: '#/components/schemas/__string'
+          description: A link to a public repository for the source code of your application,
+            for example the URL of a specific GitHub commit.
+        TemplateUrl:
+          allOf:
+          - $ref: '#/components/schemas/__string'
+          description: A link to the packaged AWS SAM template of your application.
+      required:
+      - ApplicationId
+      - CreationTime
+      - ParameterDefinitions
+      - RequiredCapabilities
+      - ResourcesSupported
+      - SemanticVersion
+      - TemplateUrl
+      description: Application version details.
+    VersionSummary:
+      type: object
+      properties:
+        ApplicationId:
+          allOf:
+          - $ref: '#/components/schemas/__string'
+          description: The application Amazon Resource Name (ARN).
+        CreationTime:
+          allOf:
+          - $ref: '#/components/schemas/__string'
+          description: The date and time this resource was created.
+        SemanticVersion:
+          allOf:
+          - $ref: '#/components/schemas/__string'
+          description: 'The semantic version of the application:
+
+
+            <https://semver.org/>'
+        SourceCodeUrl:
+          allOf:
+          - $ref: '#/components/schemas/__string'
+          description: A link to a public repository for the source code of your application,
+            for example the URL of a specific GitHub commit.
+      required:
+      - ApplicationId
+      - CreationTime
+      - SemanticVersion
+      description: An application version summary.
     __boolean:
       type: boolean
     __integer:

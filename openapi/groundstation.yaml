@@ -7,7 +7,7 @@ info:
   x-stackql-serviceName: groundstation
   x-aws-serviceName: groundstation
   x-aws-protocol: aws.protocols#restJson1
-  x-dateGenerated: '2025-05-05'
+  x-dateGenerated: '2025-05-07'
   version: '2019-05-23'
   title: AWS Ground Station
   description: |-
@@ -43,7 +43,1386 @@ servers:
       - sa-east-1
       - me-south-1
       default: us-east-1
-paths: {}
+paths:
+  /contact/{contactId}:
+    delete:
+      operationId: CancelContact
+      description: |-
+        Cancels a contact with a specified contact ID.
+      parameters:
+      - name: contactId
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/Uuid'
+      responses:
+        '200': {}
+        '531':
+          description: |-
+            Dependency encountered an error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DependencyException'
+        '431':
+          description: |-
+            One or more parameters are not valid.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InvalidParameterException'
+        '434':
+          description: |-
+            Resource was not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+    get:
+      operationId: DescribeContact
+      description: |-
+        Describes an existing contact.
+      parameters:
+      - name: contactId
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/Uuid'
+      responses:
+        '200': {}
+        '531':
+          description: |-
+            Dependency encountered an error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DependencyException'
+        '431':
+          description: |-
+            One or more parameters are not valid.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InvalidParameterException'
+        '434':
+          description: |-
+            Resource was not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+  /config:
+    post:
+      operationId: CreateConfig
+      description: |-
+        Creates a `Config` with the specified `configData` parameters.
+
+        Only one type of `configData` can be specified.
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  $ref: '#/components/schemas/SafeName'
+                configData:
+                  $ref: '#/components/schemas/ConfigTypeData'
+                tags:
+                  $ref: '#/components/schemas/TagsMap'
+      responses:
+        '200': {}
+        '531':
+          description: |-
+            Dependency encountered an error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DependencyException'
+        '431':
+          description: |-
+            One or more parameters are not valid.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InvalidParameterException'
+        '429':
+          description: |-
+            Account limits for this resource have been exceeded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceLimitExceededException'
+        '434':
+          description: |-
+            Resource was not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+    get:
+      operationId: ListConfigs
+      description: |-
+        Returns a list of `Config` objects.
+      parameters:
+      - name: maxResults
+        in: query
+        required: false
+        schema:
+          $ref: '#/components/schemas/PaginationMaxResults'
+      - name: nextToken
+        in: query
+        required: false
+        schema:
+          $ref: '#/components/schemas/PaginationToken'
+      responses:
+        '200': {}
+        '531':
+          description: |-
+            Dependency encountered an error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DependencyException'
+        '431':
+          description: |-
+            One or more parameters are not valid.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InvalidParameterException'
+        '434':
+          description: |-
+            Resource was not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+  /dataflowEndpointGroup:
+    post:
+      operationId: CreateDataflowEndpointGroup
+      description: |-
+        Creates a `DataflowEndpoint` group containing the specified list of `DataflowEndpoint` objects.
+
+        The `name` field in each endpoint is used in your mission profile `DataflowEndpointConfig` to specify which endpoints to use during a contact.
+
+        When a contact uses multiple `DataflowEndpointConfig` objects, each `Config` must match a `DataflowEndpoint` in the same group.
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                endpointDetails:
+                  $ref: '#/components/schemas/EndpointDetailsList'
+                tags:
+                  $ref: '#/components/schemas/TagsMap'
+                contactPrePassDurationSeconds:
+                  $ref: '#/components/schemas/DataflowEndpointGroupDurationInSeconds'
+                contactPostPassDurationSeconds:
+                  $ref: '#/components/schemas/DataflowEndpointGroupDurationInSeconds'
+      responses:
+        '200': {}
+        '531':
+          description: |-
+            Dependency encountered an error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DependencyException'
+        '431':
+          description: |-
+            One or more parameters are not valid.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InvalidParameterException'
+        '434':
+          description: |-
+            Resource was not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+    get:
+      operationId: ListDataflowEndpointGroups
+      description: |-
+        Returns a list of `DataflowEndpoint` groups.
+      parameters:
+      - name: maxResults
+        in: query
+        required: false
+        schema:
+          $ref: '#/components/schemas/PaginationMaxResults'
+      - name: nextToken
+        in: query
+        required: false
+        schema:
+          $ref: '#/components/schemas/PaginationToken'
+      responses:
+        '200': {}
+        '531':
+          description: |-
+            Dependency encountered an error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DependencyException'
+        '431':
+          description: |-
+            One or more parameters are not valid.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InvalidParameterException'
+        '434':
+          description: |-
+            Resource was not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+  /ephemeris:
+    post:
+      operationId: CreateEphemeris
+      description: |-
+        Creates an Ephemeris with the specified `EphemerisData`.
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                satelliteId:
+                  $ref: '#/components/schemas/Uuid'
+                enabled:
+                  $ref: '#/components/schemas/Boolean'
+                priority:
+                  $ref: '#/components/schemas/CustomerEphemerisPriority'
+                expirationTime:
+                  $ref: '#/components/schemas/Timestamp'
+                name:
+                  $ref: '#/components/schemas/SafeName'
+                kmsKeyArn:
+                  $ref: '#/components/schemas/KeyArn'
+                ephemeris:
+                  $ref: '#/components/schemas/EphemerisData'
+                tags:
+                  $ref: '#/components/schemas/TagsMap'
+      responses:
+        '200': {}
+        '531':
+          description: |-
+            Dependency encountered an error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DependencyException'
+        '431':
+          description: |-
+            One or more parameters are not valid.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InvalidParameterException'
+        '434':
+          description: |-
+            Resource was not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+  /missionprofile:
+    post:
+      operationId: CreateMissionProfile
+      description: |-
+        Creates a mission profile.
+
+        `dataflowEdges` is a list of lists of strings. Each lower level list of strings has two elements: a _from_ ARN and a _to_ ARN.
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  $ref: '#/components/schemas/SafeName'
+                contactPrePassDurationSeconds:
+                  $ref: '#/components/schemas/DurationInSeconds'
+                contactPostPassDurationSeconds:
+                  $ref: '#/components/schemas/DurationInSeconds'
+                minimumViableContactDurationSeconds:
+                  $ref: '#/components/schemas/PositiveDurationInSeconds'
+                dataflowEdges:
+                  $ref: '#/components/schemas/DataflowEdgeList'
+                trackingConfigArn:
+                  $ref: '#/components/schemas/ConfigArn'
+                tags:
+                  $ref: '#/components/schemas/TagsMap'
+                streamsKmsKey:
+                  $ref: '#/components/schemas/KmsKey'
+                streamsKmsRole:
+                  $ref: '#/components/schemas/RoleArn'
+      responses:
+        '200': {}
+        '531':
+          description: |-
+            Dependency encountered an error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DependencyException'
+        '431':
+          description: |-
+            One or more parameters are not valid.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InvalidParameterException'
+        '434':
+          description: |-
+            Resource was not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+    get:
+      operationId: ListMissionProfiles
+      description: |-
+        Returns a list of mission profiles.
+      parameters:
+      - name: maxResults
+        in: query
+        required: false
+        schema:
+          $ref: '#/components/schemas/PaginationMaxResults'
+      - name: nextToken
+        in: query
+        required: false
+        schema:
+          $ref: '#/components/schemas/PaginationToken'
+      responses:
+        '200': {}
+        '531':
+          description: |-
+            Dependency encountered an error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DependencyException'
+        '431':
+          description: |-
+            One or more parameters are not valid.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InvalidParameterException'
+        '434':
+          description: |-
+            Resource was not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+  /config/{configType}/{configId}:
+    delete:
+      operationId: DeleteConfig
+      description: |-
+        Deletes a `Config`.
+      parameters:
+      - name: configId
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/Uuid'
+      - name: configType
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/ConfigCapabilityType'
+      responses:
+        '200': {}
+        '531':
+          description: |-
+            Dependency encountered an error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DependencyException'
+        '431':
+          description: |-
+            One or more parameters are not valid.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InvalidParameterException'
+        '434':
+          description: |-
+            Resource was not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+    get:
+      operationId: GetConfig
+      description: |-
+        Returns `Config` information.
+
+        Only one `Config` response can be returned.
+      parameters:
+      - name: configId
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/Uuid'
+      - name: configType
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/ConfigCapabilityType'
+      responses:
+        '200': {}
+        '531':
+          description: |-
+            Dependency encountered an error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DependencyException'
+        '431':
+          description: |-
+            One or more parameters are not valid.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InvalidParameterException'
+        '434':
+          description: |-
+            Resource was not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+    put:
+      operationId: UpdateConfig
+      description: |-
+        Updates the `Config` used when scheduling contacts.
+
+        Updating a `Config` will not update the execution parameters for existing future contacts scheduled with this `Config`.
+      parameters:
+      - name: configId
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/Uuid'
+      - name: configType
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/ConfigCapabilityType'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  $ref: '#/components/schemas/SafeName'
+                configData:
+                  $ref: '#/components/schemas/ConfigTypeData'
+      responses:
+        '200': {}
+        '531':
+          description: |-
+            Dependency encountered an error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DependencyException'
+        '431':
+          description: |-
+            One or more parameters are not valid.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InvalidParameterException'
+        '434':
+          description: |-
+            Resource was not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+  /dataflowEndpointGroup/{dataflowEndpointGroupId}:
+    delete:
+      operationId: DeleteDataflowEndpointGroup
+      description: |-
+        Deletes a dataflow endpoint group.
+      parameters:
+      - name: dataflowEndpointGroupId
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/Uuid'
+      responses:
+        '200': {}
+        '531':
+          description: |-
+            Dependency encountered an error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DependencyException'
+        '431':
+          description: |-
+            One or more parameters are not valid.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InvalidParameterException'
+        '434':
+          description: |-
+            Resource was not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+    get:
+      operationId: GetDataflowEndpointGroup
+      description: |-
+        Returns the dataflow endpoint group.
+      parameters:
+      - name: dataflowEndpointGroupId
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/Uuid'
+      responses:
+        '200': {}
+        '531':
+          description: |-
+            Dependency encountered an error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DependencyException'
+        '431':
+          description: |-
+            One or more parameters are not valid.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InvalidParameterException'
+        '434':
+          description: |-
+            Resource was not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+  /ephemeris/{ephemerisId}:
+    delete:
+      operationId: DeleteEphemeris
+      description: |-
+        Deletes an ephemeris
+      parameters:
+      - name: ephemerisId
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/Uuid'
+      responses:
+        '200': {}
+        '531':
+          description: |-
+            Dependency encountered an error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DependencyException'
+        '431':
+          description: |-
+            One or more parameters are not valid.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InvalidParameterException'
+        '434':
+          description: |-
+            Resource was not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+    get:
+      operationId: DescribeEphemeris
+      description: |-
+        Describes an existing ephemeris.
+      parameters:
+      - name: ephemerisId
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/Uuid'
+      responses:
+        '200': {}
+        '531':
+          description: |-
+            Dependency encountered an error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DependencyException'
+        '431':
+          description: |-
+            One or more parameters are not valid.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InvalidParameterException'
+        '434':
+          description: |-
+            Resource was not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+    put:
+      operationId: UpdateEphemeris
+      description: |-
+        Updates an existing ephemeris
+      parameters:
+      - name: ephemerisId
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/Uuid'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                enabled:
+                  $ref: '#/components/schemas/Boolean'
+                name:
+                  $ref: '#/components/schemas/SafeName'
+                priority:
+                  $ref: '#/components/schemas/EphemerisPriority'
+      responses:
+        '200': {}
+        '531':
+          description: |-
+            Dependency encountered an error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DependencyException'
+        '431':
+          description: |-
+            One or more parameters are not valid.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InvalidParameterException'
+        '434':
+          description: |-
+            Resource was not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+  /missionprofile/{missionProfileId}:
+    delete:
+      operationId: DeleteMissionProfile
+      description: |-
+        Deletes a mission profile.
+      parameters:
+      - name: missionProfileId
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/Uuid'
+      responses:
+        '200': {}
+        '531':
+          description: |-
+            Dependency encountered an error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DependencyException'
+        '431':
+          description: |-
+            One or more parameters are not valid.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InvalidParameterException'
+        '434':
+          description: |-
+            Resource was not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+    get:
+      operationId: GetMissionProfile
+      description: |-
+        Returns a mission profile.
+      parameters:
+      - name: missionProfileId
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/Uuid'
+      responses:
+        '200': {}
+        '531':
+          description: |-
+            Dependency encountered an error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DependencyException'
+        '431':
+          description: |-
+            One or more parameters are not valid.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InvalidParameterException'
+        '434':
+          description: |-
+            Resource was not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+    put:
+      operationId: UpdateMissionProfile
+      description: |-
+        Updates a mission profile.
+
+        Updating a mission profile will not update the execution parameters for existing future contacts.
+      parameters:
+      - name: missionProfileId
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/Uuid'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  $ref: '#/components/schemas/SafeName'
+                contactPrePassDurationSeconds:
+                  $ref: '#/components/schemas/DurationInSeconds'
+                contactPostPassDurationSeconds:
+                  $ref: '#/components/schemas/DurationInSeconds'
+                minimumViableContactDurationSeconds:
+                  $ref: '#/components/schemas/PositiveDurationInSeconds'
+                dataflowEdges:
+                  $ref: '#/components/schemas/DataflowEdgeList'
+                trackingConfigArn:
+                  $ref: '#/components/schemas/ConfigArn'
+                streamsKmsKey:
+                  $ref: '#/components/schemas/KmsKey'
+                streamsKmsRole:
+                  $ref: '#/components/schemas/RoleArn'
+      responses:
+        '200': {}
+        '531':
+          description: |-
+            Dependency encountered an error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DependencyException'
+        '431':
+          description: |-
+            One or more parameters are not valid.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InvalidParameterException'
+        '434':
+          description: |-
+            Resource was not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+  /agent/{agentId}/configuration:
+    get:
+      operationId: GetAgentConfiguration
+      description: |-
+        For use by AWS Ground Station Agent and shouldn't be called directly.
+
+        Gets the latest configuration information for a registered agent.
+      parameters:
+      - name: agentId
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/Uuid'
+      responses:
+        '200': {}
+        '531':
+          description: |-
+            Dependency encountered an error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DependencyException'
+        '431':
+          description: |-
+            One or more parameters are not valid.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InvalidParameterException'
+        '434':
+          description: |-
+            Resource was not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+  /minute-usage:
+    post:
+      operationId: GetMinuteUsage
+      description: |-
+        Returns the number of reserved minutes used by account.
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                month:
+                  $ref: '#/components/schemas/Month'
+                year:
+                  $ref: '#/components/schemas/Year'
+      responses:
+        '200': {}
+        '531':
+          description: |-
+            Dependency encountered an error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DependencyException'
+        '431':
+          description: |-
+            One or more parameters are not valid.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InvalidParameterException'
+        '434':
+          description: |-
+            Resource was not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+  /satellite/{satelliteId}:
+    get:
+      operationId: GetSatellite
+      description: |-
+        Returns a satellite.
+      parameters:
+      - name: satelliteId
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/Uuid'
+      responses:
+        '200': {}
+        '531':
+          description: |-
+            Dependency encountered an error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DependencyException'
+        '431':
+          description: |-
+            One or more parameters are not valid.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InvalidParameterException'
+        '434':
+          description: |-
+            Resource was not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+  /contacts:
+    post:
+      operationId: ListContacts
+      description: |-
+        Returns a list of contacts.
+
+        If `statusList` contains AVAILABLE, the request must include `groundStation`, `missionprofileArn`, and `satelliteArn`.
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                maxResults:
+                  $ref: '#/components/schemas/PaginationMaxResults'
+                nextToken:
+                  $ref: '#/components/schemas/PaginationToken'
+                statusList:
+                  $ref: '#/components/schemas/StatusList'
+                startTime:
+                  $ref: '#/components/schemas/Timestamp'
+                endTime:
+                  $ref: '#/components/schemas/Timestamp'
+                groundStation:
+                  $ref: '#/components/schemas/GroundStationName'
+                satelliteArn:
+                  $ref: '#/components/schemas/satelliteArn'
+                missionProfileArn:
+                  $ref: '#/components/schemas/MissionProfileArn'
+      responses:
+        '200': {}
+        '531':
+          description: |-
+            Dependency encountered an error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DependencyException'
+        '431':
+          description: |-
+            One or more parameters are not valid.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InvalidParameterException'
+        '434':
+          description: |-
+            Resource was not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+  /ephemerides:
+    post:
+      operationId: ListEphemerides
+      description: |-
+        List existing ephemerides.
+      parameters:
+      - name: maxResults
+        in: query
+        required: false
+        schema:
+          $ref: '#/components/schemas/PaginationMaxResults'
+      - name: nextToken
+        in: query
+        required: false
+        schema:
+          $ref: '#/components/schemas/PaginationToken'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                satelliteId:
+                  $ref: '#/components/schemas/Uuid'
+                startTime:
+                  $ref: '#/components/schemas/Timestamp'
+                endTime:
+                  $ref: '#/components/schemas/Timestamp'
+                statusList:
+                  $ref: '#/components/schemas/EphemerisStatusList'
+      responses:
+        '200': {}
+        '531':
+          description: |-
+            Dependency encountered an error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DependencyException'
+        '431':
+          description: |-
+            One or more parameters are not valid.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InvalidParameterException'
+        '434':
+          description: |-
+            Resource was not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+  /groundstation:
+    get:
+      operationId: ListGroundStations
+      description: |-
+        Returns a list of ground stations.
+      parameters:
+      - name: satelliteId
+        in: query
+        required: false
+        schema:
+          $ref: '#/components/schemas/Uuid'
+      - name: maxResults
+        in: query
+        required: false
+        schema:
+          $ref: '#/components/schemas/PaginationMaxResults'
+      - name: nextToken
+        in: query
+        required: false
+        schema:
+          $ref: '#/components/schemas/PaginationToken'
+      responses:
+        '200': {}
+        '531':
+          description: |-
+            Dependency encountered an error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DependencyException'
+        '431':
+          description: |-
+            One or more parameters are not valid.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InvalidParameterException'
+        '434':
+          description: |-
+            Resource was not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+  /satellite:
+    get:
+      operationId: ListSatellites
+      description: |-
+        Returns a list of satellites.
+      parameters:
+      - name: maxResults
+        in: query
+        required: false
+        schema:
+          $ref: '#/components/schemas/PaginationMaxResults'
+      - name: nextToken
+        in: query
+        required: false
+        schema:
+          $ref: '#/components/schemas/PaginationToken'
+      responses:
+        '200': {}
+        '531':
+          description: |-
+            Dependency encountered an error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DependencyException'
+        '431':
+          description: |-
+            One or more parameters are not valid.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InvalidParameterException'
+        '434':
+          description: |-
+            Resource was not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+  /tags/{resourceArn}:
+    get:
+      operationId: ListTagsForResource
+      description: |-
+        Returns a list of tags for a specified resource.
+      parameters:
+      - name: resourceArn
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/AnyArn'
+      responses:
+        '200': {}
+        '531':
+          description: |-
+            Dependency encountered an error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DependencyException'
+        '431':
+          description: |-
+            One or more parameters are not valid.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InvalidParameterException'
+        '434':
+          description: |-
+            Resource was not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+    post:
+      operationId: TagResource
+      description: |-
+        Assigns a tag to a resource.
+      parameters:
+      - name: resourceArn
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/AnyArn'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                tags:
+                  $ref: '#/components/schemas/TagsMap'
+      responses:
+        '200': {}
+        '531':
+          description: |-
+            Dependency encountered an error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DependencyException'
+        '431':
+          description: |-
+            One or more parameters are not valid.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InvalidParameterException'
+        '434':
+          description: |-
+            Resource was not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+    delete:
+      operationId: UntagResource
+      description: |-
+        Deassigns a resource tag.
+      parameters:
+      - name: resourceArn
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/AnyArn'
+      - name: tagKeys
+        in: query
+        required: true
+        schema:
+          $ref: '#/components/schemas/TagKeys'
+      responses:
+        '200': {}
+        '531':
+          description: |-
+            Dependency encountered an error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DependencyException'
+        '431':
+          description: |-
+            One or more parameters are not valid.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InvalidParameterException'
+        '434':
+          description: |-
+            Resource was not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+  /agent:
+    post:
+      operationId: RegisterAgent
+      description: |-
+        For use by AWS Ground Station Agent and shouldn't be called directly.
+
+        Registers a new agent with AWS Ground Station.
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                discoveryData:
+                  $ref: '#/components/schemas/DiscoveryData'
+                agentDetails:
+                  $ref: '#/components/schemas/AgentDetails'
+                tags:
+                  $ref: '#/components/schemas/TagsMap'
+      responses:
+        '200': {}
+        '531':
+          description: |-
+            Dependency encountered an error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DependencyException'
+        '431':
+          description: |-
+            One or more parameters are not valid.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InvalidParameterException'
+        '434':
+          description: |-
+            Resource was not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+  /contact:
+    post:
+      operationId: ReserveContact
+      description: |-
+        Reserves a contact using specified parameters.
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                missionProfileArn:
+                  $ref: '#/components/schemas/MissionProfileArn'
+                satelliteArn:
+                  $ref: '#/components/schemas/satelliteArn'
+                startTime:
+                  $ref: '#/components/schemas/Timestamp'
+                endTime:
+                  $ref: '#/components/schemas/Timestamp'
+                groundStation:
+                  $ref: '#/components/schemas/GroundStationName'
+                tags:
+                  $ref: '#/components/schemas/TagsMap'
+      responses:
+        '200': {}
+        '531':
+          description: |-
+            Dependency encountered an error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DependencyException'
+        '431':
+          description: |-
+            One or more parameters are not valid.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InvalidParameterException'
+        '434':
+          description: |-
+            Resource was not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+  /agent/{agentId}:
+    put:
+      operationId: UpdateAgentStatus
+      description: |-
+        For use by AWS Ground Station Agent and shouldn't be called directly.
+
+        Update the status of the agent.
+      parameters:
+      - name: agentId
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/Uuid'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                taskId:
+                  $ref: '#/components/schemas/Uuid'
+                aggregateStatus:
+                  $ref: '#/components/schemas/AggregateStatus'
+                componentStatuses:
+                  $ref: '#/components/schemas/ComponentStatusList'
+      responses:
+        '200': {}
+        '531':
+          description: |-
+            Dependency encountered an error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DependencyException'
+        '431':
+          description: |-
+            One or more parameters are not valid.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InvalidParameterException'
+        '434':
+          description: |-
+            Resource was not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
 components:
   schemas:
     AWSRegion:
@@ -55,6 +1434,43 @@ components:
       type: array
       items:
         type: integer
+    AgentDetails:
+      type: object
+      properties:
+        agentVersion:
+          allOf:
+          - $ref: '#/components/schemas/VersionString'
+          description: Current agent version.
+        instanceId:
+          allOf:
+          - $ref: '#/components/schemas/InstanceId'
+          description: ID of EC2 instance agent is running on.
+        instanceType:
+          allOf:
+          - $ref: '#/components/schemas/InstanceType'
+          description: Type of EC2 instance agent is running on.
+        reservedCpuCores:
+          allOf:
+          - $ref: '#/components/schemas/AgentCpuCoresList'
+          description: 'This field should not be used. Use agentCpuCores instead.
+
+
+            List of CPU cores reserved for processes other than the agent running
+            on the EC2 instance.'
+        agentCpuCores:
+          allOf:
+          - $ref: '#/components/schemas/AgentCpuCoresList'
+          description: List of CPU cores reserved for the agent.
+        componentVersions:
+          allOf:
+          - $ref: '#/components/schemas/ComponentVersionList'
+          description: List of versions being used by agent components.
+      required:
+      - agentVersion
+      - instanceId
+      - instanceType
+      - componentVersions
+      description: Detailed information about the agent.
     AgentStatus:
       type: string
       enum:
@@ -62,11 +1478,84 @@ components:
       - FAILED
       - ACTIVE
       - INACTIVE
+    AggregateStatus:
+      type: object
+      properties:
+        status:
+          allOf:
+          - $ref: '#/components/schemas/AgentStatus'
+          description: Aggregate status.
+        signatureMap:
+          allOf:
+          - $ref: '#/components/schemas/SignatureMap'
+          description: Sparse map of failure signatures.
+      required:
+      - status
+      description: Aggregate status of Agent components.
     AngleUnits:
       type: string
       enum:
       - DEGREE_ANGLE
       - RADIAN
+    AntennaDemodDecodeDetails:
+      type: object
+      properties:
+        outputNode:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: Name of an antenna demod decode output node used in a contact.
+      description: Details about an antenna demod decode `Config` used in a contact.
+    AntennaDownlinkConfig:
+      type: object
+      properties:
+        spectrumConfig:
+          allOf:
+          - $ref: '#/components/schemas/SpectrumConfig'
+          description: Object that describes a spectral `Config`.
+      required:
+      - spectrumConfig
+      description: Information about how AWS Ground Station should configure an antenna
+        for downlink during a contact.
+    AntennaDownlinkDemodDecodeConfig:
+      type: object
+      properties:
+        spectrumConfig:
+          allOf:
+          - $ref: '#/components/schemas/SpectrumConfig'
+          description: Information about the spectral `Config`.
+        demodulationConfig:
+          allOf:
+          - $ref: '#/components/schemas/DemodulationConfig'
+          description: Information about the demodulation `Config`.
+        decodeConfig:
+          allOf:
+          - $ref: '#/components/schemas/DecodeConfig'
+          description: Information about the decode `Config`.
+      required:
+      - spectrumConfig
+      - demodulationConfig
+      - decodeConfig
+      description: Information about how AWS Ground Station should conﬁgure an antenna
+        for downlink demod decode during a contact.
+    AntennaUplinkConfig:
+      type: object
+      properties:
+        transmitDisabled:
+          allOf:
+          - $ref: '#/components/schemas/Boolean'
+          description: Whether or not uplink transmit is disabled.
+        spectrumConfig:
+          allOf:
+          - $ref: '#/components/schemas/UplinkSpectrumConfig'
+          description: Information about the uplink spectral `Config`.
+        targetEirp:
+          allOf:
+          - $ref: '#/components/schemas/Eirp'
+          description: EIRP of the target.
+      required:
+      - spectrumConfig
+      - targetEirp
+      description: Information about the uplink `Config` of an antenna.
     AnyArn:
       type: string
       pattern: ^(arn:aws:)[\s\S]{0,1024}$
@@ -77,6 +1566,35 @@ components:
       enum:
       - HEALTHY
       - UNHEALTHY
+    AwsGroundStationAgentEndpoint:
+      type: object
+      properties:
+        name:
+          allOf:
+          - $ref: '#/components/schemas/SafeName'
+          description: Name string associated with AgentEndpoint. Used as a human-readable
+            identifier for AgentEndpoint.
+        egressAddress:
+          allOf:
+          - $ref: '#/components/schemas/ConnectionDetails'
+          description: The egress address of AgentEndpoint.
+        ingressAddress:
+          allOf:
+          - $ref: '#/components/schemas/RangedConnectionDetails'
+          description: The ingress address of AgentEndpoint.
+        agentStatus:
+          allOf:
+          - $ref: '#/components/schemas/AgentStatus'
+          description: The status of AgentEndpoint.
+        auditResults:
+          allOf:
+          - $ref: '#/components/schemas/AuditResults'
+          description: The results of the audit.
+      required:
+      - name
+      - egressAddress
+      - ingressAddress
+      description: Information about AwsGroundStationAgentEndpoint.
     BandwidthUnits:
       type: string
       enum:
@@ -85,6 +1603,16 @@ components:
       - kHz
     BucketArn:
       type: string
+    CancelContactRequest:
+      type: object
+      properties:
+        contactId:
+          allOf:
+          - $ref: '#/components/schemas/Uuid'
+          description: UUID of a contact.
+      required:
+      - contactId
+      description: ''
     CapabilityArn:
       type: string
     CapabilityArnList:
@@ -110,6 +1638,43 @@ components:
       type: array
       items:
         $ref: '#/components/schemas/CapabilityHealthReason'
+    ComponentStatusData:
+      type: object
+      properties:
+        componentType:
+          allOf:
+          - $ref: '#/components/schemas/ComponentTypeString'
+          description: The Component type.
+        capabilityArn:
+          allOf:
+          - $ref: '#/components/schemas/CapabilityArn'
+          description: Capability ARN of the component.
+        status:
+          allOf:
+          - $ref: '#/components/schemas/AgentStatus'
+          description: Component status.
+        bytesSent:
+          allOf:
+          - $ref: '#/components/schemas/Long'
+          description: Bytes sent by the component.
+        bytesReceived:
+          allOf:
+          - $ref: '#/components/schemas/Long'
+          description: Bytes received by the component.
+        packetsDropped:
+          allOf:
+          - $ref: '#/components/schemas/Long'
+          description: Packets dropped by component.
+        dataflowId:
+          allOf:
+          - $ref: '#/components/schemas/Uuid'
+          description: Dataflow UUID associated with the component.
+      required:
+      - componentType
+      - capabilityArn
+      - status
+      - dataflowId
+      description: Data on the status of agent components.
     ComponentStatusList:
       type: array
       items:
@@ -117,6 +1682,21 @@ components:
     ComponentTypeString:
       type: string
       pattern: ^[a-zA-Z0-9_]{1,64}$
+    ComponentVersion:
+      type: object
+      properties:
+        componentType:
+          allOf:
+          - $ref: '#/components/schemas/ComponentTypeString'
+          description: Component type.
+        versions:
+          allOf:
+          - $ref: '#/components/schemas/VersionStringList'
+          description: List of versions.
+      required:
+      - componentType
+      - versions
+      description: Version information for agent components.
     ComponentVersionList:
       type: array
       items:
@@ -150,10 +1730,46 @@ components:
           Details for an S3 recording `Config` in a contact.
       description: |-
         Details for certain `Config` object types in a contact.
+    ConfigIdResponse:
+      type: object
+      properties:
+        configId:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: UUID of a `Config`.
+        configType:
+          allOf:
+          - $ref: '#/components/schemas/ConfigCapabilityType'
+          description: Type of a `Config`.
+        configArn:
+          allOf:
+          - $ref: '#/components/schemas/ConfigArn'
+          description: ARN of a `Config`.
+      description: ''
     ConfigList:
       type: array
       items:
         $ref: '#/components/schemas/ConfigListItem'
+    ConfigListItem:
+      type: object
+      properties:
+        configId:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: UUID of a `Config`.
+        configType:
+          allOf:
+          - $ref: '#/components/schemas/ConfigCapabilityType'
+          description: Type of a `Config`.
+        configArn:
+          allOf:
+          - $ref: '#/components/schemas/ConfigArn'
+          description: ARN of a `Config`.
+        name:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: Name of a `Config`.
+      description: An item in a list of `Config` objects.
     ConfigTypeData:
       allOf:
       - allOf:
@@ -190,6 +1806,105 @@ components:
         Object containing the parameters of a `Config`.
 
         See the subtype definitions for what each type of `Config` contains.
+    ConnectionDetails:
+      type: object
+      properties:
+        socketAddress:
+          allOf:
+          - $ref: '#/components/schemas/SocketAddress'
+          description: A socket address.
+        mtu:
+          allOf:
+          - $ref: '#/components/schemas/Integer'
+          description: Maximum transmission unit (MTU) size in bytes of a dataflow
+            endpoint.
+      required:
+      - socketAddress
+      description: Egress address of AgentEndpoint with an optional mtu.
+    ContactData:
+      type: object
+      properties:
+        contactId:
+          allOf:
+          - $ref: '#/components/schemas/Uuid'
+          description: UUID of a contact.
+        missionProfileArn:
+          allOf:
+          - $ref: '#/components/schemas/MissionProfileArn'
+          description: ARN of a mission profile.
+        satelliteArn:
+          allOf:
+          - $ref: '#/components/schemas/satelliteArn'
+          description: ARN of a satellite.
+        startTime:
+          allOf:
+          - $ref: '#/components/schemas/Timestamp'
+          description: Start time of a contact in UTC.
+        endTime:
+          allOf:
+          - $ref: '#/components/schemas/Timestamp'
+          description: End time of a contact in UTC.
+        prePassStartTime:
+          allOf:
+          - $ref: '#/components/schemas/Timestamp'
+          description: Amount of time prior to contact start you’d like to receive
+            a CloudWatch event indicating an upcoming pass.
+        postPassEndTime:
+          allOf:
+          - $ref: '#/components/schemas/Timestamp'
+          description: Amount of time after a contact ends that you’d like to receive
+            a CloudWatch event indicating the pass has finished.
+        groundStation:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: Name of a ground station.
+        contactStatus:
+          allOf:
+          - $ref: '#/components/schemas/ContactStatus'
+          description: Status of a contact.
+        errorMessage:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: Error message of a contact.
+        maximumElevation:
+          allOf:
+          - $ref: '#/components/schemas/Elevation'
+          description: Maximum elevation angle of a contact.
+        region:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: Region of a contact.
+        tags:
+          allOf:
+          - $ref: '#/components/schemas/TagsMap'
+          description: Tags assigned to a contact.
+        visibilityStartTime:
+          allOf:
+          - $ref: '#/components/schemas/Timestamp'
+          description: Projected time in UTC your satellite will rise above the [receive
+            mask](https://docs.aws.amazon.com/ground-station/latest/ug/site-masks.html).
+            This time is based on the satellite's current active ephemeris for future
+            contacts and the ephemeris that was active during contact execution for
+            completed contacts. _This field is not present for contacts with a`SCHEDULING`
+            or `SCHEDULED` status._
+        visibilityEndTime:
+          allOf:
+          - $ref: '#/components/schemas/Timestamp'
+          description: Projected time in UTC your satellite will set below the [receive
+            mask](https://docs.aws.amazon.com/ground-station/latest/ug/site-masks.html).
+            This time is based on the satellite's current active ephemeris for future
+            contacts and the ephemeris that was active during contact execution for
+            completed contacts. _This field is not present for contacts with a`SCHEDULING`
+            or `SCHEDULED` status._
+      description: Data describing a contact.
+    ContactIdResponse:
+      type: object
+      properties:
+        contactId:
+          allOf:
+          - $ref: '#/components/schemas/Uuid'
+          description: UUID of a contact.
+      description: ''
     ContactList:
       type: array
       items:
@@ -210,6 +1925,161 @@ components:
       - AVAILABLE
       - CANCELLING
       - AWS_FAILED
+    CreateConfigRequest:
+      type: object
+      properties:
+        name:
+          allOf:
+          - $ref: '#/components/schemas/SafeName'
+          description: Name of a `Config`.
+        configData:
+          allOf:
+          - $ref: '#/components/schemas/ConfigTypeData'
+          description: Parameters of a `Config`.
+        tags:
+          allOf:
+          - $ref: '#/components/schemas/TagsMap'
+          description: Tags assigned to a `Config`.
+      required:
+      - name
+      - configData
+      description: ''
+    CreateDataflowEndpointGroupRequest:
+      type: object
+      properties:
+        endpointDetails:
+          allOf:
+          - $ref: '#/components/schemas/EndpointDetailsList'
+          description: Endpoint details of each endpoint in the dataflow endpoint
+            group. All dataflow endpoints within a single dataflow endpoint group
+            must be of the same type. You cannot mix [ AWS Ground Station Agent endpoints](https://docs.aws.amazon.com/ground-station/latest/APIReference/API_AwsGroundStationAgentEndpoint.html)
+            with [Dataflow endpoints](https://docs.aws.amazon.com/ground-station/latest/APIReference/API_DataflowEndpoint.html)
+            in the same group. If your use case requires both types of endpoints,
+            you must create separate dataflow endpoint groups for each type.
+        tags:
+          allOf:
+          - $ref: '#/components/schemas/TagsMap'
+          description: Tags of a dataflow endpoint group.
+        contactPrePassDurationSeconds:
+          allOf:
+          - $ref: '#/components/schemas/DataflowEndpointGroupDurationInSeconds'
+          description: Amount of time, in seconds, before a contact starts that the
+            Ground Station Dataflow Endpoint Group will be in a `PREPASS` state. A
+            Ground Station Dataflow Endpoint Group State Change event will be emitted
+            when the Dataflow Endpoint Group enters and exits the `PREPASS` state.
+        contactPostPassDurationSeconds:
+          allOf:
+          - $ref: '#/components/schemas/DataflowEndpointGroupDurationInSeconds'
+          description: Amount of time, in seconds, after a contact ends that the Ground
+            Station Dataflow Endpoint Group will be in a `POSTPASS` state. A Ground
+            Station Dataflow Endpoint Group State Change event will be emitted when
+            the Dataflow Endpoint Group enters and exits the `POSTPASS` state.
+      required:
+      - endpointDetails
+      description: ''
+    CreateEphemerisRequest:
+      type: object
+      properties:
+        satelliteId:
+          allOf:
+          - $ref: '#/components/schemas/Uuid'
+          description: AWS Ground Station satellite ID for this ephemeris.
+        enabled:
+          allOf:
+          - $ref: '#/components/schemas/Boolean'
+          description: 'Whether to set the ephemeris status to `ENABLED` after validation.
+
+
+            Setting this to false will set the ephemeris status to `DISABLED` after
+            validation.'
+        priority:
+          allOf:
+          - $ref: '#/components/schemas/CustomerEphemerisPriority'
+          description: 'Customer-provided priority score to establish the order in
+            which overlapping ephemerides should be used.
+
+
+            The default for customer-provided ephemeris priority is 1, and higher
+            numbers take precedence.
+
+
+            Priority must be 1 or greater'
+        expirationTime:
+          allOf:
+          - $ref: '#/components/schemas/Timestamp'
+          description: An overall expiration time for the ephemeris in UTC, after
+            which it will become `EXPIRED`.
+        name:
+          allOf:
+          - $ref: '#/components/schemas/SafeName'
+          description: A name string associated with the ephemeris. Used as a human-readable
+            identifier for the ephemeris.
+        kmsKeyArn:
+          allOf:
+          - $ref: '#/components/schemas/KeyArn'
+          description: The ARN of a KMS key used to encrypt the ephemeris in Ground
+            Station.
+        ephemeris:
+          allOf:
+          - $ref: '#/components/schemas/EphemerisData'
+          description: Ephemeris data.
+        tags:
+          allOf:
+          - $ref: '#/components/schemas/TagsMap'
+          description: Tags assigned to an ephemeris.
+      required:
+      - satelliteId
+      - name
+    CreateMissionProfileRequest:
+      type: object
+      properties:
+        name:
+          allOf:
+          - $ref: '#/components/schemas/SafeName'
+          description: Name of a mission profile.
+        contactPrePassDurationSeconds:
+          allOf:
+          - $ref: '#/components/schemas/DurationInSeconds'
+          description: Amount of time prior to contact start you’d like to receive
+            a Ground Station Contact State Change event indicating an upcoming pass.
+        contactPostPassDurationSeconds:
+          allOf:
+          - $ref: '#/components/schemas/DurationInSeconds'
+          description: Amount of time after a contact ends that you’d like to receive
+            a Ground Station Contact State Change event indicating the pass has finished.
+        minimumViableContactDurationSeconds:
+          allOf:
+          - $ref: '#/components/schemas/PositiveDurationInSeconds'
+          description: Smallest amount of time in seconds that you’d like to see for
+            an available contact. AWS Ground Station will not present you with contacts
+            shorter than this duration.
+        dataflowEdges:
+          allOf:
+          - $ref: '#/components/schemas/DataflowEdgeList'
+          description: A list of lists of ARNs. Each list of ARNs is an edge, with
+            a _from_ `Config` and a _to_ `Config`.
+        trackingConfigArn:
+          allOf:
+          - $ref: '#/components/schemas/ConfigArn'
+          description: ARN of a tracking `Config`.
+        tags:
+          allOf:
+          - $ref: '#/components/schemas/TagsMap'
+          description: Tags assigned to a mission profile.
+        streamsKmsKey:
+          allOf:
+          - $ref: '#/components/schemas/KmsKey'
+          description: KMS key to use for encrypting streams.
+        streamsKmsRole:
+          allOf:
+          - $ref: '#/components/schemas/RoleArn'
+          description: Role to use for encrypting streams with KMS key.
+      required:
+      - name
+      - minimumViableContactDurationSeconds
+      - dataflowEdges
+      - trackingConfigArn
+      description: ''
     Criticality:
       type: string
       enum:
@@ -220,6 +2090,18 @@ components:
       type: integer
       minimum: 1
       maximum: 99999
+    DataflowDetail:
+      type: object
+      properties:
+        source:
+          $ref: '#/components/schemas/Source'
+        destination:
+          $ref: '#/components/schemas/Destination'
+        errorMessage:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: Error message for a dataflow.
+      description: Information about a dataflow edge used in a contact.
     DataflowEdge:
       type: array
       items:
@@ -228,6 +2110,41 @@ components:
       type: array
       items:
         $ref: '#/components/schemas/DataflowEdge'
+    DataflowEndpoint:
+      type: object
+      properties:
+        name:
+          allOf:
+          - $ref: '#/components/schemas/SafeName'
+          description: Name of a dataflow endpoint.
+        address:
+          allOf:
+          - $ref: '#/components/schemas/SocketAddress'
+          description: Socket address of a dataflow endpoint.
+        status:
+          allOf:
+          - $ref: '#/components/schemas/EndpointStatus'
+          description: Status of a dataflow endpoint.
+        mtu:
+          allOf:
+          - $ref: '#/components/schemas/Integer'
+          description: Maximum transmission unit (MTU) size in bytes of a dataflow
+            endpoint.
+      description: Information about a dataflow endpoint.
+    DataflowEndpointConfig:
+      type: object
+      properties:
+        dataflowEndpointName:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: Name of a dataflow endpoint.
+        dataflowEndpointRegion:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: Region of a dataflow endpoint.
+      required:
+      - dataflowEndpointName
+      description: Information about the dataflow endpoint `Config`.
     DataflowEndpointGroupArn:
       type: string
       pattern: ^arn:aws:groundstation:[-a-z0-9]{1,50}:[0-9]{12}:dataflow-endpoint-group/[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$
@@ -237,22 +2154,365 @@ components:
       type: integer
       minimum: 120
       maximum: 480
+    DataflowEndpointGroupIdResponse:
+      type: object
+      properties:
+        dataflowEndpointGroupId:
+          allOf:
+          - $ref: '#/components/schemas/Uuid'
+          description: UUID of a dataflow endpoint group.
+      description: ''
     DataflowEndpointGroupList:
       type: array
       items:
         $ref: '#/components/schemas/DataflowEndpointListItem'
+    DataflowEndpointListItem:
+      type: object
+      properties:
+        dataflowEndpointGroupId:
+          allOf:
+          - $ref: '#/components/schemas/Uuid'
+          description: UUID of a dataflow endpoint group.
+        dataflowEndpointGroupArn:
+          allOf:
+          - $ref: '#/components/schemas/DataflowEndpointGroupArn'
+          description: ARN of a dataflow endpoint group.
+      description: Item in a list of `DataflowEndpoint` groups.
     DataflowList:
       type: array
       items:
         $ref: '#/components/schemas/DataflowDetail'
+    DecodeConfig:
+      type: object
+      properties:
+        unvalidatedJSON:
+          allOf:
+          - $ref: '#/components/schemas/JsonString'
+          description: Unvalidated JSON of a decode `Config`.
+      required:
+      - unvalidatedJSON
+      description: Information about the decode `Config`.
+    DeleteConfigRequest:
+      type: object
+      properties:
+        configId:
+          allOf:
+          - $ref: '#/components/schemas/Uuid'
+          description: UUID of a `Config`.
+        configType:
+          allOf:
+          - $ref: '#/components/schemas/ConfigCapabilityType'
+          description: Type of a `Config`.
+      required:
+      - configId
+      - configType
+      description: ''
+    DeleteDataflowEndpointGroupRequest:
+      type: object
+      properties:
+        dataflowEndpointGroupId:
+          allOf:
+          - $ref: '#/components/schemas/Uuid'
+          description: UUID of a dataflow endpoint group.
+      required:
+      - dataflowEndpointGroupId
+      description: ''
+    DeleteEphemerisRequest:
+      type: object
+      properties:
+        ephemerisId:
+          allOf:
+          - $ref: '#/components/schemas/Uuid'
+          description: The AWS Ground Station ephemeris ID.
+      required:
+      - ephemerisId
+    DeleteMissionProfileRequest:
+      type: object
+      properties:
+        missionProfileId:
+          allOf:
+          - $ref: '#/components/schemas/Uuid'
+          description: UUID of a mission profile.
+      required:
+      - missionProfileId
+      description: ''
+    DemodulationConfig:
+      type: object
+      properties:
+        unvalidatedJSON:
+          allOf:
+          - $ref: '#/components/schemas/JsonString'
+          description: Unvalidated JSON of a demodulation `Config`.
+      required:
+      - unvalidatedJSON
+      description: Information about the demodulation `Config`.
+    DependencyException:
+      type: object
+      properties:
+        message:
+          $ref: '#/components/schemas/String'
+        parameterName:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: ''
+      description: Dependency encountered an error.
+    DescribeContactRequest:
+      type: object
+      properties:
+        contactId:
+          allOf:
+          - $ref: '#/components/schemas/Uuid'
+          description: UUID of a contact.
+      required:
+      - contactId
+      description: ''
+    DescribeContactResponse:
+      type: object
+      properties:
+        contactId:
+          allOf:
+          - $ref: '#/components/schemas/Uuid'
+          description: UUID of a contact.
+        missionProfileArn:
+          allOf:
+          - $ref: '#/components/schemas/MissionProfileArn'
+          description: ARN of a mission profile.
+        satelliteArn:
+          allOf:
+          - $ref: '#/components/schemas/satelliteArn'
+          description: ARN of a satellite.
+        startTime:
+          allOf:
+          - $ref: '#/components/schemas/Timestamp'
+          description: Start time of a contact in UTC.
+        endTime:
+          allOf:
+          - $ref: '#/components/schemas/Timestamp'
+          description: End time of a contact in UTC.
+        prePassStartTime:
+          allOf:
+          - $ref: '#/components/schemas/Timestamp'
+          description: Amount of time prior to contact start you’d like to receive
+            a CloudWatch event indicating an upcoming pass.
+        postPassEndTime:
+          allOf:
+          - $ref: '#/components/schemas/Timestamp'
+          description: Amount of time after a contact ends that you’d like to receive
+            a CloudWatch event indicating the pass has finished.
+        groundStation:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: Ground station for a contact.
+        contactStatus:
+          allOf:
+          - $ref: '#/components/schemas/ContactStatus'
+          description: Status of a contact.
+        errorMessage:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: Error message for a contact.
+        maximumElevation:
+          allOf:
+          - $ref: '#/components/schemas/Elevation'
+          description: Maximum elevation angle of a contact.
+        tags:
+          allOf:
+          - $ref: '#/components/schemas/TagsMap'
+          description: Tags assigned to a contact.
+        region:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: Region of a contact.
+        dataflowList:
+          allOf:
+          - $ref: '#/components/schemas/DataflowList'
+          description: List describing source and destination details for each dataflow
+            edge.
+        visibilityStartTime:
+          allOf:
+          - $ref: '#/components/schemas/Timestamp'
+          description: Projected time in UTC your satellite will rise above the [receive
+            mask](https://docs.aws.amazon.com/ground-station/latest/ug/site-masks.html).
+            This time is based on the satellite's current active ephemeris for future
+            contacts and the ephemeris that was active during contact execution for
+            completed contacts.
+        visibilityEndTime:
+          allOf:
+          - $ref: '#/components/schemas/Timestamp'
+          description: Projected time in UTC your satellite will set below the [receive
+            mask](https://docs.aws.amazon.com/ground-station/latest/ug/site-masks.html).
+            This time is based on the satellite's current active ephemeris for future
+            contacts and the ephemeris that was active during contact execution for
+            completed contacts.
+      description: ''
+    DescribeEphemerisRequest:
+      type: object
+      properties:
+        ephemerisId:
+          allOf:
+          - $ref: '#/components/schemas/Uuid'
+          description: The AWS Ground Station ephemeris ID.
+      required:
+      - ephemerisId
+    DescribeEphemerisResponse:
+      type: object
+      properties:
+        ephemerisId:
+          allOf:
+          - $ref: '#/components/schemas/Uuid'
+          description: The AWS Ground Station ephemeris ID.
+        satelliteId:
+          allOf:
+          - $ref: '#/components/schemas/Uuid'
+          description: The AWS Ground Station satellite ID associated with ephemeris.
+        status:
+          allOf:
+          - $ref: '#/components/schemas/EphemerisStatus'
+          description: The status of the ephemeris.
+        priority:
+          allOf:
+          - $ref: '#/components/schemas/EphemerisPriority'
+          description: 'Customer-provided priority score to establish the order in
+            which overlapping ephemerides should be used.
+
+
+            The default for customer-provided ephemeris priority is 1, and higher
+            numbers take precedence.
+
+
+            Priority must be 1 or greater'
+        creationTime:
+          allOf:
+          - $ref: '#/components/schemas/Timestamp'
+          description: The time the ephemeris was uploaded in UTC.
+        enabled:
+          allOf:
+          - $ref: '#/components/schemas/Boolean'
+          description: Whether or not the ephemeris is enabled.
+        name:
+          allOf:
+          - $ref: '#/components/schemas/SafeName'
+          description: A name string associated with the ephemeris. Used as a human-readable
+            identifier for the ephemeris.
+        tags:
+          allOf:
+          - $ref: '#/components/schemas/TagsMap'
+          description: Tags assigned to an ephemeris.
+        suppliedData:
+          allOf:
+          - $ref: '#/components/schemas/EphemerisTypeDescription'
+          description: Supplied ephemeris data.
+        invalidReason:
+          allOf:
+          - $ref: '#/components/schemas/EphemerisInvalidReason'
+          description: Reason that an ephemeris failed validation. Only provided for
+            ephemerides with `INVALID` status.
+    Destination:
+      type: object
+      properties:
+        configType:
+          allOf:
+          - $ref: '#/components/schemas/ConfigCapabilityType'
+          description: Type of a `Config`.
+        configId:
+          allOf:
+          - $ref: '#/components/schemas/Uuid'
+          description: UUID of a `Config`.
+        configDetails:
+          allOf:
+          - $ref: '#/components/schemas/ConfigDetails'
+          description: Additional details for a `Config`, if type is dataflow endpoint
+            or antenna demod decode.
+        dataflowDestinationRegion:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: Region of a dataflow destination.
+      description: Dataflow details for the destination side.
+    DiscoveryData:
+      type: object
+      properties:
+        publicIpAddresses:
+          allOf:
+          - $ref: '#/components/schemas/IpAddressList'
+          description: List of public IP addresses to associate with agent.
+        privateIpAddresses:
+          allOf:
+          - $ref: '#/components/schemas/IpAddressList'
+          description: List of private IP addresses to associate with agent.
+        capabilityArns:
+          allOf:
+          - $ref: '#/components/schemas/CapabilityArnList'
+          description: List of capabilities to associate with agent.
+      required:
+      - publicIpAddresses
+      - privateIpAddresses
+      - capabilityArns
+      description: Data for agent discovery.
     DurationInSeconds:
       type: integer
       minimum: 0
       maximum: 21600
+    Eirp:
+      type: object
+      properties:
+        value:
+          allOf:
+          - $ref: '#/components/schemas/Double'
+          description: Value of an EIRP. Valid values are between 20.0 to 50.0 dBW.
+        units:
+          allOf:
+          - $ref: '#/components/schemas/EirpUnits'
+          description: Units of an EIRP.
+      required:
+      - value
+      - units
+      description: Object that represents EIRP.
     EirpUnits:
       type: string
       enum:
       - dBW
+    Elevation:
+      type: object
+      properties:
+        value:
+          allOf:
+          - $ref: '#/components/schemas/Double'
+          description: Elevation angle value.
+        unit:
+          allOf:
+          - $ref: '#/components/schemas/AngleUnits'
+          description: Elevation angle units.
+      required:
+      - value
+      - unit
+      description: Elevation angle of the satellite in the sky during a contact.
+    EndpointDetails:
+      type: object
+      properties:
+        securityDetails:
+          allOf:
+          - $ref: '#/components/schemas/SecurityDetails'
+          description: Endpoint security details including a list of subnets, a list
+            of security groups and a role to connect streams to instances.
+        endpoint:
+          allOf:
+          - $ref: '#/components/schemas/DataflowEndpoint'
+          description: A dataflow endpoint.
+        awsGroundStationAgentEndpoint:
+          allOf:
+          - $ref: '#/components/schemas/AwsGroundStationAgentEndpoint'
+          description: An agent endpoint.
+        healthStatus:
+          allOf:
+          - $ref: '#/components/schemas/CapabilityHealth'
+          description: A dataflow endpoint health status. This field is ignored when
+            calling `CreateDataflowEndpointGroup`.
+        healthReasons:
+          allOf:
+          - $ref: '#/components/schemas/CapabilityHealthReasonList'
+          description: Health reasons for a dataflow endpoint. This field is ignored
+            when calling `CreateDataflowEndpointGroup`.
+      description: Information about the endpoint details.
     EndpointDetailsList:
       type: array
       items:
@@ -277,6 +2537,25 @@ components:
         - $ref: '#/components/schemas/OEMEphemeris'
       description: |-
         Ephemeris data.
+    EphemerisDescription:
+      type: object
+      properties:
+        sourceS3Object:
+          allOf:
+          - $ref: '#/components/schemas/S3Object'
+          description: Source S3 object used for the ephemeris.
+        ephemerisData:
+          allOf:
+          - $ref: '#/components/schemas/UnboundedString'
+          description: Supplied ephemeris data.
+      description: Description of ephemeris.
+    EphemerisIdResponse:
+      type: object
+      properties:
+        ephemerisId:
+          allOf:
+          - $ref: '#/components/schemas/Uuid'
+          description: The AWS Ground Station ephemeris ID.
     EphemerisInvalidReason:
       type: string
       enum:
@@ -285,6 +2564,80 @@ components:
       - TRAJECTORY_INVALID
       - KMS_KEY_INVALID
       - VALIDATION_ERROR
+    EphemerisItem:
+      type: object
+      properties:
+        ephemerisId:
+          allOf:
+          - $ref: '#/components/schemas/Uuid'
+          description: The AWS Ground Station ephemeris ID.
+        status:
+          allOf:
+          - $ref: '#/components/schemas/EphemerisStatus'
+          description: The status of the ephemeris.
+        priority:
+          allOf:
+          - $ref: '#/components/schemas/EphemerisPriority'
+          description: 'Customer-provided priority score to establish the order in
+            which overlapping ephemerides should be used.
+
+
+            The default for customer-provided ephemeris priority is 1, and higher
+            numbers take precedence.
+
+
+            Priority must be 1 or greater'
+        enabled:
+          allOf:
+          - $ref: '#/components/schemas/Boolean'
+          description: Whether or not the ephemeris is enabled.
+        creationTime:
+          allOf:
+          - $ref: '#/components/schemas/Timestamp'
+          description: The time the ephemeris was uploaded in UTC.
+        name:
+          allOf:
+          - $ref: '#/components/schemas/SafeName'
+          description: A name string associated with the ephemeris. Used as a human-readable
+            identifier for the ephemeris.
+        sourceS3Object:
+          allOf:
+          - $ref: '#/components/schemas/S3Object'
+          description: Source S3 object used for the ephemeris.
+      description: Ephemeris item.
+    EphemerisMetaData:
+      type: object
+      properties:
+        source:
+          allOf:
+          - $ref: '#/components/schemas/EphemerisSource'
+          description: The `EphemerisSource` that generated a given ephemeris.
+        ephemerisId:
+          allOf:
+          - $ref: '#/components/schemas/Uuid'
+          description: 'UUID of a customer-provided ephemeris.
+
+
+            This field is not populated for default ephemerides from Space Track.'
+        epoch:
+          allOf:
+          - $ref: '#/components/schemas/Timestamp'
+          description: 'The epoch of a default, ephemeris from Space Track in UTC.
+
+
+            This field is not populated for customer-provided ephemerides.'
+        name:
+          allOf:
+          - $ref: '#/components/schemas/SafeName'
+          description: 'A name string associated with the ephemeris. Used as a human-readable
+            identifier for the ephemeris.
+
+
+            A name is only returned for customer-provider ephemerides that have a
+            name associated.'
+      required:
+      - source
+      description: Metadata describing a particular ephemeris.
     EphemerisPriority:
       type: integer
       minimum: 0
@@ -314,12 +2667,321 @@ components:
       - allOf:
         - $ref: '#/components/schemas/EphemerisDescription'
       description: ""
+    Frequency:
+      type: object
+      properties:
+        value:
+          allOf:
+          - $ref: '#/components/schemas/Double'
+          description: Frequency value. Valid values are between 2200 to 2300 MHz
+            and 7750 to 8400 MHz for downlink and 2025 to 2120 MHz for uplink.
+        units:
+          allOf:
+          - $ref: '#/components/schemas/FrequencyUnits'
+          description: Frequency units.
+      required:
+      - value
+      - units
+      description: Object that describes the frequency.
+    FrequencyBandwidth:
+      type: object
+      properties:
+        value:
+          allOf:
+          - $ref: '#/components/schemas/Double'
+          description: "Frequency bandwidth value. AWS Ground Station currently has\
+            \ the following bandwidth limitations:\n\n  * For `AntennaDownlinkDemodDecodeconfig`,\
+            \ valid values are between 125 kHz to 650 MHz.\n\n  * For `AntennaDownlinkconfig`,\
+            \ valid values are between 10 kHz to 54 MHz.\n\n  * For `AntennaUplinkConfig`,\
+            \ valid values are between 10 kHz to 54 MHz."
+        units:
+          allOf:
+          - $ref: '#/components/schemas/BandwidthUnits'
+          description: Frequency bandwidth units.
+      required:
+      - value
+      - units
+      description: Object that describes the frequency bandwidth.
     FrequencyUnits:
       type: string
       enum:
       - GHz
       - MHz
       - kHz
+    GetAgentConfigurationRequest:
+      type: object
+      properties:
+        agentId:
+          allOf:
+          - $ref: '#/components/schemas/Uuid'
+          description: UUID of agent to get configuration information for.
+      required:
+      - agentId
+    GetAgentConfigurationResponse:
+      type: object
+      properties:
+        agentId:
+          allOf:
+          - $ref: '#/components/schemas/Uuid'
+          description: UUID of agent.
+        taskingDocument:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: Tasking document for agent.
+    GetConfigRequest:
+      type: object
+      properties:
+        configId:
+          allOf:
+          - $ref: '#/components/schemas/Uuid'
+          description: UUID of a `Config`.
+        configType:
+          allOf:
+          - $ref: '#/components/schemas/ConfigCapabilityType'
+          description: Type of a `Config`.
+      required:
+      - configId
+      - configType
+      description: ''
+    GetConfigResponse:
+      type: object
+      properties:
+        configId:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: UUID of a `Config`.
+        configArn:
+          allOf:
+          - $ref: '#/components/schemas/ConfigArn'
+          description: ARN of a `Config`
+        name:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: Name of a `Config`.
+        configType:
+          allOf:
+          - $ref: '#/components/schemas/ConfigCapabilityType'
+          description: Type of a `Config`.
+        configData:
+          allOf:
+          - $ref: '#/components/schemas/ConfigTypeData'
+          description: Data elements in a `Config`.
+        tags:
+          allOf:
+          - $ref: '#/components/schemas/TagsMap'
+          description: Tags assigned to a `Config`.
+      required:
+      - configId
+      - configArn
+      - name
+      - configData
+      description: ''
+    GetDataflowEndpointGroupRequest:
+      type: object
+      properties:
+        dataflowEndpointGroupId:
+          allOf:
+          - $ref: '#/components/schemas/Uuid'
+          description: UUID of a dataflow endpoint group.
+      required:
+      - dataflowEndpointGroupId
+      description: ''
+    GetDataflowEndpointGroupResponse:
+      type: object
+      properties:
+        dataflowEndpointGroupId:
+          allOf:
+          - $ref: '#/components/schemas/Uuid'
+          description: UUID of a dataflow endpoint group.
+        dataflowEndpointGroupArn:
+          allOf:
+          - $ref: '#/components/schemas/DataflowEndpointGroupArn'
+          description: ARN of a dataflow endpoint group.
+        endpointsDetails:
+          allOf:
+          - $ref: '#/components/schemas/EndpointDetailsList'
+          description: Details of a dataflow endpoint.
+        tags:
+          allOf:
+          - $ref: '#/components/schemas/TagsMap'
+          description: Tags assigned to a dataflow endpoint group.
+        contactPrePassDurationSeconds:
+          allOf:
+          - $ref: '#/components/schemas/DataflowEndpointGroupDurationInSeconds'
+          description: Amount of time, in seconds, before a contact starts that the
+            Ground Station Dataflow Endpoint Group will be in a `PREPASS` state. A
+            Ground Station Dataflow Endpoint Group State Change event will be emitted
+            when the Dataflow Endpoint Group enters and exits the `PREPASS` state.
+        contactPostPassDurationSeconds:
+          allOf:
+          - $ref: '#/components/schemas/DataflowEndpointGroupDurationInSeconds'
+          description: Amount of time, in seconds, after a contact ends that the Ground
+            Station Dataflow Endpoint Group will be in a `POSTPASS` state. A Ground
+            Station Dataflow Endpoint Group State Change event will be emitted when
+            the Dataflow Endpoint Group enters and exits the `POSTPASS` state.
+      description: ''
+    GetMinuteUsageRequest:
+      type: object
+      properties:
+        month:
+          allOf:
+          - $ref: '#/components/schemas/Month'
+          description: The month being requested, with a value of 1-12.
+        year:
+          allOf:
+          - $ref: '#/components/schemas/Year'
+          description: The year being requested, in the format of YYYY.
+      required:
+      - month
+      - year
+      description: ''
+    GetMinuteUsageResponse:
+      type: object
+      properties:
+        isReservedMinutesCustomer:
+          allOf:
+          - $ref: '#/components/schemas/Boolean'
+          description: Returns whether or not an account has signed up for the reserved
+            minutes pricing plan, specific to the month being requested.
+        totalReservedMinuteAllocation:
+          allOf:
+          - $ref: '#/components/schemas/Integer'
+          description: Total number of reserved minutes allocated, specific to the
+            month being requested.
+        upcomingMinutesScheduled:
+          allOf:
+          - $ref: '#/components/schemas/Integer'
+          description: Upcoming minutes scheduled for an account, specific to the
+            month being requested.
+        totalScheduledMinutes:
+          allOf:
+          - $ref: '#/components/schemas/Integer'
+          description: Total scheduled minutes for an account, specific to the month
+            being requested.
+        estimatedMinutesRemaining:
+          allOf:
+          - $ref: '#/components/schemas/Integer'
+          description: Estimated number of minutes remaining for an account, specific
+            to the month being requested.
+      description: ''
+    GetMissionProfileRequest:
+      type: object
+      properties:
+        missionProfileId:
+          allOf:
+          - $ref: '#/components/schemas/Uuid'
+          description: UUID of a mission profile.
+      required:
+      - missionProfileId
+      description: ''
+    GetMissionProfileResponse:
+      type: object
+      properties:
+        missionProfileId:
+          allOf:
+          - $ref: '#/components/schemas/Uuid'
+          description: UUID of a mission profile.
+        missionProfileArn:
+          allOf:
+          - $ref: '#/components/schemas/MissionProfileArn'
+          description: ARN of a mission profile.
+        name:
+          allOf:
+          - $ref: '#/components/schemas/SafeName'
+          description: Name of a mission profile.
+        region:
+          allOf:
+          - $ref: '#/components/schemas/AWSRegion'
+          description: Region of a mission profile.
+        contactPrePassDurationSeconds:
+          allOf:
+          - $ref: '#/components/schemas/DurationInSeconds'
+          description: Amount of time prior to contact start you’d like to receive
+            a CloudWatch event indicating an upcoming pass.
+        contactPostPassDurationSeconds:
+          allOf:
+          - $ref: '#/components/schemas/DurationInSeconds'
+          description: Amount of time after a contact ends that you’d like to receive
+            a CloudWatch event indicating the pass has finished.
+        minimumViableContactDurationSeconds:
+          allOf:
+          - $ref: '#/components/schemas/PositiveDurationInSeconds'
+          description: Smallest amount of time in seconds that you’d like to see for
+            an available contact. AWS Ground Station will not present you with contacts
+            shorter than this duration.
+        dataflowEdges:
+          allOf:
+          - $ref: '#/components/schemas/DataflowEdgeList'
+          description: A list of lists of ARNs. Each list of ARNs is an edge, with
+            a _from_ `Config` and a _to_ `Config`.
+        trackingConfigArn:
+          allOf:
+          - $ref: '#/components/schemas/ConfigArn'
+          description: ARN of a tracking `Config`.
+        tags:
+          allOf:
+          - $ref: '#/components/schemas/TagsMap'
+          description: Tags assigned to a mission profile.
+        streamsKmsKey:
+          allOf:
+          - $ref: '#/components/schemas/KmsKey'
+          description: KMS key to use for encrypting streams.
+        streamsKmsRole:
+          allOf:
+          - $ref: '#/components/schemas/RoleArn'
+          description: Role to use for encrypting streams with KMS key.
+      description: ''
+    GetSatelliteRequest:
+      type: object
+      properties:
+        satelliteId:
+          allOf:
+          - $ref: '#/components/schemas/Uuid'
+          description: UUID of a satellite.
+      required:
+      - satelliteId
+      description: ''
+    GetSatelliteResponse:
+      type: object
+      properties:
+        satelliteId:
+          allOf:
+          - $ref: '#/components/schemas/Uuid'
+          description: UUID of a satellite.
+        satelliteArn:
+          allOf:
+          - $ref: '#/components/schemas/satelliteArn'
+          description: ARN of a satellite.
+        noradSatelliteID:
+          allOf:
+          - $ref: '#/components/schemas/noradSatelliteID'
+          description: NORAD satellite ID number.
+        groundStations:
+          allOf:
+          - $ref: '#/components/schemas/GroundStationIdList'
+          description: A list of ground stations to which the satellite is on-boarded.
+        currentEphemeris:
+          allOf:
+          - $ref: '#/components/schemas/EphemerisMetaData'
+          description: The current ephemeris being used to compute the trajectory
+            of the satellite.
+      description: ''
+    GroundStationData:
+      type: object
+      properties:
+        groundStationId:
+          allOf:
+          - $ref: '#/components/schemas/GroundStationName'
+          description: UUID of a ground station.
+        groundStationName:
+          allOf:
+          - $ref: '#/components/schemas/GroundStationName'
+          description: Name of a ground station.
+        region:
+          allOf:
+          - $ref: '#/components/schemas/AWSRegion'
+          description: Ground station Region.
+      description: Information about the ground station data.
     GroundStationIdList:
       type: array
       items:
@@ -343,6 +3005,31 @@ components:
       pattern: ^[a-z0-9.-]{1,64}$
       minLength: 1
       maxLength: 64
+    IntegerRange:
+      type: object
+      properties:
+        minimum:
+          allOf:
+          - $ref: '#/components/schemas/Integer'
+          description: A minimum value.
+        maximum:
+          allOf:
+          - $ref: '#/components/schemas/Integer'
+          description: A maximum value.
+      required:
+      - minimum
+      - maximum
+      description: An integer range that has a minimum and maximum value.
+    InvalidParameterException:
+      type: object
+      properties:
+        message:
+          $ref: '#/components/schemas/String'
+        parameterName:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: ''
+      description: One or more parameters are not valid.
     IpAddressList:
       type: array
       items:
@@ -385,19 +3072,319 @@ components:
           KMS Alias Name.
       description: |-
         KMS key info.
+    ListConfigsRequest:
+      type: object
+      properties:
+        maxResults:
+          allOf:
+          - $ref: '#/components/schemas/PaginationMaxResults'
+          description: Maximum number of `Configs` returned.
+        nextToken:
+          allOf:
+          - $ref: '#/components/schemas/PaginationToken'
+          description: Next token returned in the request of a previous `ListConfigs`
+            call. Used to get the next page of results.
+      description: ''
+    ListConfigsResponse:
+      type: object
+      properties:
+        nextToken:
+          allOf:
+          - $ref: '#/components/schemas/PaginationToken'
+          description: Next token returned in the response of a previous `ListConfigs`
+            call. Used to get the next page of results.
+        configList:
+          allOf:
+          - $ref: '#/components/schemas/ConfigList'
+          description: List of `Config` items.
+      description: ''
+    ListContactsRequest:
+      type: object
+      properties:
+        maxResults:
+          allOf:
+          - $ref: '#/components/schemas/PaginationMaxResults'
+          description: Maximum number of contacts returned.
+        nextToken:
+          allOf:
+          - $ref: '#/components/schemas/PaginationToken'
+          description: Next token returned in the request of a previous `ListContacts`
+            call. Used to get the next page of results.
+        statusList:
+          allOf:
+          - $ref: '#/components/schemas/StatusList'
+          description: Status of a contact reservation.
+        startTime:
+          allOf:
+          - $ref: '#/components/schemas/Timestamp'
+          description: Start time of a contact in UTC.
+        endTime:
+          allOf:
+          - $ref: '#/components/schemas/Timestamp'
+          description: End time of a contact in UTC.
+        groundStation:
+          allOf:
+          - $ref: '#/components/schemas/GroundStationName'
+          description: Name of a ground station.
+        satelliteArn:
+          allOf:
+          - $ref: '#/components/schemas/satelliteArn'
+          description: ARN of a satellite.
+        missionProfileArn:
+          allOf:
+          - $ref: '#/components/schemas/MissionProfileArn'
+          description: ARN of a mission profile.
+      required:
+      - statusList
+      - startTime
+      - endTime
+      description: ''
+    ListContactsResponse:
+      type: object
+      properties:
+        nextToken:
+          allOf:
+          - $ref: '#/components/schemas/PaginationToken'
+          description: Next token returned in the response of a previous `ListContacts`
+            call. Used to get the next page of results.
+        contactList:
+          allOf:
+          - $ref: '#/components/schemas/ContactList'
+          description: List of contacts.
+      description: ''
+    ListDataflowEndpointGroupsRequest:
+      type: object
+      properties:
+        maxResults:
+          allOf:
+          - $ref: '#/components/schemas/PaginationMaxResults'
+          description: Maximum number of dataflow endpoint groups returned.
+        nextToken:
+          allOf:
+          - $ref: '#/components/schemas/PaginationToken'
+          description: Next token returned in the request of a previous `ListDataflowEndpointGroups`
+            call. Used to get the next page of results.
+      description: ''
+    ListDataflowEndpointGroupsResponse:
+      type: object
+      properties:
+        nextToken:
+          allOf:
+          - $ref: '#/components/schemas/PaginationToken'
+          description: Next token returned in the response of a previous `ListDataflowEndpointGroups`
+            call. Used to get the next page of results.
+        dataflowEndpointGroupList:
+          allOf:
+          - $ref: '#/components/schemas/DataflowEndpointGroupList'
+          description: A list of dataflow endpoint groups.
+      description: ''
+    ListEphemeridesRequest:
+      type: object
+      properties:
+        satelliteId:
+          allOf:
+          - $ref: '#/components/schemas/Uuid'
+          description: The AWS Ground Station satellite ID to list ephemeris for.
+        startTime:
+          allOf:
+          - $ref: '#/components/schemas/Timestamp'
+          description: The start time to list in UTC. The operation will return an
+            ephemeris if its expiration time is within the time range defined by the
+            `startTime` and `endTime`.
+        endTime:
+          allOf:
+          - $ref: '#/components/schemas/Timestamp'
+          description: The end time to list in UTC. The operation will return an ephemeris
+            if its expiration time is within the time range defined by the `startTime`
+            and `endTime`.
+        statusList:
+          allOf:
+          - $ref: '#/components/schemas/EphemerisStatusList'
+          description: The list of ephemeris status to return.
+        maxResults:
+          allOf:
+          - $ref: '#/components/schemas/PaginationMaxResults'
+          description: Maximum number of ephemerides to return.
+        nextToken:
+          allOf:
+          - $ref: '#/components/schemas/PaginationToken'
+          description: Pagination token.
+      required:
+      - satelliteId
+      - startTime
+      - endTime
+    ListEphemeridesResponse:
+      type: object
+      properties:
+        nextToken:
+          allOf:
+          - $ref: '#/components/schemas/PaginationToken'
+          description: Pagination token.
+        ephemerides:
+          allOf:
+          - $ref: '#/components/schemas/EphemeridesList'
+          description: List of ephemerides.
+    ListGroundStationsRequest:
+      type: object
+      properties:
+        satelliteId:
+          allOf:
+          - $ref: '#/components/schemas/Uuid'
+          description: Satellite ID to retrieve on-boarded ground stations.
+        maxResults:
+          allOf:
+          - $ref: '#/components/schemas/PaginationMaxResults'
+          description: Maximum number of ground stations returned.
+        nextToken:
+          allOf:
+          - $ref: '#/components/schemas/PaginationToken'
+          description: Next token that can be supplied in the next call to get the
+            next page of ground stations.
+      description: ''
+    ListGroundStationsResponse:
+      type: object
+      properties:
+        nextToken:
+          allOf:
+          - $ref: '#/components/schemas/PaginationToken'
+          description: Next token that can be supplied in the next call to get the
+            next page of ground stations.
+        groundStationList:
+          allOf:
+          - $ref: '#/components/schemas/GroundStationList'
+          description: List of ground stations.
+      description: ''
+    ListMissionProfilesRequest:
+      type: object
+      properties:
+        maxResults:
+          allOf:
+          - $ref: '#/components/schemas/PaginationMaxResults'
+          description: Maximum number of mission profiles returned.
+        nextToken:
+          allOf:
+          - $ref: '#/components/schemas/PaginationToken'
+          description: Next token returned in the request of a previous `ListMissionProfiles`
+            call. Used to get the next page of results.
+      description: ''
+    ListMissionProfilesResponse:
+      type: object
+      properties:
+        nextToken:
+          allOf:
+          - $ref: '#/components/schemas/PaginationToken'
+          description: Next token returned in the response of a previous `ListMissionProfiles`
+            call. Used to get the next page of results.
+        missionProfileList:
+          allOf:
+          - $ref: '#/components/schemas/MissionProfileList'
+          description: List of mission profiles.
+      description: ''
+    ListSatellitesRequest:
+      type: object
+      properties:
+        maxResults:
+          allOf:
+          - $ref: '#/components/schemas/PaginationMaxResults'
+          description: Maximum number of satellites returned.
+        nextToken:
+          allOf:
+          - $ref: '#/components/schemas/PaginationToken'
+          description: Next token that can be supplied in the next call to get the
+            next page of satellites.
+      description: ''
+    ListSatellitesResponse:
+      type: object
+      properties:
+        nextToken:
+          allOf:
+          - $ref: '#/components/schemas/PaginationToken'
+          description: Next token that can be supplied in the next call to get the
+            next page of satellites.
+        satellites:
+          allOf:
+          - $ref: '#/components/schemas/SatelliteList'
+          description: List of satellites.
+      description: ''
+    ListTagsForResourceRequest:
+      type: object
+      properties:
+        resourceArn:
+          allOf:
+          - $ref: '#/components/schemas/AnyArn'
+          description: ARN of a resource.
+      required:
+      - resourceArn
+      description: ''
+    ListTagsForResourceResponse:
+      type: object
+      properties:
+        tags:
+          allOf:
+          - $ref: '#/components/schemas/TagsMap'
+          description: Tags assigned to a resource.
+      description: ''
     MissionProfileArn:
       type: string
       pattern: ^arn:aws:groundstation:[-a-z0-9]{1,50}:[0-9]{12}:mission-profile/[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$
       minLength: 89
       maxLength: 138
+    MissionProfileIdResponse:
+      type: object
+      properties:
+        missionProfileId:
+          allOf:
+          - $ref: '#/components/schemas/Uuid'
+          description: UUID of a mission profile.
+      description: ''
     MissionProfileList:
       type: array
       items:
         $ref: '#/components/schemas/MissionProfileListItem'
+    MissionProfileListItem:
+      type: object
+      properties:
+        missionProfileId:
+          allOf:
+          - $ref: '#/components/schemas/Uuid'
+          description: UUID of a mission profile.
+        missionProfileArn:
+          allOf:
+          - $ref: '#/components/schemas/MissionProfileArn'
+          description: ARN of a mission profile.
+        region:
+          allOf:
+          - $ref: '#/components/schemas/AWSRegion'
+          description: Region of a mission profile.
+        name:
+          allOf:
+          - $ref: '#/components/schemas/SafeName'
+          description: Name of a mission profile.
+      description: Item in a list of mission profiles.
     Month:
       type: integer
       minimum: 1
       maximum: 12
+    OEMEphemeris:
+      type: object
+      properties:
+        s3Object:
+          allOf:
+          - $ref: '#/components/schemas/S3Object'
+          description: Identifies the S3 object to be used as the ephemeris.
+        oemData:
+          allOf:
+          - $ref: '#/components/schemas/UnboundedString'
+          description: The data for an OEM ephemeris, supplied directly in the request
+            rather than through an S3 object.
+      description: 'Ephemeris data in Orbit Ephemeris Message (OEM) format.
+
+
+        AWS Ground Station processes OEM Customer Provided Ephemerides according to
+        the [CCSDS standard](https://public.ccsds.org/Pubs/502x0b3e1.pdf) with some
+        extra restrictions. OEM files should be in KVN format. For more detail about
+        the OEM format that AWS Ground Station supports, see [OEM ephemeris format](https://docs.aws.amazon.com/ground-station/latest/ug/providing-custom-ephemeris-data.html#oem-ephemeris-format)
+        in the AWS Ground Station user guide.'
     PaginationMaxResults:
       type: integer
       minimum: 1
@@ -417,6 +3404,112 @@ components:
       type: integer
       minimum: 1
       maximum: 21600
+    RangedConnectionDetails:
+      type: object
+      properties:
+        socketAddress:
+          allOf:
+          - $ref: '#/components/schemas/RangedSocketAddress'
+          description: A ranged socket address.
+        mtu:
+          allOf:
+          - $ref: '#/components/schemas/Integer'
+          description: Maximum transmission unit (MTU) size in bytes of a dataflow
+            endpoint.
+      required:
+      - socketAddress
+      description: Ingress address of AgentEndpoint with a port range and an optional
+        mtu.
+    RangedSocketAddress:
+      type: object
+      properties:
+        name:
+          allOf:
+          - $ref: '#/components/schemas/IpV4Address'
+          description: IPv4 socket address.
+        portRange:
+          allOf:
+          - $ref: '#/components/schemas/IntegerRange'
+          description: Port range of a socket address.
+      required:
+      - name
+      - portRange
+      description: A socket address with a port range.
+    RegisterAgentRequest:
+      type: object
+      properties:
+        discoveryData:
+          allOf:
+          - $ref: '#/components/schemas/DiscoveryData'
+          description: Data for associating an agent with the capabilities it is managing.
+        agentDetails:
+          allOf:
+          - $ref: '#/components/schemas/AgentDetails'
+          description: Detailed information about the agent being registered.
+        tags:
+          allOf:
+          - $ref: '#/components/schemas/TagsMap'
+          description: Tags assigned to an `Agent`.
+      required:
+      - discoveryData
+      - agentDetails
+    RegisterAgentResponse:
+      type: object
+      properties:
+        agentId:
+          allOf:
+          - $ref: '#/components/schemas/Uuid'
+          description: UUID of registered agent.
+    ReserveContactRequest:
+      type: object
+      properties:
+        missionProfileArn:
+          allOf:
+          - $ref: '#/components/schemas/MissionProfileArn'
+          description: ARN of a mission profile.
+        satelliteArn:
+          allOf:
+          - $ref: '#/components/schemas/satelliteArn'
+          description: ARN of a satellite
+        startTime:
+          allOf:
+          - $ref: '#/components/schemas/Timestamp'
+          description: Start time of a contact in UTC.
+        endTime:
+          allOf:
+          - $ref: '#/components/schemas/Timestamp'
+          description: End time of a contact in UTC.
+        groundStation:
+          allOf:
+          - $ref: '#/components/schemas/GroundStationName'
+          description: Name of a ground station.
+        tags:
+          allOf:
+          - $ref: '#/components/schemas/TagsMap'
+          description: Tags assigned to a contact.
+      required:
+      - missionProfileArn
+      - satelliteArn
+      - startTime
+      - endTime
+      - groundStation
+      description: ''
+    ResourceLimitExceededException:
+      type: object
+      properties:
+        message:
+          $ref: '#/components/schemas/String'
+        parameterName:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: ''
+      description: Account limits for this resource have been exceeded.
+    ResourceNotFoundException:
+      type: object
+      properties:
+        message:
+          $ref: '#/components/schemas/String'
+      description: Resource was not found.
     RoleArn:
       type: string
     S3BucketName:
@@ -429,11 +3522,59 @@ components:
       pattern: ^([a-zA-Z0-9_\-=/]|\{satellite_id\}|\{config\-name}|\{s3\-config-id}|\{year\}|\{month\}|\{day\}){1,900}$
       minLength: 1
       maxLength: 900
+    S3Object:
+      type: object
+      properties:
+        bucket:
+          allOf:
+          - $ref: '#/components/schemas/S3BucketName'
+          description: An Amazon S3 Bucket name.
+        key:
+          allOf:
+          - $ref: '#/components/schemas/S3ObjectKey'
+          description: An Amazon S3 key for the ephemeris.
+        version:
+          allOf:
+          - $ref: '#/components/schemas/S3VersionId'
+          description: For versioned S3 objects, the version to use for the ephemeris.
+      description: Object stored in S3 containing ephemeris data.
     S3ObjectKey:
       type: string
       pattern: ^[a-zA-Z0-9!*'\)\(./_-]{1,1024}$
       minLength: 1
       maxLength: 1024
+    S3RecordingConfig:
+      type: object
+      properties:
+        bucketArn:
+          allOf:
+          - $ref: '#/components/schemas/BucketArn'
+          description: ARN of the bucket to record to.
+        roleArn:
+          allOf:
+          - $ref: '#/components/schemas/RoleArn'
+          description: ARN of the role Ground Station assumes to write data to the
+            bucket.
+        prefix:
+          allOf:
+          - $ref: '#/components/schemas/S3KeyPrefix'
+          description: S3 Key prefix to prefice data files.
+      required:
+      - bucketArn
+      - roleArn
+      description: Information about an S3 recording `Config`.
+    S3RecordingDetails:
+      type: object
+      properties:
+        bucketArn:
+          allOf:
+          - $ref: '#/components/schemas/BucketArn'
+          description: ARN of the bucket used.
+        keyTemplate:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: Key template used for the S3 Recording Configuration
+      description: Details about an S3 recording `Config` used in a contact.
     S3VersionId:
       type: string
       pattern: ^[\s\S]{1,1024}$
@@ -448,6 +3589,52 @@ components:
       type: array
       items:
         $ref: '#/components/schemas/SatelliteListItem'
+    SatelliteListItem:
+      type: object
+      properties:
+        satelliteId:
+          allOf:
+          - $ref: '#/components/schemas/Uuid'
+          description: UUID of a satellite.
+        satelliteArn:
+          allOf:
+          - $ref: '#/components/schemas/satelliteArn'
+          description: ARN of a satellite.
+        noradSatelliteID:
+          allOf:
+          - $ref: '#/components/schemas/noradSatelliteID'
+          description: NORAD satellite ID number.
+        groundStations:
+          allOf:
+          - $ref: '#/components/schemas/GroundStationIdList'
+          description: A list of ground stations to which the satellite is on-boarded.
+        currentEphemeris:
+          allOf:
+          - $ref: '#/components/schemas/EphemerisMetaData'
+          description: The current ephemeris being used to compute the trajectory
+            of the satellite.
+      description: Item in a list of satellites.
+    SecurityDetails:
+      type: object
+      properties:
+        subnetIds:
+          allOf:
+          - $ref: '#/components/schemas/SubnetList'
+          description: A list of subnets where AWS Ground Station places elastic network
+            interfaces to send streams to your instances.
+        securityGroupIds:
+          allOf:
+          - $ref: '#/components/schemas/SecurityGroupIdList'
+          description: The security groups to attach to the elastic network interfaces.
+        roleArn:
+          allOf:
+          - $ref: '#/components/schemas/RoleArn'
+          description: ARN to a role needed for connecting streams to your instances.
+      required:
+      - subnetIds
+      - securityGroupIds
+      - roleArn
+      description: Information about endpoints.
     SecurityGroupIdList:
       type: array
       items:
@@ -456,6 +3643,68 @@ components:
       type: object
       additionalProperties:
         $ref: '#/components/schemas/Boolean'
+    SocketAddress:
+      type: object
+      properties:
+        name:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: Name of a socket address.
+        port:
+          allOf:
+          - $ref: '#/components/schemas/Integer'
+          description: Port of a socket address.
+      required:
+      - name
+      - port
+      description: Information about the socket address.
+    Source:
+      type: object
+      properties:
+        configType:
+          allOf:
+          - $ref: '#/components/schemas/ConfigCapabilityType'
+          description: Type of a `Config`.
+        configId:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: UUID of a `Config`.
+        configDetails:
+          allOf:
+          - $ref: '#/components/schemas/ConfigDetails'
+          description: Additional details for a `Config`, if type is `dataflow-endpoint`
+            or `antenna-downlink-demod-decode`
+        dataflowSourceRegion:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: Region of a dataflow source.
+      description: Dataflow details for the source side.
+    SpectrumConfig:
+      type: object
+      properties:
+        centerFrequency:
+          allOf:
+          - $ref: '#/components/schemas/Frequency'
+          description: Center frequency of a spectral `Config`. Valid values are between
+            2200 to 2300 MHz and 7750 to 8400 MHz for downlink and 2025 to 2120 MHz
+            for uplink.
+        bandwidth:
+          allOf:
+          - $ref: '#/components/schemas/FrequencyBandwidth'
+          description: "Bandwidth of a spectral `Config`. AWS Ground Station currently\
+            \ has the following bandwidth limitations:\n\n  * For `AntennaDownlinkDemodDecodeconfig`,\
+            \ valid values are between 125 kHz to 650 MHz.\n\n  * For `AntennaDownlinkconfig`\
+            \ valid values are between 10 kHz to 54 MHz.\n\n  * For `AntennaUplinkConfig`,\
+            \ valid values are between 10 kHz to 54 MHz."
+        polarization:
+          allOf:
+          - $ref: '#/components/schemas/Polarization'
+          description: Polarization of a spectral `Config`. Capturing both `"RIGHT_HAND"`
+            and `"LEFT_HAND"` polarization requires two separate configs.
+      required:
+      - centerFrequency
+      - bandwidth
+      description: Object that describes a spectral `Config`.
     StatusList:
       type: array
       items:
@@ -464,18 +3713,85 @@ components:
       type: array
       items:
         type: string
+    TLEData:
+      type: object
+      properties:
+        tleLine1:
+          allOf:
+          - $ref: '#/components/schemas/TleLineOne'
+          description: First line of two-line element set (TLE) data.
+        tleLine2:
+          allOf:
+          - $ref: '#/components/schemas/TleLineTwo'
+          description: Second line of two-line element set (TLE) data.
+        validTimeRange:
+          allOf:
+          - $ref: '#/components/schemas/TimeRange'
+          description: The valid time range for the TLE. Gaps or overlap are not permitted.
+      required:
+      - tleLine1
+      - tleLine2
+      - validTimeRange
+      description: Two-line element set (TLE) data.
     TLEDataList:
       type: array
       items:
         $ref: '#/components/schemas/TLEData'
+    TLEEphemeris:
+      type: object
+      properties:
+        s3Object:
+          allOf:
+          - $ref: '#/components/schemas/S3Object'
+          description: Identifies the S3 object to be used as the ephemeris.
+        tleData:
+          allOf:
+          - $ref: '#/components/schemas/TLEDataList'
+          description: The data for a TLE ephemeris, supplied directly in the request
+            rather than through an S3 object.
+      description: Two-line element set (TLE) ephemeris.
     TagKeys:
       type: array
       items:
         $ref: '#/components/schemas/UnboundedString'
+    TagResourceRequest:
+      type: object
+      properties:
+        resourceArn:
+          allOf:
+          - $ref: '#/components/schemas/AnyArn'
+          description: ARN of a resource tag.
+        tags:
+          allOf:
+          - $ref: '#/components/schemas/TagsMap'
+          description: Tags assigned to a resource.
+      required:
+      - resourceArn
+      - tags
+      description: ''
+    TagResourceResponse:
+      type: object
+      properties: {}
+      description: ''
     TagsMap:
       type: object
       additionalProperties:
         $ref: '#/components/schemas/String'
+    TimeRange:
+      type: object
+      properties:
+        startTime:
+          allOf:
+          - $ref: '#/components/schemas/Timestamp'
+          description: Time in UTC at which the time range starts.
+        endTime:
+          allOf:
+          - $ref: '#/components/schemas/Timestamp'
+          description: Time in UTC at which the time range ends.
+      required:
+      - startTime
+      - endTime
+      description: A time range with a start and end time.
     TleLineOne:
       type: string
       pattern: '^1 [ 0-9]{5}[A-Z] [ 0-9]{5}[ A-Z]{3} [ 0-9]{5}[.][ 0-9]{8} (?:(?:[
@@ -489,10 +3805,213 @@ components:
         [ 0-9]{3}[.][ 0-9]{4} [ 0-9]{3}[.][ 0-9]{4} [ 0-9]{2}[.][ 0-9]{13}[ 0-9]$
       minLength: 69
       maxLength: 69
+    TrackingConfig:
+      type: object
+      properties:
+        autotrack:
+          allOf:
+          - $ref: '#/components/schemas/Criticality'
+          description: Current setting for autotrack.
+      required:
+      - autotrack
+      description: Object that determines whether tracking should be used during a
+        contact executed with this `Config` in the mission profile.
     UnboundedString:
       type: string
       pattern: ^[\s\S]+$
       minLength: 1
+    UntagResourceRequest:
+      type: object
+      properties:
+        resourceArn:
+          allOf:
+          - $ref: '#/components/schemas/AnyArn'
+          description: ARN of a resource.
+        tagKeys:
+          allOf:
+          - $ref: '#/components/schemas/TagKeys'
+          description: Keys of a resource tag.
+      required:
+      - resourceArn
+      - tagKeys
+      description: ''
+    UntagResourceResponse:
+      type: object
+      properties: {}
+      description: ''
+    UpdateAgentStatusRequest:
+      type: object
+      properties:
+        agentId:
+          allOf:
+          - $ref: '#/components/schemas/Uuid'
+          description: UUID of agent to update.
+        taskId:
+          allOf:
+          - $ref: '#/components/schemas/Uuid'
+          description: GUID of agent task.
+        aggregateStatus:
+          allOf:
+          - $ref: '#/components/schemas/AggregateStatus'
+          description: Aggregate status for agent.
+        componentStatuses:
+          allOf:
+          - $ref: '#/components/schemas/ComponentStatusList'
+          description: List of component statuses for agent.
+      required:
+      - agentId
+      - taskId
+      - aggregateStatus
+      - componentStatuses
+    UpdateAgentStatusResponse:
+      type: object
+      properties:
+        agentId:
+          allOf:
+          - $ref: '#/components/schemas/Uuid'
+          description: UUID of updated agent.
+      required:
+      - agentId
+    UpdateConfigRequest:
+      type: object
+      properties:
+        configId:
+          allOf:
+          - $ref: '#/components/schemas/Uuid'
+          description: UUID of a `Config`.
+        name:
+          allOf:
+          - $ref: '#/components/schemas/SafeName'
+          description: Name of a `Config`.
+        configType:
+          allOf:
+          - $ref: '#/components/schemas/ConfigCapabilityType'
+          description: Type of a `Config`.
+        configData:
+          allOf:
+          - $ref: '#/components/schemas/ConfigTypeData'
+          description: Parameters of a `Config`.
+      required:
+      - configId
+      - name
+      - configType
+      - configData
+      description: ''
+    UpdateEphemerisRequest:
+      type: object
+      properties:
+        ephemerisId:
+          allOf:
+          - $ref: '#/components/schemas/Uuid'
+          description: The AWS Ground Station ephemeris ID.
+        enabled:
+          allOf:
+          - $ref: '#/components/schemas/Boolean'
+          description: Whether the ephemeris is enabled or not. Changing this value
+            will not require the ephemeris to be re-validated.
+        name:
+          allOf:
+          - $ref: '#/components/schemas/SafeName'
+          description: A name string associated with the ephemeris. Used as a human-readable
+            identifier for the ephemeris.
+        priority:
+          allOf:
+          - $ref: '#/components/schemas/EphemerisPriority'
+          description: 'Customer-provided priority score to establish the order in
+            which overlapping ephemerides should be used.
+
+
+            The default for customer-provided ephemeris priority is 1, and higher
+            numbers take precedence.
+
+
+            Priority must be 1 or greater'
+      required:
+      - ephemerisId
+      - enabled
+    UpdateMissionProfileRequest:
+      type: object
+      properties:
+        missionProfileId:
+          allOf:
+          - $ref: '#/components/schemas/Uuid'
+          description: UUID of a mission profile.
+        name:
+          allOf:
+          - $ref: '#/components/schemas/SafeName'
+          description: Name of a mission profile.
+        contactPrePassDurationSeconds:
+          allOf:
+          - $ref: '#/components/schemas/DurationInSeconds'
+          description: Amount of time after a contact ends that you’d like to receive
+            a Ground Station Contact State Change event indicating the pass has finished.
+        contactPostPassDurationSeconds:
+          allOf:
+          - $ref: '#/components/schemas/DurationInSeconds'
+          description: Amount of time after a contact ends that you’d like to receive
+            a Ground Station Contact State Change event indicating the pass has finished.
+        minimumViableContactDurationSeconds:
+          allOf:
+          - $ref: '#/components/schemas/PositiveDurationInSeconds'
+          description: Smallest amount of time in seconds that you’d like to see for
+            an available contact. AWS Ground Station will not present you with contacts
+            shorter than this duration.
+        dataflowEdges:
+          allOf:
+          - $ref: '#/components/schemas/DataflowEdgeList'
+          description: A list of lists of ARNs. Each list of ARNs is an edge, with
+            a _from_ `Config` and a _to_ `Config`.
+        trackingConfigArn:
+          allOf:
+          - $ref: '#/components/schemas/ConfigArn'
+          description: ARN of a tracking `Config`.
+        streamsKmsKey:
+          allOf:
+          - $ref: '#/components/schemas/KmsKey'
+          description: KMS key to use for encrypting streams.
+        streamsKmsRole:
+          allOf:
+          - $ref: '#/components/schemas/RoleArn'
+          description: Role to use for encrypting streams with KMS key.
+      required:
+      - missionProfileId
+      description: ''
+    UplinkEchoConfig:
+      type: object
+      properties:
+        enabled:
+          allOf:
+          - $ref: '#/components/schemas/Boolean'
+          description: Whether or not an uplink `Config` is enabled.
+        antennaUplinkConfigArn:
+          allOf:
+          - $ref: '#/components/schemas/ConfigArn'
+          description: ARN of an uplink `Config`.
+      required:
+      - enabled
+      - antennaUplinkConfigArn
+      description: 'Information about an uplink echo `Config`.
+
+
+        Parameters from the `AntennaUplinkConfig`, corresponding to the specified
+        `AntennaUplinkConfigArn`, are used when this `UplinkEchoConfig` is used in
+        a contact.'
+    UplinkSpectrumConfig:
+      type: object
+      properties:
+        centerFrequency:
+          allOf:
+          - $ref: '#/components/schemas/Frequency'
+          description: Center frequency of an uplink spectral `Config`. Valid values
+            are between 2025 to 2120 MHz.
+        polarization:
+          allOf:
+          - $ref: '#/components/schemas/Polarization'
+          description: Polarization of an uplink spectral `Config`. Capturing both
+            `"RIGHT_HAND"` and `"LEFT_HAND"` polarization requires two separate configs.
+      required:
+      - centerFrequency
+      description: Information about the uplink spectral `Config`.
     Uuid:
       type: string
       pattern: ^[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$

@@ -7,7 +7,7 @@ info:
   x-stackql-serviceName: geo_places
   x-aws-serviceName: geoplaces
   x-aws-protocol: aws.protocols#restJson1
-  x-dateGenerated: '2025-05-05'
+  x-dateGenerated: '2025-05-07'
   version: '2020-11-19'
   title: Amazon Location Service Places V2
   description: |-
@@ -63,17 +63,727 @@ servers:
       - sa-east-1
       - me-south-1
       default: us-east-1
-paths: {}
+paths:
+  /autocomplete:
+    post:
+      operationId: Autocomplete
+      description: |-
+        The autocomplete operation speeds up and increases the accuracy of entering addresses by providing a list of address candidates matching a partially entered address. Results are sorted from most to least matching. Filtering and biasing can be used to increase the relevance of the results if additional search context is known
+      parameters:
+      - name: key
+        in: query
+        required: false
+        schema:
+          $ref: '#/components/schemas/ApiKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                QueryText:
+                  $ref: '#/components/schemas/SensitiveString'
+                MaxResults:
+                  $ref: '#/components/schemas/Integer'
+                BiasPosition:
+                  $ref: '#/components/schemas/Position'
+                Filter:
+                  $ref: '#/components/schemas/AutocompleteFilter'
+                PostalCodeMode:
+                  $ref: '#/components/schemas/PostalCodeMode'
+                AdditionalFeatures:
+                  $ref: '#/components/schemas/AutocompleteAdditionalFeatureList'
+                Language:
+                  $ref: '#/components/schemas/LanguageTag'
+                PoliticalView:
+                  $ref: '#/components/schemas/CountryCode'
+                IntendedUse:
+                  $ref: '#/components/schemas/AutocompleteIntendedUse'
+      responses:
+        '200': {}
+        '403':
+          description: |-
+            You don't have sufficient access to perform this action.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '500':
+          description: |-
+            The request processing has failed because of an unknown error, exception or failure.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerException'
+        '429':
+          description: |-
+            The request was denied due to request throttling.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThrottlingException'
+        '400':
+          description: |-
+            The input fails to satisfy the constraints specified by an AWS service.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+  /geocode:
+    post:
+      operationId: Geocode
+      description: |-
+        The `Geocode` action allows you to obtain coordinates, addresses, and other information about places.
+      parameters:
+      - name: key
+        in: query
+        required: false
+        schema:
+          $ref: '#/components/schemas/ApiKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                QueryText:
+                  $ref: '#/components/schemas/SensitiveString'
+                QueryComponents:
+                  $ref: '#/components/schemas/GeocodeQueryComponents'
+                MaxResults:
+                  $ref: '#/components/schemas/Integer'
+                BiasPosition:
+                  $ref: '#/components/schemas/Position'
+                Filter:
+                  $ref: '#/components/schemas/GeocodeFilter'
+                AdditionalFeatures:
+                  $ref: '#/components/schemas/GeocodeAdditionalFeatureList'
+                Language:
+                  $ref: '#/components/schemas/LanguageTag'
+                PoliticalView:
+                  $ref: '#/components/schemas/CountryCode'
+                IntendedUse:
+                  $ref: '#/components/schemas/GeocodeIntendedUse'
+      responses:
+        '200': {}
+        '403':
+          description: |-
+            You don't have sufficient access to perform this action.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '500':
+          description: |-
+            The request processing has failed because of an unknown error, exception or failure.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerException'
+        '429':
+          description: |-
+            The request was denied due to request throttling.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThrottlingException'
+        '400':
+          description: |-
+            The input fails to satisfy the constraints specified by an AWS service.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+  /place/{PlaceId}:
+    get:
+      operationId: GetPlace
+      description: |-
+        Finds a place by its unique ID. A `PlaceId` is returned by other place operations.
+      parameters:
+      - name: PlaceId
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/SensitiveString'
+      - name: additional-features
+        in: query
+        required: false
+        schema:
+          $ref: '#/components/schemas/GetPlaceAdditionalFeatureList'
+      - name: language
+        in: query
+        required: false
+        schema:
+          $ref: '#/components/schemas/LanguageTag'
+      - name: political-view
+        in: query
+        required: false
+        schema:
+          $ref: '#/components/schemas/CountryCode'
+      - name: intended-use
+        in: query
+        required: false
+        schema:
+          $ref: '#/components/schemas/GetPlaceIntendedUse'
+      - name: key
+        in: query
+        required: false
+        schema:
+          $ref: '#/components/schemas/ApiKey'
+      responses:
+        '200': {}
+        '403':
+          description: |-
+            You don't have sufficient access to perform this action.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '500':
+          description: |-
+            The request processing has failed because of an unknown error, exception or failure.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerException'
+        '429':
+          description: |-
+            The request was denied due to request throttling.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThrottlingException'
+        '400':
+          description: |-
+            The input fails to satisfy the constraints specified by an AWS service.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+  /reverse-geocode:
+    post:
+      operationId: ReverseGeocode
+      description: |-
+        The `ReverseGeocode` operation allows you to retrieve addresses and place information from coordinates.
+      parameters:
+      - name: key
+        in: query
+        required: false
+        schema:
+          $ref: '#/components/schemas/ApiKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                QueryPosition:
+                  $ref: '#/components/schemas/Position'
+                QueryRadius:
+                  $ref: '#/components/schemas/DistanceMeters'
+                MaxResults:
+                  $ref: '#/components/schemas/Integer'
+                Filter:
+                  $ref: '#/components/schemas/ReverseGeocodeFilter'
+                AdditionalFeatures:
+                  $ref: '#/components/schemas/ReverseGeocodeAdditionalFeatureList'
+                Language:
+                  $ref: '#/components/schemas/LanguageTag'
+                PoliticalView:
+                  $ref: '#/components/schemas/CountryCode'
+                IntendedUse:
+                  $ref: '#/components/schemas/ReverseGeocodeIntendedUse'
+      responses:
+        '200': {}
+        '403':
+          description: |-
+            You don't have sufficient access to perform this action.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '500':
+          description: |-
+            The request processing has failed because of an unknown error, exception or failure.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerException'
+        '429':
+          description: |-
+            The request was denied due to request throttling.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThrottlingException'
+        '400':
+          description: |-
+            The input fails to satisfy the constraints specified by an AWS service.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+  /search-nearby:
+    post:
+      operationId: SearchNearby
+      description: |-
+        Search nearby a specified location.
+      parameters:
+      - name: key
+        in: query
+        required: false
+        schema:
+          $ref: '#/components/schemas/ApiKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                QueryPosition:
+                  $ref: '#/components/schemas/Position'
+                QueryRadius:
+                  $ref: '#/components/schemas/DistanceMeters'
+                MaxResults:
+                  $ref: '#/components/schemas/Integer'
+                Filter:
+                  $ref: '#/components/schemas/SearchNearbyFilter'
+                AdditionalFeatures:
+                  $ref: '#/components/schemas/SearchNearbyAdditionalFeatureList'
+                Language:
+                  $ref: '#/components/schemas/LanguageTag'
+                PoliticalView:
+                  $ref: '#/components/schemas/CountryCode'
+                IntendedUse:
+                  $ref: '#/components/schemas/SearchNearbyIntendedUse'
+                NextToken:
+                  $ref: '#/components/schemas/Token'
+      responses:
+        '200': {}
+        '403':
+          description: |-
+            You don't have sufficient access to perform this action.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '500':
+          description: |-
+            The request processing has failed because of an unknown error, exception or failure.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerException'
+        '429':
+          description: |-
+            The request was denied due to request throttling.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThrottlingException'
+        '400':
+          description: |-
+            The input fails to satisfy the constraints specified by an AWS service.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+  /search-text:
+    post:
+      operationId: SearchText
+      description: |-
+        Use the `SearchText` operation to search for geocode and place information. You can then complete a follow-up query suggested from the `Suggest` API via a query id.
+      parameters:
+      - name: key
+        in: query
+        required: false
+        schema:
+          $ref: '#/components/schemas/ApiKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                QueryText:
+                  $ref: '#/components/schemas/SensitiveString'
+                QueryId:
+                  $ref: '#/components/schemas/SensitiveString'
+                MaxResults:
+                  $ref: '#/components/schemas/Integer'
+                BiasPosition:
+                  $ref: '#/components/schemas/Position'
+                Filter:
+                  $ref: '#/components/schemas/SearchTextFilter'
+                AdditionalFeatures:
+                  $ref: '#/components/schemas/SearchTextAdditionalFeatureList'
+                Language:
+                  $ref: '#/components/schemas/LanguageTag'
+                PoliticalView:
+                  $ref: '#/components/schemas/CountryCode'
+                IntendedUse:
+                  $ref: '#/components/schemas/SearchTextIntendedUse'
+                NextToken:
+                  $ref: '#/components/schemas/Token'
+      responses:
+        '200': {}
+        '403':
+          description: |-
+            You don't have sufficient access to perform this action.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '500':
+          description: |-
+            The request processing has failed because of an unknown error, exception or failure.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerException'
+        '429':
+          description: |-
+            The request was denied due to request throttling.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThrottlingException'
+        '400':
+          description: |-
+            The input fails to satisfy the constraints specified by an AWS service.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+  /suggest:
+    post:
+      operationId: Suggest
+      description: |-
+        The `Suggest` operation finds addresses or place candidates based on incomplete or misspelled queries. You then select the best query to submit based on the returned results.
+      parameters:
+      - name: key
+        in: query
+        required: false
+        schema:
+          $ref: '#/components/schemas/ApiKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                QueryText:
+                  $ref: '#/components/schemas/SensitiveString'
+                MaxResults:
+                  $ref: '#/components/schemas/Integer'
+                MaxQueryRefinements:
+                  $ref: '#/components/schemas/Integer'
+                BiasPosition:
+                  $ref: '#/components/schemas/Position'
+                Filter:
+                  $ref: '#/components/schemas/SuggestFilter'
+                AdditionalFeatures:
+                  $ref: '#/components/schemas/SuggestAdditionalFeatureList'
+                Language:
+                  $ref: '#/components/schemas/LanguageTag'
+                PoliticalView:
+                  $ref: '#/components/schemas/CountryCode'
+                IntendedUse:
+                  $ref: '#/components/schemas/SuggestIntendedUse'
+      responses:
+        '200': {}
+        '403':
+          description: |-
+            You don't have sufficient access to perform this action.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '500':
+          description: |-
+            The request processing has failed because of an unknown error, exception or failure.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerException'
+        '429':
+          description: |-
+            The request was denied due to request throttling.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThrottlingException'
+        '400':
+          description: |-
+            The input fails to satisfy the constraints specified by an AWS service.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
 components:
   schemas:
+    AccessDeniedException:
+      type: object
+      properties:
+        Message:
+          $ref: '#/components/schemas/String'
+      required:
+      - Message
+      description: You don't have sufficient access to perform this action.
+    AccessPoint:
+      type: object
+      properties:
+        Position:
+          allOf:
+          - $ref: '#/components/schemas/Position'
+          description: The position, in longitude and latitude.
+      description: Position of the access point represented by longitude and latitude
+        for a vehicle.
     AccessPointList:
       type: array
       items:
         $ref: '#/components/schemas/AccessPoint'
+    AccessRestriction:
+      type: object
+      properties:
+        Restricted:
+          allOf:
+          - $ref: '#/components/schemas/Boolean'
+          description: The restriction.
+        Categories:
+          allOf:
+          - $ref: '#/components/schemas/CategoryList'
+          description: Categories of results that results must belong too.
+      description: Indicates if the access location is restricted. Index correlates
+        to that of an access point and indicates if access through this point has
+        some form of restriction.
     AccessRestrictionList:
       type: array
       items:
         $ref: '#/components/schemas/AccessRestriction'
+    Address:
+      type: object
+      properties:
+        Label:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: Assembled address value built out of the address components,
+            according to the regional postal rules. This is the correctly formatted
+            address.
+        Country:
+          allOf:
+          - $ref: '#/components/schemas/Country'
+          description: The country component of the address.
+        Region:
+          allOf:
+          - $ref: '#/components/schemas/Region'
+          description: 'The region or state results should be present in.
+
+
+            Example: `North Rhine-Westphalia`.'
+        SubRegion:
+          allOf:
+          - $ref: '#/components/schemas/SubRegion'
+          description: The sub-region or county for which results should be present
+            in.
+        Locality:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: 'The locality or city of the address.
+
+
+            Example: `Vancouver`.'
+        District:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The district or division of a locality associated with this
+            address.
+        SubDistrict:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: 'A subdivision of a district.
+
+
+            Example: `Minden-Lübbecke`.'
+        PostalCode:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: An alphanumeric string included in a postal address to facilitate
+            mail sorting, such as post code, postcode, or ZIP code, for which the
+            result should posses.
+        Block:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: 'Name of the block.
+
+
+            Example: `Sunny Mansion 203 block: 2 Chome`'
+        SubBlock:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: 'Name of sub-block.
+
+
+            Example: `Sunny Mansion 203 sub-block: 4`'
+        Intersection:
+          allOf:
+          - $ref: '#/components/schemas/IntersectionList'
+          description: 'Name of the streets in the intersection.
+
+
+            Example: `["Friedrichstraße","Unter den Linden"]`'
+        Street:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The name of the street results should be present in.
+        StreetComponents:
+          allOf:
+          - $ref: '#/components/schemas/StreetComponentsList'
+          description: 'Components of the street.
+
+
+            Example: Younge from the "Younge street".'
+        AddressNumber:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The number that identifies an address within a street.
+        Building:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The name of the building at the address.
+      description: The place address.
+    AddressComponentMatchScores:
+      type: object
+      properties:
+        Country:
+          allOf:
+          - $ref: '#/components/schemas/MatchScore'
+          description: The alpha-2 or alpha-3 character code for the country that
+            the results will be present in.
+        Region:
+          allOf:
+          - $ref: '#/components/schemas/MatchScore'
+          description: 'The region or state results should be to be present in.
+
+
+            Example: `North Rhine-Westphalia`.'
+        SubRegion:
+          allOf:
+          - $ref: '#/components/schemas/MatchScore'
+          description: The sub-region or county for which results should be present
+            in.
+        Locality:
+          allOf:
+          - $ref: '#/components/schemas/MatchScore'
+          description: 'The city or locality results should be present in.
+
+
+            Example: `Vancouver`.'
+        District:
+          allOf:
+          - $ref: '#/components/schemas/MatchScore'
+          description: The district or division of a city the results should be present
+            in.
+        SubDistrict:
+          allOf:
+          - $ref: '#/components/schemas/MatchScore'
+          description: 'A subdivision of a district.
+
+
+            Example: `Minden-Lübbecke`'
+        PostalCode:
+          allOf:
+          - $ref: '#/components/schemas/MatchScore'
+          description: An alphanumeric string included in a postal address to facilitate
+            mail sorting, such as post code, postcode, or ZIP code, for which the
+            result should posses.
+        Block:
+          allOf:
+          - $ref: '#/components/schemas/MatchScore'
+          description: 'Name of the block.
+
+
+            Example: `Sunny Mansion 203 block: 2 Chome`'
+        SubBlock:
+          allOf:
+          - $ref: '#/components/schemas/MatchScore'
+          description: 'Name of sub-block.
+
+
+            Example: `Sunny Mansion 203 sub-block: 4`'
+        Intersection:
+          allOf:
+          - $ref: '#/components/schemas/MatchScoreList'
+          description: 'Name of the streets in the intersection.
+
+
+            Example: `["Friedrichstraße","Unter den Linden"]`'
+        AddressNumber:
+          allOf:
+          - $ref: '#/components/schemas/MatchScore'
+          description: The house number or address results should have.
+        Building:
+          allOf:
+          - $ref: '#/components/schemas/MatchScore'
+          description: The name of the building at the address.
+      description: Indicates how well the entire input matches the returned. It is
+        equal to 1 if all input tokens are recognized and matched.
+    AddressComponentPhonemes:
+      type: object
+      properties:
+        Country:
+          allOf:
+          - $ref: '#/components/schemas/PhonemeTranscriptionList'
+          description: The alpha-2 or alpha-3 character code for the country that
+            the results will be present in.
+        Region:
+          allOf:
+          - $ref: '#/components/schemas/PhonemeTranscriptionList'
+          description: How to pronounce the region or state results should be to be
+            present in.
+        SubRegion:
+          allOf:
+          - $ref: '#/components/schemas/PhonemeTranscriptionList'
+          description: How to pronounce the sub-region or county for which results
+            should be present in.
+        Locality:
+          allOf:
+          - $ref: '#/components/schemas/PhonemeTranscriptionList'
+          description: 'How to pronounce the city or locality results should be present
+            in.
+
+
+            Example: `Vancouver`.'
+        District:
+          allOf:
+          - $ref: '#/components/schemas/PhonemeTranscriptionList'
+          description: How to pronounce the district or division of a city results
+            should be present in.
+        SubDistrict:
+          allOf:
+          - $ref: '#/components/schemas/PhonemeTranscriptionList'
+          description: How to pronounce the sub-district or division of a city results
+            should be present in.
+        Block:
+          allOf:
+          - $ref: '#/components/schemas/PhonemeTranscriptionList'
+          description: How to pronounce the name of the block.
+        SubBlock:
+          allOf:
+          - $ref: '#/components/schemas/PhonemeTranscriptionList'
+          description: How to pronounce the name of the sub-block.
+        Street:
+          allOf:
+          - $ref: '#/components/schemas/PhonemeTranscriptionList'
+          description: How to pronounce the name of the street results should be present
+            in.
+      description: How to pronounce the various components of the address or place.
     ApiKey:
       type: string
       maxLength: 1000
@@ -85,6 +795,109 @@ components:
       type: array
       items:
         $ref: '#/components/schemas/AutocompleteAdditionalFeature'
+    AutocompleteAddressHighlights:
+      type: object
+      properties:
+        Label:
+          allOf:
+          - $ref: '#/components/schemas/HighlightList'
+          description: Indicates the starting and ending indexes for result items
+            where they are identified to match the input query. This should be used
+            to provide emphasis to output display to make selecting the correct result
+            from a list easier for end users.
+        Country:
+          allOf:
+          - $ref: '#/components/schemas/CountryHighlights'
+          description: The alpha-2 or alpha-3 character code for the country that
+            the results will be present in.
+        Region:
+          allOf:
+          - $ref: '#/components/schemas/RegionHighlights'
+          description: 'The region or state results should be to be present in.
+
+
+            Example: `North Rhine-Westphalia`.'
+        SubRegion:
+          allOf:
+          - $ref: '#/components/schemas/SubRegionHighlights'
+          description: The sub-region or county for which results should be present
+            in.
+        Locality:
+          allOf:
+          - $ref: '#/components/schemas/HighlightList'
+          description: 'The city or locality results should be present in.
+
+
+            Example: `Vancouver`.'
+        District:
+          allOf:
+          - $ref: '#/components/schemas/HighlightList'
+          description: The district or division of a city the results should be present
+            in.
+        SubDistrict:
+          allOf:
+          - $ref: '#/components/schemas/HighlightList'
+          description: Indicates the starting and ending index of the title in the
+            text query that match the found title.
+        Street:
+          allOf:
+          - $ref: '#/components/schemas/HighlightList'
+          description: The name of the street results should be present in.
+        Block:
+          allOf:
+          - $ref: '#/components/schemas/HighlightList'
+          description: 'Name of the block. Example: Sunny Mansion 203 block: 2 Chome'
+        SubBlock:
+          allOf:
+          - $ref: '#/components/schemas/HighlightList'
+          description: 'Name of sub-block. Example Sunny Mansion 203 sub-block: 4'
+        Intersection:
+          allOf:
+          - $ref: '#/components/schemas/IntersectionHighlightsList'
+          description: 'Name of the streets in the intersection. For example: e.g.
+            ["Friedrichstraße","Unter den Linden"]'
+        PostalCode:
+          allOf:
+          - $ref: '#/components/schemas/HighlightList'
+          description: An alphanumeric string included in a postal address to facilitate
+            mail sorting, such as post code, postcode, or ZIP code for which the result
+            should posses.
+        AddressNumber:
+          allOf:
+          - $ref: '#/components/schemas/HighlightList'
+          description: The house number or address results should have.
+        Building:
+          allOf:
+          - $ref: '#/components/schemas/HighlightList'
+          description: The name of the building at the address.
+      description: Describes how the parts of the response element matched the input
+        query by returning the sections of the response which matched to input query
+        terms.
+    AutocompleteFilter:
+      type: object
+      properties:
+        BoundingBox:
+          allOf:
+          - $ref: '#/components/schemas/BoundingBox'
+          description: 'The bounding box enclosing the geometric shape (area or line)
+            that an individual result covers.
+
+
+            The bounding box formed is defined as a set 4 coordinates: `[{westward
+            lng}, {southern lat}, {eastward lng}, {northern lat}]`'
+        Circle:
+          $ref: '#/components/schemas/FilterCircle'
+        IncludeCountries:
+          allOf:
+          - $ref: '#/components/schemas/CountryCodeList'
+          description: A list of countries that all results must be in. Countries
+            are represented by either their alpha-2 or alpha-3 character codes.
+        IncludePlaceTypes:
+          allOf:
+          - $ref: '#/components/schemas/AutocompleteFilterPlaceTypeList'
+          description: The included place types.
+      description: Autocomplete structure which contains a set of inclusion/exclusion
+        properties that results must posses in order to be returned as a result.
     AutocompleteFilterPlaceType:
       type: string
       enum:
@@ -94,10 +907,161 @@ components:
       type: array
       items:
         $ref: '#/components/schemas/AutocompleteFilterPlaceType'
+    AutocompleteHighlights:
+      type: object
+      properties:
+        Title:
+          allOf:
+          - $ref: '#/components/schemas/HighlightList'
+          description: Indicates where the title field in the result matches the input
+            query.
+        Address:
+          allOf:
+          - $ref: '#/components/schemas/AutocompleteAddressHighlights'
+          description: Describes how part of the result address match the input query.
+      description: Describes how the parts of the response element matched the input
+        query by returning the sections of the response which matched to input query
+        terms.
     AutocompleteIntendedUse:
       type: string
       enum:
       - SingleUse
+    AutocompleteRequest:
+      type: object
+      properties:
+        QueryText:
+          allOf:
+          - $ref: '#/components/schemas/SensitiveString'
+          description: The free-form text query to match addresses against. This is
+            usually a partially typed address from an end user in an address box or
+            form.
+        MaxResults:
+          allOf:
+          - $ref: '#/components/schemas/Integer'
+          description: An optional limit for the number of results returned in a single
+            call.
+        BiasPosition:
+          allOf:
+          - $ref: '#/components/schemas/Position'
+          description: 'The position in longitude and latitude that the results should
+            be close to. Typically, place results returned are ranked higher the closer
+            they are to this position. Stored in `[lng, lat]` and in the WSG84 format.
+
+
+            The fields `BiasPosition`, `FilterBoundingBox`, and `FilterCircle` are
+            mutually exclusive.'
+        Filter:
+          allOf:
+          - $ref: '#/components/schemas/AutocompleteFilter'
+          description: A structure which contains a set of inclusion/exclusion properties
+            that results must posses in order to be returned as a result.
+        PostalCodeMode:
+          allOf:
+          - $ref: '#/components/schemas/PostalCodeMode'
+          description: The `PostalCodeMode` affects how postal code results are returned.
+            If a postal code spans multiple localities and this value is empty, partial
+            district or locality information may be returned under a single postal
+            code result entry. If it's populated with the value `cityLookup`, all
+            cities in that postal code are returned.
+        AdditionalFeatures:
+          allOf:
+          - $ref: '#/components/schemas/AutocompleteAdditionalFeatureList'
+          description: A list of optional additional parameters that can be requested
+            for each result.
+        Language:
+          allOf:
+          - $ref: '#/components/schemas/LanguageTag'
+          description: A list of [BCP 47](https://en.wikipedia.org/wiki/IETF_language_tag)
+            compliant language codes for the results to be rendered in. If there is
+            no data for the result in the requested language, data will be returned
+            in the default language for the entry.
+        PoliticalView:
+          allOf:
+          - $ref: '#/components/schemas/CountryCode'
+          description: The alpha-2 or alpha-3 character code for the political view
+            of a country. The political view applies to the results of the request
+            to represent unresolved territorial claims through the point of view of
+            the specified country.
+        IntendedUse:
+          allOf:
+          - $ref: '#/components/schemas/AutocompleteIntendedUse'
+          description: Indicates if the results will be stored. Defaults to `SingleUse`,
+            if left empty.
+        Key:
+          allOf:
+          - $ref: '#/components/schemas/ApiKey'
+          description: 'Optional: The API key to be used for authorization. Either
+            an API key or valid SigV4 signature must be provided when making a request.'
+      required:
+      - QueryText
+    AutocompleteResponse:
+      type: object
+      properties:
+        PricingBucket:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: 'The pricing bucket for which the query is charged at.
+
+
+            For more inforamtion on pricing, please visit [Amazon Location Service
+            Pricing](https://aws.amazon.com/location/pricing/).'
+        ResultItems:
+          allOf:
+          - $ref: '#/components/schemas/AutocompleteResultItemList'
+          description: List of places or results returned for a query.
+      required:
+      - PricingBucket
+    AutocompleteResultItem:
+      type: object
+      properties:
+        PlaceId:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The PlaceId of the place associated with this result. This
+            can be used to look up additional details about the result via GetPlace.
+        PlaceType:
+          allOf:
+          - $ref: '#/components/schemas/PlaceType'
+          description: PlaceType describes the type of result entry returned.
+        Title:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: A formatted string for display when presenting this result
+            to an end user.
+        Address:
+          allOf:
+          - $ref: '#/components/schemas/Address'
+          description: The address associated with this result.
+        Distance:
+          allOf:
+          - $ref: '#/components/schemas/DistanceMeters'
+          description: The distance in meters between the center of the search area
+            and this result. Useful to evaluate how far away from the original bias
+            position the result is.
+        Language:
+          allOf:
+          - $ref: '#/components/schemas/LanguageTag'
+          description: A list of [BCP 47](https://en.wikipedia.org/wiki/IETF_language_tag)
+            compliant language codes for the results to be rendered in. If there is
+            no data for the result in the requested language, data will be returned
+            in the default language for the entry.
+        PoliticalView:
+          allOf:
+          - $ref: '#/components/schemas/CountryCode3'
+          description: The alpha-2 or alpha-3 character code for the political view
+            of a country. The political view applies to the results of the request
+            to represent unresolved territorial claims through the point of view of
+            the specified country.
+        Highlights:
+          allOf:
+          - $ref: '#/components/schemas/AutocompleteHighlights'
+          description: Indicates the starting and ending index of the place in the
+            text query that match the found title.
+      required:
+      - PlaceId
+      - PlaceType
+      - Title
+      description: A result matching the input query text.
     AutocompleteResultItemList:
       type: array
       items:
@@ -107,18 +1071,123 @@ components:
       items:
         type: number
       x-sensitive: true
+    BusinessChain:
+      type: object
+      properties:
+        Name:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The business chain name.
+        Id:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The Business Chain Id.
+      description: A businesschain is a chain of businesses that belong to the same
+        brand. For example `7-11`.
     BusinessChainList:
       type: array
       items:
         $ref: '#/components/schemas/BusinessChain'
+    Category:
+      type: object
+      properties:
+        Id:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The category ID.
+        Name:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The category name.
+        LocalizedName:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: Localized name of the category type.
+        Primary:
+          allOf:
+          - $ref: '#/components/schemas/Boolean'
+          description: Boolean which indicates if this category is the primary offered
+            by the place.
+      required:
+      - Id
+      - Name
+      description: Category of the `Place` returned.
     CategoryList:
       type: array
       items:
         $ref: '#/components/schemas/Category'
+    ComponentMatchScores:
+      type: object
+      properties:
+        Title:
+          allOf:
+          - $ref: '#/components/schemas/MatchScore'
+          description: Indicates the starting and ending index of the title in the
+            text query that match the found title.
+        Address:
+          allOf:
+          - $ref: '#/components/schemas/AddressComponentMatchScores'
+          description: The place's address.
+      description: Indicates how well the input matches the returned element. It is
+        equal to 1 if all input tokens are recognized and matched to the title in
+        the result.
+    ContactDetails:
+      type: object
+      properties:
+        Label:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The contact's label.
+        Value:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The contact's value.
+        Categories:
+          allOf:
+          - $ref: '#/components/schemas/CategoryList'
+          description: Categories of results that results must belong too.
+      description: Details related to contacts.
     ContactDetailsList:
       type: array
       items:
         $ref: '#/components/schemas/ContactDetails'
+    Contacts:
+      type: object
+      properties:
+        Phones:
+          allOf:
+          - $ref: '#/components/schemas/ContactDetailsList'
+          description: List of phone numbers for the results contact.
+        Faxes:
+          allOf:
+          - $ref: '#/components/schemas/ContactDetailsList'
+          description: List of fax addresses for the result contact.
+        Websites:
+          allOf:
+          - $ref: '#/components/schemas/ContactDetailsList'
+          description: List of website URLs that belong to the result.
+        Emails:
+          allOf:
+          - $ref: '#/components/schemas/ContactDetailsList'
+          description: List of emails for contacts of the result.
+      description: A list of potential contact methods for the result/place.
+    Country:
+      type: object
+      properties:
+        Code2:
+          allOf:
+          - $ref: '#/components/schemas/CountryCode2'
+          description: Country, represented by its alpha 2-character code.
+        Code3:
+          allOf:
+          - $ref: '#/components/schemas/CountryCode3'
+          description: Country, represented by its alpha t-character code.
+        Name:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: Name of the country.
+      description: The alpha-2 or alpha-3 character code for the country that the
+        results will be present in.
     CountryCode:
       type: string
       pattern: ^([A-Z]{2}|[A-Z]{3})$
@@ -138,6 +1207,21 @@ components:
       type: array
       items:
         $ref: '#/components/schemas/CountryCode'
+    CountryHighlights:
+      type: object
+      properties:
+        Code:
+          allOf:
+          - $ref: '#/components/schemas/HighlightList'
+          description: Indicates the starting and ending index of the country code
+            in the text query that match the found title.
+        Name:
+          allOf:
+          - $ref: '#/components/schemas/HighlightList'
+          description: Indicates the starting and ending index of the country code
+            in the text query that match the found title.
+      description: Indicates the starting and ending index of the country in the text
+        query that match the found title.
     DistanceMeters:
       type: integer
       format: int64
@@ -158,10 +1242,45 @@ components:
       type: array
       items:
         type: string
+    FilterCircle:
+      type: object
+      properties:
+        Center:
+          allOf:
+          - $ref: '#/components/schemas/Position'
+          description: The center position, in longitude and latitude, of the `FilterCircle`.
+        Radius:
+          allOf:
+          - $ref: '#/components/schemas/DistanceMeters'
+          description: The radius, in meters, of the `FilterCircle`.
+      required:
+      - Center
+      - Radius
+      description: The `Circle` that all results must be in.
     FilterFoodTypeList:
       type: array
       items:
         type: string
+    FoodType:
+      type: object
+      properties:
+        LocalizedName:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: Localized name of the food type.
+        Id:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The Food Type Id.
+        Primary:
+          allOf:
+          - $ref: '#/components/schemas/Boolean'
+          description: Boolean which indicates if this food type is the primary offered
+            by the place. For example, if a location serves fast food, but also dessert,
+            he primary would likely be fast food.
+      required:
+      - LocalizedName
+      description: List of `Food` types offered by this result.
     FoodTypeList:
       type: array
       items:
@@ -175,6 +1294,20 @@ components:
       type: array
       items:
         $ref: '#/components/schemas/GeocodeAdditionalFeature'
+    GeocodeFilter:
+      type: object
+      properties:
+        IncludeCountries:
+          allOf:
+          - $ref: '#/components/schemas/CountryCodeList'
+          description: A list of countries that all results must be in. Countries
+            are represented by either their alpha-2 or alpha-3 character codes.
+        IncludePlaceTypes:
+          allOf:
+          - $ref: '#/components/schemas/GeocodeFilterPlaceTypeList'
+          description: The included place types.
+      description: Geocode structure which contains a set of inclusion/exclusion properties
+        that results must posses in order to be returned as a result.
     GeocodeFilterPlaceType:
       type: string
       enum:
@@ -193,6 +1326,212 @@ components:
       enum:
       - SingleUse
       - Storage
+    GeocodeQueryComponents:
+      type: object
+      properties:
+        Country:
+          allOf:
+          - $ref: '#/components/schemas/SensitiveString'
+          description: The alpha-2 or alpha-3 character code for the country that
+            the results will be present in.
+        Region:
+          allOf:
+          - $ref: '#/components/schemas/SensitiveString'
+          description: 'The region or state results should be to be present in.
+
+
+            Example: `North Rhine-Westphalia`.'
+        SubRegion:
+          allOf:
+          - $ref: '#/components/schemas/SensitiveString'
+          description: The sub-region or county for which results should be present
+            in.
+        Locality:
+          allOf:
+          - $ref: '#/components/schemas/SensitiveString'
+          description: 'City or locality results should be present in.
+
+
+            Example: `Vancouver`.'
+        District:
+          allOf:
+          - $ref: '#/components/schemas/SensitiveString'
+          description: The district or division of a city the results should be present
+            in.
+        Street:
+          allOf:
+          - $ref: '#/components/schemas/SensitiveString'
+          description: The name of the street results should be present in.
+        AddressNumber:
+          allOf:
+          - $ref: '#/components/schemas/SensitiveString'
+          description: The house number or address results should have.
+        PostalCode:
+          allOf:
+          - $ref: '#/components/schemas/SensitiveString'
+          description: An alphanumeric string included in a postal address to facilitate
+            mail sorting, such as post code, postcode, or ZIP code for which the result
+            should posses.
+      description: A structured free text query allows you to search for places by
+        the name or text representation of specific properties of the place.
+    GeocodeRequest:
+      type: object
+      properties:
+        QueryText:
+          allOf:
+          - $ref: '#/components/schemas/SensitiveString'
+          description: The free-form text query to match addresses against. This is
+            usually a partially typed address from an end user in an address box or
+            form.
+        QueryComponents:
+          $ref: '#/components/schemas/GeocodeQueryComponents'
+        MaxResults:
+          allOf:
+          - $ref: '#/components/schemas/Integer'
+          description: An optional limit for the number of results returned in a single
+            call.
+        BiasPosition:
+          allOf:
+          - $ref: '#/components/schemas/Position'
+          description: 'The position, in longitude and latitude, that the results
+            should be close to. Typically, place results returned are ranked higher
+            the closer they are to this position. Stored in `[lng, lat]` and in the
+            WSG84 format.
+
+
+            The fields `BiasPosition`, `FilterBoundingBox`, and `FilterCircle` are
+            mutually exclusive.'
+        Filter:
+          allOf:
+          - $ref: '#/components/schemas/GeocodeFilter'
+          description: A structure which contains a set of inclusion/exclusion properties
+            that results must posses in order to be returned as a result.
+        AdditionalFeatures:
+          allOf:
+          - $ref: '#/components/schemas/GeocodeAdditionalFeatureList'
+          description: A list of optional additional parameters, such as time zone,
+            that can be requested for each result.
+        Language:
+          allOf:
+          - $ref: '#/components/schemas/LanguageTag'
+          description: A list of [BCP 47](https://en.wikipedia.org/wiki/IETF_language_tag)
+            compliant language codes for the results to be rendered in. If there is
+            no data for the result in the requested language, data will be returned
+            in the default language for the entry.
+        PoliticalView:
+          allOf:
+          - $ref: '#/components/schemas/CountryCode'
+          description: The alpha-2 or alpha-3 character code for the political view
+            of a country. The political view applies to the results of the request
+            to represent unresolved territorial claims through the point of view of
+            the specified country.
+        IntendedUse:
+          allOf:
+          - $ref: '#/components/schemas/GeocodeIntendedUse'
+          description: Indicates if the results will be stored. Defaults to `SingleUse`,
+            if left empty.
+        Key:
+          allOf:
+          - $ref: '#/components/schemas/ApiKey'
+          description: 'Optional: The API key to be used for authorization. Either
+            an API key or valid SigV4 signature must be provided when making a request.'
+    GeocodeResponse:
+      type: object
+      properties:
+        PricingBucket:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: 'The pricing bucket for which the query is charged at.
+
+
+            For more inforamtion on pricing, please visit [Amazon Location Service
+            Pricing](https://aws.amazon.com/location/pricing/).'
+        ResultItems:
+          allOf:
+          - $ref: '#/components/schemas/GeocodeResultItemList'
+          description: List of places or results returned for a query.
+      required:
+      - PricingBucket
+    GeocodeResultItem:
+      type: object
+      properties:
+        PlaceId:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The `PlaceId` of the place you wish to receive the information
+            for.
+        PlaceType:
+          allOf:
+          - $ref: '#/components/schemas/PlaceType'
+          description: A `PlaceType` is a category that the result place must belong
+            to.
+        Title:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The localized display name of this result item based on request
+            parameter `language`.
+        Address:
+          allOf:
+          - $ref: '#/components/schemas/Address'
+          description: The place's address.
+        AddressNumberCorrected:
+          allOf:
+          - $ref: '#/components/schemas/Boolean'
+          description: Boolean indicating if the address provided has been corrected.
+        PostalCodeDetails:
+          allOf:
+          - $ref: '#/components/schemas/PostalCodeDetailsList'
+          description: Contains details about the postal code of the place/result.
+        Position:
+          allOf:
+          - $ref: '#/components/schemas/Position'
+          description: The position in longitude and latitude.
+        Distance:
+          allOf:
+          - $ref: '#/components/schemas/DistanceMeters'
+          description: The distance in meters from the QueryPosition.
+        MapView:
+          allOf:
+          - $ref: '#/components/schemas/BoundingBox'
+          description: 'The bounding box enclosing the geometric shape (area or line)
+            that an individual result covers.
+
+
+            The bounding box formed is defined as a set 4 coordinates: `[{westward
+            lng}, {southern lat}, {eastward lng}, {northern lat}]`'
+        Categories:
+          allOf:
+          - $ref: '#/components/schemas/CategoryList'
+          description: Categories of results that results must belong to.
+        FoodTypes:
+          allOf:
+          - $ref: '#/components/schemas/FoodTypeList'
+          description: List of food types offered by this result.
+        AccessPoints:
+          allOf:
+          - $ref: '#/components/schemas/AccessPointList'
+          description: Position of the access point represent by longitude and latitude.
+        TimeZone:
+          allOf:
+          - $ref: '#/components/schemas/TimeZone'
+          description: The time zone in which the place is located.
+        PoliticalView:
+          allOf:
+          - $ref: '#/components/schemas/CountryCode3'
+          description: The alpha-2 or alpha-3 character code for the political view
+            of a country. The political view applies to the results of the request
+            to represent unresolved territorial claims through the point of view of
+            the specified country.
+        MatchScores:
+          allOf:
+          - $ref: '#/components/schemas/MatchScoreDetails'
+          description: Indicates how well the entire input matches the returned. It
+            is equal to 1 if all input tokens are recognized and matched.
+      required:
+      - PlaceId
+      - PlaceType
+      - Title
+      description: The Geocoded result.
     GeocodeResultItemList:
       type: array
       items:
@@ -213,10 +1552,176 @@ components:
       enum:
       - SingleUse
       - Storage
+    GetPlaceRequest:
+      type: object
+      properties:
+        PlaceId:
+          allOf:
+          - $ref: '#/components/schemas/SensitiveString'
+          description: The `PlaceId` of the place you wish to receive the information
+            for.
+        AdditionalFeatures:
+          allOf:
+          - $ref: '#/components/schemas/GetPlaceAdditionalFeatureList'
+          description: A list of optional additional parameters such as time zone
+            that can be requested for each result.
+        Language:
+          allOf:
+          - $ref: '#/components/schemas/LanguageTag'
+          description: A list of [BCP 47](https://en.wikipedia.org/wiki/IETF_language_tag)
+            compliant language codes for the results to be rendered in. If there is
+            no data for the result in the requested language, data will be returned
+            in the default language for the entry.
+        PoliticalView:
+          allOf:
+          - $ref: '#/components/schemas/CountryCode'
+          description: The alpha-2 or alpha-3 character code for the political view
+            of a country. The political view applies to the results of the request
+            to represent unresolved territorial claims through the point of view of
+            the specified country.
+        IntendedUse:
+          allOf:
+          - $ref: '#/components/schemas/GetPlaceIntendedUse'
+          description: Indicates if the results will be stored. Defaults to `SingleUse`,
+            if left empty.
+        Key:
+          allOf:
+          - $ref: '#/components/schemas/ApiKey'
+          description: 'Optional: The API key to be used for authorization. Either
+            an API key or valid SigV4 signature must be provided when making a request.'
+      required:
+      - PlaceId
+    GetPlaceResponse:
+      type: object
+      properties:
+        PlaceId:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The `PlaceId` of the place you wish to receive the information
+            for.
+        PlaceType:
+          allOf:
+          - $ref: '#/components/schemas/PlaceType'
+          description: A `PlaceType` is a category that the result place must belong
+            to.
+        Title:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The localized display name of this result item based on request
+            parameter `language`.
+        PricingBucket:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: 'The pricing bucket for which the query is charged at.
+
+
+            For more inforamtion on pricing, please visit [Amazon Location Service
+            Pricing](https://aws.amazon.com/location/pricing/).'
+        Address:
+          allOf:
+          - $ref: '#/components/schemas/Address'
+          description: The place's address.
+        AddressNumberCorrected:
+          allOf:
+          - $ref: '#/components/schemas/Boolean'
+          description: Boolean indicating if the address provided has been corrected.
+        PostalCodeDetails:
+          allOf:
+          - $ref: '#/components/schemas/PostalCodeDetailsList'
+          description: Contains details about the postal code of the place/result.
+        Position:
+          allOf:
+          - $ref: '#/components/schemas/Position'
+          description: The position, in longitude and latitude.
+        MapView:
+          allOf:
+          - $ref: '#/components/schemas/BoundingBox'
+          description: 'The bounding box enclosing the geometric shape (area or line)
+            that an individual result covers.
+
+
+            The bounding box formed is defined as a set of four coordinates: `[{westward
+            lng}, {southern lat}, {eastward lng}, {northern lat}]`'
+        Categories:
+          allOf:
+          - $ref: '#/components/schemas/CategoryList'
+          description: Categories of results that results must belong to.
+        FoodTypes:
+          allOf:
+          - $ref: '#/components/schemas/FoodTypeList'
+          description: List of food types offered by this result.
+        BusinessChains:
+          allOf:
+          - $ref: '#/components/schemas/BusinessChainList'
+          description: The Business Chains associated with the place.
+        Contacts:
+          allOf:
+          - $ref: '#/components/schemas/Contacts'
+          description: List of potential contact methods for the result/place.
+        OpeningHours:
+          allOf:
+          - $ref: '#/components/schemas/OpeningHoursList'
+          description: List of opening hours objects.
+        AccessPoints:
+          allOf:
+          - $ref: '#/components/schemas/AccessPointList'
+          description: Position of the access point in `(lng,lat)`.
+        AccessRestrictions:
+          allOf:
+          - $ref: '#/components/schemas/AccessRestrictionList'
+          description: Indicates known access restrictions on a vehicle access point.
+            The index correlates to an access point and indicates if access through
+            this point has some form of restriction.
+        TimeZone:
+          allOf:
+          - $ref: '#/components/schemas/TimeZone'
+          description: The time zone in which the place is located.
+        PoliticalView:
+          allOf:
+          - $ref: '#/components/schemas/CountryCode3'
+          description: The alpha-2 or alpha-3 character code for the political view
+            of a country. The political view applies to the results of the request
+            to represent unresolved territorial claims through the point of view of
+            the specified country.
+        Phonemes:
+          allOf:
+          - $ref: '#/components/schemas/PhonemeDetails'
+          description: How the various components of the result's address are pronounced
+            in various languages.
+      required:
+      - PlaceId
+      - PlaceType
+      - Title
+      - PricingBucket
+    Highlight:
+      type: object
+      properties:
+        StartIndex:
+          allOf:
+          - $ref: '#/components/schemas/Integer'
+          description: Start index of the highlight.
+        EndIndex:
+          allOf:
+          - $ref: '#/components/schemas/Integer'
+          description: End index of the highlight.
+        Value:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The highlight's value.
+      description: Describes how parts of the result response match the input query.
     HighlightList:
       type: array
       items:
         $ref: '#/components/schemas/Highlight'
+    InternalServerException:
+      type: object
+      properties:
+        Message:
+          $ref: '#/components/schemas/String'
+      required:
+      - Message
+      description: The request processing has failed because of an unknown error,
+        exception or failure.
     IntersectionHighlightsList:
       type: array
       items:
@@ -239,10 +1744,66 @@ components:
       default: 0
       minimum: 0
       maximum: 1
+    MatchScoreDetails:
+      type: object
+      properties:
+        Overall:
+          allOf:
+          - $ref: '#/components/schemas/MatchScore'
+          description: Indicates how well the entire input matches the returned. It
+            is equal to 1 if all input tokens are recognized and matched.
+        Components:
+          allOf:
+          - $ref: '#/components/schemas/ComponentMatchScores'
+          description: Indicates how well the component input matches the returned.
+            It is equal to 1 if all input tokens are recognized and matched.
+      description: Details related to the match score.
     MatchScoreList:
       type: array
       items:
         $ref: '#/components/schemas/MatchScore'
+    OpeningHours:
+      type: object
+      properties:
+        Display:
+          allOf:
+          - $ref: '#/components/schemas/OpeningHoursDisplayList'
+          description: List of opening hours in the format they are displayed in.
+            This can vary by result and in most cases represents how the result uniquely
+            formats their opening hours.
+        OpenNow:
+          allOf:
+          - $ref: '#/components/schemas/Boolean'
+          description: Boolean which indicates if the result/place is currently open.
+        Components:
+          allOf:
+          - $ref: '#/components/schemas/OpeningHoursComponentsList'
+          description: Components of the opening hours object.
+        Categories:
+          allOf:
+          - $ref: '#/components/schemas/CategoryList'
+          description: Categories of results that results must belong too.
+      description: List of opening hours objects.
+    OpeningHoursComponents:
+      type: object
+      properties:
+        OpenTime:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: String which represents the opening hours, such as `"T070000"`.
+        OpenDuration:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: String which represents the duration of the opening period,
+            such as `"PT12H00M"`.
+        Recurrence:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: 'Days or periods when the provided opening hours are in affect.
+
+
+            Example: `FREQ:DAILY;BYDAY:MO,TU,WE,TH,SU`'
+      description: Components of the opening hours object.
     OpeningHoursComponentsList:
       type: array
       items:
@@ -259,6 +1820,38 @@ components:
       type: array
       items:
         $ref: '#/components/schemas/OpeningHours'
+    PhonemeDetails:
+      type: object
+      properties:
+        Title:
+          allOf:
+          - $ref: '#/components/schemas/PhonemeTranscriptionList'
+          description: List of `PhonemeTranscription`. See `PhonemeTranscription`
+            for fields.
+        Address:
+          allOf:
+          - $ref: '#/components/schemas/AddressComponentPhonemes'
+          description: How to pronounce the address.
+      description: The phoneme details.
+    PhonemeTranscription:
+      type: object
+      properties:
+        Value:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: Value which indicates how to pronounce the value.
+        Language:
+          allOf:
+          - $ref: '#/components/schemas/LanguageTag'
+          description: A list of [BCP 47](https://en.wikipedia.org/wiki/IETF_language_tag)
+            compliant language codes for the results to be rendered in. If there is
+            no data for the result in the requested language, data will be returned
+            in the default language for the entry.
+        Preferred:
+          allOf:
+          - $ref: '#/components/schemas/Boolean'
+          description: Boolean which indicates if it the preferred pronunciation.
+      description: How to pronounce the various components of the address or place.
     PhonemeTranscriptionList:
       type: array
       items:
@@ -289,6 +1882,34 @@ components:
       type: string
       enum:
       - Usps
+    PostalCodeDetails:
+      type: object
+      properties:
+        PostalCode:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: An alphanumeric string included in a postal address to facilitate
+            mail sorting, such as post code, postcode, or ZIP code for which the result
+            should posses.
+        PostalAuthority:
+          allOf:
+          - $ref: '#/components/schemas/PostalAuthority'
+          description: The postal authority or entity. This could be a governmental
+            authority, a regulatory authority, or a designated postal operator.
+        PostalCodeType:
+          allOf:
+          - $ref: '#/components/schemas/PostalCodeType'
+          description: The postal code type.
+        UspsZip:
+          allOf:
+          - $ref: '#/components/schemas/UspsZip'
+          description: The ZIP Classification Code, or in other words what type of
+            postal code is it.
+        UspsZipPlus4:
+          allOf:
+          - $ref: '#/components/schemas/UspsZipPlus4'
+          description: The USPS ZIP+4 Record Type Code.
+      description: Contains details about the postal code of the place or result.
     PostalCodeDetailsList:
       type: array
       items:
@@ -303,6 +1924,34 @@ components:
       enum:
       - UspsZip
       - UspsZipPlus4
+    QueryRefinement:
+      type: object
+      properties:
+        RefinedTerm:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The term that will be suggested to the user.
+        OriginalTerm:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The sub-string of the original query that is replaced by this
+            query term.
+        StartIndex:
+          allOf:
+          - $ref: '#/components/schemas/Integer'
+          description: Start index of the parsed component.
+        EndIndex:
+          allOf:
+          - $ref: '#/components/schemas/Integer'
+          description: End index of the parsed query.
+      required:
+      - RefinedTerm
+      - OriginalTerm
+      - StartIndex
+      - EndIndex
+      description: Suggestions for refining individual query terms. Suggestions are
+        returned as objects which note the term, suggested replacement, and its index
+        in the query.
     QueryRefinementList:
       type: array
       items:
@@ -321,6 +1970,43 @@ components:
       - PostOfficeBox
       - Rural
       - Street
+    Region:
+      type: object
+      properties:
+        Code:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: 'Abbreviated code for a the state, province or region of the
+            country.
+
+
+            Example: `BC`.'
+        Name:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: 'Name for a the state, province, or region of the country.
+
+
+            Example: `British Columbia`.'
+      description: 'The region or state results should be to be present in.
+
+
+        Example: `North Rhine-Westphalia`.'
+    RegionHighlights:
+      type: object
+      properties:
+        Code:
+          allOf:
+          - $ref: '#/components/schemas/HighlightList'
+          description: Indicates the starting and ending index of the region in the
+            text query that match the found title.
+        Name:
+          allOf:
+          - $ref: '#/components/schemas/HighlightList'
+          description: Indicates the starting and ending index of the region name
+            in the text query that match the found title.
+      description: Indicates the starting and ending index of the region in the text
+        query that match the found title.
     ReverseGeocodeAdditionalFeature:
       type: string
       enum:
@@ -330,6 +2016,14 @@ components:
       type: array
       items:
         $ref: '#/components/schemas/ReverseGeocodeAdditionalFeature'
+    ReverseGeocodeFilter:
+      type: object
+      properties:
+        IncludePlaceTypes:
+          allOf:
+          - $ref: '#/components/schemas/ReverseGeocodeFilterPlaceTypeList'
+          description: The included place types.
+      description: The included place types.
     ReverseGeocodeFilterPlaceType:
       type: string
       enum:
@@ -347,6 +2041,153 @@ components:
       enum:
       - SingleUse
       - Storage
+    ReverseGeocodeRequest:
+      type: object
+      properties:
+        QueryPosition:
+          allOf:
+          - $ref: '#/components/schemas/Position'
+          description: The position, in `[lng, lat]` for which you are querying nearby
+            resultsfor. Results closer to the position will be ranked higher then
+            results further away from the position
+        QueryRadius:
+          allOf:
+          - $ref: '#/components/schemas/DistanceMeters'
+          description: The maximum distance in meters from the QueryPosition from
+            which a result will be returned.
+        MaxResults:
+          allOf:
+          - $ref: '#/components/schemas/Integer'
+          description: An optional limit for the number of results returned in a single
+            call.
+        Filter:
+          allOf:
+          - $ref: '#/components/schemas/ReverseGeocodeFilter'
+          description: A structure which contains a set of inclusion/exclusion properties
+            that results must posses in order to be returned as a result.
+        AdditionalFeatures:
+          allOf:
+          - $ref: '#/components/schemas/ReverseGeocodeAdditionalFeatureList'
+          description: A list of optional additional parameters, such as time zone
+            that can be requested for each result.
+        Language:
+          allOf:
+          - $ref: '#/components/schemas/LanguageTag'
+          description: A list of [BCP 47](https://en.wikipedia.org/wiki/IETF_language_tag)
+            compliant language codes for the results to be rendered in. If there is
+            no data for the result in the requested language, data will be returned
+            in the default language for the entry.
+        PoliticalView:
+          allOf:
+          - $ref: '#/components/schemas/CountryCode'
+          description: The alpha-2 or alpha-3 character code for the political view
+            of a country. The political view applies to the results of the request
+            to represent unresolved territorial claims through the point of view of
+            the specified country.
+        IntendedUse:
+          allOf:
+          - $ref: '#/components/schemas/ReverseGeocodeIntendedUse'
+          description: Indicates if the results will be stored. Defaults to `SingleUse`,
+            if left empty.
+        Key:
+          allOf:
+          - $ref: '#/components/schemas/ApiKey'
+          description: 'Optional: The API key to be used for authorization. Either
+            an API key or valid SigV4 signature must be provided when making a request.'
+      required:
+      - QueryPosition
+    ReverseGeocodeResponse:
+      type: object
+      properties:
+        PricingBucket:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: 'The pricing bucket for which the query is charged at.
+
+
+            For more inforamtion on pricing, please visit [Amazon Location Service
+            Pricing](https://aws.amazon.com/location/pricing/).'
+        ResultItems:
+          allOf:
+          - $ref: '#/components/schemas/ReverseGeocodeResultItemList'
+          description: List of places or results returned for a query.
+      required:
+      - PricingBucket
+    ReverseGeocodeResultItem:
+      type: object
+      properties:
+        PlaceId:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The `PlaceId` of the place you wish to receive the information
+            for.
+        PlaceType:
+          allOf:
+          - $ref: '#/components/schemas/PlaceType'
+          description: A `PlaceType` is a category that the result place must belong
+            to.
+        Title:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The localized display name of this result item based on request
+            parameter `language`.
+        Address:
+          allOf:
+          - $ref: '#/components/schemas/Address'
+          description: The place's address.
+        AddressNumberCorrected:
+          allOf:
+          - $ref: '#/components/schemas/Boolean'
+          description: Boolean indicating if the address provided has been corrected.
+        PostalCodeDetails:
+          allOf:
+          - $ref: '#/components/schemas/PostalCodeDetailsList'
+          description: Contains details about the postal code of the place/result.
+        Position:
+          allOf:
+          - $ref: '#/components/schemas/Position'
+          description: The position in longitude and latitude.
+        Distance:
+          allOf:
+          - $ref: '#/components/schemas/DistanceMeters'
+          description: The distance in meters from the QueryPosition.
+        MapView:
+          allOf:
+          - $ref: '#/components/schemas/BoundingBox'
+          description: 'The bounding box enclosing the geometric shape (area or line)
+            that an individual result covers.
+
+
+            The bounding box formed is defined as a set 4 coordinates: `[{westward
+            lng}, {southern lat}, {eastward lng}, {northern lat}]`'
+        Categories:
+          allOf:
+          - $ref: '#/components/schemas/CategoryList'
+          description: Categories of results that results must belong to.
+        FoodTypes:
+          allOf:
+          - $ref: '#/components/schemas/FoodTypeList'
+          description: List of food types offered by this result.
+        AccessPoints:
+          allOf:
+          - $ref: '#/components/schemas/AccessPointList'
+          description: Position of the access point represent by longitude and latitude.
+        TimeZone:
+          allOf:
+          - $ref: '#/components/schemas/TimeZone'
+          description: The time zone in which the place is located.
+        PoliticalView:
+          allOf:
+          - $ref: '#/components/schemas/CountryCode3'
+          description: The alpha-2 or alpha-3 character code for the political view
+            of a country. The political view applies to the results of the request
+            to represent unresolved territorial claims through the point of view of
+            the specified country.
+      required:
+      - PlaceId
+      - PlaceType
+      - Title
+      description: The returned location from the `Reverse Geocode` action.
     ReverseGeocodeResultItemList:
       type: array
       items:
@@ -362,11 +2203,229 @@ components:
       type: array
       items:
         $ref: '#/components/schemas/SearchNearbyAdditionalFeature'
+    SearchNearbyFilter:
+      type: object
+      properties:
+        BoundingBox:
+          allOf:
+          - $ref: '#/components/schemas/BoundingBox'
+          description: 'The bounding box enclosing the geometric shape (area or line)
+            that an individual result covers.
+
+
+            The bounding box formed is defined as a set 4 coordinates: `[{westward
+            lng}, {southern lat}, {eastward lng}, {northern lat}]`'
+        IncludeCountries:
+          allOf:
+          - $ref: '#/components/schemas/CountryCodeList'
+          description: A list of countries that all results must be in. Countries
+            are represented by either their alpha-2 or alpha-3 character codes.
+        IncludeCategories:
+          allOf:
+          - $ref: '#/components/schemas/FilterCategoryList'
+          description: Categories of results that results must belong too.
+        ExcludeCategories:
+          allOf:
+          - $ref: '#/components/schemas/FilterCategoryList'
+          description: Categories of results that results are excluded from.
+        IncludeBusinessChains:
+          allOf:
+          - $ref: '#/components/schemas/FilterBusinessChainList'
+          description: The Business Chains associated with the place.
+        ExcludeBusinessChains:
+          allOf:
+          - $ref: '#/components/schemas/FilterBusinessChainList'
+          description: The Business Chains associated with the place.
+        IncludeFoodTypes:
+          allOf:
+          - $ref: '#/components/schemas/FilterFoodTypeList'
+          description: Food types that results are included from.
+        ExcludeFoodTypes:
+          allOf:
+          - $ref: '#/components/schemas/FilterFoodTypeList'
+          description: Food types that results are excluded from.
+      description: SearchNearby structure which contains a set of inclusion/exclusion
+        properties that results must posses in order to be returned as a result.
     SearchNearbyIntendedUse:
       type: string
       enum:
       - SingleUse
       - Storage
+    SearchNearbyRequest:
+      type: object
+      properties:
+        QueryPosition:
+          allOf:
+          - $ref: '#/components/schemas/Position'
+          description: The position, in `[lng, lat]` for which you are querying nearby
+            resultsfor. Results closer to the position will be ranked higher then
+            results further away from the position
+        QueryRadius:
+          allOf:
+          - $ref: '#/components/schemas/DistanceMeters'
+          description: The maximum distance in meters from the QueryPosition from
+            which a result will be returned.
+        MaxResults:
+          allOf:
+          - $ref: '#/components/schemas/Integer'
+          description: An optional limit for the number of results returned in a single
+            call.
+        Filter:
+          allOf:
+          - $ref: '#/components/schemas/SearchNearbyFilter'
+          description: A structure which contains a set of inclusion/exclusion properties
+            that results must posses in order to be returned as a result.
+        AdditionalFeatures:
+          allOf:
+          - $ref: '#/components/schemas/SearchNearbyAdditionalFeatureList'
+          description: A list of optional additional parameters, such as time zone,
+            that can be requested for each result.
+        Language:
+          allOf:
+          - $ref: '#/components/schemas/LanguageTag'
+          description: A list of [BCP 47](https://en.wikipedia.org/wiki/IETF_language_tag)
+            compliant language codes for the results to be rendered in. If there is
+            no data for the result in the requested language, data will be returned
+            in the default language for the entry.
+        PoliticalView:
+          allOf:
+          - $ref: '#/components/schemas/CountryCode'
+          description: The alpha-2 or alpha-3 character code for the political view
+            of a country. The political view applies to the results of the request
+            to represent unresolved territorial claims through the point of view of
+            the specified country.
+        IntendedUse:
+          allOf:
+          - $ref: '#/components/schemas/SearchNearbyIntendedUse'
+          description: Indicates if the results will be stored. Defaults to `SingleUse`,
+            if left empty.
+        NextToken:
+          allOf:
+          - $ref: '#/components/schemas/Token'
+          description: If `nextToken` is returned, there are more results available.
+            The value of `nextToken` is a unique pagination token for each page.
+        Key:
+          allOf:
+          - $ref: '#/components/schemas/ApiKey'
+          description: 'Optional: The API key to be used for authorization. Either
+            an API key or valid SigV4 signature must be provided when making a request.'
+      required:
+      - QueryPosition
+    SearchNearbyResponse:
+      type: object
+      properties:
+        PricingBucket:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: 'The pricing bucket for which the query is charged at.
+
+
+            For more inforamtion on pricing, please visit [Amazon Location Service
+            Pricing](https://aws.amazon.com/location/pricing/).'
+        ResultItems:
+          allOf:
+          - $ref: '#/components/schemas/SearchNearbyResultItemList'
+          description: List of places or results returned for a query.
+        NextToken:
+          allOf:
+          - $ref: '#/components/schemas/Token'
+          description: If `nextToken` is returned, there are more results available.
+            The value of `nextToken` is a unique pagination token for each page.
+      required:
+      - PricingBucket
+    SearchNearbyResultItem:
+      type: object
+      properties:
+        PlaceId:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The `PlaceId` of the place you wish to receive the information
+            for.
+        PlaceType:
+          allOf:
+          - $ref: '#/components/schemas/PlaceType'
+          description: A `PlaceType` is a category that the result place must belong
+            to.
+        Title:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The item's title.
+        Address:
+          allOf:
+          - $ref: '#/components/schemas/Address'
+          description: The place's address.
+        AddressNumberCorrected:
+          allOf:
+          - $ref: '#/components/schemas/Boolean'
+          description: Boolean indicating if the address provided has been corrected.
+        Position:
+          allOf:
+          - $ref: '#/components/schemas/Position'
+          description: The position in longitude and latitude.
+        Distance:
+          allOf:
+          - $ref: '#/components/schemas/DistanceMeters'
+          description: The distance in meters from the QueryPosition.
+        MapView:
+          allOf:
+          - $ref: '#/components/schemas/BoundingBox'
+          description: 'The bounding box enclosing the geometric shape (area or line)
+            that an individual result covers.
+
+
+            The bounding box formed is defined as a set 4 coordinates: `[{westward
+            lng}, {southern lat}, {eastward lng}, {northern lat}]`'
+        Categories:
+          allOf:
+          - $ref: '#/components/schemas/CategoryList'
+          description: Categories of results that results must belong to.
+        FoodTypes:
+          allOf:
+          - $ref: '#/components/schemas/FoodTypeList'
+          description: List of food types offered by this result.
+        BusinessChains:
+          allOf:
+          - $ref: '#/components/schemas/BusinessChainList'
+          description: The Business Chains associated with the place.
+        Contacts:
+          allOf:
+          - $ref: '#/components/schemas/Contacts'
+          description: List of potential contact methods for the result/place.
+        OpeningHours:
+          allOf:
+          - $ref: '#/components/schemas/OpeningHoursList'
+          description: List of opening hours objects.
+        AccessPoints:
+          allOf:
+          - $ref: '#/components/schemas/AccessPointList'
+          description: Position of the access point represent by longitude and latitude.
+        AccessRestrictions:
+          allOf:
+          - $ref: '#/components/schemas/AccessRestrictionList'
+          description: Indicates known access restrictions on a vehicle access point.
+            The index correlates to an access point and indicates if access through
+            this point has some form of restriction.
+        TimeZone:
+          allOf:
+          - $ref: '#/components/schemas/TimeZone'
+          description: The time zone in which the place is located.
+        PoliticalView:
+          allOf:
+          - $ref: '#/components/schemas/CountryCode3'
+          description: The alpha-2 or alpha-3 character code for the political view
+            of a country. The political view applies to the results of the request
+            to represent unresolved territorial claims through the point of view of
+            the specified country.
+        Phonemes:
+          allOf:
+          - $ref: '#/components/schemas/PhonemeDetails'
+          description: How the various components of the result's address are pronounced
+            in various languages.
+      required:
+      - PlaceId
+      - PlaceType
+      - Title
+      description: The search results of nearby places.
     SearchNearbyResultItemList:
       type: array
       items:
@@ -382,21 +2441,306 @@ components:
       type: array
       items:
         $ref: '#/components/schemas/SearchTextAdditionalFeature'
+    SearchTextFilter:
+      type: object
+      properties:
+        BoundingBox:
+          allOf:
+          - $ref: '#/components/schemas/BoundingBox'
+          description: 'The bounding box enclosing the geometric shape (area or line)
+            that an individual result covers.
+
+
+            The bounding box formed is defined as a set 4 coordinates: `[{westward
+            lng}, {southern lat}, {eastward lng}, {northern lat}]`'
+        Circle:
+          $ref: '#/components/schemas/FilterCircle'
+        IncludeCountries:
+          allOf:
+          - $ref: '#/components/schemas/CountryCodeList'
+          description: A list of countries that all results must be in. Countries
+            are represented by either their alpha-2 or alpha-3 character codes.
+      description: SearchText structure which contains a set of inclusion/exclusion
+        properties that results must posses in order to be returned as a result.
     SearchTextIntendedUse:
       type: string
       enum:
       - SingleUse
       - Storage
+    SearchTextRequest:
+      type: object
+      properties:
+        QueryText:
+          allOf:
+          - $ref: '#/components/schemas/SensitiveString'
+          description: The free-form text query to match addresses against. This is
+            usually a partially typed address from an end user in an address box or
+            form.
+        QueryId:
+          allOf:
+          - $ref: '#/components/schemas/SensitiveString'
+          description: The query Id.
+        MaxResults:
+          allOf:
+          - $ref: '#/components/schemas/Integer'
+          description: An optional limit for the number of results returned in a single
+            call.
+        BiasPosition:
+          allOf:
+          - $ref: '#/components/schemas/Position'
+          description: 'The position, in longitude and latitude, that the results
+            should be close to. Typically, place results returned are ranked higher
+            the closer they are to this position. Stored in `[lng, lat]` and in the
+            WSG84 format.
+
+
+            The fields `BiasPosition`, `FilterBoundingBox`, and `FilterCircle` are
+            mutually exclusive.'
+        Filter:
+          allOf:
+          - $ref: '#/components/schemas/SearchTextFilter'
+          description: A structure which contains a set of inclusion/exclusion properties
+            that results must posses in order to be returned as a result.
+        AdditionalFeatures:
+          allOf:
+          - $ref: '#/components/schemas/SearchTextAdditionalFeatureList'
+          description: A list of optional additional parameters, such as time zone,
+            that can be requested for each result.
+        Language:
+          allOf:
+          - $ref: '#/components/schemas/LanguageTag'
+          description: A list of [BCP 47](https://en.wikipedia.org/wiki/IETF_language_tag)
+            compliant language codes for the results to be rendered in. If there is
+            no data for the result in the requested language, data will be returned
+            in the default language for the entry.
+        PoliticalView:
+          allOf:
+          - $ref: '#/components/schemas/CountryCode'
+          description: The alpha-2 or alpha-3 character code for the political view
+            of a country. The political view applies to the results of the request
+            to represent unresolved territorial claims through the point of view of
+            the specified country.
+        IntendedUse:
+          allOf:
+          - $ref: '#/components/schemas/SearchTextIntendedUse'
+          description: Indicates if the results will be stored. Defaults to `SingleUse`,
+            if left empty.
+        NextToken:
+          allOf:
+          - $ref: '#/components/schemas/Token'
+          description: If `nextToken` is returned, there are more results available.
+            The value of `nextToken` is a unique pagination token for each page.
+        Key:
+          allOf:
+          - $ref: '#/components/schemas/ApiKey'
+          description: 'Optional: The API key to be used for authorization. Either
+            an API key or valid SigV4 signature must be provided when making a request.'
+    SearchTextResponse:
+      type: object
+      properties:
+        PricingBucket:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: 'The pricing bucket for which the query is charged at.
+
+
+            For more inforamtion on pricing, please visit [Amazon Location Service
+            Pricing](https://aws.amazon.com/location/pricing/).'
+        ResultItems:
+          allOf:
+          - $ref: '#/components/schemas/SearchTextResultItemList'
+          description: List of places or results returned for a query.
+        NextToken:
+          allOf:
+          - $ref: '#/components/schemas/Token'
+          description: If `nextToken` is returned, there are more results available.
+            The value of `nextToken` is a unique pagination token for each page.
+      required:
+      - PricingBucket
+    SearchTextResultItem:
+      type: object
+      properties:
+        PlaceId:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The `PlaceId` of the place you wish to receive the information
+            for.
+        PlaceType:
+          allOf:
+          - $ref: '#/components/schemas/PlaceType'
+          description: A `PlaceType` is a category that the result place must belong
+            to.
+        Title:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The item's title.
+        Address:
+          allOf:
+          - $ref: '#/components/schemas/Address'
+          description: The place's address.
+        AddressNumberCorrected:
+          allOf:
+          - $ref: '#/components/schemas/Boolean'
+          description: Boolean indicating if the address provided has been corrected.
+        Position:
+          allOf:
+          - $ref: '#/components/schemas/Position'
+          description: The position, in longitude and latitude.
+        Distance:
+          allOf:
+          - $ref: '#/components/schemas/DistanceMeters'
+          description: The distance in meters from the QueryPosition.
+        MapView:
+          allOf:
+          - $ref: '#/components/schemas/BoundingBox'
+          description: 'The bounding box enclosing the geometric shape (area or line)
+            that an individual result covers.
+
+
+            The bounding box formed is defined as a set 4 coordinates: `[{westward
+            lng}, {southern lat}, {eastward lng}, {northern lat}]`'
+        Categories:
+          allOf:
+          - $ref: '#/components/schemas/CategoryList'
+          description: Categories of results that results must belong to.
+        FoodTypes:
+          allOf:
+          - $ref: '#/components/schemas/FoodTypeList'
+          description: List of food types offered by this result.
+        BusinessChains:
+          allOf:
+          - $ref: '#/components/schemas/BusinessChainList'
+          description: The Business Chains associated with the place.
+        Contacts:
+          allOf:
+          - $ref: '#/components/schemas/Contacts'
+          description: List of potential contact methods for the result/place.
+        OpeningHours:
+          allOf:
+          - $ref: '#/components/schemas/OpeningHoursList'
+          description: List of opening hours objects.
+        AccessPoints:
+          allOf:
+          - $ref: '#/components/schemas/AccessPointList'
+          description: Position of the access point represent by longitude and latitude.
+        AccessRestrictions:
+          allOf:
+          - $ref: '#/components/schemas/AccessRestrictionList'
+          description: Indicates known access restrictions on a vehicle access point.
+            The index correlates to an access point and indicates if access through
+            this point has some form of restriction.
+        TimeZone:
+          allOf:
+          - $ref: '#/components/schemas/TimeZone'
+          description: The time zone in which the place is located.
+        PoliticalView:
+          allOf:
+          - $ref: '#/components/schemas/CountryCode3'
+          description: The alpha-2 or alpha-3 character code for the political view
+            of a country. The political view applies to the results of the request
+            to represent unresolved territorial claims through the point of view of
+            the specified country.
+        Phonemes:
+          allOf:
+          - $ref: '#/components/schemas/PhonemeDetails'
+          description: How the various components of the result's address are pronounced
+            in various languages.
+      required:
+      - PlaceId
+      - PlaceType
+      - Title
+      description: The text search result.
     SearchTextResultItemList:
       type: array
       items:
         $ref: '#/components/schemas/SearchTextResultItem'
     SensitiveString:
       type: string
+    StreetComponents:
+      type: object
+      properties:
+        BaseName:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: 'Base name part of the street name.
+
+
+            Example: Younge from the “Younge street".'
+        Type:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: 'Street type part of the street name.
+
+
+            Example: `“avenue"`.'
+        TypePlacement:
+          allOf:
+          - $ref: '#/components/schemas/TypePlacement'
+          description: Defines if the street type is before or after the base name.
+        TypeSeparator:
+          allOf:
+          - $ref: '#/components/schemas/TypeSeparator'
+          description: What character(s) separates the string from its type.
+        Prefix:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: 'A prefix is a directional identifier that precedes, but is
+            not included in, the base name of a road.
+
+
+            Example: E for East.'
+        Suffix:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: 'A suffix is a directional identifier that follows, but is
+            not included in, the base name of a road.
+
+
+            Example W for West.'
+        Direction:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: Indicates the official directional identifiers assigned to
+            highways.
+        Language:
+          allOf:
+          - $ref: '#/components/schemas/LanguageTag'
+          description: A [BCP 47](https://en.wikipedia.org/wiki/IETF_language_tag)
+            compliant language codes for the results to be rendered in. If there is
+            no data for the result in the requested language, data will be returned
+            in the default language for the entry.
+      description: Components of a street.
     StreetComponentsList:
       type: array
       items:
         $ref: '#/components/schemas/StreetComponents'
+    SubRegion:
+      type: object
+      properties:
+        Code:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: Abbreviated code for the county or sub-region.
+        Name:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: Name for the county or sub-region.
+      description: The sub-region.
+    SubRegionHighlights:
+      type: object
+      properties:
+        Code:
+          allOf:
+          - $ref: '#/components/schemas/HighlightList'
+          description: Indicates the starting and ending index of the sub-region in
+            the text query that match the found title.
+        Name:
+          allOf:
+          - $ref: '#/components/schemas/HighlightList'
+          description: Indicates the starting and ending index of the name in the
+            text query that match the found title.
+      description: Indicates the starting and ending index of the sub-region in the
+        text query that match the found title.
     SuggestAdditionalFeature:
       type: string
       enum:
@@ -408,10 +2752,266 @@ components:
       type: array
       items:
         $ref: '#/components/schemas/SuggestAdditionalFeature'
+    SuggestAddressHighlights:
+      type: object
+      properties:
+        Label:
+          allOf:
+          - $ref: '#/components/schemas/HighlightList'
+          description: Indicates the starting and ending indexes of the places in
+            the result which were identified to match the textQuery. This result is
+            useful for providing emphasis to results where the user query directly
+            matched to make selecting the correct result from a list easier for an
+            end user.
+      description: Describes how the parts of the textQuery matched the input query
+        by returning the sections of the response which matched to textQuery terms.
+    SuggestFilter:
+      type: object
+      properties:
+        BoundingBox:
+          allOf:
+          - $ref: '#/components/schemas/BoundingBox'
+          description: 'The bounding box enclosing the geometric shape (area or line)
+            that an individual result covers.
+
+
+            The bounding box formed is defined as a set 4 coordinates: `[{westward
+            lng}, {southern lat}, {eastward lng}, {northern lat}]`'
+        Circle:
+          $ref: '#/components/schemas/FilterCircle'
+        IncludeCountries:
+          allOf:
+          - $ref: '#/components/schemas/CountryCodeList'
+          description: A list of countries that all results must be in. Countries
+            are represented by either their alpha-2 or alpha-3 character codes.
+      description: SuggestFilter structure which contains a set of inclusion/exclusion
+        properties that results must posses in order to be returned as a result.
+    SuggestHighlights:
+      type: object
+      properties:
+        Title:
+          allOf:
+          - $ref: '#/components/schemas/HighlightList'
+          description: Indicates the starting and ending index of the title in the
+            text query that match the found title.
+        Address:
+          allOf:
+          - $ref: '#/components/schemas/SuggestAddressHighlights'
+          description: The place's address.
+      description: Describes how the parts of the textQuery matched the input query
+        by returning the sections of the response which matched to textQuery terms.
     SuggestIntendedUse:
       type: string
       enum:
       - SingleUse
+    SuggestPlaceResult:
+      type: object
+      properties:
+        PlaceId:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The `PlaceId` of the place you wish to receive the information
+            for.
+        PlaceType:
+          allOf:
+          - $ref: '#/components/schemas/PlaceType'
+          description: A `PlaceType` is a category that the result place must belong
+            to.
+        Address:
+          allOf:
+          - $ref: '#/components/schemas/Address'
+          description: The place's address.
+        Position:
+          allOf:
+          - $ref: '#/components/schemas/Position'
+          description: The position, in longitude and latitude.
+        Distance:
+          allOf:
+          - $ref: '#/components/schemas/DistanceMeters'
+          description: The distance in meters from the QueryPosition.
+        MapView:
+          allOf:
+          - $ref: '#/components/schemas/BoundingBox'
+          description: 'The bounding box enclosing the geometric shape (area or line)
+            that an individual result covers.
+
+
+            The bounding box formed is defined as a set 4 coordinates: `[{westward
+            lng}, {southern lat}, {eastward lng}, {northern lat}]`'
+        Categories:
+          allOf:
+          - $ref: '#/components/schemas/CategoryList'
+          description: Categories of results that results must belong to.
+        FoodTypes:
+          allOf:
+          - $ref: '#/components/schemas/FoodTypeList'
+          description: List of food types offered by this result.
+        BusinessChains:
+          allOf:
+          - $ref: '#/components/schemas/BusinessChainList'
+          description: The Business Chains associated with the place.
+        AccessPoints:
+          allOf:
+          - $ref: '#/components/schemas/AccessPointList'
+          description: Position of the access point represent by longitude and latitude.
+        AccessRestrictions:
+          allOf:
+          - $ref: '#/components/schemas/AccessRestrictionList'
+          description: Indicates known access restrictions on a vehicle access point.
+            The index correlates to an access point and indicates if access through
+            this point has some form of restriction.
+        TimeZone:
+          allOf:
+          - $ref: '#/components/schemas/TimeZone'
+          description: The time zone in which the place is located.
+        PoliticalView:
+          allOf:
+          - $ref: '#/components/schemas/CountryCode3'
+          description: The alpha-2 or alpha-3 character code for the political view
+            of a country. The political view applies to the results of the request
+            to represent unresolved territorial claims through the point of view of
+            the specified country.
+        Phonemes:
+          allOf:
+          - $ref: '#/components/schemas/PhonemeDetails'
+          description: How the various components of the result's address are pronounced
+            in various languages.
+      description: The suggested place results.
+    SuggestQueryResult:
+      type: object
+      properties:
+        QueryId:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: QueryId can be used to complete a follow up query through the
+            SearchText API. The QueryId retains context from the original Suggest
+            request such as filters, political view and language. See the SearchText
+            API documentation for more details [SearchText API docs](https://docs.aws.amazon.com/latest/APIReference/API_geoplaces_SearchText.html).
+        QueryType:
+          allOf:
+          - $ref: '#/components/schemas/QueryType'
+          description: The query type. Category qeuries will search for places which
+            have an entry matching the given category, for example "doctor office".
+            BusinessChain queries will search for instances of a given business.
+      description: The suggested query results.
+    SuggestRequest:
+      type: object
+      properties:
+        QueryText:
+          allOf:
+          - $ref: '#/components/schemas/SensitiveString'
+          description: The free-form text query to match addresses against. This is
+            usually a partially typed address from an end user in an address box or
+            form.
+        MaxResults:
+          allOf:
+          - $ref: '#/components/schemas/Integer'
+          description: An optional limit for the number of results returned in a single
+            call.
+        MaxQueryRefinements:
+          allOf:
+          - $ref: '#/components/schemas/Integer'
+          description: Maximum number of query terms to be returned for use with a
+            search text query.
+        BiasPosition:
+          allOf:
+          - $ref: '#/components/schemas/Position'
+          description: 'The position, in longitude and latitude, that the results
+            should be close to. Typically, place results returned are ranked higher
+            the closer they are to this position. Stored in `[lng, lat]` and in the
+            WSG84 format.
+
+
+            The fields `BiasPosition`, `FilterBoundingBox`, and `FilterCircle` are
+            mutually exclusive.'
+        Filter:
+          allOf:
+          - $ref: '#/components/schemas/SuggestFilter'
+          description: A structure which contains a set of inclusion/exclusion properties
+            that results must posses in order to be returned as a result.
+        AdditionalFeatures:
+          allOf:
+          - $ref: '#/components/schemas/SuggestAdditionalFeatureList'
+          description: A list of optional additional parameters, such as time zone,
+            that can be requested for each result.
+        Language:
+          allOf:
+          - $ref: '#/components/schemas/LanguageTag'
+          description: A list of [BCP 47](https://en.wikipedia.org/wiki/IETF_language_tag)
+            compliant language codes for the results to be rendered in. If there is
+            no data for the result in the requested language, data will be returned
+            in the default language for the entry.
+        PoliticalView:
+          allOf:
+          - $ref: '#/components/schemas/CountryCode'
+          description: The alpha-2 or alpha-3 character code for the political view
+            of a country. The political view applies to the results of the request
+            to represent unresolved territorial claims through the point of view of
+            the specified country.
+        IntendedUse:
+          allOf:
+          - $ref: '#/components/schemas/SuggestIntendedUse'
+          description: Indicates if the results will be stored. Defaults to `SingleUse`,
+            if left empty.
+        Key:
+          allOf:
+          - $ref: '#/components/schemas/ApiKey'
+          description: 'Optional: The API key to be used for authorization. Either
+            an API key or valid SigV4 signature must be provided when making a request.'
+      required:
+      - QueryText
+    SuggestResponse:
+      type: object
+      properties:
+        PricingBucket:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: 'The pricing bucket for which the query is charged at.
+
+
+            For more inforamtion on pricing, please visit [Amazon Location Service
+            Pricing](https://aws.amazon.com/location/pricing/).'
+        ResultItems:
+          allOf:
+          - $ref: '#/components/schemas/SuggestResultItemList'
+          description: List of places or results returned for a query.
+        QueryRefinements:
+          allOf:
+          - $ref: '#/components/schemas/QueryRefinementList'
+          description: Maximum number of query terms to be returned for use with a
+            search text query.
+      required:
+      - PricingBucket
+    SuggestResultItem:
+      type: object
+      properties:
+        Title:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The display title that should be used when presenting this
+            option to the end user.
+        SuggestResultItemType:
+          allOf:
+          - $ref: '#/components/schemas/SuggestResultItemType'
+          description: The result type. Place results represent the final result for
+            a point of interest, Query results represent a follow up query which can
+            be completed through the SearchText operation.
+        Place:
+          allOf:
+          - $ref: '#/components/schemas/SuggestPlaceResult'
+          description: The suggested place by its unique ID.
+        Query:
+          $ref: '#/components/schemas/SuggestQueryResult'
+        Highlights:
+          allOf:
+          - $ref: '#/components/schemas/SuggestHighlights'
+          description: Describes how the parts of the response element matched the
+            input query by returning the sections of the response which matched to
+            input query terms.
+      required:
+      - Title
+      - SuggestResultItemType
+      description: The resulting item from the suggested query.
     SuggestResultItemList:
       type: array
       items:
@@ -421,6 +3021,32 @@ components:
       enum:
       - Place
       - Query
+    ThrottlingException:
+      type: object
+      properties:
+        Message:
+          $ref: '#/components/schemas/String'
+      required:
+      - Message
+      description: The request was denied due to request throttling.
+    TimeZone:
+      type: object
+      properties:
+        Name:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The time zone name.
+        Offset:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: Time zone offset of the timezone from UTC.
+        OffsetSeconds:
+          allOf:
+          - $ref: '#/components/schemas/DurationSeconds'
+          description: The offset of the time zone from UTC, in seconds.
+      required:
+      - Name
+      description: The time zone in which the place is located.
     Token:
       type: string
       minLength: 1
@@ -435,6 +3061,58 @@ components:
       pattern: ^$|^ $
       minLength: 0
       maxLength: 1
+    UspsZip:
+      type: object
+      properties:
+        ZipClassificationCode:
+          allOf:
+          - $ref: '#/components/schemas/ZipClassificationCode'
+          description: The ZIP Classification Code, or in other words what type of
+            postal code is it.
+      description: The USPS zip code.
+    UspsZipPlus4:
+      type: object
+      properties:
+        RecordTypeCode:
+          allOf:
+          - $ref: '#/components/schemas/RecordTypeCode'
+          description: The USPS ZIP+4 Record Type Code.
+      description: The USPS zip+4 code.
+    ValidationException:
+      type: object
+      properties:
+        Message:
+          $ref: '#/components/schemas/String'
+        Reason:
+          allOf:
+          - $ref: '#/components/schemas/ValidationExceptionReason'
+          description: Test stub for reason
+        FieldList:
+          allOf:
+          - $ref: '#/components/schemas/ValidationExceptionFieldList'
+          description: Test stub for FieldList.
+      required:
+      - Message
+      - Reason
+      - FieldList
+      description: The input fails to satisfy the constraints specified by an AWS
+        service.
+    ValidationExceptionField:
+      type: object
+      properties:
+        Name:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The name of the resource.
+        Message:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The error message.
+      required:
+      - Name
+      - Message
+      description: The input fails to satisfy the constraints specified by the Amazon
+        Location service.
     ValidationExceptionFieldList:
       type: array
       items:

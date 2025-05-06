@@ -7,7 +7,7 @@ info:
   x-stackql-serviceName: sagemaker_runtime
   x-aws-serviceName: sagemakerruntime
   x-aws-protocol: aws.protocols#restJson1
-  x-dateGenerated: '2025-05-05'
+  x-dateGenerated: '2025-05-07'
   version: '2017-05-13'
   title: Amazon SageMaker Runtime
   description: |-
@@ -43,7 +43,308 @@ servers:
       - sa-east-1
       - me-south-1
       default: us-east-1
-paths: {}
+paths:
+  /endpoints/{EndpointName}/invocations:
+    post:
+      operationId: InvokeEndpoint
+      description: |-
+        After you deploy a model into production using Amazon SageMaker hosting services, your client applications use this API to get inferences from the model hosted at the specified endpoint.
+
+        For an overview of Amazon SageMaker, see [How It Works](https://docs.aws.amazon.com/sagemaker/latest/dg/how-it-works.html).
+
+        Amazon SageMaker strips all POST headers except those supported by the API. Amazon SageMaker might add additional headers. You should not rely on the behavior of headers outside those enumerated in the request syntax.
+
+        Calls to `InvokeEndpoint` are authenticated by using Amazon Web Services Signature Version 4. For information, see [Authenticating Requests (Amazon Web Services Signature Version 4)](https://docs.aws.amazon.com/AmazonS3/latest/API/sig-v4-authenticating-requests.html) in the _Amazon S3 API Reference_.
+
+        A customer's model containers must respond to requests within 60 seconds. The model itself can have a maximum processing time of 60 seconds before responding to invocations. If your model is going to take 50-60 seconds of processing time, the SDK socket timeout should be set to be 70 seconds.
+
+        Endpoints are scoped to an individual account, and are not public. The URL does not contain the account ID, but Amazon SageMaker determines the account ID from the authentication token that is supplied by the caller.
+      parameters:
+      - name: EndpointName
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/EndpointName'
+      - name: Content-Type
+        in: header
+        required: false
+        schema:
+          $ref: '#/components/schemas/Header'
+      - name: Accept
+        in: header
+        required: false
+        schema:
+          $ref: '#/components/schemas/Header'
+      - name: X-Amzn-SageMaker-Custom-Attributes
+        in: header
+        required: false
+        schema:
+          $ref: '#/components/schemas/CustomAttributesHeader'
+      - name: X-Amzn-SageMaker-Target-Model
+        in: header
+        required: false
+        schema:
+          $ref: '#/components/schemas/TargetModelHeader'
+      - name: X-Amzn-SageMaker-Target-Variant
+        in: header
+        required: false
+        schema:
+          $ref: '#/components/schemas/TargetVariantHeader'
+      - name: X-Amzn-SageMaker-Target-Container-Hostname
+        in: header
+        required: false
+        schema:
+          $ref: '#/components/schemas/TargetContainerHostnameHeader'
+      - name: X-Amzn-SageMaker-Inference-Id
+        in: header
+        required: false
+        schema:
+          $ref: '#/components/schemas/InferenceId'
+      - name: X-Amzn-SageMaker-Enable-Explanations
+        in: header
+        required: false
+        schema:
+          $ref: '#/components/schemas/EnableExplanationsHeader'
+      - name: X-Amzn-SageMaker-Inference-Component
+        in: header
+        required: false
+        schema:
+          $ref: '#/components/schemas/InferenceComponentHeader'
+      - name: X-Amzn-SageMaker-Session-Id
+        in: header
+        required: false
+        schema:
+          $ref: '#/components/schemas/SessionIdOrNewSessionConstantHeader'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                Body:
+                  $ref: '#/components/schemas/BodyBlob'
+      responses:
+        '200': {}
+        '530':
+          description: |-
+            Your request caused an exception with an internal dependency. Contact customer support.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalDependencyException'
+        '500':
+          description: |-
+            An internal failure occurred.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalFailure'
+        '424':
+          description: |-
+            Model (owned by the customer in the container) returned 4xx or 5xx error code.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ModelError'
+        '429':
+          description: |-
+            Either a serverless endpoint variant's resources are still being provisioned, or a multi-model endpoint is still downloading or loading the target model. Wait and try your request again.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ModelNotReadyException'
+        '503':
+          description: |-
+            The service is unavailable. Try your call again.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServiceUnavailable'
+        '400':
+          description: |-
+            Inspect your request and try again.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationError'
+  /endpoints/{EndpointName}/async-invocations:
+    post:
+      operationId: InvokeEndpointAsync
+      description: |-
+        After you deploy a model into production using Amazon SageMaker hosting services, your client applications use this API to get inferences from the model hosted at the specified endpoint in an asynchronous manner.
+
+        Inference requests sent to this API are enqueued for asynchronous processing. The processing of the inference request may or may not complete before you receive a response from this API. The response from this API will not contain the result of the inference request but contain information about where you can locate it.
+
+        Amazon SageMaker strips all POST headers except those supported by the API. Amazon SageMaker might add additional headers. You should not rely on the behavior of headers outside those enumerated in the request syntax.
+
+        Calls to `InvokeEndpointAsync` are authenticated by using Amazon Web Services Signature Version 4. For information, see [Authenticating Requests (Amazon Web Services Signature Version 4)](https://docs.aws.amazon.com/AmazonS3/latest/API/sig-v4-authenticating-requests.html) in the _Amazon S3 API Reference_.
+      parameters:
+      - name: EndpointName
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/EndpointName'
+      - name: X-Amzn-SageMaker-Content-Type
+        in: header
+        required: false
+        schema:
+          $ref: '#/components/schemas/Header'
+      - name: X-Amzn-SageMaker-Accept
+        in: header
+        required: false
+        schema:
+          $ref: '#/components/schemas/Header'
+      - name: X-Amzn-SageMaker-Custom-Attributes
+        in: header
+        required: false
+        schema:
+          $ref: '#/components/schemas/CustomAttributesHeader'
+      - name: X-Amzn-SageMaker-Inference-Id
+        in: header
+        required: false
+        schema:
+          $ref: '#/components/schemas/InferenceId'
+      - name: X-Amzn-SageMaker-InputLocation
+        in: header
+        required: true
+        schema:
+          $ref: '#/components/schemas/InputLocationHeader'
+      - name: X-Amzn-SageMaker-RequestTTLSeconds
+        in: header
+        required: false
+        schema:
+          $ref: '#/components/schemas/RequestTTLSecondsHeader'
+      - name: X-Amzn-SageMaker-InvocationTimeoutSeconds
+        in: header
+        required: false
+        schema:
+          $ref: '#/components/schemas/InvocationTimeoutSecondsHeader'
+      responses:
+        '202': {}
+        '500':
+          description: |-
+            An internal failure occurred.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalFailure'
+        '503':
+          description: |-
+            The service is unavailable. Try your call again.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServiceUnavailable'
+        '400':
+          description: |-
+            Inspect your request and try again.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationError'
+  /endpoints/{EndpointName}/invocations-response-stream:
+    post:
+      operationId: InvokeEndpointWithResponseStream
+      description: |-
+        Invokes a model at the specified endpoint to return the inference response as a stream. The inference stream provides the response payload incrementally as a series of parts. Before you can get an inference stream, you must have access to a model that's deployed using Amazon SageMaker hosting services, and the container for that model must support inference streaming.
+
+        For more information that can help you use this API, see the following sections in the _Amazon SageMaker Developer Guide_ :
+
+          * For information about how to add streaming support to a model, see [How Containers Serve Requests](https://docs.aws.amazon.com/sagemaker/latest/dg/your-algorithms-inference-code.html#your-algorithms-inference-code-how-containe-serves-requests).
+
+          * For information about how to process the streaming response, see [Invoke real-time endpoints](https://docs.aws.amazon.com/sagemaker/latest/dg/realtime-endpoints-test-endpoints.html).
+
+        Before you can use this operation, your IAM permissions must allow the `sagemaker:InvokeEndpoint` action. For more information about Amazon SageMaker actions for IAM policies, see [Actions, resources, and condition keys for Amazon SageMaker](https://docs.aws.amazon.com/service-authorization/latest/reference/list_amazonsagemaker.html) in the _IAM Service Authorization Reference_.
+
+        Amazon SageMaker strips all POST headers except those supported by the API. Amazon SageMaker might add additional headers. You should not rely on the behavior of headers outside those enumerated in the request syntax.
+
+        Calls to `InvokeEndpointWithResponseStream` are authenticated by using Amazon Web Services Signature Version 4. For information, see [Authenticating Requests (Amazon Web Services Signature Version 4)](https://docs.aws.amazon.com/AmazonS3/latest/API/sig-v4-authenticating-requests.html) in the _Amazon S3 API Reference_.
+      parameters:
+      - name: EndpointName
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/EndpointName'
+      - name: Content-Type
+        in: header
+        required: false
+        schema:
+          $ref: '#/components/schemas/Header'
+      - name: X-Amzn-SageMaker-Accept
+        in: header
+        required: false
+        schema:
+          $ref: '#/components/schemas/Header'
+      - name: X-Amzn-SageMaker-Custom-Attributes
+        in: header
+        required: false
+        schema:
+          $ref: '#/components/schemas/CustomAttributesHeader'
+      - name: X-Amzn-SageMaker-Target-Variant
+        in: header
+        required: false
+        schema:
+          $ref: '#/components/schemas/TargetVariantHeader'
+      - name: X-Amzn-SageMaker-Target-Container-Hostname
+        in: header
+        required: false
+        schema:
+          $ref: '#/components/schemas/TargetContainerHostnameHeader'
+      - name: X-Amzn-SageMaker-Inference-Id
+        in: header
+        required: false
+        schema:
+          $ref: '#/components/schemas/InferenceId'
+      - name: X-Amzn-SageMaker-Inference-Component
+        in: header
+        required: false
+        schema:
+          $ref: '#/components/schemas/InferenceComponentHeader'
+      - name: X-Amzn-SageMaker-Session-Id
+        in: header
+        required: false
+        schema:
+          $ref: '#/components/schemas/SessionIdHeader'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                Body:
+                  $ref: '#/components/schemas/BodyBlob'
+      responses:
+        '200': {}
+        '500':
+          description: |-
+            An internal failure occurred.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalFailure'
+        '400':
+          description: |-
+            Inspect your request and try again.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationError'
+        '424':
+          description: |-
+            Model (owned by the customer in the container) returned 4xx or 5xx error code.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ModelError'
+        '503':
+          description: |-
+            The service is unavailable. Try your call again.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServiceUnavailable'
 components:
   schemas:
     BodyBlob:
@@ -89,16 +390,459 @@ components:
       pattern: ^(https|s3)://([^/]+)/?(.*)$
       minLength: 1
       maxLength: 1024
+    InternalDependencyException:
+      type: object
+      properties:
+        Message:
+          $ref: '#/components/schemas/Message'
+      description: Your request caused an exception with an internal dependency. Contact
+        customer support.
+    InternalFailure:
+      type: object
+      properties:
+        Message:
+          $ref: '#/components/schemas/Message'
+      description: An internal failure occurred.
+    InternalStreamFailure:
+      type: object
+      properties:
+        Message:
+          $ref: '#/components/schemas/Message'
+      description: The stream processing failed because of an unknown error, exception
+        or failure. Try your request again.
     InvocationTimeoutSecondsHeader:
       type: integer
       minimum: 1
       maximum: 3600
+    InvokeEndpointAsyncInput:
+      type: object
+      properties:
+        EndpointName:
+          allOf:
+          - $ref: '#/components/schemas/EndpointName'
+          description: The name of the endpoint that you specified when you created
+            the endpoint using the [CreateEndpoint](https://docs.aws.amazon.com/sagemaker/latest/dg/API_CreateEndpoint.html)
+            API.
+        ContentType:
+          allOf:
+          - $ref: '#/components/schemas/Header'
+          description: The MIME type of the input data in the request body.
+        Accept:
+          allOf:
+          - $ref: '#/components/schemas/Header'
+          description: The desired MIME type of the inference response from the model
+            container.
+        CustomAttributes:
+          allOf:
+          - $ref: '#/components/schemas/CustomAttributesHeader'
+          description: 'Provides additional information about a request for an inference
+            submitted to a model hosted at an Amazon SageMaker endpoint. The information
+            is an opaque value that is forwarded verbatim. You could use this value,
+            for example, to provide an ID that you can use to track a request or to
+            provide other metadata that a service endpoint was programmed to process.
+            The value must consist of no more than 1024 visible US-ASCII characters
+            as specified in [Section 3.3.6. Field Value Components](https://datatracker.ietf.org/doc/html/rfc7230#section-3.2.6)
+            of the Hypertext Transfer Protocol (HTTP/1.1).
+
+
+            The code in your model is responsible for setting or updating any custom
+            attributes in the response. If your code does not set this value in the
+            response, an empty value is returned. For example, if a custom attribute
+            represents the trace ID, your model can prepend the custom attribute with
+            `Trace ID:` in your post-processing function.
+
+
+            This feature is currently supported in the Amazon Web Services SDKs but
+            not in the Amazon SageMaker Python SDK.'
+        InferenceId:
+          allOf:
+          - $ref: '#/components/schemas/InferenceId'
+          description: The identifier for the inference request. Amazon SageMaker
+            will generate an identifier for you if none is specified.
+        InputLocation:
+          allOf:
+          - $ref: '#/components/schemas/InputLocationHeader'
+          description: The Amazon S3 URI where the inference request payload is stored.
+        RequestTTLSeconds:
+          allOf:
+          - $ref: '#/components/schemas/RequestTTLSecondsHeader'
+          description: Maximum age in seconds a request can be in the queue before
+            it is marked as expired. The default is 6 hours, or 21,600 seconds.
+        InvocationTimeoutSeconds:
+          allOf:
+          - $ref: '#/components/schemas/InvocationTimeoutSecondsHeader'
+          description: Maximum amount of time in seconds a request can be processed
+            before it is marked as expired. The default is 15 minutes, or 900 seconds.
+      required:
+      - EndpointName
+      - InputLocation
+    InvokeEndpointAsyncOutput:
+      type: object
+      properties:
+        InferenceId:
+          allOf:
+          - $ref: '#/components/schemas/Header'
+          description: Identifier for an inference request. This will be the same
+            as the `InferenceId` specified in the input. Amazon SageMaker will generate
+            an identifier for you if you do not specify one.
+        OutputLocation:
+          allOf:
+          - $ref: '#/components/schemas/Header'
+          description: The Amazon S3 URI where the inference response payload is stored.
+        FailureLocation:
+          allOf:
+          - $ref: '#/components/schemas/Header'
+          description: The Amazon S3 URI where the inference failure response payload
+            is stored.
+    InvokeEndpointInput:
+      type: object
+      properties:
+        EndpointName:
+          allOf:
+          - $ref: '#/components/schemas/EndpointName'
+          description: The name of the endpoint that you specified when you created
+            the endpoint using the [CreateEndpoint](https://docs.aws.amazon.com/sagemaker/latest/dg/API_CreateEndpoint.html)
+            API.
+        Body:
+          allOf:
+          - $ref: '#/components/schemas/BodyBlob'
+          description: 'Provides input data, in the format specified in the `ContentType`
+            request header. Amazon SageMaker passes all of the data in the body to
+            the model.
+
+
+            For information about the format of the request body, see [Common Data
+            Formats-Inference](https://docs.aws.amazon.com/sagemaker/latest/dg/cdf-inference.html).'
+        ContentType:
+          allOf:
+          - $ref: '#/components/schemas/Header'
+          description: The MIME type of the input data in the request body.
+        Accept:
+          allOf:
+          - $ref: '#/components/schemas/Header'
+          description: The desired MIME type of the inference response from the model
+            container.
+        CustomAttributes:
+          allOf:
+          - $ref: '#/components/schemas/CustomAttributesHeader'
+          description: 'Provides additional information about a request for an inference
+            submitted to a model hosted at an Amazon SageMaker endpoint. The information
+            is an opaque value that is forwarded verbatim. You could use this value,
+            for example, to provide an ID that you can use to track a request or to
+            provide other metadata that a service endpoint was programmed to process.
+            The value must consist of no more than 1024 visible US-ASCII characters
+            as specified in [Section 3.3.6. Field Value Components](https://datatracker.ietf.org/doc/html/rfc7230#section-3.2.6)
+            of the Hypertext Transfer Protocol (HTTP/1.1).
+
+
+            The code in your model is responsible for setting or updating any custom
+            attributes in the response. If your code does not set this value in the
+            response, an empty value is returned. For example, if a custom attribute
+            represents the trace ID, your model can prepend the custom attribute with
+            `Trace ID:` in your post-processing function.
+
+
+            This feature is currently supported in the Amazon Web Services SDKs but
+            not in the Amazon SageMaker Python SDK.'
+        TargetModel:
+          allOf:
+          - $ref: '#/components/schemas/TargetModelHeader'
+          description: The model to request for inference when invoking a multi-model
+            endpoint.
+        TargetVariant:
+          allOf:
+          - $ref: '#/components/schemas/TargetVariantHeader'
+          description: 'Specify the production variant to send the inference request
+            to when invoking an endpoint that is running two or more variants. Note
+            that this parameter overrides the default behavior for the endpoint, which
+            is to distribute the invocation traffic based on the variant weights.
+
+
+            For information about how to use variant targeting to perform a/b testing,
+            see [Test models in production](https://docs.aws.amazon.com/sagemaker/latest/dg/model-ab-testing.html)'
+        TargetContainerHostname:
+          allOf:
+          - $ref: '#/components/schemas/TargetContainerHostnameHeader'
+          description: If the endpoint hosts multiple containers and is configured
+            to use direct invocation, this parameter specifies the host name of the
+            container to invoke.
+        InferenceId:
+          allOf:
+          - $ref: '#/components/schemas/InferenceId'
+          description: If you provide a value, it is added to the captured data when
+            you enable data capture on the endpoint. For information about data capture,
+            see [Capture Data](https://docs.aws.amazon.com/sagemaker/latest/dg/model-monitor-data-capture.html).
+        EnableExplanations:
+          allOf:
+          - $ref: '#/components/schemas/EnableExplanationsHeader'
+          description: An optional JMESPath expression used to override the `EnableExplanations`
+            parameter of the `ClarifyExplainerConfig` API. See the [EnableExplanations](https://docs.aws.amazon.com/sagemaker/latest/dg/clarify-online-explainability-create-endpoint.html#clarify-online-explainability-create-endpoint-enable)
+            section in the developer guide for more information.
+        InferenceComponentName:
+          allOf:
+          - $ref: '#/components/schemas/InferenceComponentHeader'
+          description: If the endpoint hosts one or more inference components, this
+            parameter specifies the name of inference component to invoke.
+        SessionId:
+          allOf:
+          - $ref: '#/components/schemas/SessionIdOrNewSessionConstantHeader'
+          description: "Creates a stateful session or identifies an existing one.\
+            \ You can do one of the following:\n\n  * Create a stateful session by\
+            \ specifying the value `NEW_SESSION`.\n\n  * Send your request to an existing\
+            \ stateful session by specifying the ID of that session.\n\nWith a stateful\
+            \ session, you can send multiple requests to a stateful model. When you\
+            \ create a session with a stateful model, the model must create the session\
+            \ ID and set the expiration time. The model must also provide that information\
+            \ in the response to your request. You can get the ID and timestamp from\
+            \ the `NewSessionId` response parameter. For any subsequent request where\
+            \ you specify that session ID, SageMaker routes the request to the same\
+            \ instance that supports the session."
+      required:
+      - EndpointName
+      - Body
+    InvokeEndpointOutput:
+      type: object
+      properties:
+        Body:
+          allOf:
+          - $ref: '#/components/schemas/BodyBlob'
+          description: 'Includes the inference provided by the model.
+
+
+            For information about the format of the response body, see [Common Data
+            Formats-Inference](https://docs.aws.amazon.com/sagemaker/latest/dg/cdf-inference.html).
+
+
+            If the explainer is activated, the body includes the explanations provided
+            by the model. For more information, see the **Response section** under
+            [Invoke the Endpoint](https://docs.aws.amazon.com/sagemaker/latest/dg/clarify-online-explainability-invoke-endpoint.html#clarify-online-explainability-response)
+            in the Developer Guide.'
+        ContentType:
+          allOf:
+          - $ref: '#/components/schemas/Header'
+          description: The MIME type of the inference returned from the model container.
+        InvokedProductionVariant:
+          allOf:
+          - $ref: '#/components/schemas/Header'
+          description: Identifies the production variant that was invoked.
+        CustomAttributes:
+          allOf:
+          - $ref: '#/components/schemas/CustomAttributesHeader'
+          description: 'Provides additional information in the response about the
+            inference returned by a model hosted at an Amazon SageMaker endpoint.
+            The information is an opaque value that is forwarded verbatim. You could
+            use this value, for example, to return an ID received in the `CustomAttributes`
+            header of a request or other metadata that a service endpoint was programmed
+            to produce. The value must consist of no more than 1024 visible US-ASCII
+            characters as specified in [Section 3.3.6. Field Value Components](https://tools.ietf.org/html/rfc7230#section-3.2.6)
+            of the Hypertext Transfer Protocol (HTTP/1.1). If the customer wants the
+            custom attribute returned, the model must set the custom attribute to
+            be included on the way back.
+
+
+            The code in your model is responsible for setting or updating any custom
+            attributes in the response. If your code does not set this value in the
+            response, an empty value is returned. For example, if a custom attribute
+            represents the trace ID, your model can prepend the custom attribute with
+            `Trace ID:` in your post-processing function.
+
+
+            This feature is currently supported in the Amazon Web Services SDKs but
+            not in the Amazon SageMaker Python SDK.'
+        NewSessionId:
+          allOf:
+          - $ref: '#/components/schemas/NewSessionResponseHeader'
+          description: If you created a stateful session with your request, the ID
+            and expiration time that the model assigns to that session.
+        ClosedSessionId:
+          allOf:
+          - $ref: '#/components/schemas/SessionIdHeader'
+          description: If you closed a stateful session with your request, the ID
+            of that session.
+      required:
+      - Body
+    InvokeEndpointWithResponseStreamInput:
+      type: object
+      properties:
+        EndpointName:
+          allOf:
+          - $ref: '#/components/schemas/EndpointName'
+          description: The name of the endpoint that you specified when you created
+            the endpoint using the [CreateEndpoint](https://docs.aws.amazon.com/sagemaker/latest/dg/API_CreateEndpoint.html)
+            API.
+        Body:
+          allOf:
+          - $ref: '#/components/schemas/BodyBlob'
+          description: 'Provides input data, in the format specified in the `ContentType`
+            request header. Amazon SageMaker passes all of the data in the body to
+            the model.
+
+
+            For information about the format of the request body, see [Common Data
+            Formats-Inference](https://docs.aws.amazon.com/sagemaker/latest/dg/cdf-inference.html).'
+        ContentType:
+          allOf:
+          - $ref: '#/components/schemas/Header'
+          description: The MIME type of the input data in the request body.
+        Accept:
+          allOf:
+          - $ref: '#/components/schemas/Header'
+          description: The desired MIME type of the inference response from the model
+            container.
+        CustomAttributes:
+          allOf:
+          - $ref: '#/components/schemas/CustomAttributesHeader'
+          description: 'Provides additional information about a request for an inference
+            submitted to a model hosted at an Amazon SageMaker endpoint. The information
+            is an opaque value that is forwarded verbatim. You could use this value,
+            for example, to provide an ID that you can use to track a request or to
+            provide other metadata that a service endpoint was programmed to process.
+            The value must consist of no more than 1024 visible US-ASCII characters
+            as specified in [Section 3.3.6. Field Value Components](https://datatracker.ietf.org/doc/html/rfc7230#section-3.2.6)
+            of the Hypertext Transfer Protocol (HTTP/1.1).
+
+
+            The code in your model is responsible for setting or updating any custom
+            attributes in the response. If your code does not set this value in the
+            response, an empty value is returned. For example, if a custom attribute
+            represents the trace ID, your model can prepend the custom attribute with
+            `Trace ID:` in your post-processing function.
+
+
+            This feature is currently supported in the Amazon Web Services SDKs but
+            not in the Amazon SageMaker Python SDK.'
+        TargetVariant:
+          allOf:
+          - $ref: '#/components/schemas/TargetVariantHeader'
+          description: 'Specify the production variant to send the inference request
+            to when invoking an endpoint that is running two or more variants. Note
+            that this parameter overrides the default behavior for the endpoint, which
+            is to distribute the invocation traffic based on the variant weights.
+
+
+            For information about how to use variant targeting to perform a/b testing,
+            see [Test models in production](https://docs.aws.amazon.com/sagemaker/latest/dg/model-ab-testing.html)'
+        TargetContainerHostname:
+          allOf:
+          - $ref: '#/components/schemas/TargetContainerHostnameHeader'
+          description: If the endpoint hosts multiple containers and is configured
+            to use direct invocation, this parameter specifies the host name of the
+            container to invoke.
+        InferenceId:
+          allOf:
+          - $ref: '#/components/schemas/InferenceId'
+          description: An identifier that you assign to your request.
+        InferenceComponentName:
+          allOf:
+          - $ref: '#/components/schemas/InferenceComponentHeader'
+          description: If the endpoint hosts one or more inference components, this
+            parameter specifies the name of inference component to invoke for a streaming
+            response.
+        SessionId:
+          allOf:
+          - $ref: '#/components/schemas/SessionIdHeader'
+          description: 'The ID of a stateful session to handle your request.
+
+
+            You can''t create a stateful session by using the `InvokeEndpointWithResponseStream`
+            action. Instead, you can create one by using the ` InvokeEndpoint ` action.
+            In your request, you specify `NEW_SESSION` for the `SessionId` request
+            parameter. The response to that request provides the session ID for the
+            `NewSessionId` response parameter.'
+      required:
+      - EndpointName
+      - Body
+    InvokeEndpointWithResponseStreamOutput:
+      type: object
+      properties:
+        Body:
+          $ref: '#/components/schemas/ResponseStream'
+        ContentType:
+          allOf:
+          - $ref: '#/components/schemas/Header'
+          description: The MIME type of the inference returned from the model container.
+        InvokedProductionVariant:
+          allOf:
+          - $ref: '#/components/schemas/Header'
+          description: Identifies the production variant that was invoked.
+        CustomAttributes:
+          allOf:
+          - $ref: '#/components/schemas/CustomAttributesHeader'
+          description: 'Provides additional information in the response about the
+            inference returned by a model hosted at an Amazon SageMaker endpoint.
+            The information is an opaque value that is forwarded verbatim. You could
+            use this value, for example, to return an ID received in the `CustomAttributes`
+            header of a request or other metadata that a service endpoint was programmed
+            to produce. The value must consist of no more than 1024 visible US-ASCII
+            characters as specified in [Section 3.3.6. Field Value Components](https://tools.ietf.org/html/rfc7230#section-3.2.6)
+            of the Hypertext Transfer Protocol (HTTP/1.1). If the customer wants the
+            custom attribute returned, the model must set the custom attribute to
+            be included on the way back.
+
+
+            The code in your model is responsible for setting or updating any custom
+            attributes in the response. If your code does not set this value in the
+            response, an empty value is returned. For example, if a custom attribute
+            represents the trace ID, your model can prepend the custom attribute with
+            `Trace ID:` in your post-processing function.
+
+
+            This feature is currently supported in the Amazon Web Services SDKs but
+            not in the Amazon SageMaker Python SDK.'
+      required:
+      - Body
     LogStreamArn:
       type: string
     Message:
       type: string
       minLength: 0
       maxLength: 2048
+    ModelError:
+      type: object
+      properties:
+        Message:
+          $ref: '#/components/schemas/Message'
+        OriginalStatusCode:
+          allOf:
+          - $ref: '#/components/schemas/StatusCode'
+          description: Original status code.
+        OriginalMessage:
+          allOf:
+          - $ref: '#/components/schemas/Message'
+          description: Original message.
+        LogStreamArn:
+          allOf:
+          - $ref: '#/components/schemas/LogStreamArn'
+          description: The Amazon Resource Name (ARN) of the log stream.
+      description: Model (owned by the customer in the container) returned 4xx or
+        5xx error code.
+    ModelNotReadyException:
+      type: object
+      properties:
+        Message:
+          $ref: '#/components/schemas/Message'
+      description: Either a serverless endpoint variant's resources are still being
+        provisioned, or a multi-model endpoint is still downloading or loading the
+        target model. Wait and try your request again.
+    ModelStreamError:
+      type: object
+      properties:
+        Message:
+          $ref: '#/components/schemas/Message'
+        ErrorCode:
+          allOf:
+          - $ref: '#/components/schemas/ErrorCode'
+          description: "This error can have the following error codes:\n\nModelInvocationTimeExceeded\n\
+            \n    \n\nThe model failed to finish sending the response within the timeout\
+            \ period allowed by Amazon SageMaker.\n\nStreamBroken\n\n    \n\nThe Transmission\
+            \ Control Protocol (TCP) connection between the client and the model was\
+            \ reset or closed."
+      description: "An error occurred while streaming the response body. This error\
+        \ can have the following error codes:\n\nModelInvocationTimeExceeded\n\n \
+        \   \n\nThe model failed to finish sending the response within the timeout\
+        \ period allowed by Amazon SageMaker.\n\nStreamBroken\n\n    \n\nThe Transmission\
+        \ Control Protocol (TCP) connection between the client and the model was reset\
+        \ or closed."
     NewSessionResponseHeader:
       type: string
       pattern: ^[a-zA-Z0-9](-*[a-zA-Z0-9])*;\sExpires=[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}Z$
@@ -108,6 +852,17 @@ components:
       type: string
       format: byte
       x-sensitive: true
+    PayloadPart:
+      type: object
+      properties:
+        Bytes:
+          allOf:
+          - $ref: '#/components/schemas/PartBlob'
+          description: A blob that contains part of the response for your streaming
+            inference request.
+      description: A wrapper for pieces of the payload that's returned in response
+        to a streaming inference request. A streaming inference response consists
+        of one or more payload parts.
     RequestTTLSecondsHeader:
       type: integer
       minimum: 60
@@ -132,6 +887,12 @@ components:
           The stream processing failed because of an unknown error, exception or failure. Try your request again.
       description: |-
         A stream of payload parts. Each part contains a portion of the response for a streaming inference request.
+    ServiceUnavailable:
+      type: object
+      properties:
+        Message:
+          $ref: '#/components/schemas/Message'
+      description: The service is unavailable. Try your call again.
     SessionIdHeader:
       type: string
       pattern: ^[a-zA-Z0-9](-*[a-zA-Z0-9])*$
@@ -159,3 +920,9 @@ components:
       pattern: ^[a-zA-Z0-9](-*[a-zA-Z0-9])*$
       minLength: 0
       maxLength: 63
+    ValidationError:
+      type: object
+      properties:
+        Message:
+          $ref: '#/components/schemas/Message'
+      description: Inspect your request and try again.

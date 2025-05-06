@@ -7,7 +7,7 @@ info:
   x-stackql-serviceName: sso_oidc
   x-aws-serviceName: ssooidc
   x-aws-protocol: aws.protocols#restJson1
-  x-dateGenerated: '2025-05-05'
+  x-dateGenerated: '2025-05-07'
   version: '2019-06-10'
   title: AWS SSO OIDC
   description: "IAM Identity Center OpenID Connect (OIDC) is a web service that enables\
@@ -69,9 +69,219 @@ servers:
       - sa-east-1
       - me-south-1
       default: us-east-1
-paths: {}
+paths:
+  /token:
+    post:
+      operationId: CreateToken
+      description: |-
+        Creates and returns access and refresh tokens for clients that are authenticated using client secrets. The access token can be used to fetch short-lived credentials for the assigned AWS accounts or to access application APIs using `bearer` authentication.
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                clientId:
+                  $ref: '#/components/schemas/ClientId'
+                clientSecret:
+                  $ref: '#/components/schemas/ClientSecret'
+                grantType:
+                  $ref: '#/components/schemas/GrantType'
+                deviceCode:
+                  $ref: '#/components/schemas/DeviceCode'
+                code:
+                  $ref: '#/components/schemas/AuthCode'
+                refreshToken:
+                  $ref: '#/components/schemas/RefreshToken'
+                scope:
+                  $ref: '#/components/schemas/Scopes'
+                redirectUri:
+                  $ref: '#/components/schemas/URI'
+                codeVerifier:
+                  $ref: '#/components/schemas/CodeVerifier'
+      responses:
+        '200': {}
+        '400':
+          description: |-
+            Indicates that the grant type in the request is not supported by the service.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnsupportedGrantTypeException'
+        '500':
+          description: |-
+            Indicates that an error from the service occurred while trying to process a request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerException'
+        '401':
+          description: |-
+            Indicates that the `clientId` or `clientSecret` in the request is invalid. For example, this can occur when a client sends an incorrect `clientId` or an expired `clientSecret`.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InvalidClientException'
+  /token?aws_iam=t:
+    post:
+      operationId: CreateTokenWithIAM
+      description: |-
+        Creates and returns access and refresh tokens for clients and applications that are authenticated using IAM entities. The access token can be used to fetch short-lived credentials for the assigned Amazon Web Services accounts or to access application APIs using `bearer` authentication.
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                clientId:
+                  $ref: '#/components/schemas/ClientId'
+                grantType:
+                  $ref: '#/components/schemas/GrantType'
+                code:
+                  $ref: '#/components/schemas/AuthCode'
+                refreshToken:
+                  $ref: '#/components/schemas/RefreshToken'
+                assertion:
+                  $ref: '#/components/schemas/Assertion'
+                scope:
+                  $ref: '#/components/schemas/Scopes'
+                redirectUri:
+                  $ref: '#/components/schemas/URI'
+                subjectToken:
+                  $ref: '#/components/schemas/SubjectToken'
+                subjectTokenType:
+                  $ref: '#/components/schemas/TokenTypeURI'
+                requestedTokenType:
+                  $ref: '#/components/schemas/TokenTypeURI'
+                codeVerifier:
+                  $ref: '#/components/schemas/CodeVerifier'
+      responses:
+        '200': {}
+        '400':
+          description: |-
+            Indicates that the grant type in the request is not supported by the service.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnsupportedGrantTypeException'
+        '500':
+          description: |-
+            Indicates that an error from the service occurred while trying to process a request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerException'
+        '401':
+          description: |-
+            Indicates that the `clientId` or `clientSecret` in the request is invalid. For example, this can occur when a client sends an incorrect `clientId` or an expired `clientSecret`.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InvalidClientException'
+  /client/register:
+    post:
+      operationId: RegisterClient
+      description: |-
+        Registers a public client with IAM Identity Center. This allows clients to perform authorization using the authorization code grant with Proof Key for Code Exchange (PKCE) or the device code grant.
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                clientName:
+                  $ref: '#/components/schemas/ClientName'
+                clientType:
+                  $ref: '#/components/schemas/ClientType'
+                scopes:
+                  $ref: '#/components/schemas/Scopes'
+                redirectUris:
+                  $ref: '#/components/schemas/RedirectUris'
+                grantTypes:
+                  $ref: '#/components/schemas/GrantTypes'
+                issuerUrl:
+                  $ref: '#/components/schemas/URI'
+                entitledApplicationArn:
+                  $ref: '#/components/schemas/ArnType'
+      responses:
+        '200': {}
+        '500':
+          description: |-
+            Indicates that an error from the service occurred while trying to process a request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerException'
+        '400':
+          description: |-
+            Indicates that the grant type in the request is not supported by the service.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnsupportedGrantTypeException'
+  /device_authorization:
+    post:
+      operationId: StartDeviceAuthorization
+      description: |-
+        Initiates device authorization by requesting a pair of verification codes from the authorization service.
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                clientId:
+                  $ref: '#/components/schemas/ClientId'
+                clientSecret:
+                  $ref: '#/components/schemas/ClientSecret'
+                startUrl:
+                  $ref: '#/components/schemas/URI'
+      responses:
+        '200': {}
+        '500':
+          description: |-
+            Indicates that an error from the service occurred while trying to process a request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerException'
+        '401':
+          description: |-
+            Indicates that the `clientId` or `clientSecret` in the request is invalid. For example, this can occur when a client sends an incorrect `clientId` or an expired `clientSecret`.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InvalidClientException'
+        '400':
+          description: |-
+            Indicates that the client is not currently authorized to make the request. This can happen when a `clientId` is not issued for a public client.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnauthorizedClientException'
 components:
   schemas:
+    AccessDeniedException:
+      type: object
+      properties:
+        error:
+          allOf:
+          - $ref: '#/components/schemas/Error'
+          description: Single error code. For this exception the value will be `access_denied`.
+        error_description:
+          allOf:
+          - $ref: '#/components/schemas/ErrorDescription'
+          description: Human-readable text providing additional information, used
+            to assist the client developer in understanding the error that occurred.
+      description: You do not have sufficient access to perform this action.
     AccessToken:
       type: string
     ArnType:
@@ -80,6 +290,32 @@ components:
       type: string
     AuthCode:
       type: string
+    AuthorizationPendingException:
+      type: object
+      properties:
+        error:
+          allOf:
+          - $ref: '#/components/schemas/Error'
+          description: Single error code. For this exception the value will be `authorization_pending`.
+        error_description:
+          allOf:
+          - $ref: '#/components/schemas/ErrorDescription'
+          description: Human-readable text providing additional information, used
+            to assist the client developer in understanding the error that occurred.
+      description: Indicates that a request to authorize a client with an access user
+        session token is pending.
+    AwsAdditionalDetails:
+      type: object
+      properties:
+        identityContext:
+          allOf:
+          - $ref: '#/components/schemas/IdentityContext'
+          description: STS context assertion that carries a user identifier to the
+            Amazon Web Services service that it calls and can be used to obtain an
+            identity-enhanced IAM role session. This value corresponds to the `sts:identity_context`
+            claim in the ID token.
+      description: This structure contains Amazon Web Services-specific parameter
+        extensions for the token endpoint responses and includes the identity context.
     ClientId:
       type: string
     ClientName:
@@ -90,6 +326,277 @@ components:
       type: string
     CodeVerifier:
       type: string
+    CreateTokenRequest:
+      type: object
+      properties:
+        clientId:
+          allOf:
+          - $ref: '#/components/schemas/ClientId'
+          description: The unique identifier string for the client or application.
+            This value comes from the result of the RegisterClient API.
+        clientSecret:
+          allOf:
+          - $ref: '#/components/schemas/ClientSecret'
+          description: A secret string generated for the client. This value should
+            come from the persisted result of the RegisterClient API.
+        grantType:
+          allOf:
+          - $ref: '#/components/schemas/GrantType'
+          description: 'Supports the following OAuth grant types: Authorization Code,
+            Device Code, and Refresh Token. Specify one of the following values, depending
+            on the grant type that you want:
+
+
+            * Authorization Code - `authorization_code`
+
+
+            * Device Code - `urn:ietf:params:oauth:grant-type:device_code`
+
+
+            * Refresh Token - `refresh_token`'
+        deviceCode:
+          allOf:
+          - $ref: '#/components/schemas/DeviceCode'
+          description: Used only when calling this API for the Device Code grant type.
+            This short-lived code is used to identify this authorization request.
+            This comes from the result of the StartDeviceAuthorization API.
+        code:
+          allOf:
+          - $ref: '#/components/schemas/AuthCode'
+          description: Used only when calling this API for the Authorization Code
+            grant type. The short-lived code is used to identify this authorization
+            request.
+        refreshToken:
+          allOf:
+          - $ref: '#/components/schemas/RefreshToken'
+          description: 'Used only when calling this API for the Refresh Token grant
+            type. This token is used to refresh short-lived tokens, such as the access
+            token, that might expire.
+
+
+            For more information about the features and limitations of the current
+            IAM Identity Center OIDC implementation, see _Considerations for Using
+            this Guide_ in the [IAM Identity Center OIDC API Reference](https://docs.aws.amazon.com/singlesignon/latest/OIDCAPIReference/Welcome.html).'
+        scope:
+          allOf:
+          - $ref: '#/components/schemas/Scopes'
+          description: The list of scopes for which authorization is requested. The
+            access token that is issued is limited to the scopes that are granted.
+            If this value is not specified, IAM Identity Center authorizes all scopes
+            that are configured for the client during the call to RegisterClient.
+        redirectUri:
+          allOf:
+          - $ref: '#/components/schemas/URI'
+          description: Used only when calling this API for the Authorization Code
+            grant type. This value specifies the location of the client or application
+            that has registered to receive the authorization code.
+        codeVerifier:
+          allOf:
+          - $ref: '#/components/schemas/CodeVerifier'
+          description: Used only when calling this API for the Authorization Code
+            grant type. This value is generated by the client and presented to validate
+            the original code challenge value the client passed at authorization time.
+      required:
+      - clientId
+      - clientSecret
+      - grantType
+    CreateTokenResponse:
+      type: object
+      properties:
+        accessToken:
+          allOf:
+          - $ref: '#/components/schemas/AccessToken'
+          description: A bearer token to access Amazon Web Services accounts and applications
+            assigned to a user.
+        tokenType:
+          allOf:
+          - $ref: '#/components/schemas/TokenType'
+          description: Used to notify the client that the returned token is an access
+            token. The supported token type is `Bearer`.
+        expiresIn:
+          allOf:
+          - $ref: '#/components/schemas/ExpirationInSeconds'
+          description: Indicates the time in seconds when an access token will expire.
+        refreshToken:
+          allOf:
+          - $ref: '#/components/schemas/RefreshToken'
+          description: 'A token that, if present, can be used to refresh a previously
+            issued access token that might have expired.
+
+
+            For more information about the features and limitations of the current
+            IAM Identity Center OIDC implementation, see _Considerations for Using
+            this Guide_ in the [IAM Identity Center OIDC API Reference](https://docs.aws.amazon.com/singlesignon/latest/OIDCAPIReference/Welcome.html).'
+        idToken:
+          allOf:
+          - $ref: '#/components/schemas/IdToken'
+          description: 'The `idToken` is not implemented or supported. For more information
+            about the features and limitations of the current IAM Identity Center
+            OIDC implementation, see _Considerations for Using this Guide_ in the
+            [IAM Identity Center OIDC API Reference](https://docs.aws.amazon.com/singlesignon/latest/OIDCAPIReference/Welcome.html).
+
+
+            A JSON Web Token (JWT) that identifies who is associated with the issued
+            access token.'
+    CreateTokenWithIAMRequest:
+      type: object
+      properties:
+        clientId:
+          allOf:
+          - $ref: '#/components/schemas/ClientId'
+          description: The unique identifier string for the client or application.
+            This value is an application ARN that has OAuth grants configured.
+        grantType:
+          allOf:
+          - $ref: '#/components/schemas/GrantType'
+          description: 'Supports the following OAuth grant types: Authorization Code,
+            Refresh Token, JWT Bearer, and Token Exchange. Specify one of the following
+            values, depending on the grant type that you want:
+
+
+            * Authorization Code - `authorization_code`
+
+
+            * Refresh Token - `refresh_token`
+
+
+            * JWT Bearer - `urn:ietf:params:oauth:grant-type:jwt-bearer`
+
+
+            * Token Exchange - `urn:ietf:params:oauth:grant-type:token-exchange`'
+        code:
+          allOf:
+          - $ref: '#/components/schemas/AuthCode'
+          description: Used only when calling this API for the Authorization Code
+            grant type. This short-lived code is used to identify this authorization
+            request. The code is obtained through a redirect from IAM Identity Center
+            to a redirect URI persisted in the Authorization Code GrantOptions for
+            the application.
+        refreshToken:
+          allOf:
+          - $ref: '#/components/schemas/RefreshToken'
+          description: 'Used only when calling this API for the Refresh Token grant
+            type. This token is used to refresh short-lived tokens, such as the access
+            token, that might expire.
+
+
+            For more information about the features and limitations of the current
+            IAM Identity Center OIDC implementation, see _Considerations for Using
+            this Guide_ in the [IAM Identity Center OIDC API Reference](https://docs.aws.amazon.com/singlesignon/latest/OIDCAPIReference/Welcome.html).'
+        assertion:
+          allOf:
+          - $ref: '#/components/schemas/Assertion'
+          description: Used only when calling this API for the JWT Bearer grant type.
+            This value specifies the JSON Web Token (JWT) issued by a trusted token
+            issuer. To authorize a trusted token issuer, configure the JWT Bearer
+            GrantOptions for the application.
+        scope:
+          allOf:
+          - $ref: '#/components/schemas/Scopes'
+          description: 'The list of scopes for which authorization is requested. The
+            access token that is issued is limited to the scopes that are granted.
+            If the value is not specified, IAM Identity Center authorizes all scopes
+            configured for the application, including the following default scopes:
+            `openid`, `aws`, `sts:identity_context`.'
+        redirectUri:
+          allOf:
+          - $ref: '#/components/schemas/URI'
+          description: Used only when calling this API for the Authorization Code
+            grant type. This value specifies the location of the client or application
+            that has registered to receive the authorization code.
+        subjectToken:
+          allOf:
+          - $ref: '#/components/schemas/SubjectToken'
+          description: Used only when calling this API for the Token Exchange grant
+            type. This value specifies the subject of the exchange. The value of the
+            subject token must be an access token issued by IAM Identity Center to
+            a different client or application. The access token must have authorized
+            scopes that indicate the requested application as a target audience.
+        subjectTokenType:
+          allOf:
+          - $ref: '#/components/schemas/TokenTypeURI'
+          description: 'Used only when calling this API for the Token Exchange grant
+            type. This value specifies the type of token that is passed as the subject
+            of the exchange. The following value is supported:
+
+
+            * Access Token - `urn:ietf:params:oauth:token-type:access_token`'
+        requestedTokenType:
+          allOf:
+          - $ref: '#/components/schemas/TokenTypeURI'
+          description: 'Used only when calling this API for the Token Exchange grant
+            type. This value specifies the type of token that the requester can receive.
+            The following values are supported:
+
+
+            * Access Token - `urn:ietf:params:oauth:token-type:access_token`
+
+
+            * Refresh Token - `urn:ietf:params:oauth:token-type:refresh_token`'
+        codeVerifier:
+          allOf:
+          - $ref: '#/components/schemas/CodeVerifier'
+          description: Used only when calling this API for the Authorization Code
+            grant type. This value is generated by the client and presented to validate
+            the original code challenge value the client passed at authorization time.
+      required:
+      - clientId
+      - grantType
+    CreateTokenWithIAMResponse:
+      type: object
+      properties:
+        accessToken:
+          allOf:
+          - $ref: '#/components/schemas/AccessToken'
+          description: A bearer token to access Amazon Web Services accounts and applications
+            assigned to a user.
+        tokenType:
+          allOf:
+          - $ref: '#/components/schemas/TokenType'
+          description: Used to notify the requester that the returned token is an
+            access token. The supported token type is `Bearer`.
+        expiresIn:
+          allOf:
+          - $ref: '#/components/schemas/ExpirationInSeconds'
+          description: Indicates the time in seconds when an access token will expire.
+        refreshToken:
+          allOf:
+          - $ref: '#/components/schemas/RefreshToken'
+          description: 'A token that, if present, can be used to refresh a previously
+            issued access token that might have expired.
+
+
+            For more information about the features and limitations of the current
+            IAM Identity Center OIDC implementation, see _Considerations for Using
+            this Guide_ in the [IAM Identity Center OIDC API Reference](https://docs.aws.amazon.com/singlesignon/latest/OIDCAPIReference/Welcome.html).'
+        idToken:
+          allOf:
+          - $ref: '#/components/schemas/IdToken'
+          description: A JSON Web Token (JWT) that identifies the user associated
+            with the issued access token.
+        issuedTokenType:
+          allOf:
+          - $ref: '#/components/schemas/TokenTypeURI'
+          description: 'Indicates the type of tokens that are issued by IAM Identity
+            Center. The following values are supported:
+
+
+            * Access Token - `urn:ietf:params:oauth:token-type:access_token`
+
+
+            * Refresh Token - `urn:ietf:params:oauth:token-type:refresh_token`'
+        scope:
+          allOf:
+          - $ref: '#/components/schemas/Scopes'
+          description: The list of scopes for which authorization is granted. The
+            access token that is issued is limited to the scopes that are granted.
+        awsAdditionalDetails:
+          allOf:
+          - $ref: '#/components/schemas/AwsAdditionalDetails'
+          description: A structure containing information from the `idToken`. Only
+            the `identityContext` is in it, which is a value extracted from the `idToken`.
+            This provides direct access to identity information without requiring
+            JWT parsing.
     DeviceCode:
       type: string
     Error:
@@ -99,6 +606,20 @@ components:
     ExpirationInSeconds:
       type: integer
       default: 0
+    ExpiredTokenException:
+      type: object
+      properties:
+        error:
+          allOf:
+          - $ref: '#/components/schemas/Error'
+          description: Single error code. For this exception the value will be `expired_token`.
+        error_description:
+          allOf:
+          - $ref: '#/components/schemas/ErrorDescription'
+          description: Human-readable text providing additional information, used
+            to assist the client developer in understanding the error that occurred.
+      description: Indicates that the token issued by the service is expired and is
+        no longer valid.
     GrantType:
       type: string
     GrantTypes:
@@ -109,9 +630,132 @@ components:
       type: string
     IdentityContext:
       type: string
+    InternalServerException:
+      type: object
+      properties:
+        error:
+          allOf:
+          - $ref: '#/components/schemas/Error'
+          description: Single error code. For this exception the value will be `server_error`.
+        error_description:
+          allOf:
+          - $ref: '#/components/schemas/ErrorDescription'
+          description: Human-readable text providing additional information, used
+            to assist the client developer in understanding the error that occurred.
+      description: Indicates that an error from the service occurred while trying
+        to process a request.
     IntervalInSeconds:
       type: integer
       default: 0
+    InvalidClientException:
+      type: object
+      properties:
+        error:
+          allOf:
+          - $ref: '#/components/schemas/Error'
+          description: Single error code. For this exception the value will be `invalid_client`.
+        error_description:
+          allOf:
+          - $ref: '#/components/schemas/ErrorDescription'
+          description: Human-readable text providing additional information, used
+            to assist the client developer in understanding the error that occurred.
+      description: Indicates that the `clientId` or `clientSecret` in the request
+        is invalid. For example, this can occur when a client sends an incorrect `clientId`
+        or an expired `clientSecret`.
+    InvalidClientMetadataException:
+      type: object
+      properties:
+        error:
+          allOf:
+          - $ref: '#/components/schemas/Error'
+          description: Single error code. For this exception the value will be `invalid_client_metadata`.
+        error_description:
+          allOf:
+          - $ref: '#/components/schemas/ErrorDescription'
+          description: Human-readable text providing additional information, used
+            to assist the client developer in understanding the error that occurred.
+      description: Indicates that the client information sent in the request during
+        registration is invalid.
+    InvalidGrantException:
+      type: object
+      properties:
+        error:
+          allOf:
+          - $ref: '#/components/schemas/Error'
+          description: Single error code. For this exception the value will be `invalid_grant`.
+        error_description:
+          allOf:
+          - $ref: '#/components/schemas/ErrorDescription'
+          description: Human-readable text providing additional information, used
+            to assist the client developer in understanding the error that occurred.
+      description: Indicates that a request contains an invalid grant. This can occur
+        if a client makes a CreateToken request with an invalid grant type.
+    InvalidRedirectUriException:
+      type: object
+      properties:
+        error:
+          allOf:
+          - $ref: '#/components/schemas/Error'
+          description: Single error code. For this exception the value will be `invalid_redirect_uri`.
+        error_description:
+          allOf:
+          - $ref: '#/components/schemas/ErrorDescription'
+          description: Human-readable text providing additional information, used
+            to assist the client developer in understanding the error that occurred.
+      description: Indicates that one or more redirect URI in the request is not supported
+        for this operation.
+    InvalidRequestException:
+      type: object
+      properties:
+        error:
+          allOf:
+          - $ref: '#/components/schemas/Error'
+          description: Single error code. For this exception the value will be `invalid_request`.
+        error_description:
+          allOf:
+          - $ref: '#/components/schemas/ErrorDescription'
+          description: Human-readable text providing additional information, used
+            to assist the client developer in understanding the error that occurred.
+      description: Indicates that something is wrong with the input to the request.
+        For example, a required parameter might be missing or out of range.
+    InvalidRequestRegionException:
+      type: object
+      properties:
+        error:
+          allOf:
+          - $ref: '#/components/schemas/Error'
+          description: Single error code. For this exception the value will be `invalid_request`.
+        error_description:
+          allOf:
+          - $ref: '#/components/schemas/ErrorDescription'
+          description: Human-readable text providing additional information, used
+            to assist the client developer in understanding the error that occurred.
+        endpoint:
+          allOf:
+          - $ref: '#/components/schemas/Location'
+          description: Indicates the IAM Identity Center endpoint which the requester
+            may call with this token.
+        region:
+          allOf:
+          - $ref: '#/components/schemas/Region'
+          description: Indicates the region which the requester may call with this
+            token.
+      description: Indicates that a token provided as input to the request was issued
+        by and is only usable by calling IAM Identity Center endpoints in another
+        region.
+    InvalidScopeException:
+      type: object
+      properties:
+        error:
+          allOf:
+          - $ref: '#/components/schemas/Error'
+          description: Single error code. For this exception the value will be `invalid_scope`.
+        error_description:
+          allOf:
+          - $ref: '#/components/schemas/ErrorDescription'
+          description: Human-readable text providing additional information, used
+            to assist the client developer in understanding the error that occurred.
+      description: Indicates that the scope provided in the request is invalid.
     Location:
       type: string
     LongTimeStampType:
@@ -126,12 +770,170 @@ components:
       type: string
     Region:
       type: string
+    RegisterClientRequest:
+      type: object
+      properties:
+        clientName:
+          allOf:
+          - $ref: '#/components/schemas/ClientName'
+          description: The friendly name of the client.
+        clientType:
+          allOf:
+          - $ref: '#/components/schemas/ClientType'
+          description: The type of client. The service supports only `public` as a
+            client type. Anything other than public will be rejected by the service.
+        scopes:
+          allOf:
+          - $ref: '#/components/schemas/Scopes'
+          description: The list of scopes that are defined by the client. Upon authorization,
+            this list is used to restrict permissions when granting an access token.
+        redirectUris:
+          allOf:
+          - $ref: '#/components/schemas/RedirectUris'
+          description: The list of redirect URI that are defined by the client. At
+            completion of authorization, this list is used to restrict what locations
+            the user agent can be redirected back to.
+        grantTypes:
+          allOf:
+          - $ref: '#/components/schemas/GrantTypes'
+          description: 'The list of OAuth 2.0 grant types that are defined by the
+            client. This list is used to restrict the token granting flows available
+            to the client. Supports the following OAuth 2.0 grant types: Authorization
+            Code, Device Code, and Refresh Token.
+
+
+            * Authorization Code - `authorization_code`
+
+
+            * Device Code - `urn:ietf:params:oauth:grant-type:device_code`
+
+
+            * Refresh Token - `refresh_token`'
+        issuerUrl:
+          allOf:
+          - $ref: '#/components/schemas/URI'
+          description: The IAM Identity Center Issuer URL associated with an instance
+            of IAM Identity Center. This value is needed for user access to resources
+            through the client.
+        entitledApplicationArn:
+          allOf:
+          - $ref: '#/components/schemas/ArnType'
+          description: This IAM Identity Center application ARN is used to define
+            administrator-managed configuration for public client access to resources.
+            At authorization, the scopes, grants, and redirect URI available to this
+            client will be restricted by this application resource.
+      required:
+      - clientName
+      - clientType
+    RegisterClientResponse:
+      type: object
+      properties:
+        clientId:
+          allOf:
+          - $ref: '#/components/schemas/ClientId'
+          description: The unique identifier string for each client. This client uses
+            this identifier to get authenticated by the service in subsequent calls.
+        clientSecret:
+          allOf:
+          - $ref: '#/components/schemas/ClientSecret'
+          description: A secret string generated for the client. The client will use
+            this string to get authenticated by the service in subsequent calls.
+        clientIdIssuedAt:
+          allOf:
+          - $ref: '#/components/schemas/LongTimeStampType'
+          description: Indicates the time at which the `clientId` and `clientSecret`
+            were issued.
+        clientSecretExpiresAt:
+          allOf:
+          - $ref: '#/components/schemas/LongTimeStampType'
+          description: Indicates the time at which the `clientId` and `clientSecret`
+            will become invalid.
+        authorizationEndpoint:
+          allOf:
+          - $ref: '#/components/schemas/URI'
+          description: An endpoint that the client can use to request authorization.
+        tokenEndpoint:
+          allOf:
+          - $ref: '#/components/schemas/URI'
+          description: An endpoint that the client can use to create tokens.
     Scope:
       type: string
     Scopes:
       type: array
       items:
         $ref: '#/components/schemas/Scope'
+    SlowDownException:
+      type: object
+      properties:
+        error:
+          allOf:
+          - $ref: '#/components/schemas/Error'
+          description: Single error code. For this exception the value will be `slow_down`.
+        error_description:
+          allOf:
+          - $ref: '#/components/schemas/ErrorDescription'
+          description: Human-readable text providing additional information, used
+            to assist the client developer in understanding the error that occurred.
+      description: Indicates that the client is making the request too frequently
+        and is more than the service can handle.
+    StartDeviceAuthorizationRequest:
+      type: object
+      properties:
+        clientId:
+          allOf:
+          - $ref: '#/components/schemas/ClientId'
+          description: The unique identifier string for the client that is registered
+            with IAM Identity Center. This value should come from the persisted result
+            of the RegisterClient API operation.
+        clientSecret:
+          allOf:
+          - $ref: '#/components/schemas/ClientSecret'
+          description: A secret string that is generated for the client. This value
+            should come from the persisted result of the RegisterClient API operation.
+        startUrl:
+          allOf:
+          - $ref: '#/components/schemas/URI'
+          description: The URL for the Amazon Web Services access portal. For more
+            information, see [Using the Amazon Web Services access portal](https://docs.aws.amazon.com/singlesignon/latest/userguide/using-the-portal.html)
+            in the _IAM Identity Center User Guide_.
+      required:
+      - clientId
+      - clientSecret
+      - startUrl
+    StartDeviceAuthorizationResponse:
+      type: object
+      properties:
+        deviceCode:
+          allOf:
+          - $ref: '#/components/schemas/DeviceCode'
+          description: The short-lived code that is used by the device when polling
+            for a session token.
+        userCode:
+          allOf:
+          - $ref: '#/components/schemas/UserCode'
+          description: A one-time user verification code. This is needed to authorize
+            an in-use device.
+        verificationUri:
+          allOf:
+          - $ref: '#/components/schemas/URI'
+          description: The URI of the verification page that takes the `userCode`
+            to authorize the device.
+        verificationUriComplete:
+          allOf:
+          - $ref: '#/components/schemas/URI'
+          description: An alternate URL that the client can use to automatically launch
+            a browser. This process skips the manual step in which the user visits
+            the verification page and enters their code.
+        expiresIn:
+          allOf:
+          - $ref: '#/components/schemas/ExpirationInSeconds'
+          description: Indicates the number of seconds in which the verification code
+            will become invalid.
+        interval:
+          allOf:
+          - $ref: '#/components/schemas/IntervalInSeconds'
+          description: Indicates the number of seconds the client must wait between
+            attempts when polling for a session.
     SubjectToken:
       type: string
     TokenType:
@@ -140,5 +942,33 @@ components:
       type: string
     URI:
       type: string
+    UnauthorizedClientException:
+      type: object
+      properties:
+        error:
+          allOf:
+          - $ref: '#/components/schemas/Error'
+          description: Single error code. For this exception the value will be `unauthorized_client`.
+        error_description:
+          allOf:
+          - $ref: '#/components/schemas/ErrorDescription'
+          description: Human-readable text providing additional information, used
+            to assist the client developer in understanding the error that occurred.
+      description: Indicates that the client is not currently authorized to make the
+        request. This can happen when a `clientId` is not issued for a public client.
+    UnsupportedGrantTypeException:
+      type: object
+      properties:
+        error:
+          allOf:
+          - $ref: '#/components/schemas/Error'
+          description: Single error code. For this exception the value will be `unsupported_grant_type`.
+        error_description:
+          allOf:
+          - $ref: '#/components/schemas/ErrorDescription'
+          description: Human-readable text providing additional information, used
+            to assist the client developer in understanding the error that occurred.
+      description: Indicates that the grant type in the request is not supported by
+        the service.
     UserCode:
       type: string

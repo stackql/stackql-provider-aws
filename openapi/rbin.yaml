@@ -7,7 +7,7 @@ info:
   x-stackql-serviceName: rbin
   x-aws-serviceName: rbin
   x-aws-protocol: aws.protocols#restJson1
-  x-dateGenerated: '2025-05-05'
+  x-dateGenerated: '2025-05-07'
   version: '2021-06-15'
   title: Amazon Recycle Bin
   description: |-
@@ -47,13 +47,603 @@ servers:
       - sa-east-1
       - me-south-1
       default: us-east-1
-paths: {}
+paths:
+  /rules:
+    post:
+      operationId: CreateRule
+      description: |-
+        Creates a Recycle Bin retention rule. You can create two types of retention rules:
+
+          * **Tag-level retention rules** \- These retention rules use resource tags to identify the resources to protect. For each retention rule, you specify one or more tag key and value pairs. Resources (of the specified type) that have at least one of these tag key and value pairs are automatically retained in the Recycle Bin upon deletion. Use this type of retention rule to protect specific resources in your account based on their tags.
+
+          * **Region-level retention rules** \- These retention rules, by default, apply to all of the resources (of the specified type) in the Region, even if the resources are not tagged. However, you can specify exclusion tags to exclude resources that have specific tags. Use this type of retention rule to protect all resources of a specific type in a Region.
+
+        For more information, see [ Create Recycle Bin retention rules](https://docs.aws.amazon.com/ebs/latest/userguide/recycle-bin.html) in the _Amazon EBS User Guide_.
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                RetentionPeriod:
+                  $ref: '#/components/schemas/RetentionPeriod'
+                Description:
+                  $ref: '#/components/schemas/Description'
+                Tags:
+                  $ref: '#/components/schemas/TagList'
+                ResourceType:
+                  $ref: '#/components/schemas/ResourceType'
+                ResourceTags:
+                  $ref: '#/components/schemas/ResourceTags'
+                LockConfiguration:
+                  $ref: '#/components/schemas/LockConfiguration'
+                ExcludeResourceTags:
+                  $ref: '#/components/schemas/ExcludeResourceTags'
+      responses:
+        '201': {}
+        '500':
+          description: |-
+            The service could not respond to the request due to an internal problem.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerException'
+        '402':
+          description: |-
+            The request would cause a service quota for the number of tags per resource to be exceeded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServiceQuotaExceededException'
+        '400':
+          description: |-
+            One or more of the parameters in the request is not valid.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+  /rules/{Identifier}:
+    delete:
+      operationId: DeleteRule
+      description: |-
+        Deletes a Recycle Bin retention rule. For more information, see [ Delete Recycle Bin retention rules](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/recycle-bin-working-with-rules.html#recycle-bin-delete-rule) in the _Amazon Elastic Compute Cloud User Guide_.
+      parameters:
+      - name: Identifier
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/RuleIdentifier'
+      responses:
+        '204': {}
+        '409':
+          description: |-
+            The specified retention rule lock request can't be completed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConflictException'
+        '500':
+          description: |-
+            The service could not respond to the request due to an internal problem.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerException'
+        '404':
+          description: |-
+            The specified resource was not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+        '400':
+          description: |-
+            One or more of the parameters in the request is not valid.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+    get:
+      operationId: GetRule
+      description: |-
+        Gets information about a Recycle Bin retention rule.
+      parameters:
+      - name: Identifier
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/RuleIdentifier'
+      responses:
+        '200': {}
+        '500':
+          description: |-
+            The service could not respond to the request due to an internal problem.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerException'
+        '404':
+          description: |-
+            The specified resource was not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+        '400':
+          description: |-
+            One or more of the parameters in the request is not valid.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+    patch:
+      operationId: UpdateRule
+      description: |-
+        Updates an existing Recycle Bin retention rule. You can update a retention rule's description, resource tags, and retention period at any time after creation. You can't update a retention rule's resource type after creation. For more information, see [ Update Recycle Bin retention rules](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/recycle-bin-working-with-rules.html#recycle-bin-update-rule) in the _Amazon Elastic Compute Cloud User Guide_.
+      parameters:
+      - name: Identifier
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/RuleIdentifier'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                RetentionPeriod:
+                  $ref: '#/components/schemas/RetentionPeriod'
+                Description:
+                  $ref: '#/components/schemas/Description'
+                ResourceType:
+                  $ref: '#/components/schemas/ResourceType'
+                ResourceTags:
+                  $ref: '#/components/schemas/ResourceTags'
+                ExcludeResourceTags:
+                  $ref: '#/components/schemas/ExcludeResourceTags'
+      responses:
+        '200': {}
+        '409':
+          description: |-
+            The specified retention rule lock request can't be completed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConflictException'
+        '500':
+          description: |-
+            The service could not respond to the request due to an internal problem.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerException'
+        '404':
+          description: |-
+            The specified resource was not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+        '402':
+          description: |-
+            The request would cause a service quota for the number of tags per resource to be exceeded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServiceQuotaExceededException'
+        '400':
+          description: |-
+            One or more of the parameters in the request is not valid.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+  /list-rules:
+    post:
+      operationId: ListRules
+      description: |-
+        Lists the Recycle Bin retention rules in the Region.
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                MaxResults:
+                  $ref: '#/components/schemas/MaxResults'
+                NextToken:
+                  $ref: '#/components/schemas/NextToken'
+                ResourceType:
+                  $ref: '#/components/schemas/ResourceType'
+                ResourceTags:
+                  $ref: '#/components/schemas/ResourceTags'
+                LockState:
+                  $ref: '#/components/schemas/LockState'
+                ExcludeResourceTags:
+                  $ref: '#/components/schemas/ExcludeResourceTags'
+      responses:
+        '200': {}
+        '500':
+          description: |-
+            The service could not respond to the request due to an internal problem.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerException'
+        '400':
+          description: |-
+            One or more of the parameters in the request is not valid.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+  /tags/{ResourceArn}:
+    get:
+      operationId: ListTagsForResource
+      description: |-
+        Lists the tags assigned to a retention rule.
+      parameters:
+      - name: ResourceArn
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/RuleArn'
+      responses:
+        '200': {}
+        '500':
+          description: |-
+            The service could not respond to the request due to an internal problem.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerException'
+        '404':
+          description: |-
+            The specified resource was not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+        '400':
+          description: |-
+            One or more of the parameters in the request is not valid.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+    post:
+      operationId: TagResource
+      description: |-
+        Assigns tags to the specified retention rule.
+      parameters:
+      - name: ResourceArn
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/RuleArn'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                Tags:
+                  $ref: '#/components/schemas/TagList'
+      responses:
+        '201': {}
+        '500':
+          description: |-
+            The service could not respond to the request due to an internal problem.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerException'
+        '404':
+          description: |-
+            The specified resource was not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+        '402':
+          description: |-
+            The request would cause a service quota for the number of tags per resource to be exceeded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServiceQuotaExceededException'
+        '400':
+          description: |-
+            One or more of the parameters in the request is not valid.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+    delete:
+      operationId: UntagResource
+      description: |-
+        Unassigns a tag from a retention rule.
+      parameters:
+      - name: ResourceArn
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/RuleArn'
+      - name: tagKeys
+        in: query
+        required: true
+        schema:
+          $ref: '#/components/schemas/TagKeyList'
+      responses:
+        '204': {}
+        '500':
+          description: |-
+            The service could not respond to the request due to an internal problem.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerException'
+        '404':
+          description: |-
+            The specified resource was not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+        '400':
+          description: |-
+            One or more of the parameters in the request is not valid.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+  /rules/{Identifier}/lock:
+    patch:
+      operationId: LockRule
+      description: |-
+        Locks a Region-level retention rule. A locked retention rule can't be modified or deleted.
+
+        You can't lock tag-level retention rules, or Region-level retention rules that have exclusion tags.
+      parameters:
+      - name: Identifier
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/RuleIdentifier'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                LockConfiguration:
+                  $ref: '#/components/schemas/LockConfiguration'
+      responses:
+        '200': {}
+        '409':
+          description: |-
+            The specified retention rule lock request can't be completed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConflictException'
+        '500':
+          description: |-
+            The service could not respond to the request due to an internal problem.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerException'
+        '404':
+          description: |-
+            The specified resource was not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+        '400':
+          description: |-
+            One or more of the parameters in the request is not valid.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+  /rules/{Identifier}/unlock:
+    patch:
+      operationId: UnlockRule
+      description: |-
+        Unlocks a retention rule. After a retention rule is unlocked, it can be modified or deleted only after the unlock delay period expires.
+      parameters:
+      - name: Identifier
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/RuleIdentifier'
+      responses:
+        '200': {}
+        '409':
+          description: |-
+            The specified retention rule lock request can't be completed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConflictException'
+        '500':
+          description: |-
+            The service could not respond to the request due to an internal problem.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerException'
+        '404':
+          description: |-
+            The specified resource was not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+        '400':
+          description: |-
+            One or more of the parameters in the request is not valid.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
 components:
   schemas:
+    ConflictException:
+      type: object
+      properties:
+        Message:
+          $ref: '#/components/schemas/ErrorMessage'
+        Reason:
+          allOf:
+          - $ref: '#/components/schemas/ConflictExceptionReason'
+          description: The reason for the exception.
+      description: The specified retention rule lock request can't be completed.
     ConflictExceptionReason:
       type: string
       enum:
       - INVALID_RULE_STATE
+    CreateRuleRequest:
+      type: object
+      properties:
+        RetentionPeriod:
+          allOf:
+          - $ref: '#/components/schemas/RetentionPeriod'
+          description: Information about the retention period for which the retention
+            rule is to retain resources.
+        Description:
+          allOf:
+          - $ref: '#/components/schemas/Description'
+          description: The retention rule description.
+        Tags:
+          allOf:
+          - $ref: '#/components/schemas/TagList'
+          description: Information about the tags to assign to the retention rule.
+        ResourceType:
+          allOf:
+          - $ref: '#/components/schemas/ResourceType'
+          description: The resource type to be retained by the retention rule. Currently,
+            only Amazon EBS snapshots and EBS-backed AMIs are supported. To retain
+            snapshots, specify `EBS_SNAPSHOT`. To retain EBS-backed AMIs, specify
+            `EC2_IMAGE`.
+        ResourceTags:
+          allOf:
+          - $ref: '#/components/schemas/ResourceTags'
+          description: '[Tag-level retention rules only] Specifies the resource tags
+            to use to identify resources that are to be retained by a tag-level retention
+            rule. For tag-level retention rules, only deleted resources, of the specified
+            resource type, that have one or more of the specified tag key and value
+            pairs are retained. If a resource is deleted, but it does not have any
+            of the specified tag key and value pairs, it is immediately deleted without
+            being retained by the retention rule.
+
+
+            You can add the same tag key and value pair to a maximum or five retention
+            rules.
+
+
+            To create a Region-level retention rule, omit this parameter. A Region-level
+            retention rule does not have any resource tags specified. It retains all
+            deleted resources of the specified resource type in the Region in which
+            the rule is created, even if the resources are not tagged.'
+        LockConfiguration:
+          allOf:
+          - $ref: '#/components/schemas/LockConfiguration'
+          description: Information about the retention rule lock configuration.
+        ExcludeResourceTags:
+          allOf:
+          - $ref: '#/components/schemas/ExcludeResourceTags'
+          description: '[Region-level retention rules only] Specifies the exclusion
+            tags to use to identify resources that are to be excluded, or ignored,
+            by a Region-level retention rule. Resources that have any of these tags
+            are not retained by the retention rule upon deletion.
+
+
+            You can''t specify exclusion tags for tag-level retention rules.'
+      required:
+      - RetentionPeriod
+      - ResourceType
+    CreateRuleResponse:
+      type: object
+      properties:
+        Identifier:
+          allOf:
+          - $ref: '#/components/schemas/RuleIdentifier'
+          description: The unique ID of the retention rule.
+        RetentionPeriod:
+          $ref: '#/components/schemas/RetentionPeriod'
+        Description:
+          allOf:
+          - $ref: '#/components/schemas/Description'
+          description: The retention rule description.
+        Tags:
+          allOf:
+          - $ref: '#/components/schemas/TagList'
+          description: Information about the tags assigned to the retention rule.
+        ResourceType:
+          allOf:
+          - $ref: '#/components/schemas/ResourceType'
+          description: The resource type retained by the retention rule.
+        ResourceTags:
+          allOf:
+          - $ref: '#/components/schemas/ResourceTags'
+          description: '[Tag-level retention rules only] Information about the resource
+            tags used to identify resources that are retained by the retention rule.'
+        Status:
+          allOf:
+          - $ref: '#/components/schemas/RuleStatus'
+          description: The state of the retention rule. Only retention rules that
+            are in the `available` state retain resources.
+        LockConfiguration:
+          allOf:
+          - $ref: '#/components/schemas/LockConfiguration'
+          description: Information about the retention rule lock configuration.
+        LockState:
+          allOf:
+          - $ref: '#/components/schemas/LockState'
+          description: "[Region-level retention rules only] The lock state for the\
+            \ retention rule.\n\n  * `locked` \\- The retention rule is locked and\
+            \ can't be modified or deleted.\n\n  * `pending_unlock` \\- The retention\
+            \ rule has been unlocked but it is still within the unlock delay period.\
+            \ The retention rule can be modified or deleted only after the unlock\
+            \ delay period has expired.\n\n  * `unlocked` \\- The retention rule is\
+            \ unlocked and it can be modified or deleted by any user with the required\
+            \ permissions.\n\n  * `null` \\- The retention rule has never been locked.\
+            \ Once a retention rule has been locked, it can transition between the\
+            \ `locked` and `unlocked` states only; it can never transition back to\
+            \ `null`."
+        RuleArn:
+          allOf:
+          - $ref: '#/components/schemas/RuleArn'
+          description: The Amazon Resource Name (ARN) of the retention rule.
+        ExcludeResourceTags:
+          allOf:
+          - $ref: '#/components/schemas/ExcludeResourceTags'
+          description: '[Region-level retention rules only] Information about the
+            exclusion tags used to identify resources that are to be excluded, or
+            ignored, by the retention rule.'
+    DeleteRuleRequest:
+      type: object
+      properties:
+        Identifier:
+          allOf:
+          - $ref: '#/components/schemas/RuleIdentifier'
+          description: The unique ID of the retention rule.
+      required:
+      - Identifier
+    DeleteRuleResponse:
+      type: object
+      properties: {}
     Description:
       type: string
       pattern: ^[\S ]{0,255}$
@@ -63,6 +653,232 @@ components:
       type: array
       items:
         $ref: '#/components/schemas/ResourceTag'
+    GetRuleRequest:
+      type: object
+      properties:
+        Identifier:
+          allOf:
+          - $ref: '#/components/schemas/RuleIdentifier'
+          description: The unique ID of the retention rule.
+      required:
+      - Identifier
+    GetRuleResponse:
+      type: object
+      properties:
+        Identifier:
+          allOf:
+          - $ref: '#/components/schemas/RuleIdentifier'
+          description: The unique ID of the retention rule.
+        Description:
+          allOf:
+          - $ref: '#/components/schemas/Description'
+          description: The retention rule description.
+        ResourceType:
+          allOf:
+          - $ref: '#/components/schemas/ResourceType'
+          description: The resource type retained by the retention rule.
+        RetentionPeriod:
+          allOf:
+          - $ref: '#/components/schemas/RetentionPeriod'
+          description: Information about the retention period for which the retention
+            rule is to retain resources.
+        ResourceTags:
+          allOf:
+          - $ref: '#/components/schemas/ResourceTags'
+          description: '[Tag-level retention rules only] Information about the resource
+            tags used to identify resources that are retained by the retention rule.'
+        Status:
+          allOf:
+          - $ref: '#/components/schemas/RuleStatus'
+          description: The state of the retention rule. Only retention rules that
+            are in the `available` state retain resources.
+        LockConfiguration:
+          allOf:
+          - $ref: '#/components/schemas/LockConfiguration'
+          description: Information about the retention rule lock configuration.
+        LockState:
+          allOf:
+          - $ref: '#/components/schemas/LockState'
+          description: "[Region-level retention rules only] The lock state for the\
+            \ retention rule.\n\n  * `locked` \\- The retention rule is locked and\
+            \ can't be modified or deleted.\n\n  * `pending_unlock` \\- The retention\
+            \ rule has been unlocked but it is still within the unlock delay period.\
+            \ The retention rule can be modified or deleted only after the unlock\
+            \ delay period has expired.\n\n  * `unlocked` \\- The retention rule is\
+            \ unlocked and it can be modified or deleted by any user with the required\
+            \ permissions.\n\n  * `null` \\- The retention rule has never been locked.\
+            \ Once a retention rule has been locked, it can transition between the\
+            \ `locked` and `unlocked` states only; it can never transition back to\
+            \ `null`."
+        LockEndTime:
+          allOf:
+          - $ref: '#/components/schemas/TimeStamp'
+          description: The date and time at which the unlock delay is set to expire.
+            Only returned for retention rules that have been unlocked and that are
+            still within the unlock delay period.
+        RuleArn:
+          allOf:
+          - $ref: '#/components/schemas/RuleArn'
+          description: The Amazon Resource Name (ARN) of the retention rule.
+        ExcludeResourceTags:
+          allOf:
+          - $ref: '#/components/schemas/ExcludeResourceTags'
+          description: '[Region-level retention rules only] Information about the
+            exclusion tags used to identify resources that are to be excluded, or
+            ignored, by the retention rule.'
+    InternalServerException:
+      type: object
+      properties:
+        Message:
+          $ref: '#/components/schemas/ErrorMessage'
+      description: The service could not respond to the request due to an internal
+        problem.
+    ListRulesRequest:
+      type: object
+      properties:
+        MaxResults:
+          allOf:
+          - $ref: '#/components/schemas/MaxResults'
+          description: The maximum number of results to return with a single call.
+            To retrieve the remaining results, make another call with the returned
+            `NextToken` value.
+        NextToken:
+          allOf:
+          - $ref: '#/components/schemas/NextToken'
+          description: The token for the next page of results.
+        ResourceType:
+          allOf:
+          - $ref: '#/components/schemas/ResourceType'
+          description: The resource type retained by the retention rule. Only retention
+            rules that retain the specified resource type are listed. Currently, only
+            Amazon EBS snapshots and EBS-backed AMIs are supported. To list retention
+            rules that retain snapshots, specify `EBS_SNAPSHOT`. To list retention
+            rules that retain EBS-backed AMIs, specify `EC2_IMAGE`.
+        ResourceTags:
+          allOf:
+          - $ref: '#/components/schemas/ResourceTags'
+          description: '[Tag-level retention rules only] Information about the resource
+            tags used to identify resources that are retained by the retention rule.'
+        LockState:
+          allOf:
+          - $ref: '#/components/schemas/LockState'
+          description: The lock state of the retention rules to list. Only retention
+            rules with the specified lock state are returned.
+        ExcludeResourceTags:
+          allOf:
+          - $ref: '#/components/schemas/ExcludeResourceTags'
+          description: '[Region-level retention rules only] Information about the
+            exclusion tags used to identify resources that are to be excluded, or
+            ignored, by the retention rule.'
+      required:
+      - ResourceType
+    ListRulesResponse:
+      type: object
+      properties:
+        Rules:
+          allOf:
+          - $ref: '#/components/schemas/RuleSummaryList'
+          description: Information about the retention rules.
+        NextToken:
+          allOf:
+          - $ref: '#/components/schemas/NextToken'
+          description: The token to use to retrieve the next page of results. This
+            value is `null` when there are no more results to return.
+    ListTagsForResourceRequest:
+      type: object
+      properties:
+        ResourceArn:
+          allOf:
+          - $ref: '#/components/schemas/RuleArn'
+          description: The Amazon Resource Name (ARN) of the retention rule.
+      required:
+      - ResourceArn
+    ListTagsForResourceResponse:
+      type: object
+      properties:
+        Tags:
+          allOf:
+          - $ref: '#/components/schemas/TagList'
+          description: Information about the tags assigned to the retention rule.
+    LockConfiguration:
+      type: object
+      properties:
+        UnlockDelay:
+          allOf:
+          - $ref: '#/components/schemas/UnlockDelay'
+          description: Information about the retention rule unlock delay.
+      required:
+      - UnlockDelay
+      description: Information about a retention rule lock configuration.
+    LockRuleRequest:
+      type: object
+      properties:
+        Identifier:
+          allOf:
+          - $ref: '#/components/schemas/RuleIdentifier'
+          description: The unique ID of the retention rule.
+        LockConfiguration:
+          allOf:
+          - $ref: '#/components/schemas/LockConfiguration'
+          description: Information about the retention rule lock configuration.
+      required:
+      - Identifier
+      - LockConfiguration
+    LockRuleResponse:
+      type: object
+      properties:
+        Identifier:
+          allOf:
+          - $ref: '#/components/schemas/RuleIdentifier'
+          description: The unique ID of the retention rule.
+        Description:
+          allOf:
+          - $ref: '#/components/schemas/Description'
+          description: The retention rule description.
+        ResourceType:
+          allOf:
+          - $ref: '#/components/schemas/ResourceType'
+          description: The resource type retained by the retention rule.
+        RetentionPeriod:
+          $ref: '#/components/schemas/RetentionPeriod'
+        ResourceTags:
+          allOf:
+          - $ref: '#/components/schemas/ResourceTags'
+          description: '[Tag-level retention rules only] Information about the resource
+            tags used to identify resources that are retained by the retention rule.'
+        Status:
+          allOf:
+          - $ref: '#/components/schemas/RuleStatus'
+          description: The state of the retention rule. Only retention rules that
+            are in the `available` state retain resources.
+        LockConfiguration:
+          allOf:
+          - $ref: '#/components/schemas/LockConfiguration'
+          description: Information about the retention rule lock configuration.
+        LockState:
+          allOf:
+          - $ref: '#/components/schemas/LockState'
+          description: "[Region-level retention rules only] The lock state for the\
+            \ retention rule.\n\n  * `locked` \\- The retention rule is locked and\
+            \ can't be modified or deleted.\n\n  * `pending_unlock` \\- The retention\
+            \ rule has been unlocked but it is still within the unlock delay period.\
+            \ The retention rule can be modified or deleted only after the unlock\
+            \ delay period has expired.\n\n  * `unlocked` \\- The retention rule is\
+            \ unlocked and it can be modified or deleted by any user with the required\
+            \ permissions.\n\n  * `null` \\- The retention rule has never been locked.\
+            \ Once a retention rule has been locked, it can transition between the\
+            \ `locked` and `unlocked` states only; it can never transition back to\
+            \ `null`."
+        RuleArn:
+          allOf:
+          - $ref: '#/components/schemas/RuleArn'
+          description: The Amazon Resource Name (ARN) of the retention rule.
+        ExcludeResourceTags:
+          allOf:
+          - $ref: '#/components/schemas/ExcludeResourceTags'
+          description: '[Region-level retention rules only] Information about the
+            exclusion tags used to identify resources that are to be excluded, or
+            ignored, by the retention rule.'
     LockState:
       type: string
       enum:
@@ -76,10 +892,35 @@ components:
     NextToken:
       type: string
       pattern: ^[A-Za-z0-9+/=]{1,2048}$
+    ResourceNotFoundException:
+      type: object
+      properties:
+        Message:
+          $ref: '#/components/schemas/ErrorMessage'
+        Reason:
+          allOf:
+          - $ref: '#/components/schemas/ResourceNotFoundExceptionReason'
+          description: The reason for the exception.
+      description: The specified resource was not found.
     ResourceNotFoundExceptionReason:
       type: string
       enum:
       - RULE_NOT_FOUND
+    ResourceTag:
+      type: object
+      properties:
+        ResourceTagKey:
+          allOf:
+          - $ref: '#/components/schemas/ResourceTagKey'
+          description: The tag key.
+        ResourceTagValue:
+          allOf:
+          - $ref: '#/components/schemas/ResourceTagValue'
+          description: The tag value.
+      required:
+      - ResourceTagKey
+      description: '[Tag-level retention rules only] Information about the resource
+        tags used to identify resources that are retained by the retention rule.'
     ResourceTagKey:
       type: string
       pattern: ^[\S\s]{1,128}$
@@ -95,6 +936,24 @@ components:
       enum:
       - EBS_SNAPSHOT
       - EC2_IMAGE
+    RetentionPeriod:
+      type: object
+      properties:
+        RetentionPeriodValue:
+          allOf:
+          - $ref: '#/components/schemas/RetentionPeriodValue'
+          description: The period value for which the retention rule is to retain
+            resources. The period is measured using the unit specified for **RetentionPeriodUnit**.
+        RetentionPeriodUnit:
+          allOf:
+          - $ref: '#/components/schemas/RetentionPeriodUnit'
+          description: The unit of time in which the retention period is measured.
+            Currently, only `DAYS` is supported.
+      required:
+      - RetentionPeriodValue
+      - RetentionPeriodUnit
+      description: Information about the retention period for which the retention
+        rule is to retain resources.
     RetentionPeriodUnit:
       type: string
       enum:
@@ -116,14 +975,75 @@ components:
       enum:
       - pending
       - available
+    RuleSummary:
+      type: object
+      properties:
+        Identifier:
+          allOf:
+          - $ref: '#/components/schemas/RuleIdentifier'
+          description: The unique ID of the retention rule.
+        Description:
+          allOf:
+          - $ref: '#/components/schemas/Description'
+          description: The retention rule description.
+        RetentionPeriod:
+          allOf:
+          - $ref: '#/components/schemas/RetentionPeriod'
+          description: Information about the retention period for which the retention
+            rule is to retain resources.
+        LockState:
+          allOf:
+          - $ref: '#/components/schemas/LockState'
+          description: "[Region-level retention rules only] The lock state for the\
+            \ retention rule.\n\n  * `locked` \\- The retention rule is locked and\
+            \ can't be modified or deleted.\n\n  * `pending_unlock` \\- The retention\
+            \ rule has been unlocked but it is still within the unlock delay period.\
+            \ The retention rule can be modified or deleted only after the unlock\
+            \ delay period has expired.\n\n  * `unlocked` \\- The retention rule is\
+            \ unlocked and it can be modified or deleted by any user with the required\
+            \ permissions.\n\n  * `null` \\- The retention rule has never been locked.\
+            \ Once a retention rule has been locked, it can transition between the\
+            \ `locked` and `unlocked` states only; it can never transition back to\
+            \ `null`."
+        RuleArn:
+          allOf:
+          - $ref: '#/components/schemas/RuleArn'
+          description: The Amazon Resource Name (ARN) of the retention rule.
+      description: Information about a Recycle Bin retention rule.
     RuleSummaryList:
       type: array
       items:
         $ref: '#/components/schemas/RuleSummary'
+    ServiceQuotaExceededException:
+      type: object
+      properties:
+        Message:
+          $ref: '#/components/schemas/ErrorMessage'
+        Reason:
+          allOf:
+          - $ref: '#/components/schemas/ServiceQuotaExceededExceptionReason'
+          description: The reason for the exception.
+      description: The request would cause a service quota for the number of tags
+        per resource to be exceeded.
     ServiceQuotaExceededExceptionReason:
       type: string
       enum:
       - SERVICE_QUOTA_EXCEEDED
+    Tag:
+      type: object
+      properties:
+        Key:
+          allOf:
+          - $ref: '#/components/schemas/TagKey'
+          description: The tag key.
+        Value:
+          allOf:
+          - $ref: '#/components/schemas/TagValue'
+          description: The tag value.
+      required:
+      - Key
+      - Value
+      description: Information about the tags to assign to the retention rule.
     TagKey:
       type: string
       pattern: ^([\p{L}\p{Z}\p{N}_.:/=+\-@]*)$
@@ -137,6 +1057,23 @@ components:
       type: array
       items:
         $ref: '#/components/schemas/Tag'
+    TagResourceRequest:
+      type: object
+      properties:
+        ResourceArn:
+          allOf:
+          - $ref: '#/components/schemas/RuleArn'
+          description: The Amazon Resource Name (ARN) of the retention rule.
+        Tags:
+          allOf:
+          - $ref: '#/components/schemas/TagList'
+          description: Information about the tags to assign to the retention rule.
+      required:
+      - ResourceArn
+      - Tags
+    TagResourceResponse:
+      type: object
+      properties: {}
     TagValue:
       type: string
       pattern: ^([\p{L}\p{Z}\p{N}_.:/=+\-@]*)$
@@ -145,6 +1082,26 @@ components:
     TimeStamp:
       type: string
       format: date-time
+    UnlockDelay:
+      type: object
+      properties:
+        UnlockDelayValue:
+          allOf:
+          - $ref: '#/components/schemas/UnlockDelayValue'
+          description: The unlock delay period, measured in the unit specified for
+            **UnlockDelayUnit**.
+        UnlockDelayUnit:
+          allOf:
+          - $ref: '#/components/schemas/UnlockDelayUnit'
+          description: The unit of time in which to measure the unlock delay. Currently,
+            the unlock delay can be measure only in days.
+      required:
+      - UnlockDelayValue
+      - UnlockDelayUnit
+      description: Information about the retention rule unlock delay. The unlock delay
+        is the period after which a retention rule can be modified or edited after
+        it has been unlocked by a user with the required permissions. The retention
+        rule can't be modified or deleted during the unlock delay.
     UnlockDelayUnit:
       type: string
       enum:
@@ -153,6 +1110,214 @@ components:
       type: integer
       minimum: 7
       maximum: 30
+    UnlockRuleRequest:
+      type: object
+      properties:
+        Identifier:
+          allOf:
+          - $ref: '#/components/schemas/RuleIdentifier'
+          description: The unique ID of the retention rule.
+      required:
+      - Identifier
+    UnlockRuleResponse:
+      type: object
+      properties:
+        Identifier:
+          allOf:
+          - $ref: '#/components/schemas/RuleIdentifier'
+          description: The unique ID of the retention rule.
+        Description:
+          allOf:
+          - $ref: '#/components/schemas/Description'
+          description: The retention rule description.
+        ResourceType:
+          allOf:
+          - $ref: '#/components/schemas/ResourceType'
+          description: The resource type retained by the retention rule.
+        RetentionPeriod:
+          $ref: '#/components/schemas/RetentionPeriod'
+        ResourceTags:
+          allOf:
+          - $ref: '#/components/schemas/ResourceTags'
+          description: '[Tag-level retention rules only] Information about the resource
+            tags used to identify resources that are retained by the retention rule.'
+        Status:
+          allOf:
+          - $ref: '#/components/schemas/RuleStatus'
+          description: The state of the retention rule. Only retention rules that
+            are in the `available` state retain resources.
+        LockConfiguration:
+          allOf:
+          - $ref: '#/components/schemas/LockConfiguration'
+          description: Information about the retention rule lock configuration.
+        LockState:
+          allOf:
+          - $ref: '#/components/schemas/LockState'
+          description: "[Region-level retention rules only] The lock state for the\
+            \ retention rule.\n\n  * `locked` \\- The retention rule is locked and\
+            \ can't be modified or deleted.\n\n  * `pending_unlock` \\- The retention\
+            \ rule has been unlocked but it is still within the unlock delay period.\
+            \ The retention rule can be modified or deleted only after the unlock\
+            \ delay period has expired.\n\n  * `unlocked` \\- The retention rule is\
+            \ unlocked and it can be modified or deleted by any user with the required\
+            \ permissions.\n\n  * `null` \\- The retention rule has never been locked.\
+            \ Once a retention rule has been locked, it can transition between the\
+            \ `locked` and `unlocked` states only; it can never transition back to\
+            \ `null`."
+        LockEndTime:
+          allOf:
+          - $ref: '#/components/schemas/TimeStamp'
+          description: The date and time at which the unlock delay is set to expire.
+            Only returned for retention rules that have been unlocked and that are
+            still within the unlock delay period.
+        RuleArn:
+          allOf:
+          - $ref: '#/components/schemas/RuleArn'
+          description: The Amazon Resource Name (ARN) of the retention rule.
+        ExcludeResourceTags:
+          allOf:
+          - $ref: '#/components/schemas/ExcludeResourceTags'
+          description: '[Region-level retention rules only] Information about the
+            exclusion tags used to identify resources that are to be excluded, or
+            ignored, by the retention rule.'
+    UntagResourceRequest:
+      type: object
+      properties:
+        ResourceArn:
+          allOf:
+          - $ref: '#/components/schemas/RuleArn'
+          description: The Amazon Resource Name (ARN) of the retention rule.
+        TagKeys:
+          allOf:
+          - $ref: '#/components/schemas/TagKeyList'
+          description: The tag keys of the tags to unassign. All tags that have the
+            specified tag key are unassigned.
+      required:
+      - ResourceArn
+      - TagKeys
+    UntagResourceResponse:
+      type: object
+      properties: {}
+    UpdateRuleRequest:
+      type: object
+      properties:
+        Identifier:
+          allOf:
+          - $ref: '#/components/schemas/RuleIdentifier'
+          description: The unique ID of the retention rule.
+        RetentionPeriod:
+          allOf:
+          - $ref: '#/components/schemas/RetentionPeriod'
+          description: Information about the retention period for which the retention
+            rule is to retain resources.
+        Description:
+          allOf:
+          - $ref: '#/components/schemas/Description'
+          description: The retention rule description.
+        ResourceType:
+          allOf:
+          - $ref: '#/components/schemas/ResourceType'
+          description: This parameter is currently not supported. You can't update
+            a retention rule's resource type after creation.
+        ResourceTags:
+          allOf:
+          - $ref: '#/components/schemas/ResourceTags'
+          description: '[Tag-level retention rules only] Specifies the resource tags
+            to use to identify resources that are to be retained by a tag-level retention
+            rule. For tag-level retention rules, only deleted resources, of the specified
+            resource type, that have one or more of the specified tag key and value
+            pairs are retained. If a resource is deleted, but it does not have any
+            of the specified tag key and value pairs, it is immediately deleted without
+            being retained by the retention rule.
+
+
+            You can add the same tag key and value pair to a maximum or five retention
+            rules.
+
+
+            To create a Region-level retention rule, omit this parameter. A Region-level
+            retention rule does not have any resource tags specified. It retains all
+            deleted resources of the specified resource type in the Region in which
+            the rule is created, even if the resources are not tagged.'
+        ExcludeResourceTags:
+          allOf:
+          - $ref: '#/components/schemas/ExcludeResourceTags'
+          description: '[Region-level retention rules only] Specifies the exclusion
+            tags to use to identify resources that are to be excluded, or ignored,
+            by a Region-level retention rule. Resources that have any of these tags
+            are not retained by the retention rule upon deletion.
+
+
+            You can''t specify exclusion tags for tag-level retention rules.'
+      required:
+      - Identifier
+    UpdateRuleResponse:
+      type: object
+      properties:
+        Identifier:
+          allOf:
+          - $ref: '#/components/schemas/RuleIdentifier'
+          description: The unique ID of the retention rule.
+        RetentionPeriod:
+          $ref: '#/components/schemas/RetentionPeriod'
+        Description:
+          allOf:
+          - $ref: '#/components/schemas/Description'
+          description: The retention rule description.
+        ResourceType:
+          allOf:
+          - $ref: '#/components/schemas/ResourceType'
+          description: The resource type retained by the retention rule.
+        ResourceTags:
+          allOf:
+          - $ref: '#/components/schemas/ResourceTags'
+          description: '[Tag-level retention rules only] Information about the resource
+            tags used to identify resources that are retained by the retention rule.'
+        Status:
+          allOf:
+          - $ref: '#/components/schemas/RuleStatus'
+          description: The state of the retention rule. Only retention rules that
+            are in the `available` state retain resources.
+        LockState:
+          allOf:
+          - $ref: '#/components/schemas/LockState'
+          description: "[Region-level retention rules only] The lock state for the\
+            \ retention rule.\n\n  * `locked` \\- The retention rule is locked and\
+            \ can't be modified or deleted.\n\n  * `pending_unlock` \\- The retention\
+            \ rule has been unlocked but it is still within the unlock delay period.\
+            \ The retention rule can be modified or deleted only after the unlock\
+            \ delay period has expired.\n\n  * `unlocked` \\- The retention rule is\
+            \ unlocked and it can be modified or deleted by any user with the required\
+            \ permissions.\n\n  * `null` \\- The retention rule has never been locked.\
+            \ Once a retention rule has been locked, it can transition between the\
+            \ `locked` and `unlocked` states only; it can never transition back to\
+            \ `null`."
+        LockEndTime:
+          allOf:
+          - $ref: '#/components/schemas/TimeStamp'
+          description: The date and time at which the unlock delay is set to expire.
+            Only returned for retention rules that have been unlocked and that are
+            still within the unlock delay period.
+        RuleArn:
+          allOf:
+          - $ref: '#/components/schemas/RuleArn'
+          description: The Amazon Resource Name (ARN) of the retention rule.
+        ExcludeResourceTags:
+          allOf:
+          - $ref: '#/components/schemas/ExcludeResourceTags'
+          description: '[Region-level retention rules only] Information about the
+            exclusion tags used to identify resources that are to be excluded, or
+            ignored, by the retention rule.'
+    ValidationException:
+      type: object
+      properties:
+        Message:
+          $ref: '#/components/schemas/ErrorMessage'
+        Reason:
+          allOf:
+          - $ref: '#/components/schemas/ValidationExceptionReason'
+          description: The reason for the exception.
+      description: One or more of the parameters in the request is not valid.
     ValidationExceptionReason:
       type: string
       enum:

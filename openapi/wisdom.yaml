@@ -7,7 +7,7 @@ info:
   x-stackql-serviceName: wisdom
   x-aws-serviceName: wisdom
   x-aws-protocol: aws.protocols#restJson1
-  x-dateGenerated: '2025-05-05'
+  x-dateGenerated: '2025-05-07'
   version: '2020-10-19'
   title: Amazon Connect Wisdom Service
   description: |-
@@ -43,12 +43,1984 @@ servers:
       - sa-east-1
       - me-south-1
       default: us-east-1
-paths: {}
+paths:
+  /assistants:
+    post:
+      operationId: CreateAssistant
+      description: |-
+        Creates an Amazon Connect Wisdom assistant.
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                clientToken:
+                  $ref: '#/components/schemas/ClientToken'
+                name:
+                  $ref: '#/components/schemas/Name'
+                type:
+                  $ref: '#/components/schemas/AssistantType'
+                description:
+                  $ref: '#/components/schemas/Description'
+                tags:
+                  $ref: '#/components/schemas/Tags'
+                serverSideEncryptionConfiguration:
+                  $ref: '#/components/schemas/ServerSideEncryptionConfiguration'
+      responses:
+        '200': {}
+        '403':
+          description: |-
+            You do not have sufficient access to perform this action.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '409':
+          description: |-
+            The request could not be processed because of conflict in the current state of the resource. For example, if you're using a `Create` API (such as `CreateAssistant`) that accepts name, a conflicting resource (usually with the same name) is being created or mutated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConflictException'
+        '402':
+          description: |-
+            You've exceeded your service quota. To perform the requested action, remove some of the relevant resources, or use service quotas to request a service quota increase.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServiceQuotaExceededException'
+        '400':
+          description: |-
+            The input fails to satisfy the constraints specified by a service.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+    get:
+      operationId: ListAssistants
+      description: |-
+        Lists information about assistants.
+      parameters:
+      - name: nextToken
+        in: query
+        required: false
+        schema:
+          $ref: '#/components/schemas/NextToken'
+      - name: maxResults
+        in: query
+        required: false
+        schema:
+          $ref: '#/components/schemas/MaxResults'
+      responses:
+        '200': {}
+        '403':
+          description: |-
+            You do not have sufficient access to perform this action.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '400':
+          description: |-
+            The input fails to satisfy the constraints specified by a service.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+  /assistants/{assistantId}/associations:
+    post:
+      operationId: CreateAssistantAssociation
+      description: |-
+        Creates an association between an Amazon Connect Wisdom assistant and another resource. Currently, the only supported association is with a knowledge base. An assistant can have only a single association.
+      parameters:
+      - name: assistantId
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/UuidOrArn'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                associationType:
+                  $ref: '#/components/schemas/AssociationType'
+                association:
+                  $ref: '#/components/schemas/AssistantAssociationInputData'
+                clientToken:
+                  $ref: '#/components/schemas/ClientToken'
+                tags:
+                  $ref: '#/components/schemas/Tags'
+      responses:
+        '200': {}
+        '403':
+          description: |-
+            You do not have sufficient access to perform this action.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '409':
+          description: |-
+            The request could not be processed because of conflict in the current state of the resource. For example, if you're using a `Create` API (such as `CreateAssistant`) that accepts name, a conflicting resource (usually with the same name) is being created or mutated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConflictException'
+        '404':
+          description: |-
+            The specified resource does not exist.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+        '402':
+          description: |-
+            You've exceeded your service quota. To perform the requested action, remove some of the relevant resources, or use service quotas to request a service quota increase.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServiceQuotaExceededException'
+        '400':
+          description: |-
+            The input fails to satisfy the constraints specified by a service.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+    get:
+      operationId: ListAssistantAssociations
+      description: |-
+        Lists information about assistant associations.
+      parameters:
+      - name: nextToken
+        in: query
+        required: false
+        schema:
+          $ref: '#/components/schemas/NextToken'
+      - name: maxResults
+        in: query
+        required: false
+        schema:
+          $ref: '#/components/schemas/MaxResults'
+      - name: assistantId
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/UuidOrArn'
+      responses:
+        '200': {}
+        '403':
+          description: |-
+            You do not have sufficient access to perform this action.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '404':
+          description: |-
+            The specified resource does not exist.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+        '400':
+          description: |-
+            The input fails to satisfy the constraints specified by a service.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+  /knowledgeBases/{knowledgeBaseId}/contents:
+    post:
+      operationId: CreateContent
+      description: |-
+        Creates Wisdom content. Before to calling this API, use [StartContentUpload](https://docs.aws.amazon.com/wisdom/latest/APIReference/API_StartContentUpload.html) to upload an asset.
+      parameters:
+      - name: knowledgeBaseId
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/UuidOrArn'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  $ref: '#/components/schemas/Name'
+                title:
+                  $ref: '#/components/schemas/ContentTitle'
+                overrideLinkOutUri:
+                  $ref: '#/components/schemas/Uri'
+                metadata:
+                  $ref: '#/components/schemas/ContentMetadata'
+                uploadId:
+                  $ref: '#/components/schemas/UploadId'
+                clientToken:
+                  $ref: '#/components/schemas/NonEmptyString'
+                tags:
+                  $ref: '#/components/schemas/Tags'
+      responses:
+        '200': {}
+        '403':
+          description: |-
+            You do not have sufficient access to perform this action.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '409':
+          description: |-
+            The request could not be processed because of conflict in the current state of the resource. For example, if you're using a `Create` API (such as `CreateAssistant`) that accepts name, a conflicting resource (usually with the same name) is being created or mutated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConflictException'
+        '404':
+          description: |-
+            The specified resource does not exist.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+        '402':
+          description: |-
+            You've exceeded your service quota. To perform the requested action, remove some of the relevant resources, or use service quotas to request a service quota increase.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServiceQuotaExceededException'
+        '400':
+          description: |-
+            The input fails to satisfy the constraints specified by a service.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+    get:
+      operationId: ListContents
+      description: |-
+        Lists the content.
+      parameters:
+      - name: nextToken
+        in: query
+        required: false
+        schema:
+          $ref: '#/components/schemas/NextToken'
+      - name: maxResults
+        in: query
+        required: false
+        schema:
+          $ref: '#/components/schemas/MaxResults'
+      - name: knowledgeBaseId
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/UuidOrArn'
+      responses:
+        '200': {}
+        '403':
+          description: |-
+            You do not have sufficient access to perform this action.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '404':
+          description: |-
+            The specified resource does not exist.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+        '400':
+          description: |-
+            The input fails to satisfy the constraints specified by a service.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+  /knowledgeBases:
+    post:
+      operationId: CreateKnowledgeBase
+      description: |-
+        Creates a knowledge base.
+
+        When using this API, you cannot reuse [Amazon AppIntegrations](https://docs.aws.amazon.com/appintegrations/latest/APIReference/Welcome.html) DataIntegrations with external knowledge bases such as Salesforce and ServiceNow. If you do, you'll get an `InvalidRequestException` error.
+
+        For example, you're programmatically managing your external knowledge base, and you want to add or remove one of the fields that is being ingested from Salesforce. Do the following:
+
+          1. Call [DeleteKnowledgeBase](https://docs.aws.amazon.com/wisdom/latest/APIReference/API_DeleteKnowledgeBase.html).
+
+          2. Call [DeleteDataIntegration](https://docs.aws.amazon.com/appintegrations/latest/APIReference/API_DeleteDataIntegration.html).
+
+          3. Call [CreateDataIntegration](https://docs.aws.amazon.com/appintegrations/latest/APIReference/API_CreateDataIntegration.html) to recreate the DataIntegration or a create different one.
+
+          4. Call CreateKnowledgeBase.
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                clientToken:
+                  $ref: '#/components/schemas/NonEmptyString'
+                name:
+                  $ref: '#/components/schemas/Name'
+                knowledgeBaseType:
+                  $ref: '#/components/schemas/KnowledgeBaseType'
+                sourceConfiguration:
+                  $ref: '#/components/schemas/SourceConfiguration'
+                renderingConfiguration:
+                  $ref: '#/components/schemas/RenderingConfiguration'
+                serverSideEncryptionConfiguration:
+                  $ref: '#/components/schemas/ServerSideEncryptionConfiguration'
+                description:
+                  $ref: '#/components/schemas/Description'
+                tags:
+                  $ref: '#/components/schemas/Tags'
+      responses:
+        '200': {}
+        '403':
+          description: |-
+            You do not have sufficient access to perform this action.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '409':
+          description: |-
+            The request could not be processed because of conflict in the current state of the resource. For example, if you're using a `Create` API (such as `CreateAssistant`) that accepts name, a conflicting resource (usually with the same name) is being created or mutated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConflictException'
+        '402':
+          description: |-
+            You've exceeded your service quota. To perform the requested action, remove some of the relevant resources, or use service quotas to request a service quota increase.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServiceQuotaExceededException'
+        '400':
+          description: |-
+            The input fails to satisfy the constraints specified by a service.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+    get:
+      operationId: ListKnowledgeBases
+      description: |-
+        Lists the knowledge bases.
+      parameters:
+      - name: nextToken
+        in: query
+        required: false
+        schema:
+          $ref: '#/components/schemas/NonEmptyString'
+      - name: maxResults
+        in: query
+        required: false
+        schema:
+          $ref: '#/components/schemas/MaxResults'
+      responses:
+        '200': {}
+        '403':
+          description: |-
+            You do not have sufficient access to perform this action.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '400':
+          description: |-
+            The input fails to satisfy the constraints specified by a service.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+  /knowledgeBases/{knowledgeBaseId}/quickResponses:
+    post:
+      operationId: CreateQuickResponse
+      description: |-
+        Creates a Wisdom quick response.
+      parameters:
+      - name: knowledgeBaseId
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/UuidOrArn'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  $ref: '#/components/schemas/QuickResponseName'
+                content:
+                  $ref: '#/components/schemas/QuickResponseDataProvider'
+                contentType:
+                  $ref: '#/components/schemas/QuickResponseType'
+                groupingConfiguration:
+                  $ref: '#/components/schemas/GroupingConfiguration'
+                description:
+                  $ref: '#/components/schemas/QuickResponseDescription'
+                shortcutKey:
+                  $ref: '#/components/schemas/ShortCutKey'
+                isActive:
+                  $ref: '#/components/schemas/Boolean'
+                channels:
+                  $ref: '#/components/schemas/Channels'
+                language:
+                  $ref: '#/components/schemas/LanguageCode'
+                clientToken:
+                  $ref: '#/components/schemas/NonEmptyString'
+                tags:
+                  $ref: '#/components/schemas/Tags'
+      responses:
+        '200': {}
+        '403':
+          description: |-
+            You do not have sufficient access to perform this action.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '409':
+          description: |-
+            The request could not be processed because of conflict in the current state of the resource. For example, if you're using a `Create` API (such as `CreateAssistant`) that accepts name, a conflicting resource (usually with the same name) is being created or mutated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConflictException'
+        '404':
+          description: |-
+            The specified resource does not exist.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+        '402':
+          description: |-
+            You've exceeded your service quota. To perform the requested action, remove some of the relevant resources, or use service quotas to request a service quota increase.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServiceQuotaExceededException'
+        '400':
+          description: |-
+            The input fails to satisfy the constraints specified by a service.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+    get:
+      operationId: ListQuickResponses
+      description: |-
+        Lists information about quick response.
+      parameters:
+      - name: nextToken
+        in: query
+        required: false
+        schema:
+          $ref: '#/components/schemas/NonEmptyString'
+      - name: maxResults
+        in: query
+        required: false
+        schema:
+          $ref: '#/components/schemas/MaxResults'
+      - name: knowledgeBaseId
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/UuidOrArn'
+      responses:
+        '200': {}
+        '403':
+          description: |-
+            You do not have sufficient access to perform this action.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '404':
+          description: |-
+            The specified resource does not exist.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+        '400':
+          description: |-
+            The input fails to satisfy the constraints specified by a service.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+  /assistants/{assistantId}/sessions:
+    post:
+      operationId: CreateSession
+      description: |-
+        Creates a session. A session is a contextual container used for generating recommendations. Amazon Connect creates a new Wisdom session for each contact on which Wisdom is enabled.
+      parameters:
+      - name: assistantId
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/UuidOrArn'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                clientToken:
+                  $ref: '#/components/schemas/ClientToken'
+                name:
+                  $ref: '#/components/schemas/Name'
+                description:
+                  $ref: '#/components/schemas/Description'
+                tags:
+                  $ref: '#/components/schemas/Tags'
+      responses:
+        '200': {}
+        '409':
+          description: |-
+            The request could not be processed because of conflict in the current state of the resource. For example, if you're using a `Create` API (such as `CreateAssistant`) that accepts name, a conflicting resource (usually with the same name) is being created or mutated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConflictException'
+        '404':
+          description: |-
+            The specified resource does not exist.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+        '400':
+          description: |-
+            The input fails to satisfy the constraints specified by a service.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+  /assistants/{assistantId}:
+    delete:
+      operationId: DeleteAssistant
+      description: |-
+        Deletes an assistant.
+      parameters:
+      - name: assistantId
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/UuidOrArn'
+      responses:
+        '204': {}
+        '403':
+          description: |-
+            You do not have sufficient access to perform this action.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '404':
+          description: |-
+            The specified resource does not exist.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+        '400':
+          description: |-
+            The input fails to satisfy the constraints specified by a service.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+    get:
+      operationId: GetAssistant
+      description: |-
+        Retrieves information about an assistant.
+      parameters:
+      - name: assistantId
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/UuidOrArn'
+      responses:
+        '200': {}
+        '403':
+          description: |-
+            You do not have sufficient access to perform this action.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '404':
+          description: |-
+            The specified resource does not exist.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+        '400':
+          description: |-
+            The input fails to satisfy the constraints specified by a service.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+  /assistants/{assistantId}/associations/{assistantAssociationId}:
+    delete:
+      operationId: DeleteAssistantAssociation
+      description: |-
+        Deletes an assistant association.
+      parameters:
+      - name: assistantAssociationId
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/UuidOrArn'
+      - name: assistantId
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/UuidOrArn'
+      responses:
+        '204': {}
+        '403':
+          description: |-
+            You do not have sufficient access to perform this action.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '404':
+          description: |-
+            The specified resource does not exist.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+        '400':
+          description: |-
+            The input fails to satisfy the constraints specified by a service.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+    get:
+      operationId: GetAssistantAssociation
+      description: |-
+        Retrieves information about an assistant association.
+      parameters:
+      - name: assistantAssociationId
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/UuidOrArn'
+      - name: assistantId
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/UuidOrArn'
+      responses:
+        '200': {}
+        '403':
+          description: |-
+            You do not have sufficient access to perform this action.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '404':
+          description: |-
+            The specified resource does not exist.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+        '400':
+          description: |-
+            The input fails to satisfy the constraints specified by a service.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+  /knowledgeBases/{knowledgeBaseId}/contents/{contentId}:
+    delete:
+      operationId: DeleteContent
+      description: |-
+        Deletes the content.
+      parameters:
+      - name: knowledgeBaseId
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/UuidOrArn'
+      - name: contentId
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/UuidOrArn'
+      responses:
+        '204': {}
+        '403':
+          description: |-
+            You do not have sufficient access to perform this action.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '404':
+          description: |-
+            The specified resource does not exist.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+        '400':
+          description: |-
+            The input fails to satisfy the constraints specified by a service.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+    get:
+      operationId: GetContent
+      description: |-
+        Retrieves content, including a pre-signed URL to download the content.
+      parameters:
+      - name: contentId
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/UuidOrArn'
+      - name: knowledgeBaseId
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/UuidOrArn'
+      responses:
+        '200': {}
+        '403':
+          description: |-
+            You do not have sufficient access to perform this action.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '404':
+          description: |-
+            The specified resource does not exist.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+        '400':
+          description: |-
+            The input fails to satisfy the constraints specified by a service.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+    post:
+      operationId: UpdateContent
+      description: |-
+        Updates information about the content.
+      parameters:
+      - name: knowledgeBaseId
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/UuidOrArn'
+      - name: contentId
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/UuidOrArn'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                revisionId:
+                  $ref: '#/components/schemas/NonEmptyString'
+                title:
+                  $ref: '#/components/schemas/ContentTitle'
+                overrideLinkOutUri:
+                  $ref: '#/components/schemas/Uri'
+                removeOverrideLinkOutUri:
+                  $ref: '#/components/schemas/Boolean'
+                metadata:
+                  $ref: '#/components/schemas/ContentMetadata'
+                uploadId:
+                  $ref: '#/components/schemas/UploadId'
+      responses:
+        '200': {}
+        '403':
+          description: |-
+            You do not have sufficient access to perform this action.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '412':
+          description: |-
+            The provided `revisionId` does not match, indicating the content has been modified since it was last read.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PreconditionFailedException'
+        '404':
+          description: |-
+            The specified resource does not exist.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+        '400':
+          description: |-
+            The input fails to satisfy the constraints specified by a service.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+  /knowledgeBases/{knowledgeBaseId}/importJobs/{importJobId}:
+    delete:
+      operationId: DeleteImportJob
+      description: |-
+        Deletes the quick response import job.
+      parameters:
+      - name: knowledgeBaseId
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/UuidOrArn'
+      - name: importJobId
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/Uuid'
+      responses:
+        '204': {}
+        '403':
+          description: |-
+            You do not have sufficient access to perform this action.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '409':
+          description: |-
+            The request could not be processed because of conflict in the current state of the resource. For example, if you're using a `Create` API (such as `CreateAssistant`) that accepts name, a conflicting resource (usually with the same name) is being created or mutated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConflictException'
+        '404':
+          description: |-
+            The specified resource does not exist.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+        '400':
+          description: |-
+            The input fails to satisfy the constraints specified by a service.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+    get:
+      operationId: GetImportJob
+      description: |-
+        Retrieves the started import job.
+      parameters:
+      - name: importJobId
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/Uuid'
+      - name: knowledgeBaseId
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/UuidOrArn'
+      responses:
+        '200': {}
+        '403':
+          description: |-
+            You do not have sufficient access to perform this action.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '404':
+          description: |-
+            The specified resource does not exist.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+        '400':
+          description: |-
+            The input fails to satisfy the constraints specified by a service.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+  /knowledgeBases/{knowledgeBaseId}:
+    delete:
+      operationId: DeleteKnowledgeBase
+      description: |-
+        Deletes the knowledge base.
+
+        When you use this API to delete an external knowledge base such as Salesforce or ServiceNow, you must also delete the [Amazon AppIntegrations](https://docs.aws.amazon.com/appintegrations/latest/APIReference/Welcome.html) DataIntegration. This is because you can't reuse the DataIntegration after it's been associated with an external knowledge base. However, you can delete and recreate it. See [DeleteDataIntegration](https://docs.aws.amazon.com/appintegrations/latest/APIReference/API_DeleteDataIntegration.html) and [CreateDataIntegration](https://docs.aws.amazon.com/appintegrations/latest/APIReference/API_CreateDataIntegration.html) in the _Amazon AppIntegrations API Reference_.
+      parameters:
+      - name: knowledgeBaseId
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/UuidOrArn'
+      responses:
+        '204': {}
+        '403':
+          description: |-
+            You do not have sufficient access to perform this action.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '409':
+          description: |-
+            The request could not be processed because of conflict in the current state of the resource. For example, if you're using a `Create` API (such as `CreateAssistant`) that accepts name, a conflicting resource (usually with the same name) is being created or mutated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConflictException'
+        '404':
+          description: |-
+            The specified resource does not exist.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+        '400':
+          description: |-
+            The input fails to satisfy the constraints specified by a service.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+    get:
+      operationId: GetKnowledgeBase
+      description: |-
+        Retrieves information about the knowledge base.
+      parameters:
+      - name: knowledgeBaseId
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/UuidOrArn'
+      responses:
+        '200': {}
+        '403':
+          description: |-
+            You do not have sufficient access to perform this action.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '404':
+          description: |-
+            The specified resource does not exist.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+        '400':
+          description: |-
+            The input fails to satisfy the constraints specified by a service.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+  /knowledgeBases/{knowledgeBaseId}/quickResponses/{quickResponseId}:
+    delete:
+      operationId: DeleteQuickResponse
+      description: |-
+        Deletes a quick response.
+      parameters:
+      - name: knowledgeBaseId
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/UuidOrArn'
+      - name: quickResponseId
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/UuidOrArn'
+      responses:
+        '204': {}
+        '403':
+          description: |-
+            You do not have sufficient access to perform this action.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '404':
+          description: |-
+            The specified resource does not exist.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+        '400':
+          description: |-
+            The input fails to satisfy the constraints specified by a service.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+    get:
+      operationId: GetQuickResponse
+      description: |-
+        Retrieves the quick response.
+      parameters:
+      - name: quickResponseId
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/UuidOrArn'
+      - name: knowledgeBaseId
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/UuidOrArn'
+      responses:
+        '200': {}
+        '403':
+          description: |-
+            You do not have sufficient access to perform this action.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '404':
+          description: |-
+            The specified resource does not exist.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+        '400':
+          description: |-
+            The input fails to satisfy the constraints specified by a service.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+    post:
+      operationId: UpdateQuickResponse
+      description: |-
+        Updates an existing Wisdom quick response.
+      parameters:
+      - name: knowledgeBaseId
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/UuidOrArn'
+      - name: quickResponseId
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/UuidOrArn'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  $ref: '#/components/schemas/QuickResponseName'
+                content:
+                  $ref: '#/components/schemas/QuickResponseDataProvider'
+                contentType:
+                  $ref: '#/components/schemas/QuickResponseType'
+                groupingConfiguration:
+                  $ref: '#/components/schemas/GroupingConfiguration'
+                removeGroupingConfiguration:
+                  $ref: '#/components/schemas/Boolean'
+                description:
+                  $ref: '#/components/schemas/QuickResponseDescription'
+                removeDescription:
+                  $ref: '#/components/schemas/Boolean'
+                shortcutKey:
+                  $ref: '#/components/schemas/ShortCutKey'
+                removeShortcutKey:
+                  $ref: '#/components/schemas/Boolean'
+                isActive:
+                  $ref: '#/components/schemas/Boolean'
+                channels:
+                  $ref: '#/components/schemas/Channels'
+                language:
+                  $ref: '#/components/schemas/LanguageCode'
+      responses:
+        '200': {}
+        '403':
+          description: |-
+            You do not have sufficient access to perform this action.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '409':
+          description: |-
+            The request could not be processed because of conflict in the current state of the resource. For example, if you're using a `Create` API (such as `CreateAssistant`) that accepts name, a conflicting resource (usually with the same name) is being created or mutated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConflictException'
+        '412':
+          description: |-
+            The provided `revisionId` does not match, indicating the content has been modified since it was last read.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PreconditionFailedException'
+        '404':
+          description: |-
+            The specified resource does not exist.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+        '400':
+          description: |-
+            The input fails to satisfy the constraints specified by a service.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+  /knowledgeBases/{knowledgeBaseId}/contents/{contentId}/summary:
+    get:
+      operationId: GetContentSummary
+      description: |-
+        Retrieves summary information about the content.
+      parameters:
+      - name: contentId
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/UuidOrArn'
+      - name: knowledgeBaseId
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/UuidOrArn'
+      responses:
+        '200': {}
+        '403':
+          description: |-
+            You do not have sufficient access to perform this action.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '404':
+          description: |-
+            The specified resource does not exist.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+        '400':
+          description: |-
+            The input fails to satisfy the constraints specified by a service.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+  /assistants/{assistantId}/sessions/{sessionId}/recommendations:
+    get:
+      operationId: GetRecommendations
+      description: |-
+        Retrieves recommendations for the specified session. To avoid retrieving the same recommendations in subsequent calls, use [NotifyRecommendationsReceived](https://docs.aws.amazon.com/wisdom/latest/APIReference/API_NotifyRecommendationsReceived.html). This API supports long-polling behavior with the `waitTimeSeconds` parameter. Short poll is the default behavior and only returns recommendations already available. To perform a manual query against an assistant, use [QueryAssistant](https://docs.aws.amazon.com/wisdom/latest/APIReference/API_QueryAssistant.html).
+      parameters:
+      - name: assistantId
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/UuidOrArn'
+      - name: sessionId
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/UuidOrArn'
+      - name: maxResults
+        in: query
+        required: false
+        schema:
+          $ref: '#/components/schemas/MaxResults'
+      - name: waitTimeSeconds
+        in: query
+        required: false
+        schema:
+          $ref: '#/components/schemas/WaitTimeSeconds'
+      responses:
+        '200': {}
+        '403':
+          description: |-
+            You do not have sufficient access to perform this action.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '404':
+          description: |-
+            The specified resource does not exist.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+        '400':
+          description: |-
+            The input fails to satisfy the constraints specified by a service.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+  /assistants/{assistantId}/sessions/{sessionId}:
+    get:
+      operationId: GetSession
+      description: |-
+        Retrieves information for a specified session.
+      parameters:
+      - name: assistantId
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/UuidOrArn'
+      - name: sessionId
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/UuidOrArn'
+      responses:
+        '200': {}
+        '403':
+          description: |-
+            You do not have sufficient access to perform this action.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '404':
+          description: |-
+            The specified resource does not exist.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+        '400':
+          description: |-
+            The input fails to satisfy the constraints specified by a service.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+  /knowledgeBases/{knowledgeBaseId}/importJobs:
+    get:
+      operationId: ListImportJobs
+      description: |-
+        Lists information about import jobs.
+      parameters:
+      - name: nextToken
+        in: query
+        required: false
+        schema:
+          $ref: '#/components/schemas/NonEmptyString'
+      - name: maxResults
+        in: query
+        required: false
+        schema:
+          $ref: '#/components/schemas/MaxResults'
+      - name: knowledgeBaseId
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/UuidOrArn'
+      responses:
+        '200': {}
+        '403':
+          description: |-
+            You do not have sufficient access to perform this action.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '400':
+          description: |-
+            The input fails to satisfy the constraints specified by a service.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+    post:
+      operationId: StartImportJob
+      description: |-
+        Start an asynchronous job to import Wisdom resources from an uploaded source file. Before calling this API, use [StartContentUpload](https://docs.aws.amazon.com/wisdom/latest/APIReference/API_StartContentUpload.html) to upload an asset that contains the resource data.
+
+          * For importing Wisdom quick responses, you need to upload a csv file including the quick responses. For information about how to format the csv file for importing quick responses, see [Import quick responses](https://docs.aws.amazon.com/console/connect/quick-responses/add-data).
+      parameters:
+      - name: knowledgeBaseId
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/UuidOrArn'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                importJobType:
+                  $ref: '#/components/schemas/ImportJobType'
+                uploadId:
+                  $ref: '#/components/schemas/UploadId'
+                clientToken:
+                  $ref: '#/components/schemas/NonEmptyString'
+                metadata:
+                  $ref: '#/components/schemas/ContentMetadata'
+                externalSourceConfiguration:
+                  $ref: '#/components/schemas/ExternalSourceConfiguration'
+      responses:
+        '200': {}
+        '403':
+          description: |-
+            You do not have sufficient access to perform this action.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '409':
+          description: |-
+            The request could not be processed because of conflict in the current state of the resource. For example, if you're using a `Create` API (such as `CreateAssistant`) that accepts name, a conflicting resource (usually with the same name) is being created or mutated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConflictException'
+        '404':
+          description: |-
+            The specified resource does not exist.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+        '402':
+          description: |-
+            You've exceeded your service quota. To perform the requested action, remove some of the relevant resources, or use service quotas to request a service quota increase.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServiceQuotaExceededException'
+        '400':
+          description: |-
+            The input fails to satisfy the constraints specified by a service.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+  /tags/{resourceArn}:
+    get:
+      operationId: ListTagsForResource
+      description: |-
+        Lists the tags for the specified resource.
+      parameters:
+      - name: resourceArn
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/Arn'
+      responses:
+        '200': {}
+        '404':
+          description: |-
+            The specified resource does not exist.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+    post:
+      operationId: TagResource
+      description: |-
+        Adds the specified tags to the specified resource.
+      parameters:
+      - name: resourceArn
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/Arn'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                tags:
+                  $ref: '#/components/schemas/Tags'
+      responses:
+        '200': {}
+        '404':
+          description: |-
+            The specified resource does not exist.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+        '400':
+          description: |-
+            Amazon Connect Wisdom throws this exception if you have too many tags in your tag set.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TooManyTagsException'
+    delete:
+      operationId: UntagResource
+      description: |-
+        Removes the specified tags from the specified resource.
+      parameters:
+      - name: resourceArn
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/Arn'
+      - name: tagKeys
+        in: query
+        required: true
+        schema:
+          $ref: '#/components/schemas/TagKeyList'
+      responses:
+        '200': {}
+        '404':
+          description: |-
+            The specified resource does not exist.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+  /assistants/{assistantId}/sessions/{sessionId}/recommendations/notify:
+    post:
+      operationId: NotifyRecommendationsReceived
+      description: |-
+        Removes the specified recommendations from the specified assistant's queue of newly available recommendations. You can use this API in conjunction with [GetRecommendations](https://docs.aws.amazon.com/wisdom/latest/APIReference/API_GetRecommendations.html) and a `waitTimeSeconds` input for long-polling behavior and avoiding duplicate recommendations.
+      parameters:
+      - name: assistantId
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/UuidOrArn'
+      - name: sessionId
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/UuidOrArn'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                recommendationIds:
+                  $ref: '#/components/schemas/RecommendationIdList'
+      responses:
+        '200': {}
+        '403':
+          description: |-
+            You do not have sufficient access to perform this action.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '404':
+          description: |-
+            The specified resource does not exist.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+        '400':
+          description: |-
+            The input fails to satisfy the constraints specified by a service.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+  /assistants/{assistantId}/query:
+    post:
+      operationId: QueryAssistant
+      description: |-
+        Performs a manual search against the specified assistant. To retrieve recommendations for an assistant, use [GetRecommendations](https://docs.aws.amazon.com/wisdom/latest/APIReference/API_GetRecommendations.html).
+      parameters:
+      - name: assistantId
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/UuidOrArn'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                queryText:
+                  $ref: '#/components/schemas/QueryText'
+                nextToken:
+                  $ref: '#/components/schemas/NextToken'
+                maxResults:
+                  $ref: '#/components/schemas/MaxResults'
+      responses:
+        '200': {}
+        '403':
+          description: |-
+            You do not have sufficient access to perform this action.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '408':
+          description: |-
+            The request reached the service more than 15 minutes after the date stamp on the request or more than 15 minutes after the request expiration date (such as for pre-signed URLs), or the date stamp on the request is more than 15 minutes in the future.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RequestTimeoutException'
+        '404':
+          description: |-
+            The specified resource does not exist.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+        '400':
+          description: |-
+            The input fails to satisfy the constraints specified by a service.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+  /knowledgeBases/{knowledgeBaseId}/templateUri:
+    delete:
+      operationId: RemoveKnowledgeBaseTemplateUri
+      description: |-
+        Removes a URI template from a knowledge base.
+      parameters:
+      - name: knowledgeBaseId
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/UuidOrArn'
+      responses:
+        '204': {}
+        '403':
+          description: |-
+            You do not have sufficient access to perform this action.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '404':
+          description: |-
+            The specified resource does not exist.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+        '400':
+          description: |-
+            The input fails to satisfy the constraints specified by a service.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+    post:
+      operationId: UpdateKnowledgeBaseTemplateUri
+      description: |-
+        Updates the template URI of a knowledge base. This is only supported for knowledge bases of type EXTERNAL. Include a single variable in `${variable}` format; this interpolated by Wisdom using ingested content. For example, if you ingest a Salesforce article, it has an `Id` value, and you can set the template URI to `https://myInstanceName.lightning.force.com/lightning/r/Knowledge__kav/*${Id}*/view`.
+      parameters:
+      - name: knowledgeBaseId
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/UuidOrArn'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                templateUri:
+                  $ref: '#/components/schemas/Uri'
+      responses:
+        '200': {}
+        '403':
+          description: |-
+            You do not have sufficient access to perform this action.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '404':
+          description: |-
+            The specified resource does not exist.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+        '400':
+          description: |-
+            The input fails to satisfy the constraints specified by a service.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+  /knowledgeBases/{knowledgeBaseId}/search:
+    post:
+      operationId: SearchContent
+      description: |-
+        Searches for content in a specified knowledge base. Can be used to get a specific content resource by its name.
+      parameters:
+      - name: nextToken
+        in: query
+        required: false
+        schema:
+          $ref: '#/components/schemas/NextToken'
+      - name: maxResults
+        in: query
+        required: false
+        schema:
+          $ref: '#/components/schemas/MaxResults'
+      - name: knowledgeBaseId
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/UuidOrArn'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                searchExpression:
+                  $ref: '#/components/schemas/SearchExpression'
+      responses:
+        '200': {}
+        '403':
+          description: |-
+            You do not have sufficient access to perform this action.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '404':
+          description: |-
+            The specified resource does not exist.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+        '400':
+          description: |-
+            The input fails to satisfy the constraints specified by a service.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+  /knowledgeBases/{knowledgeBaseId}/search/quickResponses:
+    post:
+      operationId: SearchQuickResponses
+      description: |-
+        Searches existing Wisdom quick responses in a Wisdom knowledge base.
+      parameters:
+      - name: knowledgeBaseId
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/UuidOrArn'
+      - name: nextToken
+        in: query
+        required: false
+        schema:
+          $ref: '#/components/schemas/NonEmptyString'
+      - name: maxResults
+        in: query
+        required: false
+        schema:
+          $ref: '#/components/schemas/MaxResults'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                searchExpression:
+                  $ref: '#/components/schemas/QuickResponseSearchExpression'
+                attributes:
+                  $ref: '#/components/schemas/ContactAttributes'
+      responses:
+        '200': {}
+        '403':
+          description: |-
+            You do not have sufficient access to perform this action.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '408':
+          description: |-
+            The request reached the service more than 15 minutes after the date stamp on the request or more than 15 minutes after the request expiration date (such as for pre-signed URLs), or the date stamp on the request is more than 15 minutes in the future.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RequestTimeoutException'
+        '404':
+          description: |-
+            The specified resource does not exist.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+        '400':
+          description: |-
+            The input fails to satisfy the constraints specified by a service.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+  /assistants/{assistantId}/searchSessions:
+    post:
+      operationId: SearchSessions
+      description: |-
+        Searches for sessions.
+      parameters:
+      - name: nextToken
+        in: query
+        required: false
+        schema:
+          $ref: '#/components/schemas/NextToken'
+      - name: maxResults
+        in: query
+        required: false
+        schema:
+          $ref: '#/components/schemas/MaxResults'
+      - name: assistantId
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/UuidOrArn'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                searchExpression:
+                  $ref: '#/components/schemas/SearchExpression'
+      responses:
+        '200': {}
+        '403':
+          description: |-
+            You do not have sufficient access to perform this action.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '404':
+          description: |-
+            The specified resource does not exist.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+        '400':
+          description: |-
+            The input fails to satisfy the constraints specified by a service.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+  /knowledgeBases/{knowledgeBaseId}/upload:
+    post:
+      operationId: StartContentUpload
+      description: |-
+        Get a URL to upload content to a knowledge base. To upload content, first make a PUT request to the returned URL with your file, making sure to include the required headers. Then use [CreateContent](https://docs.aws.amazon.com/wisdom/latest/APIReference/API_CreateContent.html) to finalize the content creation process or [UpdateContent](https://docs.aws.amazon.com/wisdom/latest/APIReference/API_UpdateContent.html) to modify an existing resource. You can only upload content to a knowledge base of type CUSTOM.
+      parameters:
+      - name: knowledgeBaseId
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/UuidOrArn'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                contentType:
+                  $ref: '#/components/schemas/ContentType'
+                presignedUrlTimeToLive:
+                  $ref: '#/components/schemas/TimeToLive'
+      responses:
+        '200': {}
+        '403':
+          description: |-
+            You do not have sufficient access to perform this action.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '404':
+          description: |-
+            The specified resource does not exist.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+        '400':
+          description: |-
+            The input fails to satisfy the constraints specified by a service.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
 components:
   schemas:
+    AccessDeniedException:
+      type: object
+      properties:
+        message:
+          $ref: '#/components/schemas/String'
+      description: You do not have sufficient access to perform this action.
+    AppIntegrationsConfiguration:
+      type: object
+      properties:
+        appIntegrationArn:
+          allOf:
+          - $ref: '#/components/schemas/GenericArn'
+          description: "The Amazon Resource Name (ARN) of the AppIntegrations DataIntegration\
+            \ to use for ingesting content.\n\n  * For [ Salesforce](https://developer.salesforce.com/docs/atlas.en-us.knowledge_dev.meta/knowledge_dev/sforce_api_objects_knowledge__kav.htm),\
+            \ your AppIntegrations DataIntegration must have an ObjectConfiguration\
+            \ if objectFields is not provided, including at least `Id`, `ArticleNumber`,\
+            \ `VersionNumber`, `Title`, `PublishStatus`, and `IsDeleted` as source\
+            \ fields. \n\n  * For [ ServiceNow](https://developer.servicenow.com/dev.do#!/reference/api/rome/rest/knowledge-management-api),\
+            \ your AppIntegrations DataIntegration must have an ObjectConfiguration\
+            \ if objectFields is not provided, including at least `number`, `short_description`,\
+            \ `sys_mod_count`, `workflow_state`, and `active` as source fields. \n\
+            \n  * For [ Zendesk](https://developer.zendesk.com/api-reference/help_center/help-center-api/articles/),\
+            \ your AppIntegrations DataIntegration must have an ObjectConfiguration\
+            \ if `objectFields` is not provided, including at least `id`, `title`,\
+            \ `updated_at`, and `draft` as source fields. \n\n  * For [SharePoint](https://learn.microsoft.com/en-us/sharepoint/dev/sp-add-ins/sharepoint-net-server-csom-jsom-and-rest-api-index),\
+            \ your AppIntegrations DataIntegration must have a FileConfiguration,\
+            \ including only file extensions that are among `docx`, `pdf`, `html`,\
+            \ `htm`, and `txt`. \n\n  * For [Amazon S3](https://aws.amazon.com/s3/),\
+            \ the ObjectConfiguration and FileConfiguration of your AppIntegrations\
+            \ DataIntegration must be null. The `SourceURI` of your DataIntegration\
+            \ must use the following format: `s3://your_s3_bucket_name`.\n\nThe bucket\
+            \ policy of the corresponding S3 bucket must allow the Amazon Web Services\
+            \ principal `app-integrations.amazonaws.com` to perform `s3:ListBucket`,\
+            \ `s3:GetObject`, and `s3:GetBucketLocation` against the bucket."
+        objectFields:
+          allOf:
+          - $ref: '#/components/schemas/ObjectFieldsList'
+          description: "The fields from the source that are made available to your\
+            \ agents in Wisdom. Optional if ObjectConfiguration is included in the\
+            \ provided DataIntegration.\n\n  * For [ Salesforce](https://developer.salesforce.com/docs/atlas.en-us.knowledge_dev.meta/knowledge_dev/sforce_api_objects_knowledge__kav.htm),\
+            \ you must include at least `Id`, `ArticleNumber`, `VersionNumber`, `Title`,\
+            \ `PublishStatus`, and `IsDeleted`. \n\n  * For [ ServiceNow](https://developer.servicenow.com/dev.do#!/reference/api/rome/rest/knowledge-management-api),\
+            \ you must include at least `number`, `short_description`, `sys_mod_count`,\
+            \ `workflow_state`, and `active`. \n\n  * For [ Zendesk](https://developer.zendesk.com/api-reference/help_center/help-center-api/articles/),\
+            \ you must include at least `id`, `title`, `updated_at`, and `draft`.\
+            \ \n\nMake sure to include additional fields. These fields are indexed\
+            \ and used to source recommendations."
+      required:
+      - appIntegrationArn
+      description: Configuration information for Amazon AppIntegrations to automatically
+        ingest content.
     Arn:
       type: string
       pattern: ^arn:[a-z-]*?:wisdom:[a-z0-9-]*?:[0-9]{12}:[a-z-]*?/[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}(?:/[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12})?$
+    AssistantAssociationData:
+      type: object
+      properties:
+        assistantAssociationId:
+          allOf:
+          - $ref: '#/components/schemas/Uuid'
+          description: The identifier of the assistant association.
+        assistantAssociationArn:
+          allOf:
+          - $ref: '#/components/schemas/Arn'
+          description: The Amazon Resource Name (ARN) of the assistant association.
+        assistantId:
+          allOf:
+          - $ref: '#/components/schemas/Uuid'
+          description: The identifier of the Wisdom assistant.
+        assistantArn:
+          allOf:
+          - $ref: '#/components/schemas/Arn'
+          description: The Amazon Resource Name (ARN) of the Wisdom assistant.
+        associationType:
+          allOf:
+          - $ref: '#/components/schemas/AssociationType'
+          description: The type of association.
+        associationData:
+          allOf:
+          - $ref: '#/components/schemas/AssistantAssociationOutputData'
+          description: A union type that currently has a single argument, the knowledge
+            base ID.
+        tags:
+          allOf:
+          - $ref: '#/components/schemas/Tags'
+          description: The tags used to organize, track, or control access for this
+            resource.
+      required:
+      - assistantAssociationId
+      - assistantAssociationArn
+      - assistantId
+      - assistantArn
+      - associationType
+      - associationData
+      description: Information about the assistant association.
     AssistantAssociationInputData:
       allOf:
       - allOf:
@@ -65,10 +2037,118 @@ components:
           The knowledge base where output data is sent.
       description: |-
         The data that is output as a result of the assistant association.
+    AssistantAssociationSummary:
+      type: object
+      properties:
+        assistantAssociationId:
+          allOf:
+          - $ref: '#/components/schemas/Uuid'
+          description: The identifier of the assistant association.
+        assistantAssociationArn:
+          allOf:
+          - $ref: '#/components/schemas/Arn'
+          description: The Amazon Resource Name (ARN) of the assistant association.
+        assistantId:
+          allOf:
+          - $ref: '#/components/schemas/Uuid'
+          description: The identifier of the Wisdom assistant.
+        assistantArn:
+          allOf:
+          - $ref: '#/components/schemas/Arn'
+          description: The Amazon Resource Name (ARN) of the Wisdom assistant.
+        associationType:
+          allOf:
+          - $ref: '#/components/schemas/AssociationType'
+          description: The type of association.
+        associationData:
+          allOf:
+          - $ref: '#/components/schemas/AssistantAssociationOutputData'
+          description: The association data.
+        tags:
+          allOf:
+          - $ref: '#/components/schemas/Tags'
+          description: The tags used to organize, track, or control access for this
+            resource.
+      required:
+      - assistantAssociationId
+      - assistantAssociationArn
+      - assistantId
+      - assistantArn
+      - associationType
+      - associationData
+      description: Summary information about the assistant association.
     AssistantAssociationSummaryList:
       type: array
       items:
         $ref: '#/components/schemas/AssistantAssociationSummary'
+    AssistantData:
+      type: object
+      properties:
+        assistantId:
+          allOf:
+          - $ref: '#/components/schemas/Uuid'
+          description: The identifier of the Wisdom assistant.
+        assistantArn:
+          allOf:
+          - $ref: '#/components/schemas/Arn'
+          description: The Amazon Resource Name (ARN) of the Wisdom assistant.
+        name:
+          allOf:
+          - $ref: '#/components/schemas/Name'
+          description: The name.
+        type:
+          allOf:
+          - $ref: '#/components/schemas/AssistantType'
+          description: The type of assistant.
+        status:
+          allOf:
+          - $ref: '#/components/schemas/AssistantStatus'
+          description: The status of the assistant.
+        description:
+          allOf:
+          - $ref: '#/components/schemas/Description'
+          description: The description.
+        tags:
+          allOf:
+          - $ref: '#/components/schemas/Tags'
+          description: The tags used to organize, track, or control access for this
+            resource.
+        serverSideEncryptionConfiguration:
+          allOf:
+          - $ref: '#/components/schemas/ServerSideEncryptionConfiguration'
+          description: 'The configuration information for the customer managed key
+            used for encryption.
+
+
+            This KMS key must have a policy that allows `kms:CreateGrant`, `kms:DescribeKey`,
+            and `kms:Decrypt/kms:GenerateDataKey` permissions to the IAM identity
+            using the key to invoke Wisdom. To use Wisdom with chat, the key policy
+            must also allow `kms:Decrypt`, `kms:GenerateDataKey*`, and `kms:DescribeKey`
+            permissions to the `connect.amazonaws.com` service principal.
+
+
+            For more information about setting up a customer managed key for Wisdom,
+            see [Enable Amazon Connect Wisdom for your instance](https://docs.aws.amazon.com/connect/latest/adminguide/enable-wisdom.html).'
+        integrationConfiguration:
+          allOf:
+          - $ref: '#/components/schemas/AssistantIntegrationConfiguration'
+          description: The configuration information for the Wisdom assistant integration.
+      required:
+      - assistantId
+      - assistantArn
+      - name
+      - type
+      - status
+      description: The assistant data.
+    AssistantIntegrationConfiguration:
+      type: object
+      properties:
+        topicIntegrationArn:
+          allOf:
+          - $ref: '#/components/schemas/GenericArn'
+          description: The Amazon Resource Name (ARN) of the integrated Amazon SNS
+            topic used for streaming chat messages.
+      description: The configuration information for the Wisdom assistant integration.
     AssistantList:
       type: array
       items:
@@ -82,6 +2162,65 @@ components:
       - DELETE_IN_PROGRESS
       - DELETE_FAILED
       - DELETED
+    AssistantSummary:
+      type: object
+      properties:
+        assistantId:
+          allOf:
+          - $ref: '#/components/schemas/Uuid'
+          description: The identifier of the Wisdom assistant.
+        assistantArn:
+          allOf:
+          - $ref: '#/components/schemas/Arn'
+          description: The Amazon Resource Name (ARN) of the Wisdom assistant.
+        name:
+          allOf:
+          - $ref: '#/components/schemas/Name'
+          description: The name of the assistant.
+        type:
+          allOf:
+          - $ref: '#/components/schemas/AssistantType'
+          description: The type of the assistant.
+        status:
+          allOf:
+          - $ref: '#/components/schemas/AssistantStatus'
+          description: The status of the assistant.
+        description:
+          allOf:
+          - $ref: '#/components/schemas/Description'
+          description: The description of the assistant.
+        tags:
+          allOf:
+          - $ref: '#/components/schemas/Tags'
+          description: The tags used to organize, track, or control access for this
+            resource.
+        serverSideEncryptionConfiguration:
+          allOf:
+          - $ref: '#/components/schemas/ServerSideEncryptionConfiguration'
+          description: 'The configuration information for the customer managed key
+            used for encryption.
+
+
+            This KMS key must have a policy that allows `kms:CreateGrant`, `kms:DescribeKey`,
+            and `kms:Decrypt/kms:GenerateDataKey` permissions to the IAM identity
+            using the key to invoke Wisdom. To use Wisdom with chat, the key policy
+            must also allow `kms:Decrypt`, `kms:GenerateDataKey*`, and `kms:DescribeKey`
+            permissions to the `connect.amazonaws.com` service principal.
+
+
+            For more information about setting up a customer managed key for Wisdom,
+            see [Enable Amazon Connect Wisdom for your instance](https://docs.aws.amazon.com/connect/latest/adminguide/enable-wisdom.html).'
+        integrationConfiguration:
+          allOf:
+          - $ref: '#/components/schemas/AssistantIntegrationConfiguration'
+          description: The configuration information for the Wisdom assistant integration.
+      required:
+      - assistantId
+      - assistantArn
+      - name
+      - type
+      - status
+      description: Summary information about the assistant.
     AssistantType:
       type: string
       enum:
@@ -110,6 +2249,24 @@ components:
           The configuration information of the Amazon Connect data source.
       description: |-
         The configuration information of the external data source.
+    ConflictException:
+      type: object
+      properties:
+        message:
+          $ref: '#/components/schemas/String'
+      description: The request could not be processed because of conflict in the current
+        state of the resource. For example, if you're using a `Create` API (such as
+        `CreateAssistant`) that accepts name, a conflicting resource (usually with
+        the same name) is being created or mutated.
+    ConnectConfiguration:
+      type: object
+      properties:
+        instanceId:
+          allOf:
+          - $ref: '#/components/schemas/NonEmptyString'
+          description: The identifier of the Amazon Connect instance. You can find
+            the instanceId in the ARN of the instance.
+      description: The configuration information of the Amazon Connect data source.
     ContactAttributeKey:
       type: string
     ContactAttributeKeys:
@@ -123,10 +2280,111 @@ components:
       type: object
       additionalProperties:
         $ref: '#/components/schemas/ContactAttributeValue'
+    ContentData:
+      type: object
+      properties:
+        contentArn:
+          allOf:
+          - $ref: '#/components/schemas/Arn'
+          description: The Amazon Resource Name (ARN) of the content.
+        contentId:
+          allOf:
+          - $ref: '#/components/schemas/Uuid'
+          description: The identifier of the content.
+        knowledgeBaseArn:
+          allOf:
+          - $ref: '#/components/schemas/Arn'
+          description: The Amazon Resource Name (ARN) of the knowledge base.
+        knowledgeBaseId:
+          allOf:
+          - $ref: '#/components/schemas/Uuid'
+          description: The identifier of the knowledge base. This should not be a
+            QUICK_RESPONSES type knowledge base if you're storing Wisdom Content resource
+            to it.
+        name:
+          allOf:
+          - $ref: '#/components/schemas/Name'
+          description: The name of the content.
+        revisionId:
+          allOf:
+          - $ref: '#/components/schemas/NonEmptyString'
+          description: The identifier of the content revision.
+        title:
+          allOf:
+          - $ref: '#/components/schemas/ContentTitle'
+          description: The title of the content.
+        contentType:
+          allOf:
+          - $ref: '#/components/schemas/ContentType'
+          description: The media type of the content.
+        status:
+          allOf:
+          - $ref: '#/components/schemas/ContentStatus'
+          description: The status of the content.
+        metadata:
+          allOf:
+          - $ref: '#/components/schemas/ContentMetadata'
+          description: A key/value map to store attributes without affecting tagging
+            or recommendations. For example, when synchronizing data between an external
+            system and Wisdom, you can store an external version identifier as metadata
+            to utilize for determining drift.
+        tags:
+          allOf:
+          - $ref: '#/components/schemas/Tags'
+          description: The tags used to organize, track, or control access for this
+            resource.
+        linkOutUri:
+          allOf:
+          - $ref: '#/components/schemas/Uri'
+          description: The URI of the content.
+        url:
+          allOf:
+          - $ref: '#/components/schemas/Url'
+          description: The URL of the content.
+        urlExpiry:
+          allOf:
+          - $ref: '#/components/schemas/Timestamp'
+          description: The expiration time of the URL as an epoch timestamp.
+      required:
+      - contentArn
+      - contentId
+      - knowledgeBaseArn
+      - knowledgeBaseId
+      - name
+      - revisionId
+      - title
+      - contentType
+      - status
+      - metadata
+      - url
+      - urlExpiry
+      description: Information about the content.
     ContentMetadata:
       type: object
       additionalProperties:
         $ref: '#/components/schemas/NonEmptyString'
+    ContentReference:
+      type: object
+      properties:
+        knowledgeBaseArn:
+          allOf:
+          - $ref: '#/components/schemas/Arn'
+          description: The Amazon Resource Name (ARN) of the knowledge base.
+        knowledgeBaseId:
+          allOf:
+          - $ref: '#/components/schemas/Uuid'
+          description: The identifier of the knowledge base. This should not be a
+            QUICK_RESPONSES type knowledge base if you're storing Wisdom Content resource
+            to it.
+        contentArn:
+          allOf:
+          - $ref: '#/components/schemas/Arn'
+          description: The Amazon Resource Name (ARN) of the content.
+        contentId:
+          allOf:
+          - $ref: '#/components/schemas/Uuid'
+          description: The identifier of the content.
+      description: Reference information about the content.
     ContentStatus:
       type: string
       enum:
@@ -137,6 +2395,71 @@ components:
       - DELETE_FAILED
       - DELETED
       - UPDATE_FAILED
+    ContentSummary:
+      type: object
+      properties:
+        contentArn:
+          allOf:
+          - $ref: '#/components/schemas/Arn'
+          description: The Amazon Resource Name (ARN) of the content.
+        contentId:
+          allOf:
+          - $ref: '#/components/schemas/Uuid'
+          description: The identifier of the content.
+        knowledgeBaseArn:
+          allOf:
+          - $ref: '#/components/schemas/Arn'
+          description: The Amazon Resource Name (ARN) of the knowledge base.
+        knowledgeBaseId:
+          allOf:
+          - $ref: '#/components/schemas/Uuid'
+          description: The identifier of the knowledge base. This should not be a
+            QUICK_RESPONSES type knowledge base if you're storing Wisdom Content resource
+            to it.
+        name:
+          allOf:
+          - $ref: '#/components/schemas/Name'
+          description: The name of the content.
+        revisionId:
+          allOf:
+          - $ref: '#/components/schemas/NonEmptyString'
+          description: The identifier of the revision of the content.
+        title:
+          allOf:
+          - $ref: '#/components/schemas/ContentTitle'
+          description: The title of the content.
+        contentType:
+          allOf:
+          - $ref: '#/components/schemas/ContentType'
+          description: The media type of the content.
+        status:
+          allOf:
+          - $ref: '#/components/schemas/ContentStatus'
+          description: The status of the content.
+        metadata:
+          allOf:
+          - $ref: '#/components/schemas/ContentMetadata'
+          description: A key/value map to store attributes without affecting tagging
+            or recommendations. For example, when synchronizing data between an external
+            system and Wisdom, you can store an external version identifier as metadata
+            to utilize for determining drift.
+        tags:
+          allOf:
+          - $ref: '#/components/schemas/Tags'
+          description: The tags used to organize, track, or control access for this
+            resource.
+      required:
+      - contentArn
+      - contentId
+      - knowledgeBaseArn
+      - knowledgeBaseId
+      - name
+      - revisionId
+      - title
+      - contentType
+      - status
+      - metadata
+      description: Summary information about the content.
     ContentSummaryList:
       type: array
       items:
@@ -148,15 +2471,514 @@ components:
     ContentType:
       type: string
       pattern: ^(text/(plain|html|csv))|(application/(pdf|vnd\.openxmlformats-officedocument\.wordprocessingml\.document))|(application/x\.wisdom-json;source=(salesforce|servicenow|zendesk))$
+    CreateAssistantAssociationRequest:
+      type: object
+      properties:
+        assistantId:
+          allOf:
+          - $ref: '#/components/schemas/UuidOrArn'
+          description: The identifier of the Wisdom assistant. Can be either the ID
+            or the ARN. URLs cannot contain the ARN.
+        associationType:
+          allOf:
+          - $ref: '#/components/schemas/AssociationType'
+          description: The type of association.
+        association:
+          allOf:
+          - $ref: '#/components/schemas/AssistantAssociationInputData'
+          description: The identifier of the associated resource.
+        clientToken:
+          allOf:
+          - $ref: '#/components/schemas/ClientToken'
+          description: A unique, case-sensitive identifier that you provide to ensure
+            the idempotency of the request. If not provided, the Amazon Web Services
+            SDK populates this field. For more information about idempotency, see
+            [Making retries safe with idempotent APIs](https://aws.amazon.com/builders-library/making-retries-safe-with-idempotent-APIs/).
+        tags:
+          allOf:
+          - $ref: '#/components/schemas/Tags'
+          description: The tags used to organize, track, or control access for this
+            resource.
+      required:
+      - assistantId
+      - associationType
+      - association
+    CreateAssistantAssociationResponse:
+      type: object
+      properties:
+        assistantAssociation:
+          allOf:
+          - $ref: '#/components/schemas/AssistantAssociationData'
+          description: The assistant association.
+    CreateAssistantRequest:
+      type: object
+      properties:
+        clientToken:
+          allOf:
+          - $ref: '#/components/schemas/ClientToken'
+          description: A unique, case-sensitive identifier that you provide to ensure
+            the idempotency of the request. If not provided, the Amazon Web Services
+            SDK populates this field. For more information about idempotency, see
+            [Making retries safe with idempotent APIs](https://aws.amazon.com/builders-library/making-retries-safe-with-idempotent-APIs/).
+        name:
+          allOf:
+          - $ref: '#/components/schemas/Name'
+          description: The name of the assistant.
+        type:
+          allOf:
+          - $ref: '#/components/schemas/AssistantType'
+          description: The type of assistant.
+        description:
+          allOf:
+          - $ref: '#/components/schemas/Description'
+          description: The description of the assistant.
+        tags:
+          allOf:
+          - $ref: '#/components/schemas/Tags'
+          description: The tags used to organize, track, or control access for this
+            resource.
+        serverSideEncryptionConfiguration:
+          allOf:
+          - $ref: '#/components/schemas/ServerSideEncryptionConfiguration'
+          description: 'The configuration information for the customer managed key
+            used for encryption.
+
+
+            The customer managed key must have a policy that allows `kms:CreateGrant`,
+            ` kms:DescribeKey`, and `kms:Decrypt/kms:GenerateDataKey` permissions
+            to the IAM identity using the key to invoke Wisdom. To use Wisdom with
+            chat, the key policy must also allow `kms:Decrypt`, `kms:GenerateDataKey*`,
+            and `kms:DescribeKey` permissions to the `connect.amazonaws.com` service
+            principal.
+
+
+            For more information about setting up a customer managed key for Wisdom,
+            see [Enable Amazon Connect Wisdom for your instance](https://docs.aws.amazon.com/connect/latest/adminguide/enable-wisdom.html).'
+      required:
+      - name
+      - type
+    CreateAssistantResponse:
+      type: object
+      properties:
+        assistant:
+          allOf:
+          - $ref: '#/components/schemas/AssistantData'
+          description: Information about the assistant.
+    CreateContentRequest:
+      type: object
+      properties:
+        knowledgeBaseId:
+          allOf:
+          - $ref: '#/components/schemas/UuidOrArn'
+          description: The identifier of the knowledge base. This should not be a
+            QUICK_RESPONSES type knowledge base if you're storing Wisdom Content resource
+            to it. Can be either the ID or the ARN. URLs cannot contain the ARN.
+        name:
+          allOf:
+          - $ref: '#/components/schemas/Name'
+          description: The name of the content. Each piece of content in a knowledge
+            base must have a unique name. You can retrieve a piece of content using
+            only its knowledge base and its name with the [SearchContent](https://docs.aws.amazon.com/wisdom/latest/APIReference/API_SearchContent.html)
+            API.
+        title:
+          allOf:
+          - $ref: '#/components/schemas/ContentTitle'
+          description: The title of the content. If not set, the title is equal to
+            the name.
+        overrideLinkOutUri:
+          allOf:
+          - $ref: '#/components/schemas/Uri'
+          description: The URI you want to use for the article. If the knowledge base
+            has a templateUri, setting this argument overrides it for this piece of
+            content.
+        metadata:
+          allOf:
+          - $ref: '#/components/schemas/ContentMetadata'
+          description: A key/value map to store attributes without affecting tagging
+            or recommendations. For example, when synchronizing data between an external
+            system and Wisdom, you can store an external version identifier as metadata
+            to utilize for determining drift.
+        uploadId:
+          allOf:
+          - $ref: '#/components/schemas/UploadId'
+          description: A pointer to the uploaded asset. This value is returned by
+            [StartContentUpload](https://docs.aws.amazon.com/wisdom/latest/APIReference/API_StartContentUpload.html).
+        clientToken:
+          allOf:
+          - $ref: '#/components/schemas/NonEmptyString'
+          description: A unique, case-sensitive identifier that you provide to ensure
+            the idempotency of the request. If not provided, the Amazon Web Services
+            SDK populates this field. For more information about idempotency, see
+            [Making retries safe with idempotent APIs](https://aws.amazon.com/builders-library/making-retries-safe-with-idempotent-APIs/).
+        tags:
+          allOf:
+          - $ref: '#/components/schemas/Tags'
+          description: The tags used to organize, track, or control access for this
+            resource.
+      required:
+      - knowledgeBaseId
+      - name
+      - uploadId
+    CreateContentResponse:
+      type: object
+      properties:
+        content:
+          allOf:
+          - $ref: '#/components/schemas/ContentData'
+          description: The content.
+    CreateKnowledgeBaseRequest:
+      type: object
+      properties:
+        clientToken:
+          allOf:
+          - $ref: '#/components/schemas/NonEmptyString'
+          description: A unique, case-sensitive identifier that you provide to ensure
+            the idempotency of the request. If not provided, the Amazon Web Services
+            SDK populates this field. For more information about idempotency, see
+            [Making retries safe with idempotent APIs](https://aws.amazon.com/builders-library/making-retries-safe-with-idempotent-APIs/).
+        name:
+          allOf:
+          - $ref: '#/components/schemas/Name'
+          description: The name of the knowledge base.
+        knowledgeBaseType:
+          allOf:
+          - $ref: '#/components/schemas/KnowledgeBaseType'
+          description: The type of knowledge base. Only CUSTOM knowledge bases allow
+            you to upload your own content. EXTERNAL knowledge bases support integrations
+            with third-party systems whose content is synchronized automatically.
+        sourceConfiguration:
+          allOf:
+          - $ref: '#/components/schemas/SourceConfiguration'
+          description: The source of the knowledge base content. Only set this argument
+            for EXTERNAL knowledge bases.
+        renderingConfiguration:
+          allOf:
+          - $ref: '#/components/schemas/RenderingConfiguration'
+          description: Information about how to render the content.
+        serverSideEncryptionConfiguration:
+          allOf:
+          - $ref: '#/components/schemas/ServerSideEncryptionConfiguration'
+          description: 'The configuration information for the customer managed key
+            used for encryption.
+
+
+            This KMS key must have a policy that allows `kms:CreateGrant`, `kms:DescribeKey`,
+            and `kms:Decrypt/kms:GenerateDataKey` permissions to the IAM identity
+            using the key to invoke Wisdom.
+
+
+            For more information about setting up a customer managed key for Wisdom,
+            see [Enable Amazon Connect Wisdom for your instance](https://docs.aws.amazon.com/connect/latest/adminguide/enable-wisdom.html).'
+        description:
+          allOf:
+          - $ref: '#/components/schemas/Description'
+          description: The description.
+        tags:
+          allOf:
+          - $ref: '#/components/schemas/Tags'
+          description: The tags used to organize, track, or control access for this
+            resource.
+      required:
+      - name
+      - knowledgeBaseType
+    CreateKnowledgeBaseResponse:
+      type: object
+      properties:
+        knowledgeBase:
+          allOf:
+          - $ref: '#/components/schemas/KnowledgeBaseData'
+          description: The knowledge base.
+    CreateQuickResponseRequest:
+      type: object
+      properties:
+        knowledgeBaseId:
+          allOf:
+          - $ref: '#/components/schemas/UuidOrArn'
+          description: The identifier of the knowledge base. This should not be a
+            QUICK_RESPONSES type knowledge base if you're storing Wisdom Content resource
+            to it. Can be either the ID or the ARN. URLs cannot contain the ARN.
+        name:
+          allOf:
+          - $ref: '#/components/schemas/QuickResponseName'
+          description: The name of the quick response.
+        content:
+          allOf:
+          - $ref: '#/components/schemas/QuickResponseDataProvider'
+          description: The content of the quick response.
+        contentType:
+          allOf:
+          - $ref: '#/components/schemas/QuickResponseType'
+          description: "The media type of the quick response content.\n\n  * Use `application/x.quickresponse;format=plain`\
+            \ for a quick response written in plain text.\n\n  * Use `application/x.quickresponse;format=markdown`\
+            \ for a quick response written in richtext."
+        groupingConfiguration:
+          allOf:
+          - $ref: '#/components/schemas/GroupingConfiguration'
+          description: The configuration information of the user groups that the quick
+            response is accessible to.
+        description:
+          allOf:
+          - $ref: '#/components/schemas/QuickResponseDescription'
+          description: The description of the quick response.
+        shortcutKey:
+          allOf:
+          - $ref: '#/components/schemas/ShortCutKey'
+          description: The shortcut key of the quick response. The value should be
+            unique across the knowledge base.
+        isActive:
+          allOf:
+          - $ref: '#/components/schemas/Boolean'
+          description: Whether the quick response is active.
+        channels:
+          allOf:
+          - $ref: '#/components/schemas/Channels'
+          description: The Amazon Connect channels this quick response applies to.
+        language:
+          allOf:
+          - $ref: '#/components/schemas/LanguageCode'
+          description: The language code value for the language in which the quick
+            response is written. The supported language codes include `de_DE`, `en_US`,
+            `es_ES`, `fr_FR`, `id_ID`, `it_IT`, `ja_JP`, `ko_KR`, `pt_BR`, `zh_CN`,
+            `zh_TW`
+        clientToken:
+          allOf:
+          - $ref: '#/components/schemas/NonEmptyString'
+          description: A unique, case-sensitive identifier that you provide to ensure
+            the idempotency of the request. If not provided, the Amazon Web Services
+            SDK populates this field. For more information about idempotency, see
+            [Making retries safe with idempotent APIs](https://aws.amazon.com/builders-library/making-retries-safe-with-idempotent-APIs/).
+        tags:
+          allOf:
+          - $ref: '#/components/schemas/Tags'
+          description: The tags used to organize, track, or control access for this
+            resource.
+      required:
+      - knowledgeBaseId
+      - name
+      - content
+    CreateQuickResponseResponse:
+      type: object
+      properties:
+        quickResponse:
+          allOf:
+          - $ref: '#/components/schemas/QuickResponseData'
+          description: The quick response.
+    CreateSessionRequest:
+      type: object
+      properties:
+        clientToken:
+          allOf:
+          - $ref: '#/components/schemas/ClientToken'
+          description: A unique, case-sensitive identifier that you provide to ensure
+            the idempotency of the request. If not provided, the Amazon Web Services
+            SDK populates this field. For more information about idempotency, see
+            [Making retries safe with idempotent APIs](https://aws.amazon.com/builders-library/making-retries-safe-with-idempotent-APIs/).
+        assistantId:
+          allOf:
+          - $ref: '#/components/schemas/UuidOrArn'
+          description: The identifier of the Wisdom assistant. Can be either the ID
+            or the ARN. URLs cannot contain the ARN.
+        name:
+          allOf:
+          - $ref: '#/components/schemas/Name'
+          description: The name of the session.
+        description:
+          allOf:
+          - $ref: '#/components/schemas/Description'
+          description: The description.
+        tags:
+          allOf:
+          - $ref: '#/components/schemas/Tags'
+          description: The tags used to organize, track, or control access for this
+            resource.
+      required:
+      - assistantId
+      - name
+    CreateSessionResponse:
+      type: object
+      properties:
+        session:
+          allOf:
+          - $ref: '#/components/schemas/SessionData'
+          description: The session.
+    DeleteAssistantAssociationRequest:
+      type: object
+      properties:
+        assistantAssociationId:
+          allOf:
+          - $ref: '#/components/schemas/UuidOrArn'
+          description: The identifier of the assistant association. Can be either
+            the ID or the ARN. URLs cannot contain the ARN.
+        assistantId:
+          allOf:
+          - $ref: '#/components/schemas/UuidOrArn'
+          description: The identifier of the Wisdom assistant. Can be either the ID
+            or the ARN. URLs cannot contain the ARN.
+      required:
+      - assistantAssociationId
+      - assistantId
+    DeleteAssistantAssociationResponse:
+      type: object
+      properties: {}
+    DeleteAssistantRequest:
+      type: object
+      properties:
+        assistantId:
+          allOf:
+          - $ref: '#/components/schemas/UuidOrArn'
+          description: The identifier of the Wisdom assistant. Can be either the ID
+            or the ARN. URLs cannot contain the ARN.
+      required:
+      - assistantId
+    DeleteAssistantResponse:
+      type: object
+      properties: {}
+    DeleteContentRequest:
+      type: object
+      properties:
+        knowledgeBaseId:
+          allOf:
+          - $ref: '#/components/schemas/UuidOrArn'
+          description: The identifier of the knowledge base. This should not be a
+            QUICK_RESPONSES type knowledge base if you're storing Wisdom Content resource
+            to it. Can be either the ID or the ARN. URLs cannot contain the ARN.
+        contentId:
+          allOf:
+          - $ref: '#/components/schemas/UuidOrArn'
+          description: The identifier of the content. Can be either the ID or the
+            ARN. URLs cannot contain the ARN.
+      required:
+      - knowledgeBaseId
+      - contentId
+    DeleteContentResponse:
+      type: object
+      properties: {}
+    DeleteImportJobRequest:
+      type: object
+      properties:
+        knowledgeBaseId:
+          allOf:
+          - $ref: '#/components/schemas/UuidOrArn'
+          description: The identifier of the knowledge base. This should not be a
+            QUICK_RESPONSES type knowledge base if you're storing Wisdom Content resource
+            to it.
+        importJobId:
+          allOf:
+          - $ref: '#/components/schemas/Uuid'
+          description: The identifier of the import job to be deleted.
+      required:
+      - knowledgeBaseId
+      - importJobId
+    DeleteImportJobResponse:
+      type: object
+      properties: {}
+    DeleteKnowledgeBaseRequest:
+      type: object
+      properties:
+        knowledgeBaseId:
+          allOf:
+          - $ref: '#/components/schemas/UuidOrArn'
+          description: The knowledge base to delete content from. Can be either the
+            ID or the ARN. URLs cannot contain the ARN.
+      required:
+      - knowledgeBaseId
+    DeleteKnowledgeBaseResponse:
+      type: object
+      properties: {}
+    DeleteQuickResponseRequest:
+      type: object
+      properties:
+        knowledgeBaseId:
+          allOf:
+          - $ref: '#/components/schemas/UuidOrArn'
+          description: The knowledge base from which the quick response is deleted.
+            The identifier of the knowledge base. This should not be a QUICK_RESPONSES
+            type knowledge base if you're storing Wisdom Content resource to it.
+        quickResponseId:
+          allOf:
+          - $ref: '#/components/schemas/UuidOrArn'
+          description: The identifier of the quick response to delete.
+      required:
+      - knowledgeBaseId
+      - quickResponseId
+    DeleteQuickResponseResponse:
+      type: object
+      properties: {}
     Description:
       type: string
       pattern: ^[a-zA-Z0-9\s_.,-]+
       minLength: 1
       maxLength: 255
+    Document:
+      type: object
+      properties:
+        contentReference:
+          allOf:
+          - $ref: '#/components/schemas/ContentReference'
+          description: A reference to the content resource.
+        title:
+          allOf:
+          - $ref: '#/components/schemas/DocumentText'
+          description: The title of the document.
+        excerpt:
+          allOf:
+          - $ref: '#/components/schemas/DocumentText'
+          description: The excerpt from the document.
+      required:
+      - contentReference
+      description: The document.
+    DocumentText:
+      type: object
+      properties:
+        text:
+          allOf:
+          - $ref: '#/components/schemas/SensitiveString'
+          description: Text in the document.
+        highlights:
+          allOf:
+          - $ref: '#/components/schemas/Highlights'
+          description: Highlights in the document text.
+      description: The text of the document.
     ExternalSource:
       type: string
       enum:
       - AMAZON_CONNECT
+    ExternalSourceConfiguration:
+      type: object
+      properties:
+        source:
+          allOf:
+          - $ref: '#/components/schemas/ExternalSource'
+          description: The type of the external data source.
+        configuration:
+          allOf:
+          - $ref: '#/components/schemas/Configuration'
+          description: The configuration information of the external data source.
+      required:
+      - source
+      - configuration
+      description: The configuration information of the external data source.
+    Filter:
+      type: object
+      properties:
+        field:
+          allOf:
+          - $ref: '#/components/schemas/FilterField'
+          description: The field on which to filter.
+        operator:
+          allOf:
+          - $ref: '#/components/schemas/FilterOperator'
+          description: The operator to use for comparing the field’s value with the
+            provided value.
+        value:
+          allOf:
+          - $ref: '#/components/schemas/NonEmptyString'
+          description: The desired field value on which to filter.
+      required:
+      - field
+      - operator
+      - value
+      description: A search filter.
     FilterField:
       type: string
       enum:
@@ -174,6 +2996,240 @@ components:
       pattern: ^arn:[a-z-]+?:[a-z-]+?:[a-z0-9-]*?:([0-9]{12})?:[a-zA-Z0-9-:/]+$
       minLength: 1
       maxLength: 2048
+    GetAssistantAssociationRequest:
+      type: object
+      properties:
+        assistantAssociationId:
+          allOf:
+          - $ref: '#/components/schemas/UuidOrArn'
+          description: The identifier of the assistant association. Can be either
+            the ID or the ARN. URLs cannot contain the ARN.
+        assistantId:
+          allOf:
+          - $ref: '#/components/schemas/UuidOrArn'
+          description: The identifier of the Wisdom assistant. Can be either the ID
+            or the ARN. URLs cannot contain the ARN.
+      required:
+      - assistantAssociationId
+      - assistantId
+    GetAssistantAssociationResponse:
+      type: object
+      properties:
+        assistantAssociation:
+          allOf:
+          - $ref: '#/components/schemas/AssistantAssociationData'
+          description: The assistant association.
+    GetAssistantRequest:
+      type: object
+      properties:
+        assistantId:
+          allOf:
+          - $ref: '#/components/schemas/UuidOrArn'
+          description: The identifier of the Wisdom assistant. Can be either the ID
+            or the ARN. URLs cannot contain the ARN.
+      required:
+      - assistantId
+    GetAssistantResponse:
+      type: object
+      properties:
+        assistant:
+          allOf:
+          - $ref: '#/components/schemas/AssistantData'
+          description: Information about the assistant.
+    GetContentRequest:
+      type: object
+      properties:
+        contentId:
+          allOf:
+          - $ref: '#/components/schemas/UuidOrArn'
+          description: The identifier of the content. Can be either the ID or the
+            ARN. URLs cannot contain the ARN.
+        knowledgeBaseId:
+          allOf:
+          - $ref: '#/components/schemas/UuidOrArn'
+          description: The identifier of the knowledge base. This should not be a
+            QUICK_RESPONSES type knowledge base if you're storing Wisdom Content resource
+            to it. Can be either the ID or the ARN. URLs cannot contain the ARN.
+      required:
+      - contentId
+      - knowledgeBaseId
+    GetContentResponse:
+      type: object
+      properties:
+        content:
+          allOf:
+          - $ref: '#/components/schemas/ContentData'
+          description: The content.
+    GetContentSummaryRequest:
+      type: object
+      properties:
+        contentId:
+          allOf:
+          - $ref: '#/components/schemas/UuidOrArn'
+          description: The identifier of the content. Can be either the ID or the
+            ARN. URLs cannot contain the ARN.
+        knowledgeBaseId:
+          allOf:
+          - $ref: '#/components/schemas/UuidOrArn'
+          description: The identifier of the knowledge base. This should not be a
+            QUICK_RESPONSES type knowledge base if you're storing Wisdom Content resource
+            to it. Can be either the ID or the ARN. URLs cannot contain the ARN.
+      required:
+      - contentId
+      - knowledgeBaseId
+    GetContentSummaryResponse:
+      type: object
+      properties:
+        contentSummary:
+          allOf:
+          - $ref: '#/components/schemas/ContentSummary'
+          description: The content summary.
+    GetImportJobRequest:
+      type: object
+      properties:
+        importJobId:
+          allOf:
+          - $ref: '#/components/schemas/Uuid'
+          description: The identifier of the import job to retrieve.
+        knowledgeBaseId:
+          allOf:
+          - $ref: '#/components/schemas/UuidOrArn'
+          description: The identifier of the knowledge base that the import job belongs
+            to.
+      required:
+      - importJobId
+      - knowledgeBaseId
+    GetImportJobResponse:
+      type: object
+      properties:
+        importJob:
+          allOf:
+          - $ref: '#/components/schemas/ImportJobData'
+          description: The import job.
+    GetKnowledgeBaseRequest:
+      type: object
+      properties:
+        knowledgeBaseId:
+          allOf:
+          - $ref: '#/components/schemas/UuidOrArn'
+          description: The identifier of the knowledge base. This should not be a
+            QUICK_RESPONSES type knowledge base if you're storing Wisdom Content resource
+            to it. Can be either the ID or the ARN. URLs cannot contain the ARN.
+      required:
+      - knowledgeBaseId
+    GetKnowledgeBaseResponse:
+      type: object
+      properties:
+        knowledgeBase:
+          allOf:
+          - $ref: '#/components/schemas/KnowledgeBaseData'
+          description: The knowledge base.
+    GetQuickResponseRequest:
+      type: object
+      properties:
+        quickResponseId:
+          allOf:
+          - $ref: '#/components/schemas/UuidOrArn'
+          description: The identifier of the quick response.
+        knowledgeBaseId:
+          allOf:
+          - $ref: '#/components/schemas/UuidOrArn'
+          description: The identifier of the knowledge base. This should be a QUICK_RESPONSES
+            type knowledge base.
+      required:
+      - quickResponseId
+      - knowledgeBaseId
+    GetQuickResponseResponse:
+      type: object
+      properties:
+        quickResponse:
+          allOf:
+          - $ref: '#/components/schemas/QuickResponseData'
+          description: The quick response.
+    GetRecommendationsRequest:
+      type: object
+      properties:
+        assistantId:
+          allOf:
+          - $ref: '#/components/schemas/UuidOrArn'
+          description: The identifier of the Wisdom assistant. Can be either the ID
+            or the ARN. URLs cannot contain the ARN.
+        sessionId:
+          allOf:
+          - $ref: '#/components/schemas/UuidOrArn'
+          description: The identifier of the session. Can be either the ID or the
+            ARN. URLs cannot contain the ARN.
+        maxResults:
+          allOf:
+          - $ref: '#/components/schemas/MaxResults'
+          description: The maximum number of results to return per page.
+        waitTimeSeconds:
+          allOf:
+          - $ref: '#/components/schemas/WaitTimeSeconds'
+          description: The duration (in seconds) for which the call waits for a recommendation
+            to be made available before returning. If a recommendation is available,
+            the call returns sooner than `WaitTimeSeconds`. If no messages are available
+            and the wait time expires, the call returns successfully with an empty
+            list.
+      required:
+      - assistantId
+      - sessionId
+    GetRecommendationsResponse:
+      type: object
+      properties:
+        recommendations:
+          allOf:
+          - $ref: '#/components/schemas/RecommendationList'
+          description: The recommendations.
+        triggers:
+          allOf:
+          - $ref: '#/components/schemas/RecommendationTriggerList'
+          description: The triggers corresponding to recommendations.
+      required:
+      - recommendations
+    GetSessionRequest:
+      type: object
+      properties:
+        assistantId:
+          allOf:
+          - $ref: '#/components/schemas/UuidOrArn'
+          description: The identifier of the Wisdom assistant. Can be either the ID
+            or the ARN. URLs cannot contain the ARN.
+        sessionId:
+          allOf:
+          - $ref: '#/components/schemas/UuidOrArn'
+          description: The identifier of the session. Can be either the ID or the
+            ARN. URLs cannot contain the ARN.
+      required:
+      - assistantId
+      - sessionId
+    GetSessionResponse:
+      type: object
+      properties:
+        session:
+          allOf:
+          - $ref: '#/components/schemas/SessionData'
+          description: The session.
+    GroupingConfiguration:
+      type: object
+      properties:
+        criteria:
+          allOf:
+          - $ref: '#/components/schemas/GroupingCriteria'
+          description: "The criteria used for grouping Wisdom users.\n\nThe following\
+            \ is the list of supported criteria values.\n\n  * `RoutingProfileArn`:\
+            \ Grouping the users by their [Amazon Connect routing profile ARN](https://docs.aws.amazon.com/connect/latest/APIReference/API_RoutingProfile.html).\
+            \ User should have [SearchRoutingProfile](https://docs.aws.amazon.com/connect/latest/APIReference/API_SearchRoutingProfiles.html)\
+            \ and [DescribeRoutingProfile](https://docs.aws.amazon.com/connect/latest/APIReference/API_DescribeRoutingProfile.html)\
+            \ permissions when setting criteria to this value."
+        values:
+          allOf:
+          - $ref: '#/components/schemas/GroupingValues'
+          description: "The list of values that define different groups of Wisdom\
+            \ users.\n\n  * When setting `criteria` to `RoutingProfileArn`, you need\
+            \ to provide a list of ARNs of [Amazon Connect routing profiles](https://docs.aws.amazon.com/connect/latest/APIReference/API_RoutingProfile.html)\
+            \ as values of this parameter."
+      description: The configuration information of the grouping of Wisdom users.
     GroupingCriteria:
       type: string
       minLength: 1
@@ -190,6 +3246,19 @@ components:
       type: object
       additionalProperties:
         $ref: '#/components/schemas/NonEmptyString'
+    Highlight:
+      type: object
+      properties:
+        beginOffsetInclusive:
+          allOf:
+          - $ref: '#/components/schemas/HighlightOffset'
+          description: The offset for the start of the highlight.
+        endOffsetExclusive:
+          allOf:
+          - $ref: '#/components/schemas/HighlightOffset'
+          description: The offset for the end of the highlight.
+      description: Offset specification to describe highlighting of document excerpts
+        for rendering search results and recommendations.
     HighlightOffset:
       type: integer
       default: 0
@@ -197,6 +3266,76 @@ components:
       type: array
       items:
         $ref: '#/components/schemas/Highlight'
+    ImportJobData:
+      type: object
+      properties:
+        importJobId:
+          allOf:
+          - $ref: '#/components/schemas/Uuid'
+          description: The identifier of the import job.
+        knowledgeBaseId:
+          allOf:
+          - $ref: '#/components/schemas/Uuid'
+          description: The identifier of the knowledge base. This should not be a
+            QUICK_RESPONSES type knowledge base if you're storing Wisdom Content resource
+            to it.
+        uploadId:
+          allOf:
+          - $ref: '#/components/schemas/UploadId'
+          description: A pointer to the uploaded asset. This value is returned by
+            [StartContentUpload](https://docs.aws.amazon.com/wisdom/latest/APIReference/API_StartContentUpload.html).
+        knowledgeBaseArn:
+          allOf:
+          - $ref: '#/components/schemas/Arn'
+          description: The Amazon Resource Name (ARN) of the knowledge base.
+        importJobType:
+          allOf:
+          - $ref: '#/components/schemas/ImportJobType'
+          description: The type of the import job.
+        status:
+          allOf:
+          - $ref: '#/components/schemas/ImportJobStatus'
+          description: The status of the import job.
+        url:
+          allOf:
+          - $ref: '#/components/schemas/Url'
+          description: The download link to the resource file that is uploaded to
+            the import job.
+        failedRecordReport:
+          allOf:
+          - $ref: '#/components/schemas/Url'
+          description: The link to donwload the information of resource data that
+            failed to be imported.
+        urlExpiry:
+          allOf:
+          - $ref: '#/components/schemas/Timestamp'
+          description: The expiration time of the URL as an epoch timestamp.
+        createdTime:
+          allOf:
+          - $ref: '#/components/schemas/Timestamp'
+          description: The timestamp when the import job was created.
+        lastModifiedTime:
+          allOf:
+          - $ref: '#/components/schemas/Timestamp'
+          description: The timestamp when the import job data was last modified.
+        metadata:
+          allOf:
+          - $ref: '#/components/schemas/ContentMetadata'
+          description: The metadata fields of the imported Wisdom resources.
+        externalSourceConfiguration:
+          $ref: '#/components/schemas/ExternalSourceConfiguration'
+      required:
+      - importJobId
+      - knowledgeBaseId
+      - uploadId
+      - knowledgeBaseArn
+      - importJobType
+      - status
+      - url
+      - urlExpiry
+      - createdTime
+      - lastModifiedTime
+      description: Summary information about the import job.
     ImportJobList:
       type: array
       items:
@@ -210,10 +3349,150 @@ components:
       - DELETE_IN_PROGRESS
       - DELETE_FAILED
       - DELETED
+    ImportJobSummary:
+      type: object
+      properties:
+        importJobId:
+          allOf:
+          - $ref: '#/components/schemas/Uuid'
+          description: The identifier of the import job.
+        knowledgeBaseId:
+          allOf:
+          - $ref: '#/components/schemas/Uuid'
+          description: The identifier of the knowledge base. This should not be a
+            QUICK_RESPONSES type knowledge base if you're storing Wisdom Content resource
+            to it.
+        uploadId:
+          allOf:
+          - $ref: '#/components/schemas/UploadId'
+          description: A pointer to the uploaded asset. This value is returned by
+            [StartContentUpload](https://docs.aws.amazon.com/wisdom/latest/APIReference/API_StartContentUpload.html).
+        knowledgeBaseArn:
+          allOf:
+          - $ref: '#/components/schemas/Arn'
+          description: The Amazon Resource Name (ARN) of the knowledge base.
+        importJobType:
+          allOf:
+          - $ref: '#/components/schemas/ImportJobType'
+          description: The type of import job.
+        status:
+          allOf:
+          - $ref: '#/components/schemas/ImportJobStatus'
+          description: The status of the import job.
+        createdTime:
+          allOf:
+          - $ref: '#/components/schemas/Timestamp'
+          description: The timestamp when the import job was created.
+        lastModifiedTime:
+          allOf:
+          - $ref: '#/components/schemas/Timestamp'
+          description: The timestamp when the import job was last modified.
+        metadata:
+          allOf:
+          - $ref: '#/components/schemas/ContentMetadata'
+          description: The metadata fields of the imported Wisdom resources.
+        externalSourceConfiguration:
+          allOf:
+          - $ref: '#/components/schemas/ExternalSourceConfiguration'
+          description: The configuration information of the external source that the
+            resource data are imported from.
+      required:
+      - importJobId
+      - knowledgeBaseId
+      - uploadId
+      - knowledgeBaseArn
+      - importJobType
+      - status
+      - createdTime
+      - lastModifiedTime
+      description: Summary information about the import job.
     ImportJobType:
       type: string
       enum:
       - QUICK_RESPONSES
+    KnowledgeBaseAssociationData:
+      type: object
+      properties:
+        knowledgeBaseId:
+          allOf:
+          - $ref: '#/components/schemas/Uuid'
+          description: The identifier of the knowledge base. This should not be a
+            QUICK_RESPONSES type knowledge base if you're storing Wisdom Content resource
+            to it.
+        knowledgeBaseArn:
+          allOf:
+          - $ref: '#/components/schemas/Arn'
+          description: The Amazon Resource Name (ARN) of the knowledge base.
+      description: Association information about the knowledge base.
+    KnowledgeBaseData:
+      type: object
+      properties:
+        knowledgeBaseId:
+          allOf:
+          - $ref: '#/components/schemas/Uuid'
+          description: The identifier of the knowledge base. This should not be a
+            QUICK_RESPONSES type knowledge base if you're storing Wisdom Content resource
+            to it.
+        knowledgeBaseArn:
+          allOf:
+          - $ref: '#/components/schemas/Arn'
+          description: The Amazon Resource Name (ARN) of the knowledge base.
+        name:
+          allOf:
+          - $ref: '#/components/schemas/Name'
+          description: The name of the knowledge base.
+        knowledgeBaseType:
+          allOf:
+          - $ref: '#/components/schemas/KnowledgeBaseType'
+          description: The type of knowledge base.
+        status:
+          allOf:
+          - $ref: '#/components/schemas/KnowledgeBaseStatus'
+          description: The status of the knowledge base.
+        lastContentModificationTime:
+          allOf:
+          - $ref: '#/components/schemas/Timestamp'
+          description: An epoch timestamp indicating the most recent content modification
+            inside the knowledge base. If no content exists in a knowledge base, this
+            value is unset.
+        sourceConfiguration:
+          allOf:
+          - $ref: '#/components/schemas/SourceConfiguration'
+          description: Source configuration information about the knowledge base.
+        renderingConfiguration:
+          allOf:
+          - $ref: '#/components/schemas/RenderingConfiguration'
+          description: Information about how to render the content.
+        serverSideEncryptionConfiguration:
+          allOf:
+          - $ref: '#/components/schemas/ServerSideEncryptionConfiguration'
+          description: 'The configuration information for the customer managed key
+            used for encryption.
+
+
+            This KMS key must have a policy that allows `kms:CreateGrant`, `kms:DescribeKey`,
+            and `kms:Decrypt/kms:GenerateDataKey` permissions to the IAM identity
+            using the key to invoke Wisdom.
+
+
+            For more information about setting up a customer managed key for Wisdom,
+            see [Enable Amazon Connect Wisdom for your instance](https://docs.aws.amazon.com/connect/latest/adminguide/enable-wisdom.html).'
+        description:
+          allOf:
+          - $ref: '#/components/schemas/Description'
+          description: The description.
+        tags:
+          allOf:
+          - $ref: '#/components/schemas/Tags'
+          description: The tags used to organize, track, or control access for this
+            resource.
+      required:
+      - knowledgeBaseId
+      - knowledgeBaseArn
+      - name
+      - knowledgeBaseType
+      - status
+      description: Information about the knowledge base.
     KnowledgeBaseList:
       type: array
       items:
@@ -227,6 +3506,69 @@ components:
       - DELETE_IN_PROGRESS
       - DELETE_FAILED
       - DELETED
+    KnowledgeBaseSummary:
+      type: object
+      properties:
+        knowledgeBaseId:
+          allOf:
+          - $ref: '#/components/schemas/Uuid'
+          description: The identifier of the knowledge base. This should not be a
+            QUICK_RESPONSES type knowledge base if you're storing Wisdom Content resource
+            to it.
+        knowledgeBaseArn:
+          allOf:
+          - $ref: '#/components/schemas/Arn'
+          description: The Amazon Resource Name (ARN) of the knowledge base.
+        name:
+          allOf:
+          - $ref: '#/components/schemas/Name'
+          description: The name of the knowledge base.
+        knowledgeBaseType:
+          allOf:
+          - $ref: '#/components/schemas/KnowledgeBaseType'
+          description: The type of knowledge base.
+        status:
+          allOf:
+          - $ref: '#/components/schemas/KnowledgeBaseStatus'
+          description: The status of the knowledge base summary.
+        sourceConfiguration:
+          allOf:
+          - $ref: '#/components/schemas/SourceConfiguration'
+          description: Configuration information about the external data source.
+        renderingConfiguration:
+          allOf:
+          - $ref: '#/components/schemas/RenderingConfiguration'
+          description: Information about how to render the content.
+        serverSideEncryptionConfiguration:
+          allOf:
+          - $ref: '#/components/schemas/ServerSideEncryptionConfiguration'
+          description: 'The configuration information for the customer managed key
+            used for encryption.
+
+
+            This KMS key must have a policy that allows `kms:CreateGrant`, `kms:DescribeKey`,
+            `kms:Decrypt/kms:GenerateDataKey` permissions to the IAM identity using
+            the key to invoke Wisdom.
+
+
+            For more information about setting up a customer managed key for Wisdom,
+            see [Enable Amazon Connect Wisdom for your instance](https://docs.aws.amazon.com/connect/latest/adminguide/enable-wisdom.html).'
+        description:
+          allOf:
+          - $ref: '#/components/schemas/Description'
+          description: The description of the knowledge base.
+        tags:
+          allOf:
+          - $ref: '#/components/schemas/Tags'
+          description: The tags used to organize, track, or control access for this
+            resource.
+      required:
+      - knowledgeBaseId
+      - knowledgeBaseArn
+      - name
+      - knowledgeBaseType
+      - status
+      description: Summary information about the knowledge base.
     KnowledgeBaseType:
       type: string
       enum:
@@ -237,6 +3579,218 @@ components:
       type: string
       minLength: 2
       maxLength: 5
+    ListAssistantAssociationsRequest:
+      type: object
+      properties:
+        nextToken:
+          allOf:
+          - $ref: '#/components/schemas/NextToken'
+          description: The token for the next set of results. Use the value returned
+            in the previous response in the next request to retrieve the next set
+            of results.
+        maxResults:
+          allOf:
+          - $ref: '#/components/schemas/MaxResults'
+          description: The maximum number of results to return per page.
+        assistantId:
+          allOf:
+          - $ref: '#/components/schemas/UuidOrArn'
+          description: The identifier of the Wisdom assistant. Can be either the ID
+            or the ARN. URLs cannot contain the ARN.
+      required:
+      - assistantId
+    ListAssistantAssociationsResponse:
+      type: object
+      properties:
+        assistantAssociationSummaries:
+          allOf:
+          - $ref: '#/components/schemas/AssistantAssociationSummaryList'
+          description: Summary information about assistant associations.
+        nextToken:
+          allOf:
+          - $ref: '#/components/schemas/NextToken'
+          description: If there are additional results, this is the token for the
+            next set of results.
+      required:
+      - assistantAssociationSummaries
+    ListAssistantsRequest:
+      type: object
+      properties:
+        nextToken:
+          allOf:
+          - $ref: '#/components/schemas/NextToken'
+          description: The token for the next set of results. Use the value returned
+            in the previous response in the next request to retrieve the next set
+            of results.
+        maxResults:
+          allOf:
+          - $ref: '#/components/schemas/MaxResults'
+          description: The maximum number of results to return per page.
+    ListAssistantsResponse:
+      type: object
+      properties:
+        assistantSummaries:
+          allOf:
+          - $ref: '#/components/schemas/AssistantList'
+          description: Information about the assistants.
+        nextToken:
+          allOf:
+          - $ref: '#/components/schemas/NextToken'
+          description: If there are additional results, this is the token for the
+            next set of results.
+      required:
+      - assistantSummaries
+    ListContentsRequest:
+      type: object
+      properties:
+        nextToken:
+          allOf:
+          - $ref: '#/components/schemas/NextToken'
+          description: The token for the next set of results. Use the value returned
+            in the previous response in the next request to retrieve the next set
+            of results.
+        maxResults:
+          allOf:
+          - $ref: '#/components/schemas/MaxResults'
+          description: The maximum number of results to return per page.
+        knowledgeBaseId:
+          allOf:
+          - $ref: '#/components/schemas/UuidOrArn'
+          description: The identifier of the knowledge base. This should not be a
+            QUICK_RESPONSES type knowledge base if you're storing Wisdom Content resource
+            to it. Can be either the ID or the ARN. URLs cannot contain the ARN.
+      required:
+      - knowledgeBaseId
+    ListContentsResponse:
+      type: object
+      properties:
+        contentSummaries:
+          allOf:
+          - $ref: '#/components/schemas/ContentSummaryList'
+          description: Information about the content.
+        nextToken:
+          allOf:
+          - $ref: '#/components/schemas/NextToken'
+          description: If there are additional results, this is the token for the
+            next set of results.
+      required:
+      - contentSummaries
+    ListImportJobsRequest:
+      type: object
+      properties:
+        nextToken:
+          allOf:
+          - $ref: '#/components/schemas/NonEmptyString'
+          description: The token for the next set of results. Use the value returned
+            in the previous response in the next request to retrieve the next set
+            of results.
+        maxResults:
+          allOf:
+          - $ref: '#/components/schemas/MaxResults'
+          description: The maximum number of results to return per page.
+        knowledgeBaseId:
+          allOf:
+          - $ref: '#/components/schemas/UuidOrArn'
+          description: The identifier of the knowledge base. This should not be a
+            QUICK_RESPONSES type knowledge base if you're storing Wisdom Content resource
+            to it. Can be either the ID or the ARN. URLs cannot contain the ARN.
+      required:
+      - knowledgeBaseId
+    ListImportJobsResponse:
+      type: object
+      properties:
+        importJobSummaries:
+          allOf:
+          - $ref: '#/components/schemas/ImportJobList'
+          description: Summary information about the import jobs.
+        nextToken:
+          allOf:
+          - $ref: '#/components/schemas/NonEmptyString'
+          description: The token for the next set of results. Use the value returned
+            in the previous response in the next request to retrieve the next set
+            of results.
+      required:
+      - importJobSummaries
+    ListKnowledgeBasesRequest:
+      type: object
+      properties:
+        nextToken:
+          allOf:
+          - $ref: '#/components/schemas/NonEmptyString'
+          description: The token for the next set of results. Use the value returned
+            in the previous response in the next request to retrieve the next set
+            of results.
+        maxResults:
+          allOf:
+          - $ref: '#/components/schemas/MaxResults'
+          description: The maximum number of results to return per page.
+    ListKnowledgeBasesResponse:
+      type: object
+      properties:
+        knowledgeBaseSummaries:
+          allOf:
+          - $ref: '#/components/schemas/KnowledgeBaseList'
+          description: Information about the knowledge bases.
+        nextToken:
+          allOf:
+          - $ref: '#/components/schemas/NonEmptyString'
+          description: If there are additional results, this is the token for the
+            next set of results.
+      required:
+      - knowledgeBaseSummaries
+    ListQuickResponsesRequest:
+      type: object
+      properties:
+        nextToken:
+          allOf:
+          - $ref: '#/components/schemas/NonEmptyString'
+          description: The token for the next set of results. Use the value returned
+            in the previous response in the next request to retrieve the next set
+            of results.
+        maxResults:
+          allOf:
+          - $ref: '#/components/schemas/MaxResults'
+          description: The maximum number of results to return per page.
+        knowledgeBaseId:
+          allOf:
+          - $ref: '#/components/schemas/UuidOrArn'
+          description: The identifier of the knowledge base. This should not be a
+            QUICK_RESPONSES type knowledge base if you're storing Wisdom Content resource
+            to it. Can be either the ID or the ARN. URLs cannot contain the ARN.
+      required:
+      - knowledgeBaseId
+    ListQuickResponsesResponse:
+      type: object
+      properties:
+        quickResponseSummaries:
+          allOf:
+          - $ref: '#/components/schemas/QuickResponseSummaryList'
+          description: Summary information about the quick responses.
+        nextToken:
+          allOf:
+          - $ref: '#/components/schemas/NonEmptyString'
+          description: The token for the next set of results. Use the value returned
+            in the previous response in the next request to retrieve the next set
+            of results.
+      required:
+      - quickResponseSummaries
+    ListTagsForResourceRequest:
+      type: object
+      properties:
+        resourceArn:
+          allOf:
+          - $ref: '#/components/schemas/Arn'
+          description: The Amazon Resource Name (ARN) of the resource.
+      required:
+      - resourceArn
+    ListTagsForResourceResponse:
+      type: object
+      properties:
+        tags:
+          allOf:
+          - $ref: '#/components/schemas/Tags'
+          description: The tags used to organize, track, or control access for this
+            resource.
     MaxResults:
       type: integer
       minimum: 1
@@ -254,12 +3808,56 @@ components:
       type: string
       minLength: 1
       maxLength: 4096
+    NotifyRecommendationsReceivedError:
+      type: object
+      properties:
+        recommendationId:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The identifier of the recommendation that is in error.
+        message:
+          allOf:
+          - $ref: '#/components/schemas/NotifyRecommendationsReceivedErrorMessage'
+          description: A recommendation is causing an error.
+      description: An error occurred when creating a recommendation.
     NotifyRecommendationsReceivedErrorList:
       type: array
       items:
         $ref: '#/components/schemas/NotifyRecommendationsReceivedError'
     NotifyRecommendationsReceivedErrorMessage:
       type: string
+    NotifyRecommendationsReceivedRequest:
+      type: object
+      properties:
+        assistantId:
+          allOf:
+          - $ref: '#/components/schemas/UuidOrArn'
+          description: The identifier of the Wisdom assistant. Can be either the ID
+            or the ARN. URLs cannot contain the ARN.
+        sessionId:
+          allOf:
+          - $ref: '#/components/schemas/UuidOrArn'
+          description: The identifier of the session. Can be either the ID or the
+            ARN. URLs cannot contain the ARN.
+        recommendationIds:
+          allOf:
+          - $ref: '#/components/schemas/RecommendationIdList'
+          description: The identifiers of the recommendations.
+      required:
+      - assistantId
+      - sessionId
+      - recommendationIds
+    NotifyRecommendationsReceivedResponse:
+      type: object
+      properties:
+        recommendationIds:
+          allOf:
+          - $ref: '#/components/schemas/RecommendationIdList'
+          description: The identifiers of the recommendations.
+        errors:
+          allOf:
+          - $ref: '#/components/schemas/NotifyRecommendationsReceivedErrorList'
+          description: The identifiers of recommendations that are causing errors.
     ObjectFieldsList:
       type: array
       items:
@@ -269,12 +3867,66 @@ components:
       enum:
       - ASC
       - DESC
+    PreconditionFailedException:
+      type: object
+      properties:
+        message:
+          $ref: '#/components/schemas/String'
+      description: The provided `revisionId` does not match, indicating the content
+        has been modified since it was last read.
     Priority:
       type: string
       enum:
       - HIGH
       - MEDIUM
       - LOW
+    QueryAssistantRequest:
+      type: object
+      properties:
+        assistantId:
+          allOf:
+          - $ref: '#/components/schemas/UuidOrArn'
+          description: The identifier of the Wisdom assistant. Can be either the ID
+            or the ARN. URLs cannot contain the ARN.
+        queryText:
+          allOf:
+          - $ref: '#/components/schemas/QueryText'
+          description: The text to search for.
+        nextToken:
+          allOf:
+          - $ref: '#/components/schemas/NextToken'
+          description: The token for the next set of results. Use the value returned
+            in the previous response in the next request to retrieve the next set
+            of results.
+        maxResults:
+          allOf:
+          - $ref: '#/components/schemas/MaxResults'
+          description: The maximum number of results to return per page.
+      required:
+      - assistantId
+      - queryText
+    QueryAssistantResponse:
+      type: object
+      properties:
+        results:
+          allOf:
+          - $ref: '#/components/schemas/QueryResultsList'
+          description: The results of the query.
+        nextToken:
+          allOf:
+          - $ref: '#/components/schemas/NextToken'
+          description: If there are additional results, this is the token for the
+            next set of results.
+      required:
+      - results
+    QueryRecommendationTriggerData:
+      type: object
+      properties:
+        text:
+          allOf:
+          - $ref: '#/components/schemas/QueryText'
+          description: The text associated with the recommendation trigger.
+      description: Data associated with the QUERY RecommendationTriggerType.
     QueryResultsList:
       type: array
       items:
@@ -293,6 +3945,110 @@ components:
           The content of the quick response.
       description: |-
         The container quick response content.
+    QuickResponseContents:
+      type: object
+      properties:
+        plainText:
+          $ref: '#/components/schemas/QuickResponseContentProvider'
+        markdown:
+          $ref: '#/components/schemas/QuickResponseContentProvider'
+      description: The content of the quick response stored in different media types.
+    QuickResponseData:
+      type: object
+      properties:
+        quickResponseArn:
+          allOf:
+          - $ref: '#/components/schemas/Arn'
+          description: The Amazon Resource Name (ARN) of the quick response.
+        quickResponseId:
+          allOf:
+          - $ref: '#/components/schemas/Uuid'
+          description: The identifier of the quick response.
+        knowledgeBaseArn:
+          allOf:
+          - $ref: '#/components/schemas/Arn'
+          description: The Amazon Resource Name (ARN) of the knowledge base.
+        knowledgeBaseId:
+          allOf:
+          - $ref: '#/components/schemas/Uuid'
+          description: The identifier of the knowledge base. This should not be a
+            QUICK_RESPONSES type knowledge base if you're storing Wisdom Content resource
+            to it. Can be either the ID or the ARN. URLs cannot contain the ARN.
+        name:
+          allOf:
+          - $ref: '#/components/schemas/QuickResponseName'
+          description: The name of the quick response.
+        contentType:
+          allOf:
+          - $ref: '#/components/schemas/QuickResponseType'
+          description: "The media type of the quick response content.\n\n  * Use `application/x.quickresponse;format=plain`\
+            \ for quick response written in plain text.\n\n  * Use `application/x.quickresponse;format=markdown`\
+            \ for quick response written in richtext."
+        status:
+          allOf:
+          - $ref: '#/components/schemas/QuickResponseStatus'
+          description: The status of the quick response data.
+        createdTime:
+          allOf:
+          - $ref: '#/components/schemas/Timestamp'
+          description: The timestamp when the quick response was created.
+        lastModifiedTime:
+          allOf:
+          - $ref: '#/components/schemas/Timestamp'
+          description: The timestamp when the quick response data was last modified.
+        contents:
+          allOf:
+          - $ref: '#/components/schemas/QuickResponseContents'
+          description: The contents of the quick response.
+        description:
+          allOf:
+          - $ref: '#/components/schemas/QuickResponseDescription'
+          description: The description of the quick response.
+        groupingConfiguration:
+          allOf:
+          - $ref: '#/components/schemas/GroupingConfiguration'
+          description: The configuration information of the user groups that the quick
+            response is accessible to.
+        shortcutKey:
+          allOf:
+          - $ref: '#/components/schemas/ShortCutKey'
+          description: The shortcut key of the quick response. The value should be
+            unique across the knowledge base.
+        lastModifiedBy:
+          allOf:
+          - $ref: '#/components/schemas/GenericArn'
+          description: The Amazon Resource Name (ARN) of the user who last updated
+            the quick response data.
+        isActive:
+          allOf:
+          - $ref: '#/components/schemas/Boolean'
+          description: Whether the quick response is active.
+        channels:
+          allOf:
+          - $ref: '#/components/schemas/Channels'
+          description: The Amazon Connect contact channels this quick response applies
+            to. The supported contact channel types include `Chat`.
+        language:
+          allOf:
+          - $ref: '#/components/schemas/LanguageCode'
+          description: The language code value for the language in which the quick
+            response is written.
+        tags:
+          allOf:
+          - $ref: '#/components/schemas/Tags'
+          description: The tags used to organize, track, or control access for this
+            resource.
+      required:
+      - quickResponseArn
+      - quickResponseId
+      - knowledgeBaseArn
+      - knowledgeBaseId
+      - name
+      - contentType
+      - status
+      - createdTime
+      - lastModifiedTime
+      description: Information about the quick response.
     QuickResponseDataProvider:
       allOf:
       - allOf:
@@ -305,6 +4061,35 @@ components:
       type: string
       minLength: 1
       maxLength: 255
+    QuickResponseFilterField:
+      type: object
+      properties:
+        name:
+          allOf:
+          - $ref: '#/components/schemas/NonEmptyString'
+          description: The name of the attribute field to filter the quick responses
+            by.
+        values:
+          allOf:
+          - $ref: '#/components/schemas/QuickResponseFilterValueList'
+          description: The values of attribute field to filter the quick response
+            by.
+        operator:
+          allOf:
+          - $ref: '#/components/schemas/QuickResponseFilterOperator'
+          description: The operator to use for filtering.
+        includeNoExistence:
+          allOf:
+          - $ref: '#/components/schemas/Boolean'
+          description: Whether to treat null value as a match for the attribute field.
+      required:
+      - name
+      - operator
+      description: "The quick response fields to filter the quick response query results\
+        \ by.\n\nThe following is the list of supported field names.\n\n  * name\n\
+        \n  * description\n\n  * shortcutKey\n\n  * isActive\n\n  * channels\n\n \
+        \ * language\n\n  * contentType\n\n  * createdTime\n\n  * lastModifiedTime\n\
+        \n  * lastModifiedBy\n\n  * groupingConfiguration.criteria\n\n  * groupingConfiguration.values"
     QuickResponseFilterFieldList:
       type: array
       items:
@@ -326,6 +4111,60 @@ components:
       type: string
       minLength: 1
       maxLength: 40
+    QuickResponseOrderField:
+      type: object
+      properties:
+        name:
+          allOf:
+          - $ref: '#/components/schemas/NonEmptyString'
+          description: The name of the attribute to order the quick response query
+            results by.
+        order:
+          allOf:
+          - $ref: '#/components/schemas/Order'
+          description: The order at which the quick responses are sorted by.
+      required:
+      - name
+      description: "The quick response fields to order the quick response query results\
+        \ by.\n\nThe following is the list of supported field names.\n\n  * name\n\
+        \n  * description\n\n  * shortcutKey\n\n  * isActive\n\n  * channels\n\n \
+        \ * language\n\n  * contentType\n\n  * createdTime\n\n  * lastModifiedTime\n\
+        \n  * lastModifiedBy\n\n  * groupingConfiguration.criteria\n\n  * groupingConfiguration.values"
+    QuickResponseQueryField:
+      type: object
+      properties:
+        name:
+          allOf:
+          - $ref: '#/components/schemas/NonEmptyString'
+          description: The name of the attribute to query the quick responses by.
+        values:
+          allOf:
+          - $ref: '#/components/schemas/QuickResponseQueryValueList'
+          description: The values of the attribute to query the quick responses by.
+        operator:
+          allOf:
+          - $ref: '#/components/schemas/QuickResponseQueryOperator'
+          description: The operator to use for matching attribute field values in
+            the query.
+        allowFuzziness:
+          allOf:
+          - $ref: '#/components/schemas/Boolean'
+          description: Whether the query expects only exact matches on the attribute
+            field values. The results of the query will only include exact matches
+            if this parameter is set to false.
+        priority:
+          allOf:
+          - $ref: '#/components/schemas/Priority'
+          description: The importance of the attribute field when calculating query
+            result relevancy scores. The value set for this parameter affects the
+            ordering of search results.
+      required:
+      - name
+      - values
+      - operator
+      description: "The quick response fields to query quick responses by.\n\nThe\
+        \ following is the list of supported field names.\n\n  * content\n\n  * name\n\
+        \n  * description\n\n  * shortcutKey"
     QuickResponseQueryFieldList:
       type: array
       items:
@@ -343,6 +4182,133 @@ components:
       type: array
       items:
         $ref: '#/components/schemas/QuickResponseQueryValue'
+    QuickResponseSearchExpression:
+      type: object
+      properties:
+        queries:
+          allOf:
+          - $ref: '#/components/schemas/QuickResponseQueryFieldList'
+          description: The quick response query expressions.
+        filters:
+          allOf:
+          - $ref: '#/components/schemas/QuickResponseFilterFieldList'
+          description: The configuration of filtering rules applied to quick response
+            query results.
+        orderOnField:
+          allOf:
+          - $ref: '#/components/schemas/QuickResponseOrderField'
+          description: The quick response attribute fields on which the query results
+            are ordered.
+      description: Information about the import job.
+    QuickResponseSearchResultData:
+      type: object
+      properties:
+        quickResponseArn:
+          allOf:
+          - $ref: '#/components/schemas/Arn'
+          description: The Amazon Resource Name (ARN) of the quick response.
+        quickResponseId:
+          allOf:
+          - $ref: '#/components/schemas/Uuid'
+          description: The identifier of the quick response.
+        knowledgeBaseArn:
+          allOf:
+          - $ref: '#/components/schemas/Arn'
+          description: The Amazon Resource Name (ARN) of the knowledge base.
+        knowledgeBaseId:
+          allOf:
+          - $ref: '#/components/schemas/Uuid'
+          description: The identifier of the knowledge base. This should not be a
+            QUICK_RESPONSES type knowledge base if you're storing Wisdom Content resource
+            to it. Can be either the ID or the ARN. URLs cannot contain the ARN.
+        name:
+          allOf:
+          - $ref: '#/components/schemas/QuickResponseName'
+          description: The name of the quick response.
+        contentType:
+          allOf:
+          - $ref: '#/components/schemas/QuickResponseType'
+          description: "The media type of the quick response content.\n\n  * Use `application/x.quickresponse;format=plain`\
+            \ for quick response written in plain text.\n\n  * Use `application/x.quickresponse;format=markdown`\
+            \ for quick response written in richtext."
+        status:
+          allOf:
+          - $ref: '#/components/schemas/QuickResponseStatus'
+          description: The resource status of the quick response.
+        contents:
+          allOf:
+          - $ref: '#/components/schemas/QuickResponseContents'
+          description: The contents of the quick response.
+        createdTime:
+          allOf:
+          - $ref: '#/components/schemas/Timestamp'
+          description: The timestamp when the quick response was created.
+        lastModifiedTime:
+          allOf:
+          - $ref: '#/components/schemas/Timestamp'
+          description: The timestamp when the quick response search result data was
+            last modified.
+        isActive:
+          allOf:
+          - $ref: '#/components/schemas/Boolean'
+          description: Whether the quick response is active.
+        description:
+          allOf:
+          - $ref: '#/components/schemas/QuickResponseDescription'
+          description: The description of the quick response.
+        groupingConfiguration:
+          allOf:
+          - $ref: '#/components/schemas/GroupingConfiguration'
+          description: The configuration information of the user groups that the quick
+            response is accessible to.
+        shortcutKey:
+          allOf:
+          - $ref: '#/components/schemas/ShortCutKey'
+          description: The shortcut key of the quick response. The value should be
+            unique across the knowledge base.
+        lastModifiedBy:
+          allOf:
+          - $ref: '#/components/schemas/GenericArn'
+          description: The Amazon Resource Name (ARN) of the user who last updated
+            the quick response search result data.
+        channels:
+          allOf:
+          - $ref: '#/components/schemas/Channels'
+          description: The Amazon Connect contact channels this quick response applies
+            to. The supported contact channel types include `Chat`.
+        language:
+          allOf:
+          - $ref: '#/components/schemas/LanguageCode'
+          description: The language code value for the language in which the quick
+            response is written.
+        attributesNotInterpolated:
+          allOf:
+          - $ref: '#/components/schemas/ContactAttributeKeys'
+          description: The user defined contact attributes that are not resolved when
+            the search result is returned.
+        attributesInterpolated:
+          allOf:
+          - $ref: '#/components/schemas/ContactAttributeKeys'
+          description: The user defined contact attributes that are resolved when
+            the search result is returned.
+        tags:
+          allOf:
+          - $ref: '#/components/schemas/Tags'
+          description: The tags used to organize, track, or control access for this
+            resource.
+      required:
+      - quickResponseArn
+      - quickResponseId
+      - knowledgeBaseArn
+      - knowledgeBaseId
+      - name
+      - contentType
+      - status
+      - contents
+      - createdTime
+      - lastModifiedTime
+      - isActive
+      description: The result of quick response search.
     QuickResponseSearchResultsList:
       type: array
       items:
@@ -358,6 +4324,83 @@ components:
       - DELETED
       - UPDATE_IN_PROGRESS
       - UPDATE_FAILED
+    QuickResponseSummary:
+      type: object
+      properties:
+        quickResponseArn:
+          allOf:
+          - $ref: '#/components/schemas/Arn'
+          description: The Amazon Resource Name (ARN) of the quick response.
+        quickResponseId:
+          allOf:
+          - $ref: '#/components/schemas/Uuid'
+          description: The identifier of the quick response.
+        knowledgeBaseArn:
+          allOf:
+          - $ref: '#/components/schemas/Arn'
+          description: The Amazon Resource Name (ARN) of the knowledge base.
+        knowledgeBaseId:
+          allOf:
+          - $ref: '#/components/schemas/Uuid'
+          description: The identifier of the knowledge base. This should not be a
+            QUICK_RESPONSES type knowledge base if you're storing Wisdom Content resource
+            to it.
+        name:
+          allOf:
+          - $ref: '#/components/schemas/QuickResponseName'
+          description: The name of the quick response.
+        contentType:
+          allOf:
+          - $ref: '#/components/schemas/QuickResponseType'
+          description: "The media type of the quick response content.\n\n  * Use `application/x.quickresponse;format=plain`\
+            \ for quick response written in plain text.\n\n  * Use `application/x.quickresponse;format=markdown`\
+            \ for quick response written in richtext."
+        status:
+          allOf:
+          - $ref: '#/components/schemas/QuickResponseStatus'
+          description: The resource status of the quick response.
+        createdTime:
+          allOf:
+          - $ref: '#/components/schemas/Timestamp'
+          description: The timestamp when the quick response was created.
+        lastModifiedTime:
+          allOf:
+          - $ref: '#/components/schemas/Timestamp'
+          description: The timestamp when the quick response summary was last modified.
+        description:
+          allOf:
+          - $ref: '#/components/schemas/QuickResponseDescription'
+          description: The description of the quick response.
+        lastModifiedBy:
+          allOf:
+          - $ref: '#/components/schemas/GenericArn'
+          description: The Amazon Resource Name (ARN) of the user who last updated
+            the quick response data.
+        isActive:
+          allOf:
+          - $ref: '#/components/schemas/Boolean'
+          description: Whether the quick response is active.
+        channels:
+          allOf:
+          - $ref: '#/components/schemas/Channels'
+          description: The Amazon Connect contact channels this quick response applies
+            to. The supported contact channel types include `Chat`.
+        tags:
+          allOf:
+          - $ref: '#/components/schemas/Tags'
+          description: The tags used to organize, track, or control access for this
+            resource.
+      required:
+      - quickResponseArn
+      - quickResponseId
+      - knowledgeBaseArn
+      - knowledgeBaseId
+      - name
+      - contentType
+      - status
+      - createdTime
+      - lastModifiedTime
+      description: The summary information about the quick response.
     QuickResponseSummaryList:
       type: array
       items:
@@ -365,6 +4408,33 @@ components:
     QuickResponseType:
       type: string
       pattern: ^(application/x\.quickresponse;format=(plain|markdown))$
+    RecommendationData:
+      type: object
+      properties:
+        recommendationId:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The identifier of the recommendation.
+        document:
+          allOf:
+          - $ref: '#/components/schemas/Document'
+          description: The recommended document.
+        relevanceScore:
+          allOf:
+          - $ref: '#/components/schemas/RelevanceScore'
+          description: The relevance score of the recommendation.
+        relevanceLevel:
+          allOf:
+          - $ref: '#/components/schemas/RelevanceLevel'
+          description: The relevance level of the recommendation.
+        type:
+          allOf:
+          - $ref: '#/components/schemas/RecommendationType'
+          description: The type of recommendation.
+      required:
+      - recommendationId
+      - document
+      description: Information about the recommendation.
     RecommendationIdList:
       type: array
       items:
@@ -379,6 +4449,41 @@ components:
       - ISSUE_DETECTION
       - RULE_EVALUATION
       - OTHER
+    RecommendationTrigger:
+      type: object
+      properties:
+        id:
+          allOf:
+          - $ref: '#/components/schemas/Uuid'
+          description: The identifier of the recommendation trigger.
+        type:
+          allOf:
+          - $ref: '#/components/schemas/RecommendationTriggerType'
+          description: The type of recommendation trigger.
+        source:
+          allOf:
+          - $ref: '#/components/schemas/RecommendationSourceType'
+          description: "The source of the recommendation trigger.\n\n  * ISSUE_DETECTION:\
+            \ The corresponding recommendations were triggered by a Contact Lens issue.\n\
+            \n  * RULE_EVALUATION: The corresponding recommendations were triggered\
+            \ by a Contact Lens rule."
+        data:
+          allOf:
+          - $ref: '#/components/schemas/RecommendationTriggerData'
+          description: A union type containing information related to the trigger.
+        recommendationIds:
+          allOf:
+          - $ref: '#/components/schemas/RecommendationIdList'
+          description: The identifiers of the recommendations.
+      required:
+      - id
+      - type
+      - source
+      - data
+      - recommendationIds
+      description: A recommendation trigger provides context on the event that produced
+        the referenced recommendations. Recommendations are only referenced in `recommendationIds`
+        by a single RecommendationTrigger.
     RecommendationTriggerData:
       allOf:
       - allOf:
@@ -410,12 +4515,301 @@ components:
       format: double
       default: 0
       minimum: 0.0
+    RemoveKnowledgeBaseTemplateUriRequest:
+      type: object
+      properties:
+        knowledgeBaseId:
+          allOf:
+          - $ref: '#/components/schemas/UuidOrArn'
+          description: The identifier of the knowledge base. This should not be a
+            QUICK_RESPONSES type knowledge base if you're storing Wisdom Content resource
+            to it. Can be either the ID or the ARN. URLs cannot contain the ARN.
+      required:
+      - knowledgeBaseId
+    RemoveKnowledgeBaseTemplateUriResponse:
+      type: object
+      properties: {}
+    RenderingConfiguration:
+      type: object
+      properties:
+        templateUri:
+          allOf:
+          - $ref: '#/components/schemas/Uri'
+          description: "A URI template containing exactly one variable in `${variableName}\
+            \ `format. This can only be set for `EXTERNAL` knowledge bases. For Salesforce,\
+            \ ServiceNow, and Zendesk, the variable must be one of the following:\n\
+            \n  * Salesforce: `Id`, `ArticleNumber`, `VersionNumber`, `Title`, `PublishStatus`,\
+            \ or `IsDeleted`\n\n  * ServiceNow: `number`, `short_description`, `sys_mod_count`,\
+            \ `workflow_state`, or `active`\n\n  * Zendesk: `id`, `title`, `updated_at`,\
+            \ or `draft`\n\nThe variable is replaced with the actual value for a piece\
+            \ of content when calling [GetContent](https://docs.aws.amazon.com/wisdom/latest/APIReference/API_GetContent.html)."
+      description: Information about how to render the content.
+    RequestTimeoutException:
+      type: object
+      properties:
+        message:
+          $ref: '#/components/schemas/String'
+      description: The request reached the service more than 15 minutes after the
+        date stamp on the request or more than 15 minutes after the request expiration
+        date (such as for pre-signed URLs), or the date stamp on the request is more
+        than 15 minutes in the future.
+    ResourceNotFoundException:
+      type: object
+      properties:
+        message:
+          $ref: '#/components/schemas/String'
+        resourceName:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The specified resource name.
+      description: The specified resource does not exist.
+    ResultData:
+      type: object
+      properties:
+        resultId:
+          allOf:
+          - $ref: '#/components/schemas/Uuid'
+          description: The identifier of the result data.
+        document:
+          allOf:
+          - $ref: '#/components/schemas/Document'
+          description: The document.
+        relevanceScore:
+          allOf:
+          - $ref: '#/components/schemas/RelevanceScore'
+          description: The relevance score of the results.
+      required:
+      - resultId
+      - document
+      description: Information about the result.
+    SearchContentRequest:
+      type: object
+      properties:
+        nextToken:
+          allOf:
+          - $ref: '#/components/schemas/NextToken'
+          description: The token for the next set of results. Use the value returned
+            in the previous response in the next request to retrieve the next set
+            of results.
+        maxResults:
+          allOf:
+          - $ref: '#/components/schemas/MaxResults'
+          description: The maximum number of results to return per page.
+        knowledgeBaseId:
+          allOf:
+          - $ref: '#/components/schemas/UuidOrArn'
+          description: The identifier of the knowledge base. This should not be a
+            QUICK_RESPONSES type knowledge base if you're storing Wisdom Content resource
+            to it. Can be either the ID or the ARN. URLs cannot contain the ARN.
+        searchExpression:
+          allOf:
+          - $ref: '#/components/schemas/SearchExpression'
+          description: The search expression to filter results.
+      required:
+      - knowledgeBaseId
+      - searchExpression
+    SearchContentResponse:
+      type: object
+      properties:
+        contentSummaries:
+          allOf:
+          - $ref: '#/components/schemas/ContentSummaryList'
+          description: Summary information about the content.
+        nextToken:
+          allOf:
+          - $ref: '#/components/schemas/NextToken'
+          description: If there are additional results, this is the token for the
+            next set of results.
+      required:
+      - contentSummaries
+    SearchExpression:
+      type: object
+      properties:
+        filters:
+          allOf:
+          - $ref: '#/components/schemas/FilterList'
+          description: The search expression filters.
+      required:
+      - filters
+      description: The search expression.
+    SearchQuickResponsesRequest:
+      type: object
+      properties:
+        knowledgeBaseId:
+          allOf:
+          - $ref: '#/components/schemas/UuidOrArn'
+          description: The identifier of the knowledge base. This should be a QUICK_RESPONSES
+            type knowledge base. Can be either the ID or the ARN. URLs cannot contain
+            the ARN.
+        searchExpression:
+          allOf:
+          - $ref: '#/components/schemas/QuickResponseSearchExpression'
+          description: The search expression for querying the quick response.
+        nextToken:
+          allOf:
+          - $ref: '#/components/schemas/NonEmptyString'
+          description: The token for the next set of results. Use the value returned
+            in the previous response in the next request to retrieve the next set
+            of results.
+        maxResults:
+          allOf:
+          - $ref: '#/components/schemas/MaxResults'
+          description: The maximum number of results to return per page.
+        attributes:
+          allOf:
+          - $ref: '#/components/schemas/ContactAttributes'
+          description: The [user-defined Amazon Connect contact attributes](https://docs.aws.amazon.com/connect/latest/adminguide/connect-attrib-list.html#user-defined-attributes)
+            to be resolved when search results are returned.
+      required:
+      - knowledgeBaseId
+      - searchExpression
+    SearchQuickResponsesResponse:
+      type: object
+      properties:
+        results:
+          allOf:
+          - $ref: '#/components/schemas/QuickResponseSearchResultsList'
+          description: The results of the quick response search.
+        nextToken:
+          allOf:
+          - $ref: '#/components/schemas/NonEmptyString'
+          description: The token for the next set of results. Use the value returned
+            in the previous response in the next request to retrieve the next set
+            of results.
+      required:
+      - results
+    SearchSessionsRequest:
+      type: object
+      properties:
+        nextToken:
+          allOf:
+          - $ref: '#/components/schemas/NextToken'
+          description: The token for the next set of results. Use the value returned
+            in the previous response in the next request to retrieve the next set
+            of results.
+        maxResults:
+          allOf:
+          - $ref: '#/components/schemas/MaxResults'
+          description: The maximum number of results to return per page.
+        assistantId:
+          allOf:
+          - $ref: '#/components/schemas/UuidOrArn'
+          description: The identifier of the Wisdom assistant. Can be either the ID
+            or the ARN. URLs cannot contain the ARN.
+        searchExpression:
+          allOf:
+          - $ref: '#/components/schemas/SearchExpression'
+          description: The search expression to filter results.
+      required:
+      - assistantId
+      - searchExpression
+    SearchSessionsResponse:
+      type: object
+      properties:
+        sessionSummaries:
+          allOf:
+          - $ref: '#/components/schemas/SessionSummaries'
+          description: Summary information about the sessions.
+        nextToken:
+          allOf:
+          - $ref: '#/components/schemas/NextToken'
+          description: If there are additional results, this is the token for the
+            next set of results.
+      required:
+      - sessionSummaries
     SensitiveString:
       type: string
+    ServerSideEncryptionConfiguration:
+      type: object
+      properties:
+        kmsKeyId:
+          allOf:
+          - $ref: '#/components/schemas/NonEmptyString'
+          description: The customer managed key used for encryption. For more information
+            about setting up a customer managed key for Wisdom, see [Enable Amazon
+            Connect Wisdom for your instance](https://docs.aws.amazon.com/connect/latest/adminguide/enable-wisdom.html).
+            For information about valid ID values, see [Key identifiers (KeyId)](https://docs.aws.amazon.com/kms/latest/developerguide/concepts.html#key-id).
+      description: The configuration information for the customer managed key used
+        for encryption.
+    ServiceQuotaExceededException:
+      type: object
+      properties:
+        message:
+          $ref: '#/components/schemas/String'
+      description: You've exceeded your service quota. To perform the requested action,
+        remove some of the relevant resources, or use service quotas to request a
+        service quota increase.
+    SessionData:
+      type: object
+      properties:
+        sessionArn:
+          allOf:
+          - $ref: '#/components/schemas/Arn'
+          description: The Amazon Resource Name (ARN) of the session.
+        sessionId:
+          allOf:
+          - $ref: '#/components/schemas/Uuid'
+          description: The identifier of the session.
+        name:
+          allOf:
+          - $ref: '#/components/schemas/Name'
+          description: The name of the session.
+        description:
+          allOf:
+          - $ref: '#/components/schemas/Description'
+          description: The description of the session.
+        tags:
+          allOf:
+          - $ref: '#/components/schemas/Tags'
+          description: The tags used to organize, track, or control access for this
+            resource.
+        integrationConfiguration:
+          allOf:
+          - $ref: '#/components/schemas/SessionIntegrationConfiguration'
+          description: The configuration information for the session integration.
+      required:
+      - sessionArn
+      - sessionId
+      - name
+      description: Information about the session.
+    SessionIntegrationConfiguration:
+      type: object
+      properties:
+        topicIntegrationArn:
+          allOf:
+          - $ref: '#/components/schemas/GenericArn'
+          description: The Amazon Resource Name (ARN) of the integrated Amazon SNS
+            topic used for streaming chat messages.
+      description: The configuration information for the session integration.
     SessionSummaries:
       type: array
       items:
         $ref: '#/components/schemas/SessionSummary'
+    SessionSummary:
+      type: object
+      properties:
+        sessionId:
+          allOf:
+          - $ref: '#/components/schemas/Uuid'
+          description: The identifier of the session.
+        sessionArn:
+          allOf:
+          - $ref: '#/components/schemas/Arn'
+          description: The Amazon Resource Name (ARN) of the session.
+        assistantId:
+          allOf:
+          - $ref: '#/components/schemas/Uuid'
+          description: The identifier of the Wisdom assistant.
+        assistantArn:
+          allOf:
+          - $ref: '#/components/schemas/Arn'
+          description: The Amazon Resource Name (ARN) of the Wisdom assistant.
+      required:
+      - sessionId
+      - sessionArn
+      - assistantId
+      - assistantArn
+      description: Summary information about the session.
     ShortCutKey:
       type: string
       minLength: 1
@@ -428,6 +4822,97 @@ components:
           Configuration information for Amazon AppIntegrations to automatically ingest content.
       description: |-
         Configuration information about the external data source.
+    StartContentUploadRequest:
+      type: object
+      properties:
+        knowledgeBaseId:
+          allOf:
+          - $ref: '#/components/schemas/UuidOrArn'
+          description: The identifier of the knowledge base. This should not be a
+            QUICK_RESPONSES type knowledge base if you're storing Wisdom Content resource
+            to it. Can be either the ID or the ARN. URLs cannot contain the ARN.
+        contentType:
+          allOf:
+          - $ref: '#/components/schemas/ContentType'
+          description: The type of content to upload.
+        presignedUrlTimeToLive:
+          allOf:
+          - $ref: '#/components/schemas/TimeToLive'
+          description: The expected expiration time of the generated presigned URL,
+            specified in minutes.
+      required:
+      - knowledgeBaseId
+      - contentType
+    StartContentUploadResponse:
+      type: object
+      properties:
+        uploadId:
+          allOf:
+          - $ref: '#/components/schemas/UploadId'
+          description: The identifier of the upload.
+        url:
+          allOf:
+          - $ref: '#/components/schemas/Url'
+          description: The URL of the upload.
+        urlExpiry:
+          allOf:
+          - $ref: '#/components/schemas/Timestamp'
+          description: The expiration time of the URL as an epoch timestamp.
+        headersToInclude:
+          allOf:
+          - $ref: '#/components/schemas/Headers'
+          description: The headers to include in the upload.
+      required:
+      - uploadId
+      - url
+      - urlExpiry
+      - headersToInclude
+    StartImportJobRequest:
+      type: object
+      properties:
+        knowledgeBaseId:
+          allOf:
+          - $ref: '#/components/schemas/UuidOrArn'
+          description: "The identifier of the knowledge base. This should not be a\
+            \ QUICK_RESPONSES type knowledge base if you're storing Wisdom Content\
+            \ resource to it. Can be either the ID or the ARN. URLs cannot contain\
+            \ the ARN.\n\n  * For importing Wisdom quick responses, this should be\
+            \ a `QUICK_RESPONSES` type knowledge base."
+        importJobType:
+          allOf:
+          - $ref: '#/components/schemas/ImportJobType'
+          description: "The type of the import job.\n\n  * For importing quick response\
+            \ resource, set the value to `QUICK_RESPONSES`."
+        uploadId:
+          allOf:
+          - $ref: '#/components/schemas/UploadId'
+          description: A pointer to the uploaded asset. This value is returned by
+            [StartContentUpload](https://docs.aws.amazon.com/wisdom/latest/APIReference/API_StartContentUpload.html).
+        clientToken:
+          allOf:
+          - $ref: '#/components/schemas/NonEmptyString'
+          description: The tags used to organize, track, or control access for this
+            resource.
+        metadata:
+          allOf:
+          - $ref: '#/components/schemas/ContentMetadata'
+          description: The metadata fields of the imported Wisdom resources.
+        externalSourceConfiguration:
+          allOf:
+          - $ref: '#/components/schemas/ExternalSourceConfiguration'
+          description: The configuration information of the external source that the
+            resource data are imported from.
+      required:
+      - knowledgeBaseId
+      - importJobType
+      - uploadId
+    StartImportJobResponse:
+      type: object
+      properties:
+        importJob:
+          allOf:
+          - $ref: '#/components/schemas/ImportJobData'
+          description: The import job.
     TagKey:
       type: string
       pattern: ^(?!aws:)[a-zA-Z+-=._:/]+$
@@ -437,6 +4922,24 @@ components:
       type: array
       items:
         $ref: '#/components/schemas/TagKey'
+    TagResourceRequest:
+      type: object
+      properties:
+        resourceArn:
+          allOf:
+          - $ref: '#/components/schemas/Arn'
+          description: The Amazon Resource Name (ARN) of the resource.
+        tags:
+          allOf:
+          - $ref: '#/components/schemas/Tags'
+          description: The tags used to organize, track, or control access for this
+            resource.
+      required:
+      - resourceArn
+      - tags
+    TagResourceResponse:
+      type: object
+      properties: {}
     TagValue:
       type: string
       minLength: 1
@@ -450,6 +4953,194 @@ components:
       minimum: 1
       maximum: 60
       description: Expiration time in minutes
+    TooManyTagsException:
+      type: object
+      properties:
+        message:
+          $ref: '#/components/schemas/String'
+        resourceName:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The specified resource name.
+      description: Amazon Connect Wisdom throws this exception if you have too many
+        tags in your tag set.
+    UntagResourceRequest:
+      type: object
+      properties:
+        resourceArn:
+          allOf:
+          - $ref: '#/components/schemas/Arn'
+          description: The Amazon Resource Name (ARN) of the resource.
+        tagKeys:
+          allOf:
+          - $ref: '#/components/schemas/TagKeyList'
+          description: The tag keys.
+      required:
+      - resourceArn
+      - tagKeys
+    UntagResourceResponse:
+      type: object
+      properties: {}
+    UpdateContentRequest:
+      type: object
+      properties:
+        knowledgeBaseId:
+          allOf:
+          - $ref: '#/components/schemas/UuidOrArn'
+          description: The identifier of the knowledge base. This should not be a
+            QUICK_RESPONSES type knowledge base if you're storing Wisdom Content resource
+            to it. Can be either the ID or the ARN
+        contentId:
+          allOf:
+          - $ref: '#/components/schemas/UuidOrArn'
+          description: The identifier of the content. Can be either the ID or the
+            ARN. URLs cannot contain the ARN.
+        revisionId:
+          allOf:
+          - $ref: '#/components/schemas/NonEmptyString'
+          description: The `revisionId` of the content resource to update, taken from
+            an earlier call to `GetContent`, `GetContentSummary`, `SearchContent`,
+            or `ListContents`. If included, this argument acts as an optimistic lock
+            to ensure content was not modified since it was last read. If it has been
+            modified, this API throws a `PreconditionFailedException`.
+        title:
+          allOf:
+          - $ref: '#/components/schemas/ContentTitle'
+          description: The title of the content.
+        overrideLinkOutUri:
+          allOf:
+          - $ref: '#/components/schemas/Uri'
+          description: The URI for the article. If the knowledge base has a templateUri,
+            setting this argument overrides it for this piece of content. To remove
+            an existing `overrideLinkOurUri`, exclude this argument and set `removeOverrideLinkOutUri`
+            to true.
+        removeOverrideLinkOutUri:
+          allOf:
+          - $ref: '#/components/schemas/Boolean'
+          description: Unset the existing `overrideLinkOutUri` if it exists.
+        metadata:
+          allOf:
+          - $ref: '#/components/schemas/ContentMetadata'
+          description: A key/value map to store attributes without affecting tagging
+            or recommendations. For example, when synchronizing data between an external
+            system and Wisdom, you can store an external version identifier as metadata
+            to utilize for determining drift.
+        uploadId:
+          allOf:
+          - $ref: '#/components/schemas/UploadId'
+          description: A pointer to the uploaded asset. This value is returned by
+            [StartContentUpload](https://docs.aws.amazon.com/wisdom/latest/APIReference/API_StartContentUpload.html).
+      required:
+      - knowledgeBaseId
+      - contentId
+    UpdateContentResponse:
+      type: object
+      properties:
+        content:
+          allOf:
+          - $ref: '#/components/schemas/ContentData'
+          description: The content.
+    UpdateKnowledgeBaseTemplateUriRequest:
+      type: object
+      properties:
+        knowledgeBaseId:
+          allOf:
+          - $ref: '#/components/schemas/UuidOrArn'
+          description: The identifier of the knowledge base. This should not be a
+            QUICK_RESPONSES type knowledge base if you're storing Wisdom Content resource
+            to it. Can be either the ID or the ARN. URLs cannot contain the ARN.
+        templateUri:
+          allOf:
+          - $ref: '#/components/schemas/Uri'
+          description: The template URI to update.
+      required:
+      - knowledgeBaseId
+      - templateUri
+    UpdateKnowledgeBaseTemplateUriResponse:
+      type: object
+      properties:
+        knowledgeBase:
+          allOf:
+          - $ref: '#/components/schemas/KnowledgeBaseData'
+          description: The knowledge base to update.
+    UpdateQuickResponseRequest:
+      type: object
+      properties:
+        knowledgeBaseId:
+          allOf:
+          - $ref: '#/components/schemas/UuidOrArn'
+          description: The identifier of the knowledge base. This should not be a
+            QUICK_RESPONSES type knowledge base if you're storing Wisdom Content resource
+            to it. Can be either the ID or the ARN. URLs cannot contain the ARN.
+        quickResponseId:
+          allOf:
+          - $ref: '#/components/schemas/UuidOrArn'
+          description: The identifier of the quick response.
+        name:
+          allOf:
+          - $ref: '#/components/schemas/QuickResponseName'
+          description: The name of the quick response.
+        content:
+          allOf:
+          - $ref: '#/components/schemas/QuickResponseDataProvider'
+          description: The updated content of the quick response.
+        contentType:
+          allOf:
+          - $ref: '#/components/schemas/QuickResponseType'
+          description: "The media type of the quick response content.\n\n  * Use `application/x.quickresponse;format=plain`\
+            \ for quick response written in plain text.\n\n  * Use `application/x.quickresponse;format=markdown`\
+            \ for quick response written in richtext."
+        groupingConfiguration:
+          allOf:
+          - $ref: '#/components/schemas/GroupingConfiguration'
+          description: The updated grouping configuration of the quick response.
+        removeGroupingConfiguration:
+          allOf:
+          - $ref: '#/components/schemas/Boolean'
+          description: Whether to remove the grouping configuration of the quick response.
+        description:
+          allOf:
+          - $ref: '#/components/schemas/QuickResponseDescription'
+          description: The updated description of the quick response.
+        removeDescription:
+          allOf:
+          - $ref: '#/components/schemas/Boolean'
+          description: Whether to remove the description from the quick response.
+        shortcutKey:
+          allOf:
+          - $ref: '#/components/schemas/ShortCutKey'
+          description: The shortcut key of the quick response. The value should be
+            unique across the knowledge base.
+        removeShortcutKey:
+          allOf:
+          - $ref: '#/components/schemas/Boolean'
+          description: Whether to remove the shortcut key of the quick response.
+        isActive:
+          allOf:
+          - $ref: '#/components/schemas/Boolean'
+          description: Whether the quick response is active.
+        channels:
+          allOf:
+          - $ref: '#/components/schemas/Channels'
+          description: The Amazon Connect contact channels this quick response applies
+            to. The supported contact channel types include `Chat`.
+        language:
+          allOf:
+          - $ref: '#/components/schemas/LanguageCode'
+          description: The language code value for the language in which the quick
+            response is written. The supported language codes include `de_DE`, `en_US`,
+            `es_ES`, `fr_FR`, `id_ID`, `it_IT`, `ja_JP`, `ko_KR`, `pt_BR`, `zh_CN`,
+            `zh_TW`
+      required:
+      - knowledgeBaseId
+      - quickResponseId
+    UpdateQuickResponseResponse:
+      type: object
+      properties:
+        quickResponse:
+          allOf:
+          - $ref: '#/components/schemas/QuickResponseData'
+          description: The quick response.
     UploadId:
       type: string
       minLength: 1
@@ -468,6 +5159,12 @@ components:
     UuidOrArn:
       type: string
       pattern: ^[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$|^arn:[a-z-]*?:wisdom:[a-z0-9-]*?:[0-9]{12}:[a-z-]*?/[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}(?:/[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12})?$
+    ValidationException:
+      type: object
+      properties:
+        message:
+          $ref: '#/components/schemas/String'
+      description: The input fails to satisfy the constraints specified by a service.
     WaitTimeSeconds:
       type: integer
       default: 0

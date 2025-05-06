@@ -7,7 +7,7 @@ info:
   x-stackql-serviceName: oam
   x-aws-serviceName: oam
   x-aws-protocol: aws.protocols#restJson1
-  x-dateGenerated: '2025-05-05'
+  x-dateGenerated: '2025-05-07'
   version: '2022-06-10'
   title: CloudWatch Observability Access Manager
   description: |-
@@ -47,16 +47,1001 @@ servers:
       - sa-east-1
       - me-south-1
       default: us-east-1
-paths: {}
+paths:
+  /CreateLink:
+    post:
+      operationId: CreateLink
+      description: |-
+        Creates a link between a source account and a sink that you have created in a monitoring account. After the link is created, data is sent from the source account to the monitoring account. When you create a link, you can optionally specify filters that specify which metric namespaces and which log groups are shared from the source account to the monitoring account.
+
+        Before you create a link, you must create a sink in the monitoring account and create a sink policy in that account. The sink policy must permit the source account to link to it. You can grant permission to source accounts by granting permission to an entire organization or to individual accounts.
+
+        For more information, see [CreateSink](https://docs.aws.amazon.com/OAM/latest/APIReference/API_CreateSink.html) and [PutSinkPolicy](https://docs.aws.amazon.com/OAM/latest/APIReference/API_PutSinkPolicy.html).
+
+        Each monitoring account can be linked to as many as 100,000 source accounts.
+
+        Each source account can be linked to as many as five monitoring accounts.
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                LabelTemplate:
+                  $ref: '#/components/schemas/LabelTemplate'
+                ResourceTypes:
+                  $ref: '#/components/schemas/ResourceTypesInput'
+                SinkIdentifier:
+                  $ref: '#/components/schemas/ResourceIdentifier'
+                Tags:
+                  $ref: '#/components/schemas/TagMapInput'
+                LinkConfiguration:
+                  $ref: '#/components/schemas/LinkConfiguration'
+      responses:
+        '200': {}
+        '409':
+          description: |-
+            A resource was in an inconsistent state during an update or a deletion.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConflictException'
+        '500':
+          description: |-
+            Unexpected error while processing the request. Retry the request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServiceFault'
+        '400':
+          description: |-
+            A required parameter is missing from the request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MissingRequiredParameterException'
+        '429':
+          description: |-
+            The request would cause a service quota to be exceeded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServiceQuotaExceededException'
+  /CreateSink:
+    post:
+      operationId: CreateSink
+      description: |-
+        Use this to create a _sink_ in the current account, so that it can be used as a monitoring account in CloudWatch cross-account observability. A sink is a resource that represents an attachment point in a monitoring account. Source accounts can link to the sink to send observability data.
+
+        After you create a sink, you must create a sink policy that allows source accounts to attach to it. For more information, see [PutSinkPolicy](https://docs.aws.amazon.com/OAM/latest/APIReference/API_PutSinkPolicy.html).
+
+        Each account can contain one sink per Region. If you delete a sink, you can then create a new one in that Region.
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                Name:
+                  $ref: '#/components/schemas/SinkName'
+                Tags:
+                  $ref: '#/components/schemas/TagMapInput'
+      responses:
+        '200': {}
+        '409':
+          description: |-
+            A resource was in an inconsistent state during an update or a deletion.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConflictException'
+        '500':
+          description: |-
+            Unexpected error while processing the request. Retry the request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServiceFault'
+        '400':
+          description: |-
+            A required parameter is missing from the request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MissingRequiredParameterException'
+        '429':
+          description: |-
+            The request would cause a service quota to be exceeded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServiceQuotaExceededException'
+  /DeleteLink:
+    post:
+      operationId: DeleteLink
+      description: |-
+        Deletes a link between a monitoring account sink and a source account. You must run this operation in the source account.
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                Identifier:
+                  $ref: '#/components/schemas/ResourceIdentifier'
+      responses:
+        '200': {}
+        '500':
+          description: |-
+            Unexpected error while processing the request. Retry the request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServiceFault'
+        '400':
+          description: |-
+            A required parameter is missing from the request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MissingRequiredParameterException'
+        '404':
+          description: |-
+            The request references a resource that does not exist.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+  /DeleteSink:
+    post:
+      operationId: DeleteSink
+      description: |-
+        Deletes a sink. You must delete all links to a sink before you can delete that sink.
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                Identifier:
+                  $ref: '#/components/schemas/ResourceIdentifier'
+      responses:
+        '200': {}
+        '409':
+          description: |-
+            A resource was in an inconsistent state during an update or a deletion.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConflictException'
+        '500':
+          description: |-
+            Unexpected error while processing the request. Retry the request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServiceFault'
+        '400':
+          description: |-
+            A required parameter is missing from the request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MissingRequiredParameterException'
+        '404':
+          description: |-
+            The request references a resource that does not exist.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+  /GetLink:
+    post:
+      operationId: GetLink
+      description: |-
+        Returns complete information about one link.
+
+        To use this operation, provide the link ARN. To retrieve a list of link ARNs, use [ListLinks](https://docs.aws.amazon.com/OAM/latest/APIReference/API_ListLinks.html).
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                Identifier:
+                  $ref: '#/components/schemas/ResourceIdentifier'
+      responses:
+        '200': {}
+        '500':
+          description: |-
+            Unexpected error while processing the request. Retry the request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServiceFault'
+        '400':
+          description: |-
+            A required parameter is missing from the request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MissingRequiredParameterException'
+        '404':
+          description: |-
+            The request references a resource that does not exist.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+  /GetSink:
+    post:
+      operationId: GetSink
+      description: |-
+        Returns complete information about one monitoring account sink.
+
+        To use this operation, provide the sink ARN. To retrieve a list of sink ARNs, use [ListSinks](https://docs.aws.amazon.com/OAM/latest/APIReference/API_ListSinks.html).
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                Identifier:
+                  $ref: '#/components/schemas/ResourceIdentifier'
+      responses:
+        '200': {}
+        '500':
+          description: |-
+            Unexpected error while processing the request. Retry the request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServiceFault'
+        '400':
+          description: |-
+            A required parameter is missing from the request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MissingRequiredParameterException'
+        '404':
+          description: |-
+            The request references a resource that does not exist.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+  /GetSinkPolicy:
+    post:
+      operationId: GetSinkPolicy
+      description: |-
+        Returns the current sink policy attached to this sink. The sink policy specifies what accounts can attach to this sink as source accounts, and what types of data they can share.
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                SinkIdentifier:
+                  $ref: '#/components/schemas/ResourceIdentifier'
+      responses:
+        '200': {}
+        '500':
+          description: |-
+            Unexpected error while processing the request. Retry the request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServiceFault'
+        '400':
+          description: |-
+            A required parameter is missing from the request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MissingRequiredParameterException'
+        '404':
+          description: |-
+            The request references a resource that does not exist.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+  /ListAttachedLinks:
+    post:
+      operationId: ListAttachedLinks
+      description: |-
+        Returns a list of source account links that are linked to this monitoring account sink.
+
+        To use this operation, provide the sink ARN. To retrieve a list of sink ARNs, use [ListSinks](https://docs.aws.amazon.com/OAM/latest/APIReference/API_ListSinks.html).
+
+        To find a list of links for one source account, use [ListLinks](https://docs.aws.amazon.com/OAM/latest/APIReference/API_ListLinks.html).
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                MaxResults:
+                  $ref: '#/components/schemas/ListAttachedLinksMaxResults'
+                NextToken:
+                  $ref: '#/components/schemas/NextToken'
+                SinkIdentifier:
+                  $ref: '#/components/schemas/ResourceIdentifier'
+      responses:
+        '200': {}
+        '500':
+          description: |-
+            Unexpected error while processing the request. Retry the request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServiceFault'
+        '400':
+          description: |-
+            A required parameter is missing from the request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MissingRequiredParameterException'
+        '404':
+          description: |-
+            The request references a resource that does not exist.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+  /ListLinks:
+    post:
+      operationId: ListLinks
+      description: |-
+        Use this operation in a source account to return a list of links to monitoring account sinks that this source account has.
+
+        To find a list of links for one monitoring account sink, use [ListAttachedLinks](https://docs.aws.amazon.com/OAM/latest/APIReference/API_ListAttachedLinks.html) from within the monitoring account.
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                MaxResults:
+                  $ref: '#/components/schemas/ListLinksMaxResults'
+                NextToken:
+                  $ref: '#/components/schemas/NextToken'
+      responses:
+        '200': {}
+        '500':
+          description: |-
+            Unexpected error while processing the request. Retry the request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServiceFault'
+        '400':
+          description: |-
+            A parameter is specified incorrectly.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InvalidParameterException'
+        '404':
+          description: |-
+            The request references a resource that does not exist.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+  /ListSinks:
+    post:
+      operationId: ListSinks
+      description: |-
+        Use this operation in a monitoring account to return the list of sinks created in that account.
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                MaxResults:
+                  $ref: '#/components/schemas/ListSinksMaxResults'
+                NextToken:
+                  $ref: '#/components/schemas/NextToken'
+      responses:
+        '200': {}
+        '500':
+          description: |-
+            Unexpected error while processing the request. Retry the request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServiceFault'
+        '400':
+          description: |-
+            A parameter is specified incorrectly.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InvalidParameterException'
+        '404':
+          description: |-
+            The request references a resource that does not exist.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+  /tags/{ResourceArn}:
+    get:
+      operationId: ListTagsForResource
+      description: |-
+        Displays the tags associated with a resource. Both sinks and links support tagging.
+      parameters:
+      - name: ResourceArn
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/Arn'
+      responses:
+        '200': {}
+        '404':
+          description: |-
+            The request references a resource that does not exist.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+        '400':
+          description: |-
+            The value of a parameter in the request caused an error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+    put:
+      operationId: TagResource
+      description: |-
+        Assigns one or more tags (key-value pairs) to the specified resource. Both sinks and links can be tagged.
+
+        Tags can help you organize and categorize your resources. You can also use them to scope user permissions by granting a user permission to access or change only resources with certain tag values.
+
+        Tags don't have any semantic meaning to Amazon Web Services and are interpreted strictly as strings of characters.
+
+        You can use the `TagResource` action with a resource that already has tags. If you specify a new tag key for the alarm, this tag is appended to the list of tags associated with the alarm. If you specify a tag key that is already associated with the alarm, the new tag value that you specify replaces the previous value for that tag.
+
+        You can associate as many as 50 tags with a resource.
+
+        Unlike tagging permissions in other Amazon Web Services services, to tag or untag links and sinks you must have the `oam:ResourceTag` permission. The `iam:ResourceTag` permission does not allow you to tag and untag links and sinks.
+      parameters:
+      - name: ResourceArn
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/Arn'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                Tags:
+                  $ref: '#/components/schemas/TagMapInput'
+      responses:
+        '200': {}
+        '404':
+          description: |-
+            The request references a resource that does not exist.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+        '400':
+          description: |-
+            The value of a parameter in the request caused an error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+    delete:
+      operationId: UntagResource
+      description: |-
+        Removes one or more tags from the specified resource.
+
+        Unlike tagging permissions in other Amazon Web Services services, to tag or untag links and sinks you must have the `oam:ResourceTag` permission. The `iam:TagResource` permission does not allow you to tag and untag links and sinks.
+      parameters:
+      - name: ResourceArn
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/Arn'
+      - name: tagKeys
+        in: query
+        required: true
+        schema:
+          $ref: '#/components/schemas/TagKeys'
+      responses:
+        '200': {}
+        '404':
+          description: |-
+            The request references a resource that does not exist.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+        '400':
+          description: |-
+            The value of a parameter in the request caused an error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+  /PutSinkPolicy:
+    post:
+      operationId: PutSinkPolicy
+      description: |-
+        Creates or updates the resource policy that grants permissions to source accounts to link to the monitoring account sink. When you create a sink policy, you can grant permissions to all accounts in an organization or to individual accounts.
+
+        You can also use a sink policy to limit the types of data that is shared. The three types that you can allow or deny are:
+
+          * **Metrics** \- Specify with `AWS::CloudWatch::Metric`
+
+          * **Log groups** \- Specify with `AWS::Logs::LogGroup`
+
+          * **Traces** \- Specify with `AWS::XRay::Trace`
+
+          * **Application Insights - Applications** \- Specify with `AWS::ApplicationInsights::Application`
+
+        See the examples in this section to see how to specify permitted source accounts and data types.
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                SinkIdentifier:
+                  $ref: '#/components/schemas/ResourceIdentifier'
+                Policy:
+                  $ref: '#/components/schemas/SinkPolicy'
+      responses:
+        '200': {}
+        '500':
+          description: |-
+            Unexpected error while processing the request. Retry the request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServiceFault'
+        '400':
+          description: |-
+            A required parameter is missing from the request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MissingRequiredParameterException'
+        '404':
+          description: |-
+            The request references a resource that does not exist.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+  /UpdateLink:
+    post:
+      operationId: UpdateLink
+      description: |-
+        Use this operation to change what types of data are shared from a source account to its linked monitoring account sink. You can't change the sink or change the monitoring account with this operation.
+
+        When you update a link, you can optionally specify filters that specify which metric namespaces and which log groups are shared from the source account to the monitoring account.
+
+        To update the list of tags associated with the sink, use [TagResource](https://docs.aws.amazon.com/OAM/latest/APIReference/API_TagResource.html).
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                Identifier:
+                  $ref: '#/components/schemas/ResourceIdentifier'
+                ResourceTypes:
+                  $ref: '#/components/schemas/ResourceTypesInput'
+                LinkConfiguration:
+                  $ref: '#/components/schemas/LinkConfiguration'
+      responses:
+        '200': {}
+        '500':
+          description: |-
+            Unexpected error while processing the request. Retry the request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServiceFault'
+        '400':
+          description: |-
+            A required parameter is missing from the request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MissingRequiredParameterException'
+        '404':
+          description: |-
+            The request references a resource that does not exist.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
 components:
   schemas:
     Arn:
       type: string
       pattern: ^arn:(\w|-)+:oam:.+:.+:.+
+    ConflictException:
+      type: object
+      properties:
+        Message:
+          $ref: '#/components/schemas/String'
+        amznErrorType:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The name of the exception.
+      description: A resource was in an inconsistent state during an update or a deletion.
+    CreateLinkInput:
+      type: object
+      properties:
+        LabelTemplate:
+          allOf:
+          - $ref: '#/components/schemas/LabelTemplate'
+          description: "Specify a friendly human-readable name to use to identify\
+            \ this source account when you are viewing data from it in the monitoring\
+            \ account.\n\nYou can use a custom label or use the following variables:\n\
+            \n  * `$AccountName` is the name of the account\n\n  * `$AccountEmail`\
+            \ is the globally unique email address of the account\n\n  * `$AccountEmailNoDomain`\
+            \ is the email address of the account without the domain name"
+        ResourceTypes:
+          allOf:
+          - $ref: '#/components/schemas/ResourceTypesInput'
+          description: An array of strings that define which types of data that the
+            source account shares with the monitoring account.
+        SinkIdentifier:
+          allOf:
+          - $ref: '#/components/schemas/ResourceIdentifier'
+          description: 'The ARN of the sink to use to create this link. You can use
+            [ListSinks](https://docs.aws.amazon.com/OAM/latest/APIReference/API_ListSinks.html)
+            to find the ARNs of sinks.
+
+
+            For more information about sinks, see [CreateSink](https://docs.aws.amazon.com/OAM/latest/APIReference/API_CreateSink.html).'
+        Tags:
+          allOf:
+          - $ref: '#/components/schemas/TagMapInput'
+          description: 'Assigns one or more tags (key-value pairs) to the link.
+
+
+            Tags can help you organize and categorize your resources. You can also
+            use them to scope user permissions by granting a user permission to access
+            or change only resources with certain tag values.
+
+
+            For more information about using tags to control access, see [Controlling
+            access to Amazon Web Services resources using tags](https://docs.aws.amazon.com/IAM/latest/UserGuide/access_tags.html).'
+        LinkConfiguration:
+          allOf:
+          - $ref: '#/components/schemas/LinkConfiguration'
+          description: Use this structure to optionally create filters that specify
+            that only some metric namespaces or log groups are to be shared from the
+            source account to the monitoring account.
+      required:
+      - LabelTemplate
+      - ResourceTypes
+      - SinkIdentifier
+    CreateLinkOutput:
+      type: object
+      properties:
+        Arn:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The ARN of the link that is newly created.
+        Id:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The random ID string that Amazon Web Services generated as
+            part of the link ARN.
+        Label:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The label that you assigned to this link. If the `labelTemplate`
+            includes variables, this field displays the variables resolved to their
+            actual values.
+        LabelTemplate:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The exact label template that you specified, with the variables
+            not resolved.
+        ResourceTypes:
+          allOf:
+          - $ref: '#/components/schemas/ResourceTypesOutput'
+          description: The resource types supported by this link.
+        SinkArn:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The ARN of the sink that is used for this link.
+        Tags:
+          allOf:
+          - $ref: '#/components/schemas/TagMapOutput'
+          description: The tags assigned to the link.
+        LinkConfiguration:
+          allOf:
+          - $ref: '#/components/schemas/LinkConfiguration'
+          description: This structure includes filters that specify which metric namespaces
+            and which log groups are shared from the source account to the monitoring
+            account.
+    CreateSinkInput:
+      type: object
+      properties:
+        Name:
+          allOf:
+          - $ref: '#/components/schemas/SinkName'
+          description: A name for the sink.
+        Tags:
+          allOf:
+          - $ref: '#/components/schemas/TagMapInput'
+          description: 'Assigns one or more tags (key-value pairs) to the link.
+
+
+            Tags can help you organize and categorize your resources. You can also
+            use them to scope user permissions by granting a user permission to access
+            or change only resources with certain tag values.
+
+
+            For more information about using tags to control access, see [Controlling
+            access to Amazon Web Services resources using tags](https://docs.aws.amazon.com/IAM/latest/UserGuide/access_tags.html).'
+      required:
+      - Name
+    CreateSinkOutput:
+      type: object
+      properties:
+        Arn:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The ARN of the sink that is newly created.
+        Id:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The random ID string that Amazon Web Services generated as
+            part of the sink ARN.
+        Name:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The name of the sink.
+        Tags:
+          allOf:
+          - $ref: '#/components/schemas/TagMapOutput'
+          description: The tags assigned to the sink.
+    DeleteLinkInput:
+      type: object
+      properties:
+        Identifier:
+          allOf:
+          - $ref: '#/components/schemas/ResourceIdentifier'
+          description: The ARN of the link to delete.
+      required:
+      - Identifier
+    DeleteLinkOutput:
+      type: object
+      properties: {}
+    DeleteSinkInput:
+      type: object
+      properties:
+        Identifier:
+          allOf:
+          - $ref: '#/components/schemas/ResourceIdentifier'
+          description: The ARN of the sink to delete.
+      required:
+      - Identifier
+    DeleteSinkOutput:
+      type: object
+      properties: {}
+    GetLinkInput:
+      type: object
+      properties:
+        Identifier:
+          allOf:
+          - $ref: '#/components/schemas/ResourceIdentifier'
+          description: The ARN of the link to retrieve information for.
+      required:
+      - Identifier
+    GetLinkOutput:
+      type: object
+      properties:
+        Arn:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The ARN of the link.
+        Id:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The random ID string that Amazon Web Services generated as
+            part of the link ARN.
+        Label:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The label that you assigned to this link, with the variables
+            resolved to their actual values.
+        LabelTemplate:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The exact label template that was specified when the link was
+            created, with the template variables not resolved.
+        ResourceTypes:
+          allOf:
+          - $ref: '#/components/schemas/ResourceTypesOutput'
+          description: The resource types supported by this link.
+        SinkArn:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The ARN of the sink that is used for this link.
+        Tags:
+          allOf:
+          - $ref: '#/components/schemas/TagMapOutput'
+          description: The tags assigned to the link.
+        LinkConfiguration:
+          allOf:
+          - $ref: '#/components/schemas/LinkConfiguration'
+          description: This structure includes filters that specify which metric namespaces
+            and which log groups are shared from the source account to the monitoring
+            account.
+    GetSinkInput:
+      type: object
+      properties:
+        Identifier:
+          allOf:
+          - $ref: '#/components/schemas/ResourceIdentifier'
+          description: The ARN of the sink to retrieve information for.
+      required:
+      - Identifier
+    GetSinkOutput:
+      type: object
+      properties:
+        Arn:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The ARN of the sink.
+        Id:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The random ID string that Amazon Web Services generated as
+            part of the sink ARN.
+        Name:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The name of the sink.
+        Tags:
+          allOf:
+          - $ref: '#/components/schemas/TagMapOutput'
+          description: The tags assigned to the sink.
+    GetSinkPolicyInput:
+      type: object
+      properties:
+        SinkIdentifier:
+          allOf:
+          - $ref: '#/components/schemas/ResourceIdentifier'
+          description: The ARN of the sink to retrieve the policy of.
+      required:
+      - SinkIdentifier
+    GetSinkPolicyOutput:
+      type: object
+      properties:
+        SinkArn:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The ARN of the sink.
+        SinkId:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The random ID string that Amazon Web Services generated as
+            part of the sink ARN.
+        Policy:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The policy that you specified, in JSON format.
+    InternalServiceFault:
+      type: object
+      properties:
+        Message:
+          $ref: '#/components/schemas/String'
+        amznErrorType:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The name of the exception.
+      description: Unexpected error while processing the request. Retry the request.
+    InvalidParameterException:
+      type: object
+      properties:
+        message:
+          $ref: '#/components/schemas/String'
+        amznErrorType:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The name of the exception.
+      description: A parameter is specified incorrectly.
     LabelTemplate:
       type: string
       minLength: 1
       maxLength: 64
+    LinkConfiguration:
+      type: object
+      properties:
+        LogGroupConfiguration:
+          allOf:
+          - $ref: '#/components/schemas/LogGroupConfiguration'
+          description: Use this structure to filter which log groups are to send log
+            events from the source account to the monitoring account.
+        MetricConfiguration:
+          allOf:
+          - $ref: '#/components/schemas/MetricConfiguration'
+          description: Use this structure to filter which metric namespaces are to
+            be shared from the source account to the monitoring account.
+      description: Use this structure to optionally create filters that specify that
+        only some metric namespaces or log groups are to be shared from the source
+        account to the monitoring account.
+    ListAttachedLinksInput:
+      type: object
+      properties:
+        MaxResults:
+          allOf:
+          - $ref: '#/components/schemas/ListAttachedLinksMaxResults'
+          description: Limits the number of returned links to the specified number.
+        NextToken:
+          allOf:
+          - $ref: '#/components/schemas/NextToken'
+          description: The token for the next set of items to return. You received
+            this token from a previous call.
+        SinkIdentifier:
+          allOf:
+          - $ref: '#/components/schemas/ResourceIdentifier'
+          description: The ARN of the sink that you want to retrieve links for.
+      required:
+      - SinkIdentifier
+    ListAttachedLinksItem:
+      type: object
+      properties:
+        Label:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The label that was assigned to this link at creation, with
+            the variables resolved to their actual values.
+        LinkArn:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The ARN of the link.
+        ResourceTypes:
+          allOf:
+          - $ref: '#/components/schemas/ResourceTypesOutput'
+          description: The resource types supported by this link.
+      description: A structure that contains information about one link attached to
+        this monitoring account sink.
     ListAttachedLinksItems:
       type: array
       items:
@@ -65,6 +1050,59 @@ components:
       type: integer
       minimum: 1
       maximum: 1000
+    ListAttachedLinksOutput:
+      type: object
+      properties:
+        Items:
+          allOf:
+          - $ref: '#/components/schemas/ListAttachedLinksItems'
+          description: An array of structures that contain the information about the
+            attached links.
+        NextToken:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The token to use when requesting the next set of links.
+      required:
+      - Items
+    ListLinksInput:
+      type: object
+      properties:
+        MaxResults:
+          allOf:
+          - $ref: '#/components/schemas/ListLinksMaxResults'
+          description: Limits the number of returned links to the specified number.
+        NextToken:
+          allOf:
+          - $ref: '#/components/schemas/NextToken'
+          description: The token for the next set of items to return. You received
+            this token from a previous call.
+    ListLinksItem:
+      type: object
+      properties:
+        Arn:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The ARN of the link.
+        Id:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The random ID string that Amazon Web Services generated as
+            part of the link ARN.
+        Label:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The label that was assigned to this link at creation, with
+            the variables resolved to their actual values.
+        ResourceTypes:
+          allOf:
+          - $ref: '#/components/schemas/ResourceTypesOutput'
+          description: The resource types supported by this link.
+        SinkArn:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The ARN of the sink that this link is attached to.
+      description: A structure that contains information about one of this source
+        account's links to a monitoring account.
     ListLinksItems:
       type: array
       items:
@@ -73,6 +1111,50 @@ components:
       type: integer
       minimum: 1
       maximum: 5
+    ListLinksOutput:
+      type: object
+      properties:
+        Items:
+          allOf:
+          - $ref: '#/components/schemas/ListLinksItems'
+          description: An array of structures that contain the information about the
+            returned links.
+        NextToken:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The token to use when requesting the next set of links.
+      required:
+      - Items
+    ListSinksInput:
+      type: object
+      properties:
+        MaxResults:
+          allOf:
+          - $ref: '#/components/schemas/ListSinksMaxResults'
+          description: Limits the number of returned links to the specified number.
+        NextToken:
+          allOf:
+          - $ref: '#/components/schemas/NextToken'
+          description: The token for the next set of items to return. You received
+            this token from a previous call.
+    ListSinksItem:
+      type: object
+      properties:
+        Arn:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The ARN of the sink.
+        Id:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The random ID string that Amazon Web Services generated as
+            part of the sink ARN.
+        Name:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The name of the sink.
+      description: A structure that contains information about one of this monitoring
+        account's sinks.
     ListSinksItems:
       type: array
       items:
@@ -81,19 +1163,184 @@ components:
       type: integer
       minimum: 1
       maximum: 100
+    ListSinksOutput:
+      type: object
+      properties:
+        Items:
+          allOf:
+          - $ref: '#/components/schemas/ListSinksItems'
+          description: An array of structures that contain the information about the
+            returned sinks.
+        NextToken:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The token to use when requesting the next set of sinks.
+      required:
+      - Items
+    ListTagsForResourceInput:
+      type: object
+      properties:
+        ResourceArn:
+          allOf:
+          - $ref: '#/components/schemas/Arn'
+          description: 'The ARN of the resource that you want to view tags for.
+
+
+            The ARN format of a sink is `arn:aws:oam:_Region_ :_account-id_ :sink/_sink-id_
+            `
+
+
+            The ARN format of a link is `arn:aws:oam:_Region_ :_account-id_ :link/_link-id_
+            `
+
+
+            For more information about ARN format, see [CloudWatch Logs resources
+            and operations](https://docs.aws.amazon.com/AmazonCloudWatch/latest/logs/iam-access-control-overview-cwl.html).
+
+
+            Unlike tagging permissions in other Amazon Web Services services, to retrieve
+            the list of tags for links or sinks you must have the `oam:RequestTag`
+            permission. The `aws:ReguestTag` permission does not allow you to tag
+            and untag links and sinks.'
+      required:
+      - ResourceArn
+    ListTagsForResourceOutput:
+      type: object
+      properties:
+        Tags:
+          allOf:
+          - $ref: '#/components/schemas/TagMapOutput'
+          description: The list of tags associated with the requested resource.>
+    LogGroupConfiguration:
+      type: object
+      properties:
+        Filter:
+          allOf:
+          - $ref: '#/components/schemas/LogsFilter'
+          description: "Use this field to specify which log groups are to share their\
+            \ log events with the monitoring account. Use the term `LogGroupName`\
+            \ and one or more of the following operands. Use single quotation marks\
+            \ (') around log group names. The matching of log group names is case\
+            \ sensitive. Each filter has a limit of five conditional operands. Conditional\
+            \ operands are `AND` and `OR`.\n\n  * `=` and `!=`\n\n  * `AND`\n\n  *\
+            \ `OR`\n\n  * `LIKE` and `NOT LIKE`. These can be used only as prefix\
+            \ searches. Include a `%` at the end of the string that you want to search\
+            \ for and include.\n\n  * `IN` and `NOT IN`, using parentheses `( )`\n\
+            \nExamples:\n\n  * `LogGroupName IN ('This-Log-Group', 'Other-Log-Group')`\
+            \ includes only the log groups with names `This-Log-Group` and `Other-Log-Group`.\n\
+            \n  * `LogGroupName NOT IN ('Private-Log-Group', 'Private-Log-Group-2')`\
+            \ includes all log groups except the log groups with names `Private-Log-Group`\
+            \ and `Private-Log-Group-2`.\n\n  * `LogGroupName LIKE 'aws/lambda/%'\
+            \ OR LogGroupName LIKE 'AWSLogs%'` includes all log groups that have names\
+            \ that start with `aws/lambda/` or `AWSLogs`.\n\nIf you are updating a\
+            \ link that uses filters, you can specify `*` as the only value for the\
+            \ `filter` parameter to delete the filter and share all log groups with\
+            \ the monitoring account."
+      required:
+      - Filter
+      description: This structure contains the `Filter` parameter which you can use
+        to specify which log groups are to share log events from this source account
+        to the monitoring account.
     LogsFilter:
       type: string
       minLength: 1
       maxLength: 2000
+    MetricConfiguration:
+      type: object
+      properties:
+        Filter:
+          allOf:
+          - $ref: '#/components/schemas/MetricsFilter'
+          description: "Use this field to specify which metrics are to be shared with\
+            \ the monitoring account. Use the term `Namespace` and one or more of\
+            \ the following operands. Use single quotation marks (') around namespace\
+            \ names. The matching of namespace names is case sensitive. Each filter\
+            \ has a limit of five conditional operands. Conditional operands are `AND`\
+            \ and `OR`.\n\n  * `=` and `!=`\n\n  * `AND`\n\n  * `OR`\n\n  * `LIKE`\
+            \ and `NOT LIKE`. These can be used only as prefix searches. Include a\
+            \ `%` at the end of the string that you want to search for and include.\n\
+            \n  * `IN` and `NOT IN`, using parentheses `( )`\n\nExamples:\n\n  * `Namespace\
+            \ NOT LIKE 'AWS/%'` includes only namespaces that don't start with `AWS/`,\
+            \ such as custom namespaces.\n\n  * `Namespace IN ('AWS/EC2', 'AWS/ELB',\
+            \ 'AWS/S3')` includes only the metrics in the EC2, Elastic Load Balancing,\
+            \ and Amazon S3 namespaces. \n\n  * `Namespace = 'AWS/EC2' OR Namespace\
+            \ NOT LIKE 'AWS/%'` includes only the EC2 namespace and your custom namespaces.\n\
+            \nIf you are updating a link that uses filters, you can specify `*` as\
+            \ the only value for the `filter` parameter to delete the filter and share\
+            \ all metric namespaces with the monitoring account."
+      required:
+      - Filter
+      description: This structure contains the `Filter` parameter which you can use
+        to specify which metric namespaces are to be shared from this source account
+        to the monitoring account.
     MetricsFilter:
       type: string
       minLength: 1
       maxLength: 2000
+    MissingRequiredParameterException:
+      type: object
+      properties:
+        message:
+          $ref: '#/components/schemas/String'
+        amznErrorType:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The name of the exception.
+      description: A required parameter is missing from the request.
     NextToken:
       type: string
+    PutSinkPolicyInput:
+      type: object
+      properties:
+        SinkIdentifier:
+          allOf:
+          - $ref: '#/components/schemas/ResourceIdentifier'
+          description: The ARN of the sink to attach this policy to.
+        Policy:
+          allOf:
+          - $ref: '#/components/schemas/SinkPolicy'
+          description: 'The JSON policy to use. If you are updating an existing policy,
+            the entire existing policy is replaced by what you specify here.
+
+
+            The policy must be in JSON string format with quotation marks escaped
+            and no newlines.
+
+
+            For examples of different types of policies, see the **Examples** section
+            on this page.'
+      required:
+      - SinkIdentifier
+      - Policy
+    PutSinkPolicyOutput:
+      type: object
+      properties:
+        SinkArn:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The ARN of the sink.
+        SinkId:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The random ID string that Amazon Web Services generated as
+            part of the sink ARN.
+        Policy:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The policy that you specified.
     ResourceIdentifier:
       type: string
       pattern: ^[a-zA-Z0-9][a-zA-Z0-9_:\.\-\/]{0,2047}$
+    ResourceNotFoundException:
+      type: object
+      properties:
+        Message:
+          $ref: '#/components/schemas/String'
+        amznErrorType:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The name of the exception.
+      description: The request references a resource that does not exist.
     ResourceType:
       type: string
       enum:
@@ -112,6 +1359,16 @@ components:
       type: array
       items:
         type: string
+    ServiceQuotaExceededException:
+      type: object
+      properties:
+        Message:
+          $ref: '#/components/schemas/String'
+        amznErrorType:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The name of the exception.
+      description: The request would cause a service quota to be exceeded.
     SinkName:
       type: string
       pattern: ^[a-zA-Z0-9_\.\-]{1,255}$
@@ -133,7 +1390,141 @@ components:
       type: object
       additionalProperties:
         $ref: '#/components/schemas/String'
+    TagResourceInput:
+      type: object
+      properties:
+        ResourceArn:
+          allOf:
+          - $ref: '#/components/schemas/Arn'
+          description: 'The ARN of the resource that you''re adding tags to.
+
+
+            The ARN format of a sink is `arn:aws:oam:_Region_ :_account-id_ :sink/_sink-id_
+            `
+
+
+            The ARN format of a link is `arn:aws:oam:_Region_ :_account-id_ :link/_link-id_
+            `
+
+
+            For more information about ARN format, see [CloudWatch Logs resources
+            and operations](https://docs.aws.amazon.com/AmazonCloudWatch/latest/logs/iam-access-control-overview-cwl.html).'
+        Tags:
+          allOf:
+          - $ref: '#/components/schemas/TagMapInput'
+          description: The list of key-value pairs to associate with the resource.
+      required:
+      - ResourceArn
+      - Tags
+    TagResourceOutput:
+      type: object
+      properties: {}
     TagValue:
       type: string
       minLength: 0
       maxLength: 256
+    TooManyTagsException:
+      type: object
+      properties:
+        Message:
+          $ref: '#/components/schemas/String'
+      description: A resource can have no more than 50 tags.
+    UntagResourceInput:
+      type: object
+      properties:
+        ResourceArn:
+          allOf:
+          - $ref: '#/components/schemas/Arn'
+          description: 'The ARN of the resource that you''re removing tags from.
+
+
+            The ARN format of a sink is `arn:aws:oam:_Region_ :_account-id_ :sink/_sink-id_
+            `
+
+
+            The ARN format of a link is `arn:aws:oam:_Region_ :_account-id_ :link/_link-id_
+            `
+
+
+            For more information about ARN format, see [CloudWatch Logs resources
+            and operations](https://docs.aws.amazon.com/AmazonCloudWatch/latest/logs/iam-access-control-overview-cwl.html).'
+        TagKeys:
+          allOf:
+          - $ref: '#/components/schemas/TagKeys'
+          description: The list of tag keys to remove from the resource.
+      required:
+      - ResourceArn
+      - TagKeys
+    UntagResourceOutput:
+      type: object
+      properties: {}
+    UpdateLinkInput:
+      type: object
+      properties:
+        Identifier:
+          allOf:
+          - $ref: '#/components/schemas/ResourceIdentifier'
+          description: The ARN of the link that you want to update.
+        ResourceTypes:
+          allOf:
+          - $ref: '#/components/schemas/ResourceTypesInput'
+          description: 'An array of strings that define which types of data that the
+            source account will send to the monitoring account.
+
+
+            Your input here replaces the current set of data types that are shared.'
+        LinkConfiguration:
+          allOf:
+          - $ref: '#/components/schemas/LinkConfiguration'
+          description: Use this structure to filter which metric namespaces and which
+            log groups are to be shared from the source account to the monitoring
+            account.
+      required:
+      - Identifier
+      - ResourceTypes
+    UpdateLinkOutput:
+      type: object
+      properties:
+        Arn:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The ARN of the link that you have updated.
+        Id:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The random ID string that Amazon Web Services generated as
+            part of the sink ARN.
+        Label:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The label assigned to this link, with the variables resolved
+            to their actual values.
+        LabelTemplate:
+          allOf:
+          - $ref: '#/components/schemas/LabelTemplate'
+          description: The exact label template that was specified when the link was
+            created, with the template variables not resolved.
+        ResourceTypes:
+          allOf:
+          - $ref: '#/components/schemas/ResourceTypesOutput'
+          description: The resource types now supported by this link.
+        SinkArn:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The ARN of the sink that is used for this link.
+        Tags:
+          allOf:
+          - $ref: '#/components/schemas/TagMapOutput'
+          description: The tags assigned to the link.
+        LinkConfiguration:
+          allOf:
+          - $ref: '#/components/schemas/LinkConfiguration'
+          description: This structure includes filters that specify which metric namespaces
+            and which log groups are shared from the source account to the monitoring
+            account.
+    ValidationException:
+      type: object
+      properties:
+        Message:
+          $ref: '#/components/schemas/String'
+      description: The value of a parameter in the request caused an error.

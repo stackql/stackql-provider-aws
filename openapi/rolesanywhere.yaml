@@ -7,7 +7,7 @@ info:
   x-stackql-serviceName: rolesanywhere
   x-aws-serviceName: rolesanywhere
   x-aws-protocol: aws.protocols#restJson1
-  x-dateGenerated: '2025-05-05'
+  x-dateGenerated: '2025-05-07'
   version: '2018-05-10'
   title: IAM Roles Anywhere
   description: |-
@@ -47,13 +47,1110 @@ servers:
       - sa-east-1
       - me-south-1
       default: us-east-1
-paths: {}
+paths:
+  /profiles:
+    post:
+      operationId: CreateProfile
+      description: |-
+        Creates a _profile_ , a list of the roles that Roles Anywhere service is trusted to assume. You use profiles to intersect permissions with IAM managed policies.
+
+        **Required permissions:** `rolesanywhere:CreateProfile`.
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  $ref: '#/components/schemas/ResourceName'
+                requireInstanceProperties:
+                  $ref: '#/components/schemas/Boolean'
+                sessionPolicy:
+                  $ref: '#/components/schemas/String'
+                roleArns:
+                  $ref: '#/components/schemas/RoleArnList'
+                managedPolicyArns:
+                  $ref: '#/components/schemas/ManagedPolicyList'
+                durationSeconds:
+                  $ref: '#/components/schemas/Integer'
+                enabled:
+                  $ref: '#/components/schemas/Boolean'
+                tags:
+                  $ref: '#/components/schemas/TagList'
+                acceptRoleSessionName:
+                  $ref: '#/components/schemas/Boolean'
+      responses:
+        '201': {}
+        '403':
+          description: |-
+            You do not have sufficient access to perform this action.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '400':
+          description: |-
+            Validation exception error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+    get:
+      operationId: ListProfiles
+      description: |-
+        Lists all profiles in the authenticated account and Amazon Web Services Region.
+
+        **Required permissions:** `rolesanywhere:ListProfiles`.
+      parameters:
+      - name: nextToken
+        in: query
+        required: false
+        schema:
+          $ref: '#/components/schemas/String'
+      - name: pageSize
+        in: query
+        required: false
+        schema:
+          $ref: '#/components/schemas/Integer'
+      responses:
+        '200': {}
+        '403':
+          description: |-
+            You do not have sufficient access to perform this action.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '400':
+          description: |-
+            Validation exception error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+  /trustanchors:
+    post:
+      operationId: CreateTrustAnchor
+      description: |-
+        Creates a trust anchor to establish trust between IAM Roles Anywhere and your certificate authority (CA). You can define a trust anchor as a reference to an Private Certificate Authority (Private CA) or by uploading a CA certificate. Your Amazon Web Services workloads can authenticate with the trust anchor using certificates issued by the CA in exchange for temporary Amazon Web Services credentials.
+
+        **Required permissions:** `rolesanywhere:CreateTrustAnchor`.
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  $ref: '#/components/schemas/ResourceName'
+                source:
+                  $ref: '#/components/schemas/Source'
+                enabled:
+                  $ref: '#/components/schemas/Boolean'
+                tags:
+                  $ref: '#/components/schemas/TagList'
+                notificationSettings:
+                  $ref: '#/components/schemas/NotificationSettings'
+      responses:
+        '201': {}
+        '403':
+          description: |-
+            You do not have sufficient access to perform this action.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '400':
+          description: |-
+            Validation exception error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+    get:
+      operationId: ListTrustAnchors
+      description: |-
+        Lists the trust anchors in the authenticated account and Amazon Web Services Region.
+
+        **Required permissions:** `rolesanywhere:ListTrustAnchors`.
+      parameters:
+      - name: nextToken
+        in: query
+        required: false
+        schema:
+          $ref: '#/components/schemas/String'
+      - name: pageSize
+        in: query
+        required: false
+        schema:
+          $ref: '#/components/schemas/Integer'
+      responses:
+        '200': {}
+        '403':
+          description: |-
+            You do not have sufficient access to perform this action.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '400':
+          description: |-
+            Validation exception error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+  /profiles/{profileId}/mappings:
+    delete:
+      operationId: DeleteAttributeMapping
+      description: |-
+        Delete an entry from the attribute mapping rules enforced by a given profile.
+      parameters:
+      - name: profileId
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/Uuid'
+      - name: certificateField
+        in: query
+        required: true
+        schema:
+          $ref: '#/components/schemas/CertificateField'
+      - name: specifiers
+        in: query
+        required: false
+        schema:
+          $ref: '#/components/schemas/SpecifierList'
+      responses:
+        '200': {}
+        '403':
+          description: |-
+            You do not have sufficient access to perform this action.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '404':
+          description: |-
+            The resource could not be found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+        '400':
+          description: |-
+            Validation exception error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+    put:
+      operationId: PutAttributeMapping
+      description: |-
+        Put an entry in the attribute mapping rules that will be enforced by a given profile. A mapping specifies a certificate field and one or more specifiers that have contextual meanings.
+      parameters:
+      - name: profileId
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/Uuid'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                certificateField:
+                  $ref: '#/components/schemas/CertificateField'
+                mappingRules:
+                  $ref: '#/components/schemas/MappingRules'
+      responses:
+        '200': {}
+        '403':
+          description: |-
+            You do not have sufficient access to perform this action.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '404':
+          description: |-
+            The resource could not be found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+        '400':
+          description: |-
+            Validation exception error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+  /crl/{crlId}:
+    delete:
+      operationId: DeleteCrl
+      description: |-
+        Deletes a certificate revocation list (CRL).
+
+        **Required permissions:** `rolesanywhere:DeleteCrl`.
+      parameters:
+      - name: crlId
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/Uuid'
+      responses:
+        '200': {}
+        '403':
+          description: |-
+            You do not have sufficient access to perform this action.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '404':
+          description: |-
+            The resource could not be found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+    get:
+      operationId: GetCrl
+      description: |-
+        Gets a certificate revocation list (CRL).
+
+        **Required permissions:** `rolesanywhere:GetCrl`.
+      parameters:
+      - name: crlId
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/Uuid'
+      responses:
+        '200': {}
+        '404':
+          description: |-
+            The resource could not be found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+    patch:
+      operationId: UpdateCrl
+      description: |-
+        Updates the certificate revocation list (CRL). A CRL is a list of certificates that have been revoked by the issuing certificate authority (CA). IAM Roles Anywhere validates against the CRL before issuing credentials.
+
+        **Required permissions:** `rolesanywhere:UpdateCrl`.
+      parameters:
+      - name: crlId
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/Uuid'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  $ref: '#/components/schemas/ResourceName'
+                crlData:
+                  $ref: '#/components/schemas/Blob'
+      responses:
+        '200': {}
+        '403':
+          description: |-
+            You do not have sufficient access to perform this action.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '404':
+          description: |-
+            The resource could not be found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+        '400':
+          description: |-
+            Validation exception error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+  /profile/{profileId}:
+    delete:
+      operationId: DeleteProfile
+      description: |-
+        Deletes a profile.
+
+        **Required permissions:** `rolesanywhere:DeleteProfile`.
+      parameters:
+      - name: profileId
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/Uuid'
+      responses:
+        '200': {}
+        '403':
+          description: |-
+            You do not have sufficient access to perform this action.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '404':
+          description: |-
+            The resource could not be found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+    get:
+      operationId: GetProfile
+      description: |-
+        Gets a profile.
+
+        **Required permissions:** `rolesanywhere:GetProfile`.
+      parameters:
+      - name: profileId
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/Uuid'
+      responses:
+        '200': {}
+        '403':
+          description: |-
+            You do not have sufficient access to perform this action.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '404':
+          description: |-
+            The resource could not be found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+    patch:
+      operationId: UpdateProfile
+      description: |-
+        Updates a _profile_ , a list of the roles that IAM Roles Anywhere service is trusted to assume. You use profiles to intersect permissions with IAM managed policies.
+
+        **Required permissions:** `rolesanywhere:UpdateProfile`.
+      parameters:
+      - name: profileId
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/Uuid'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  $ref: '#/components/schemas/ResourceName'
+                sessionPolicy:
+                  $ref: '#/components/schemas/String'
+                roleArns:
+                  $ref: '#/components/schemas/RoleArnList'
+                managedPolicyArns:
+                  $ref: '#/components/schemas/ManagedPolicyList'
+                durationSeconds:
+                  $ref: '#/components/schemas/Integer'
+                acceptRoleSessionName:
+                  $ref: '#/components/schemas/Boolean'
+      responses:
+        '200': {}
+        '403':
+          description: |-
+            You do not have sufficient access to perform this action.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '404':
+          description: |-
+            The resource could not be found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+        '400':
+          description: |-
+            Validation exception error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+  /trustanchor/{trustAnchorId}:
+    delete:
+      operationId: DeleteTrustAnchor
+      description: |-
+        Deletes a trust anchor.
+
+        **Required permissions:** `rolesanywhere:DeleteTrustAnchor`.
+      parameters:
+      - name: trustAnchorId
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/Uuid'
+      responses:
+        '200': {}
+        '403':
+          description: |-
+            You do not have sufficient access to perform this action.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '404':
+          description: |-
+            The resource could not be found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+    get:
+      operationId: GetTrustAnchor
+      description: |-
+        Gets a trust anchor.
+
+        **Required permissions:** `rolesanywhere:GetTrustAnchor`.
+      parameters:
+      - name: trustAnchorId
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/Uuid'
+      responses:
+        '200': {}
+        '403':
+          description: |-
+            You do not have sufficient access to perform this action.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '404':
+          description: |-
+            The resource could not be found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+        '400':
+          description: |-
+            Validation exception error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+    patch:
+      operationId: UpdateTrustAnchor
+      description: |-
+        Updates a trust anchor. You establish trust between IAM Roles Anywhere and your certificate authority (CA) by configuring a trust anchor. You can define a trust anchor as a reference to an Private Certificate Authority (Private CA) or by uploading a CA certificate. Your Amazon Web Services workloads can authenticate with the trust anchor using certificates issued by the CA in exchange for temporary Amazon Web Services credentials.
+
+        **Required permissions:** `rolesanywhere:UpdateTrustAnchor`.
+      parameters:
+      - name: trustAnchorId
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/Uuid'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  $ref: '#/components/schemas/ResourceName'
+                source:
+                  $ref: '#/components/schemas/Source'
+      responses:
+        '200': {}
+        '403':
+          description: |-
+            You do not have sufficient access to perform this action.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '404':
+          description: |-
+            The resource could not be found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+        '400':
+          description: |-
+            Validation exception error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+  /crl/{crlId}/disable:
+    post:
+      operationId: DisableCrl
+      description: |-
+        Disables a certificate revocation list (CRL).
+
+        **Required permissions:** `rolesanywhere:DisableCrl`.
+      parameters:
+      - name: crlId
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/Uuid'
+      responses:
+        '200': {}
+        '403':
+          description: |-
+            You do not have sufficient access to perform this action.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '404':
+          description: |-
+            The resource could not be found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+  /profile/{profileId}/disable:
+    post:
+      operationId: DisableProfile
+      description: |-
+        Disables a profile. When disabled, temporary credential requests with this profile fail.
+
+        **Required permissions:** `rolesanywhere:DisableProfile`.
+      parameters:
+      - name: profileId
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/Uuid'
+      responses:
+        '200': {}
+        '403':
+          description: |-
+            You do not have sufficient access to perform this action.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '404':
+          description: |-
+            The resource could not be found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+  /trustanchor/{trustAnchorId}/disable:
+    post:
+      operationId: DisableTrustAnchor
+      description: |-
+        Disables a trust anchor. When disabled, temporary credential requests specifying this trust anchor are unauthorized.
+
+        **Required permissions:** `rolesanywhere:DisableTrustAnchor`.
+      parameters:
+      - name: trustAnchorId
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/Uuid'
+      responses:
+        '200': {}
+        '403':
+          description: |-
+            You do not have sufficient access to perform this action.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '404':
+          description: |-
+            The resource could not be found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+  /crl/{crlId}/enable:
+    post:
+      operationId: EnableCrl
+      description: |-
+        Enables a certificate revocation list (CRL). When enabled, certificates stored in the CRL are unauthorized to receive session credentials.
+
+        **Required permissions:** `rolesanywhere:EnableCrl`.
+      parameters:
+      - name: crlId
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/Uuid'
+      responses:
+        '200': {}
+        '403':
+          description: |-
+            You do not have sufficient access to perform this action.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '404':
+          description: |-
+            The resource could not be found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+  /profile/{profileId}/enable:
+    post:
+      operationId: EnableProfile
+      description: |-
+        Enables temporary credential requests for a profile.
+
+        **Required permissions:** `rolesanywhere:EnableProfile`.
+      parameters:
+      - name: profileId
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/Uuid'
+      responses:
+        '200': {}
+        '403':
+          description: |-
+            You do not have sufficient access to perform this action.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '404':
+          description: |-
+            The resource could not be found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+  /trustanchor/{trustAnchorId}/enable:
+    post:
+      operationId: EnableTrustAnchor
+      description: |-
+        Enables a trust anchor. When enabled, certificates in the trust anchor chain are authorized for trust validation.
+
+        **Required permissions:** `rolesanywhere:EnableTrustAnchor`.
+      parameters:
+      - name: trustAnchorId
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/Uuid'
+      responses:
+        '200': {}
+        '403':
+          description: |-
+            You do not have sufficient access to perform this action.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '404':
+          description: |-
+            The resource could not be found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+  /subject/{subjectId}:
+    get:
+      operationId: GetSubject
+      description: |-
+        Gets a _subject_ , which associates a certificate identity with authentication attempts. The subject stores auditing information such as the status of the last authentication attempt, the certificate data used in the attempt, and the last time the associated identity attempted authentication.
+
+        **Required permissions:** `rolesanywhere:GetSubject`.
+      parameters:
+      - name: subjectId
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/Uuid'
+      responses:
+        '200': {}
+        '403':
+          description: |-
+            You do not have sufficient access to perform this action.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '404':
+          description: |-
+            The resource could not be found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+  /crls:
+    post:
+      operationId: ImportCrl
+      description: |-
+        Imports the certificate revocation list (CRL). A CRL is a list of certificates that have been revoked by the issuing certificate Authority (CA).In order to be properly imported, a CRL must be in PEM format. IAM Roles Anywhere validates against the CRL before issuing credentials.
+
+        **Required permissions:** `rolesanywhere:ImportCrl`.
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  $ref: '#/components/schemas/ResourceName'
+                crlData:
+                  $ref: '#/components/schemas/Blob'
+                enabled:
+                  $ref: '#/components/schemas/Boolean'
+                tags:
+                  $ref: '#/components/schemas/TagList'
+                trustAnchorArn:
+                  $ref: '#/components/schemas/TrustAnchorArn'
+      responses:
+        '201': {}
+        '403':
+          description: |-
+            You do not have sufficient access to perform this action.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '400':
+          description: |-
+            Validation exception error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+    get:
+      operationId: ListCrls
+      description: |-
+        Lists all certificate revocation lists (CRL) in the authenticated account and Amazon Web Services Region.
+
+        **Required permissions:** `rolesanywhere:ListCrls`.
+      parameters:
+      - name: nextToken
+        in: query
+        required: false
+        schema:
+          $ref: '#/components/schemas/String'
+      - name: pageSize
+        in: query
+        required: false
+        schema:
+          $ref: '#/components/schemas/Integer'
+      responses:
+        '200': {}
+        '403':
+          description: |-
+            You do not have sufficient access to perform this action.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '400':
+          description: |-
+            Validation exception error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+  /subjects:
+    get:
+      operationId: ListSubjects
+      description: |-
+        Lists the subjects in the authenticated account and Amazon Web Services Region.
+
+        **Required permissions:** `rolesanywhere:ListSubjects`.
+      parameters:
+      - name: nextToken
+        in: query
+        required: false
+        schema:
+          $ref: '#/components/schemas/String'
+      - name: pageSize
+        in: query
+        required: false
+        schema:
+          $ref: '#/components/schemas/Integer'
+      responses:
+        '200': {}
+        '403':
+          description: |-
+            You do not have sufficient access to perform this action.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '400':
+          description: |-
+            Validation exception error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+  /ListTagsForResource:
+    get:
+      operationId: ListTagsForResource
+      description: |-
+        Lists the tags attached to the resource.
+
+        **Required permissions:** `rolesanywhere:ListTagsForResource`.
+      parameters:
+      - name: resourceArn
+        in: query
+        required: true
+        schema:
+          $ref: '#/components/schemas/AmazonResourceName'
+      responses:
+        '200': {}
+        '403':
+          description: |-
+            You do not have sufficient access to perform this action.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '404':
+          description: |-
+            The resource could not be found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+        '400':
+          description: |-
+            Validation exception error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+  /put-notifications-settings:
+    patch:
+      operationId: PutNotificationSettings
+      description: |-
+        Attaches a list of _notification settings_ to a trust anchor.
+
+        A notification setting includes information such as event name, threshold, status of the notification setting, and the channel to notify.
+
+        **Required permissions:** `rolesanywhere:PutNotificationSettings`.
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                trustAnchorId:
+                  $ref: '#/components/schemas/Uuid'
+                notificationSettings:
+                  $ref: '#/components/schemas/NotificationSettings'
+      responses:
+        '200': {}
+        '403':
+          description: |-
+            You do not have sufficient access to perform this action.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '404':
+          description: |-
+            The resource could not be found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+        '400':
+          description: |-
+            Validation exception error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+  /reset-notifications-settings:
+    patch:
+      operationId: ResetNotificationSettings
+      description: |-
+        Resets the _custom notification setting_ to IAM Roles Anywhere default setting.
+
+        **Required permissions:** `rolesanywhere:ResetNotificationSettings`.
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                trustAnchorId:
+                  $ref: '#/components/schemas/Uuid'
+                notificationSettingKeys:
+                  $ref: '#/components/schemas/NotificationSettingKeys'
+      responses:
+        '200': {}
+        '403':
+          description: |-
+            You do not have sufficient access to perform this action.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '404':
+          description: |-
+            The resource could not be found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+        '400':
+          description: |-
+            Validation exception error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+  /TagResource:
+    post:
+      operationId: TagResource
+      description: |-
+        Attaches tags to a resource.
+
+        **Required permissions:** `rolesanywhere:TagResource`.
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                resourceArn:
+                  $ref: '#/components/schemas/AmazonResourceName'
+                tags:
+                  $ref: '#/components/schemas/TagList'
+      responses:
+        '201': {}
+        '403':
+          description: |-
+            You do not have sufficient access to perform this action.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '404':
+          description: |-
+            The resource could not be found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+        '400':
+          description: |-
+            Validation exception error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+  /UntagResource:
+    post:
+      operationId: UntagResource
+      description: |-
+        Removes tags from the resource.
+
+        **Required permissions:** `rolesanywhere:UntagResource`.
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                resourceArn:
+                  $ref: '#/components/schemas/AmazonResourceName'
+                tagKeys:
+                  $ref: '#/components/schemas/TagKeyList'
+      responses:
+        '200': {}
+        '403':
+          description: |-
+            You do not have sufficient access to perform this action.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '404':
+          description: |-
+            The resource could not be found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+        '400':
+          description: |-
+            Validation exception error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
 components:
   schemas:
+    AccessDeniedException:
+      type: object
+      properties:
+        message:
+          $ref: '#/components/schemas/String'
+      description: You do not have sufficient access to perform this action.
     AmazonResourceName:
       type: string
       minLength: 1
       maxLength: 1011
+    AttributeMapping:
+      type: object
+      properties:
+        certificateField:
+          allOf:
+          - $ref: '#/components/schemas/CertificateField'
+          description: Fields (x509Subject, x509Issuer and x509SAN) within X.509 certificates.
+        mappingRules:
+          allOf:
+          - $ref: '#/components/schemas/MappingRules'
+          description: A list of mapping entries for every supported specifier or
+            sub-field.
+      description: A mapping applied to the authenticating end-entity certificate.
     AttributeMappings:
       type: array
       items:
@@ -64,26 +1161,355 @@ components:
       - x509Subject
       - x509Issuer
       - x509SAN
+    CreateProfileRequest:
+      type: object
+      properties:
+        name:
+          allOf:
+          - $ref: '#/components/schemas/ResourceName'
+          description: The name of the profile.
+        requireInstanceProperties:
+          allOf:
+          - $ref: '#/components/schemas/Boolean'
+          description: Specifies whether instance properties are required in temporary
+            credential requests with this profile.
+        sessionPolicy:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: A session policy that applies to the trust boundary of the
+            vended session credentials.
+        roleArns:
+          allOf:
+          - $ref: '#/components/schemas/RoleArnList'
+          description: A list of IAM roles that this profile can assume in a temporary
+            credential request.
+        managedPolicyArns:
+          allOf:
+          - $ref: '#/components/schemas/ManagedPolicyList'
+          description: A list of managed policy ARNs that apply to the vended session
+            credentials.
+        durationSeconds:
+          allOf:
+          - $ref: '#/components/schemas/Integer'
+          description: Used to determine how long sessions vended using this profile
+            are valid for. See the `Expiration` section of the [CreateSession API
+            documentation](https://docs.aws.amazon.com/rolesanywhere/latest/userguide/authentication-create-session.html#credentials-object)
+            page for more details. In requests, if this value is not provided, the
+            default value will be 3600.
+        enabled:
+          allOf:
+          - $ref: '#/components/schemas/Boolean'
+          description: Specifies whether the profile is enabled.
+        tags:
+          allOf:
+          - $ref: '#/components/schemas/TagList'
+          description: The tags to attach to the profile.
+        acceptRoleSessionName:
+          allOf:
+          - $ref: '#/components/schemas/Boolean'
+          description: Used to determine if a custom role session name will be accepted
+            in a temporary credential request.
+      required:
+      - name
+      - roleArns
+    CreateTrustAnchorRequest:
+      type: object
+      properties:
+        name:
+          allOf:
+          - $ref: '#/components/schemas/ResourceName'
+          description: The name of the trust anchor.
+        source:
+          allOf:
+          - $ref: '#/components/schemas/Source'
+          description: The trust anchor type and its related certificate data.
+        enabled:
+          allOf:
+          - $ref: '#/components/schemas/Boolean'
+          description: Specifies whether the trust anchor is enabled.
+        tags:
+          allOf:
+          - $ref: '#/components/schemas/TagList'
+          description: The tags to attach to the trust anchor.
+        notificationSettings:
+          allOf:
+          - $ref: '#/components/schemas/NotificationSettings'
+          description: A list of notification settings to be associated to the trust
+            anchor.
+      required:
+      - name
+      - source
     CredentialSummaries:
       type: array
       items:
         $ref: '#/components/schemas/CredentialSummary'
+    CredentialSummary:
+      type: object
+      properties:
+        seenAt:
+          allOf:
+          - $ref: '#/components/schemas/Timestamp'
+          description: The ISO-8601 time stamp of when the certificate was last used
+            in a temporary credential request.
+        serialNumber:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The serial number of the certificate.
+        issuer:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The fully qualified domain name of the issuing certificate
+            for the presented end-entity certificate.
+        enabled:
+          allOf:
+          - $ref: '#/components/schemas/Boolean'
+          description: Indicates whether the credential is enabled.
+        x509CertificateData:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The PEM-encoded data of the certificate.
+        failed:
+          allOf:
+          - $ref: '#/components/schemas/Boolean'
+          description: Indicates whether the temporary credential request was successful.
+      description: A record of a presented X509 credential from a temporary credential
+        request.
+    CrlDetail:
+      type: object
+      properties:
+        crlId:
+          allOf:
+          - $ref: '#/components/schemas/Uuid'
+          description: The unique identifier of the certificate revocation list (CRL).
+        crlArn:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The ARN of the certificate revocation list (CRL).
+        name:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The name of the certificate revocation list (CRL).
+        enabled:
+          allOf:
+          - $ref: '#/components/schemas/Boolean'
+          description: Indicates whether the certificate revocation list (CRL) is
+            enabled.
+        crlData:
+          allOf:
+          - $ref: '#/components/schemas/Blob'
+          description: The state of the certificate revocation list (CRL) after a
+            read or write operation.
+        trustAnchorArn:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The ARN of the TrustAnchor the certificate revocation list
+            (CRL) will provide revocation for.
+        createdAt:
+          allOf:
+          - $ref: '#/components/schemas/Timestamp'
+          description: The ISO-8601 timestamp when the certificate revocation list
+            (CRL) was created.
+        updatedAt:
+          allOf:
+          - $ref: '#/components/schemas/Timestamp'
+          description: The ISO-8601 timestamp when the certificate revocation list
+            (CRL) was last updated.
+      description: The state of the certificate revocation list (CRL) after a read
+        or write operation.
+    CrlDetailResponse:
+      type: object
+      properties:
+        crl:
+          allOf:
+          - $ref: '#/components/schemas/CrlDetail'
+          description: The state of the certificate revocation list (CRL) after a
+            read or write operation.
+      required:
+      - crl
     CrlDetails:
       type: array
       items:
         $ref: '#/components/schemas/CrlDetail'
+    DeleteAttributeMappingRequest:
+      type: object
+      properties:
+        profileId:
+          allOf:
+          - $ref: '#/components/schemas/Uuid'
+          description: The unique identifier of the profile.
+        certificateField:
+          allOf:
+          - $ref: '#/components/schemas/CertificateField'
+          description: Fields (x509Subject, x509Issuer and x509SAN) within X.509 certificates.
+        specifiers:
+          allOf:
+          - $ref: '#/components/schemas/SpecifierList'
+          description: A list of specifiers of a certificate field; for example, CN,
+            OU, UID from a Subject.
+      required:
+      - profileId
+      - certificateField
+    DeleteAttributeMappingResponse:
+      type: object
+      properties:
+        profile:
+          allOf:
+          - $ref: '#/components/schemas/ProfileDetail'
+          description: The state of the profile after a read or write operation.
+      required:
+      - profile
+    ImportCrlRequest:
+      type: object
+      properties:
+        name:
+          allOf:
+          - $ref: '#/components/schemas/ResourceName'
+          description: The name of the certificate revocation list (CRL).
+        crlData:
+          allOf:
+          - $ref: '#/components/schemas/Blob'
+          description: The x509 v3 specified certificate revocation list (CRL).
+        enabled:
+          allOf:
+          - $ref: '#/components/schemas/Boolean'
+          description: Specifies whether the certificate revocation list (CRL) is
+            enabled.
+        tags:
+          allOf:
+          - $ref: '#/components/schemas/TagList'
+          description: A list of tags to attach to the certificate revocation list
+            (CRL).
+        trustAnchorArn:
+          allOf:
+          - $ref: '#/components/schemas/TrustAnchorArn'
+          description: The ARN of the TrustAnchor the certificate revocation list
+            (CRL) will provide revocation for.
+      required:
+      - name
+      - crlData
+      - trustAnchorArn
     InstanceProperties:
       type: array
       items:
         $ref: '#/components/schemas/InstanceProperty'
+    InstanceProperty:
+      type: object
+      properties:
+        seenAt:
+          allOf:
+          - $ref: '#/components/schemas/Timestamp'
+          description: The ISO-8601 time stamp of when the certificate was last used
+            in a temporary credential request.
+        properties:
+          allOf:
+          - $ref: '#/components/schemas/InstancePropertyMap'
+          description: A list of instanceProperty objects.
+        failed:
+          allOf:
+          - $ref: '#/components/schemas/Boolean'
+          description: Indicates whether the temporary credential request was successful.
+      description: A key-value pair you set that identifies a property of the authenticating
+        instance.
     InstancePropertyMap:
       type: object
       additionalProperties:
         $ref: '#/components/schemas/String'
+    ListCrlsResponse:
+      type: object
+      properties:
+        nextToken:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: A token that indicates where the output should continue from,
+            if a previous request did not show all results. To get the next results,
+            make the request again with this value.
+        crls:
+          allOf:
+          - $ref: '#/components/schemas/CrlDetails'
+          description: A list of certificate revocation lists (CRL).
+    ListProfilesResponse:
+      type: object
+      properties:
+        nextToken:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: A token that indicates where the output should continue from,
+            if a previous request did not show all results. To get the next results,
+            make the request again with this value.
+        profiles:
+          allOf:
+          - $ref: '#/components/schemas/ProfileDetails'
+          description: A list of profiles.
+    ListRequest:
+      type: object
+      properties:
+        nextToken:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: A token that indicates where the output should continue from,
+            if a previous request did not show all results. To get the next results,
+            make the request again with this value.
+        pageSize:
+          allOf:
+          - $ref: '#/components/schemas/Integer'
+          description: The number of resources in the paginated list.
+    ListSubjectsResponse:
+      type: object
+      properties:
+        subjects:
+          allOf:
+          - $ref: '#/components/schemas/SubjectSummaries'
+          description: A list of subjects.
+        nextToken:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: A token that indicates where the output should continue from,
+            if a previous request did not show all results. To get the next results,
+            make the request again with this value.
+    ListTagsForResourceRequest:
+      type: object
+      properties:
+        resourceArn:
+          allOf:
+          - $ref: '#/components/schemas/AmazonResourceName'
+          description: The ARN of the resource.
+      required:
+      - resourceArn
+    ListTagsForResourceResponse:
+      type: object
+      properties:
+        tags:
+          allOf:
+          - $ref: '#/components/schemas/TagList'
+          description: A list of tags attached to the resource.
+    ListTrustAnchorsResponse:
+      type: object
+      properties:
+        nextToken:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: A token that indicates where the output should continue from,
+            if a previous request did not show all results. To get the next results,
+            make the request again with this value.
+        trustAnchors:
+          allOf:
+          - $ref: '#/components/schemas/TrustAnchorDetails'
+          description: A list of trust anchors.
     ManagedPolicyList:
       type: array
       items:
         type: string
+    MappingRule:
+      type: object
+      properties:
+        specifier:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: Specifier within a certificate field, such as CN, OU, or UID
+            from the Subject field.
+      required:
+      - specifier
+      description: A single mapping entry for each supported specifier or sub-field.
     MappingRules:
       type: array
       items:
@@ -97,10 +1523,97 @@ components:
       enum:
       - CA_CERTIFICATE_EXPIRY
       - END_ENTITY_CERTIFICATE_EXPIRY
+    NotificationSetting:
+      type: object
+      properties:
+        enabled:
+          allOf:
+          - $ref: '#/components/schemas/Boolean'
+          description: Indicates whether the notification setting is enabled.
+        event:
+          allOf:
+          - $ref: '#/components/schemas/NotificationEvent'
+          description: The event to which this notification setting is applied.
+        threshold:
+          allOf:
+          - $ref: '#/components/schemas/Integer'
+          description: The number of days before a notification event. This value
+            is required for a notification setting that is enabled.
+        channel:
+          allOf:
+          - $ref: '#/components/schemas/NotificationChannel'
+          description: 'The specified channel of notification. IAM Roles Anywhere
+            uses CloudWatch metrics, EventBridge, and Health Dashboard to notify for
+            an event.
+
+
+            In the absence of a specific channel, IAM Roles Anywhere applies this
+            setting to ''ALL'' channels.'
+      required:
+      - enabled
+      - event
+      description: Customizable notification settings that will be applied to notification
+        events. IAM Roles Anywhere consumes these settings while notifying across
+        multiple channels - CloudWatch metrics, EventBridge, and Health Dashboard.
+    NotificationSettingDetail:
+      type: object
+      properties:
+        enabled:
+          allOf:
+          - $ref: '#/components/schemas/Boolean'
+          description: Indicates whether the notification setting is enabled.
+        event:
+          allOf:
+          - $ref: '#/components/schemas/NotificationEvent'
+          description: The event to which this notification setting is applied.
+        threshold:
+          allOf:
+          - $ref: '#/components/schemas/Integer'
+          description: The number of days before a notification event.
+        channel:
+          allOf:
+          - $ref: '#/components/schemas/NotificationChannel'
+          description: 'The specified channel of notification. IAM Roles Anywhere
+            uses CloudWatch metrics, EventBridge, and Health Dashboard to notify for
+            an event.
+
+
+            In the absence of a specific channel, IAM Roles Anywhere applies this
+            setting to ''ALL'' channels.'
+        configuredBy:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The principal that configured the notification setting. For
+            default settings configured by IAM Roles Anywhere, the value is `rolesanywhere.amazonaws.com`,
+            and for customized notifications settings, it is the respective account
+            ID.
+      required:
+      - enabled
+      - event
+      description: 'The state of a notification setting.
+
+
+        A notification setting includes information such as event name, threshold,
+        status of the notification setting, and the channel to notify.'
     NotificationSettingDetails:
       type: array
       items:
         $ref: '#/components/schemas/NotificationSettingDetail'
+    NotificationSettingKey:
+      type: object
+      properties:
+        event:
+          allOf:
+          - $ref: '#/components/schemas/NotificationEvent'
+          description: The notification setting event to reset.
+        channel:
+          allOf:
+          - $ref: '#/components/schemas/NotificationChannel'
+          description: The specified channel of notification.
+      required:
+      - event
+      description: A notification setting key to reset. A notification setting key
+        includes the event and the channel.
     NotificationSettingKeys:
       type: array
       items:
@@ -114,15 +1627,170 @@ components:
       pattern: ^arn:aws(-[^:]+)?:rolesanywhere(:.*){2}(:profile.*)$
       minLength: 1
       maxLength: 1011
+    ProfileDetail:
+      type: object
+      properties:
+        profileId:
+          allOf:
+          - $ref: '#/components/schemas/Uuid'
+          description: The unique identifier of the profile.
+        profileArn:
+          allOf:
+          - $ref: '#/components/schemas/ProfileArn'
+          description: The ARN of the profile.
+        name:
+          allOf:
+          - $ref: '#/components/schemas/ResourceName'
+          description: The name of the profile.
+        requireInstanceProperties:
+          allOf:
+          - $ref: '#/components/schemas/Boolean'
+          description: Specifies whether instance properties are required in temporary
+            credential requests with this profile.
+        enabled:
+          allOf:
+          - $ref: '#/components/schemas/Boolean'
+          description: Indicates whether the profile is enabled.
+        createdBy:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The Amazon Web Services account that created the profile.
+        sessionPolicy:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: A session policy that applies to the trust boundary of the
+            vended session credentials.
+        roleArns:
+          allOf:
+          - $ref: '#/components/schemas/RoleArnList'
+          description: A list of IAM roles that this profile can assume in a temporary
+            credential request.
+        managedPolicyArns:
+          allOf:
+          - $ref: '#/components/schemas/ManagedPolicyList'
+          description: A list of managed policy ARNs that apply to the vended session
+            credentials.
+        createdAt:
+          allOf:
+          - $ref: '#/components/schemas/Timestamp'
+          description: The ISO-8601 timestamp when the profile was created.
+        updatedAt:
+          allOf:
+          - $ref: '#/components/schemas/Timestamp'
+          description: The ISO-8601 timestamp when the profile was last updated.
+        durationSeconds:
+          allOf:
+          - $ref: '#/components/schemas/Integer'
+          description: Used to determine how long sessions vended using this profile
+            are valid for. See the `Expiration` section of the [CreateSession API
+            documentation](https://docs.aws.amazon.com/rolesanywhere/latest/userguide/authentication-create-session.html#credentials-object)
+            page for more details. In requests, if this value is not provided, the
+            default value will be 3600.
+        acceptRoleSessionName:
+          allOf:
+          - $ref: '#/components/schemas/Boolean'
+          description: Used to determine if a custom role session name will be accepted
+            in a temporary credential request.
+        attributeMappings:
+          allOf:
+          - $ref: '#/components/schemas/AttributeMappings'
+          description: A mapping applied to the authenticating end-entity certificate.
+      description: The state of the profile after a read or write operation.
+    ProfileDetailResponse:
+      type: object
+      properties:
+        profile:
+          allOf:
+          - $ref: '#/components/schemas/ProfileDetail'
+          description: The state of the profile after a read or write operation.
     ProfileDetails:
       type: array
       items:
         $ref: '#/components/schemas/ProfileDetail'
+    PutAttributeMappingRequest:
+      type: object
+      properties:
+        profileId:
+          allOf:
+          - $ref: '#/components/schemas/Uuid'
+          description: The unique identifier of the profile.
+        certificateField:
+          allOf:
+          - $ref: '#/components/schemas/CertificateField'
+          description: Fields (x509Subject, x509Issuer and x509SAN) within X.509 certificates.
+        mappingRules:
+          allOf:
+          - $ref: '#/components/schemas/MappingRules'
+          description: A list of mapping entries for every supported specifier or
+            sub-field.
+      required:
+      - profileId
+      - certificateField
+      - mappingRules
+    PutAttributeMappingResponse:
+      type: object
+      properties:
+        profile:
+          allOf:
+          - $ref: '#/components/schemas/ProfileDetail'
+          description: The state of the profile after a read or write operation.
+      required:
+      - profile
+    PutNotificationSettingsRequest:
+      type: object
+      properties:
+        trustAnchorId:
+          allOf:
+          - $ref: '#/components/schemas/Uuid'
+          description: The unique identifier of the trust anchor.
+        notificationSettings:
+          allOf:
+          - $ref: '#/components/schemas/NotificationSettings'
+          description: A list of notification settings to be associated to the trust
+            anchor.
+      required:
+      - trustAnchorId
+      - notificationSettings
+    PutNotificationSettingsResponse:
+      type: object
+      properties:
+        trustAnchor:
+          $ref: '#/components/schemas/TrustAnchorDetail'
+      required:
+      - trustAnchor
+    ResetNotificationSettingsRequest:
+      type: object
+      properties:
+        trustAnchorId:
+          allOf:
+          - $ref: '#/components/schemas/Uuid'
+          description: The unique identifier of the trust anchor.
+        notificationSettingKeys:
+          allOf:
+          - $ref: '#/components/schemas/NotificationSettingKeys'
+          description: A list of notification setting keys to reset. A notification
+            setting key includes the event and the channel.
+      required:
+      - trustAnchorId
+      - notificationSettingKeys
+    ResetNotificationSettingsResponse:
+      type: object
+      properties:
+        trustAnchor:
+          $ref: '#/components/schemas/TrustAnchorDetail'
+      required:
+      - trustAnchor
     ResourceName:
       type: string
       pattern: ^[ a-zA-Z0-9-_]*$
       minLength: 1
       maxLength: 255
+    ResourceNotFoundException:
+      type: object
+      properties:
+        message:
+          $ref: '#/components/schemas/String'
+      description: The resource could not be found.
     RoleArn:
       type: string
       pattern: ^arn:aws(-[^:]+)?:iam(:.*){2}(:role.*)$
@@ -132,6 +1800,54 @@ components:
       type: array
       items:
         $ref: '#/components/schemas/RoleArn'
+    ScalarCrlRequest:
+      type: object
+      properties:
+        crlId:
+          allOf:
+          - $ref: '#/components/schemas/Uuid'
+          description: The unique identifier of the certificate revocation list (CRL).
+      required:
+      - crlId
+    ScalarProfileRequest:
+      type: object
+      properties:
+        profileId:
+          allOf:
+          - $ref: '#/components/schemas/Uuid'
+          description: The unique identifier of the profile.
+      required:
+      - profileId
+    ScalarSubjectRequest:
+      type: object
+      properties:
+        subjectId:
+          allOf:
+          - $ref: '#/components/schemas/Uuid'
+          description: The unique identifier of the subject.
+      required:
+      - subjectId
+    ScalarTrustAnchorRequest:
+      type: object
+      properties:
+        trustAnchorId:
+          allOf:
+          - $ref: '#/components/schemas/Uuid'
+          description: The unique identifier of the trust anchor.
+      required:
+      - trustAnchorId
+    Source:
+      type: object
+      properties:
+        sourceType:
+          allOf:
+          - $ref: '#/components/schemas/TrustAnchorType'
+          description: The type of the trust anchor.
+        sourceData:
+          allOf:
+          - $ref: '#/components/schemas/SourceData'
+          description: The data field of the trust anchor depending on its type.
+      description: The trust anchor type and its related certificate data.
     SourceData:
       allOf:
       - allOf:
@@ -148,10 +1864,108 @@ components:
       type: array
       items:
         type: string
+    SubjectDetail:
+      type: object
+      properties:
+        subjectArn:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The ARN of the resource.
+        subjectId:
+          allOf:
+          - $ref: '#/components/schemas/Uuid'
+          description: The id of the resource
+        enabled:
+          allOf:
+          - $ref: '#/components/schemas/Boolean'
+          description: The enabled status of the subject.
+        x509Subject:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The x509 principal identifier of the authenticating certificate.
+        lastSeenAt:
+          allOf:
+          - $ref: '#/components/schemas/Timestamp'
+          description: The ISO-8601 timestamp of the last time this subject requested
+            temporary session credentials.
+        createdAt:
+          allOf:
+          - $ref: '#/components/schemas/Timestamp'
+          description: The ISO-8601 timestamp when the subject was created.
+        updatedAt:
+          allOf:
+          - $ref: '#/components/schemas/Timestamp'
+          description: The ISO-8601 timestamp when the subject was last updated.
+        credentials:
+          allOf:
+          - $ref: '#/components/schemas/CredentialSummaries'
+          description: The temporary session credentials vended at the last authenticating
+            call with this subject.
+        instanceProperties:
+          allOf:
+          - $ref: '#/components/schemas/InstanceProperties'
+          description: The specified instance properties associated with the request.
+      description: The state of the subject after a read or write operation.
+    SubjectDetailResponse:
+      type: object
+      properties:
+        subject:
+          allOf:
+          - $ref: '#/components/schemas/SubjectDetail'
+          description: The state of the subject after a read or write operation.
     SubjectSummaries:
       type: array
       items:
         $ref: '#/components/schemas/SubjectSummary'
+    SubjectSummary:
+      type: object
+      properties:
+        subjectArn:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The ARN of the resource.
+        subjectId:
+          allOf:
+          - $ref: '#/components/schemas/Uuid'
+          description: The id of the resource.
+        enabled:
+          allOf:
+          - $ref: '#/components/schemas/Boolean'
+          description: The enabled status of the subject.
+        x509Subject:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The x509 principal identifier of the authenticating certificate.
+        lastSeenAt:
+          allOf:
+          - $ref: '#/components/schemas/Timestamp'
+          description: The ISO-8601 time stamp of when the certificate was last used
+            in a temporary credential request.
+        createdAt:
+          allOf:
+          - $ref: '#/components/schemas/Timestamp'
+          description: The ISO-8601 time stamp of when the certificate was first used
+            in a temporary credential request.
+        updatedAt:
+          allOf:
+          - $ref: '#/components/schemas/Timestamp'
+          description: The ISO-8601 timestamp when the subject was last updated.
+      description: A summary representation of subjects.
+    Tag:
+      type: object
+      properties:
+        key:
+          allOf:
+          - $ref: '#/components/schemas/TagKey'
+          description: The tag key.
+        value:
+          allOf:
+          - $ref: '#/components/schemas/TagValue'
+          description: The tag value.
+      required:
+      - key
+      - value
+      description: A label that consists of a key and value you define.
     TagKey:
       type: string
       pattern: ^[ a-zA-Z0-9_.:/=+@-]*$
@@ -165,16 +1979,85 @@ components:
       type: array
       items:
         $ref: '#/components/schemas/Tag'
+    TagResourceRequest:
+      type: object
+      properties:
+        resourceArn:
+          allOf:
+          - $ref: '#/components/schemas/AmazonResourceName'
+          description: The ARN of the resource.
+        tags:
+          allOf:
+          - $ref: '#/components/schemas/TagList'
+          description: The tags to attach to the resource.
+      required:
+      - resourceArn
+      - tags
+    TagResourceResponse:
+      type: object
+      properties: {}
     TagValue:
       type: string
       pattern: ^[ a-zA-Z0-9_.:/=+@-]*$
       minLength: 0
       maxLength: 256
+    TooManyTagsException:
+      type: object
+      properties:
+        message:
+          $ref: '#/components/schemas/String'
+      description: Too many tags.
     TrustAnchorArn:
       type: string
       pattern: ^arn:aws(-[^:]+)?:rolesanywhere(:.*){2}(:trust-anchor.*)$
       minLength: 1
       maxLength: 1011
+    TrustAnchorDetail:
+      type: object
+      properties:
+        trustAnchorId:
+          allOf:
+          - $ref: '#/components/schemas/Uuid'
+          description: The unique identifier of the trust anchor.
+        trustAnchorArn:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The ARN of the trust anchor.
+        name:
+          allOf:
+          - $ref: '#/components/schemas/ResourceName'
+          description: The name of the trust anchor.
+        source:
+          allOf:
+          - $ref: '#/components/schemas/Source'
+          description: The trust anchor type and its related certificate data.
+        enabled:
+          allOf:
+          - $ref: '#/components/schemas/Boolean'
+          description: Indicates whether the trust anchor is enabled.
+        createdAt:
+          allOf:
+          - $ref: '#/components/schemas/Timestamp'
+          description: The ISO-8601 timestamp when the trust anchor was created.
+        updatedAt:
+          allOf:
+          - $ref: '#/components/schemas/Timestamp'
+          description: The ISO-8601 timestamp when the trust anchor was last updated.
+        notificationSettings:
+          allOf:
+          - $ref: '#/components/schemas/NotificationSettingDetails'
+          description: A list of notification settings to be associated to the trust
+            anchor.
+      description: The state of the trust anchor after a read or write operation.
+    TrustAnchorDetailResponse:
+      type: object
+      properties:
+        trustAnchor:
+          allOf:
+          - $ref: '#/components/schemas/TrustAnchorDetail'
+          description: The state of the trust anchor after a read or write operation.
+      required:
+      - trustAnchor
     TrustAnchorDetails:
       type: array
       items:
@@ -185,8 +2068,106 @@ components:
       - AWS_ACM_PCA
       - CERTIFICATE_BUNDLE
       - SELF_SIGNED_REPOSITORY
+    UntagResourceRequest:
+      type: object
+      properties:
+        resourceArn:
+          allOf:
+          - $ref: '#/components/schemas/AmazonResourceName'
+          description: The ARN of the resource.
+        tagKeys:
+          allOf:
+          - $ref: '#/components/schemas/TagKeyList'
+          description: A list of keys. Tag keys are the unique identifiers of tags.
+      required:
+      - resourceArn
+      - tagKeys
+    UntagResourceResponse:
+      type: object
+      properties: {}
+    UpdateCrlRequest:
+      type: object
+      properties:
+        crlId:
+          allOf:
+          - $ref: '#/components/schemas/Uuid'
+          description: The unique identifier of the certificate revocation list (CRL).
+        name:
+          allOf:
+          - $ref: '#/components/schemas/ResourceName'
+          description: The name of the Crl.
+        crlData:
+          allOf:
+          - $ref: '#/components/schemas/Blob'
+          description: The x509 v3 specified certificate revocation list (CRL).
+      required:
+      - crlId
+    UpdateProfileRequest:
+      type: object
+      properties:
+        profileId:
+          allOf:
+          - $ref: '#/components/schemas/Uuid'
+          description: The unique identifier of the profile.
+        name:
+          allOf:
+          - $ref: '#/components/schemas/ResourceName'
+          description: The name of the profile.
+        sessionPolicy:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: A session policy that applies to the trust boundary of the
+            vended session credentials.
+        roleArns:
+          allOf:
+          - $ref: '#/components/schemas/RoleArnList'
+          description: A list of IAM roles that this profile can assume in a temporary
+            credential request.
+        managedPolicyArns:
+          allOf:
+          - $ref: '#/components/schemas/ManagedPolicyList'
+          description: A list of managed policy ARNs that apply to the vended session
+            credentials.
+        durationSeconds:
+          allOf:
+          - $ref: '#/components/schemas/Integer'
+          description: Used to determine how long sessions vended using this profile
+            are valid for. See the `Expiration` section of the [CreateSession API
+            documentation](https://docs.aws.amazon.com/rolesanywhere/latest/userguide/authentication-create-session.html#credentials-object)
+            page for more details. In requests, if this value is not provided, the
+            default value will be 3600.
+        acceptRoleSessionName:
+          allOf:
+          - $ref: '#/components/schemas/Boolean'
+          description: Used to determine if a custom role session name will be accepted
+            in a temporary credential request.
+      required:
+      - profileId
+    UpdateTrustAnchorRequest:
+      type: object
+      properties:
+        trustAnchorId:
+          allOf:
+          - $ref: '#/components/schemas/Uuid'
+          description: The unique identifier of the trust anchor.
+        name:
+          allOf:
+          - $ref: '#/components/schemas/ResourceName'
+          description: The name of the trust anchor.
+        source:
+          allOf:
+          - $ref: '#/components/schemas/Source'
+          description: The trust anchor type and its related certificate data.
+      required:
+      - trustAnchorId
     Uuid:
       type: string
       pattern: '[a-f0-9]{8}-([a-z0-9]{4}-){3}[a-z0-9]{12}'
       minLength: 36
       maxLength: 36
+    ValidationException:
+      type: object
+      properties:
+        message:
+          $ref: '#/components/schemas/String'
+      description: Validation exception error.

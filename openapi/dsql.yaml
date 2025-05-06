@@ -7,7 +7,7 @@ info:
   x-stackql-serviceName: dsql
   x-aws-serviceName: dsql
   x-aws-protocol: aws.protocols#restJson1
-  x-dateGenerated: '2025-05-05'
+  x-dateGenerated: '2025-05-07'
   version: '2018-05-10'
   title: Amazon Aurora DSQL
   description: |-
@@ -45,9 +45,352 @@ servers:
       - sa-east-1
       - me-south-1
       default: us-east-1
-paths: {}
+paths:
+  /cluster:
+    post:
+      operationId: CreateCluster
+      description: |-
+        Creates a cluster in Amazon Aurora DSQL.
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                deletionProtectionEnabled:
+                  $ref: '#/components/schemas/DeletionProtectionEnabled'
+                tags:
+                  $ref: '#/components/schemas/TagMap'
+                clientToken:
+                  $ref: '#/components/schemas/ClientToken'
+      responses:
+        '200': {}
+        '409':
+          description: |-
+            The submitted action has conflicts.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConflictException'
+        '402':
+          description: |-
+            The service limit was exceeded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServiceQuotaExceededException'
+    get:
+      operationId: ListClusters
+      description: |-
+        Retrieves information about a list of clusters.
+      parameters:
+      - name: max-results
+        in: query
+        required: false
+        schema:
+          $ref: '#/components/schemas/MaxResults'
+      - name: next-token
+        in: query
+        required: false
+        schema:
+          $ref: '#/components/schemas/NextToken'
+      responses:
+        '200': {}
+        '404':
+          description: |-
+            The resource could not be found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+  /multi-region-clusters:
+    post:
+      operationId: CreateMultiRegionClusters
+      description: |-
+        Creates multi-Region clusters in Amazon Aurora DSQL. Multi-Region clusters require a linked Region list, which is an array of the Regions in which you want to create linked clusters. Multi-Region clusters require a witness Region, which participates in quorum in failure scenarios.
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                linkedRegionList:
+                  $ref: '#/components/schemas/RegionList'
+                clusterProperties:
+                  $ref: '#/components/schemas/ClusterPropertyMap'
+                witnessRegion:
+                  $ref: '#/components/schemas/Region'
+                clientToken:
+                  $ref: '#/components/schemas/ClientToken'
+      responses:
+        '200': {}
+        '409':
+          description: |-
+            The submitted action has conflicts.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConflictException'
+        '402':
+          description: |-
+            The service limit was exceeded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServiceQuotaExceededException'
+    delete:
+      operationId: DeleteMultiRegionClusters
+      description: |-
+        Deletes a multi-Region cluster in Amazon Aurora DSQL.
+      parameters:
+      - name: linked-cluster-arns
+        in: query
+        required: true
+        schema:
+          $ref: '#/components/schemas/ClusterArnList'
+      - name: client-token
+        in: query
+        required: false
+        schema:
+          $ref: '#/components/schemas/ClientToken'
+      responses:
+        '200': {}
+        '409':
+          description: |-
+            The submitted action has conflicts.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConflictException'
+        '404':
+          description: |-
+            The resource could not be found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+  /cluster/{identifier}:
+    delete:
+      operationId: DeleteCluster
+      description: |-
+        Deletes a cluster in Amazon Aurora DSQL.
+      parameters:
+      - name: identifier
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/ClusterId'
+      - name: client-token
+        in: query
+        required: false
+        schema:
+          $ref: '#/components/schemas/ClientToken'
+      responses:
+        '200': {}
+        '409':
+          description: |-
+            The submitted action has conflicts.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConflictException'
+        '404':
+          description: |-
+            The resource could not be found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+    get:
+      operationId: GetCluster
+      description: |-
+        Retrieves information about a cluster.
+      parameters:
+      - name: identifier
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/ClusterId'
+      responses:
+        '200': {}
+        '404':
+          description: |-
+            The resource could not be found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+    post:
+      operationId: UpdateCluster
+      description: |-
+        Updates a cluster.
+      parameters:
+      - name: identifier
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/ClusterId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                deletionProtectionEnabled:
+                  $ref: '#/components/schemas/DeletionProtectionEnabled'
+                clientToken:
+                  $ref: '#/components/schemas/ClientToken'
+      responses:
+        '200': {}
+        '409':
+          description: |-
+            The submitted action has conflicts.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConflictException'
+        '404':
+          description: |-
+            The resource could not be found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+  /clusters/{identifier}/vpc-endpoint-service-name:
+    get:
+      operationId: GetVpcEndpointServiceName
+      description: |-
+        Retrieves the VPC endpoint service name.
+      parameters:
+      - name: identifier
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/ClusterId'
+      responses:
+        '200': {}
+        '500':
+          description: |-
+            The request processing has failed because of an unknown error, exception or failure.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerException'
+        '404':
+          description: |-
+            The resource could not be found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+        '429':
+          description: |-
+            The request was denied due to request throttling.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThrottlingException'
+        '400':
+          description: |-
+            The input failed to satisfy the constraints specified by an Amazon Web Services service.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+  /tags/{resourceArn}:
+    get:
+      operationId: ListTagsForResource
+      description: |-
+        Lists all of the tags for a resource.
+      parameters:
+      - name: resourceArn
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/Arn'
+      responses:
+        '200': {}
+        '404':
+          description: |-
+            The resource could not be found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+    post:
+      operationId: TagResource
+      description: |-
+        Tags a resource with a map of key and value pairs.
+      parameters:
+      - name: resourceArn
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/Arn'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                tags:
+                  $ref: '#/components/schemas/TagMap'
+      responses:
+        '200': {}
+        '404':
+          description: |-
+            The resource could not be found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+        '402':
+          description: |-
+            The service limit was exceeded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServiceQuotaExceededException'
+    delete:
+      operationId: UntagResource
+      description: |-
+        Removes a tag from a resource.
+      parameters:
+      - name: resourceArn
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/Arn'
+      - name: tagKeys
+        in: query
+        required: true
+        schema:
+          $ref: '#/components/schemas/TagKeyList'
+      responses:
+        '200': {}
+        '404':
+          description: |-
+            The resource could not be found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
 components:
   schemas:
+    AccessDeniedException:
+      type: object
+      properties:
+        message:
+          $ref: '#/components/schemas/String'
+      required:
+      - message
+      description: You do not have sufficient access to perform this action.
     Arn:
       type: string
       pattern: ^arn:.+$
@@ -92,9 +435,347 @@ components:
       - DELETED
       - FAILED
       description: Cluster Status
+    ClusterSummary:
+      type: object
+      properties:
+        identifier:
+          allOf:
+          - $ref: '#/components/schemas/ClusterId'
+          description: The ID of the cluster.
+        arn:
+          allOf:
+          - $ref: '#/components/schemas/ClusterArn'
+          description: The ARN of the cluster.
+      required:
+      - identifier
+      - arn
+      description: A summary of the properties of a cluster.
+    ConflictException:
+      type: object
+      properties:
+        message:
+          $ref: '#/components/schemas/String'
+        resourceId:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: Resource Id
+        resourceType:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: Resource Type
+      required:
+      - message
+      description: The submitted action has conflicts.
+    CreateClusterInput:
+      type: object
+      properties:
+        deletionProtectionEnabled:
+          allOf:
+          - $ref: '#/components/schemas/DeletionProtectionEnabled'
+          description: If enabled, you can't delete your cluster. You must first disable
+            this property before you can delete your cluster.
+        tags:
+          allOf:
+          - $ref: '#/components/schemas/TagMap'
+          description: A map of key and value pairs to use to tag your cluster.
+        clientToken:
+          allOf:
+          - $ref: '#/components/schemas/ClientToken'
+          description: 'A unique, case-sensitive identifier that you provide to ensure
+            the idempotency of the request. Idempotency ensures that an API request
+            completes only once. With an idempotent request, if the original request
+            completes successfully, the subsequent retries with the same client token
+            return the result from the original successful request and they have no
+            additional effect.
+
+
+            If you don''t specify a client token, the Amazon Web Services SDK automatically
+            generates one.'
+    CreateClusterOutput:
+      type: object
+      properties:
+        identifier:
+          allOf:
+          - $ref: '#/components/schemas/ClusterId'
+          description: The ID of the created cluster.
+        arn:
+          allOf:
+          - $ref: '#/components/schemas/ClusterArn'
+          description: The ARN of the created cluster.
+        status:
+          allOf:
+          - $ref: '#/components/schemas/ClusterStatus'
+          description: The status of the created cluster.
+        creationTime:
+          allOf:
+          - $ref: '#/components/schemas/ClusterCreationTime'
+          description: The time of when created the cluster.
+        deletionProtectionEnabled:
+          allOf:
+          - $ref: '#/components/schemas/DeletionProtectionEnabled'
+          description: Whether deletion protection is enabled on this cluster.
+      required:
+      - identifier
+      - arn
+      - status
+      - creationTime
+      - deletionProtectionEnabled
+      description: Output Mixin
+    CreateMultiRegionClustersInput:
+      type: object
+      properties:
+        linkedRegionList:
+          allOf:
+          - $ref: '#/components/schemas/RegionList'
+          description: An array of the Regions in which you want to create additional
+            clusters.
+        clusterProperties:
+          allOf:
+          - $ref: '#/components/schemas/ClusterPropertyMap'
+          description: A mapping of properties to use when creating linked clusters.
+        witnessRegion:
+          allOf:
+          - $ref: '#/components/schemas/Region'
+          description: The witness Region of multi-Region clusters.
+        clientToken:
+          allOf:
+          - $ref: '#/components/schemas/ClientToken'
+          description: 'A unique, case-sensitive identifier that you provide to ensure
+            the idempotency of the request. Idempotency ensures that an API request
+            completes only once. With an idempotent request, if the original request
+            completes successfully. The subsequent retries with the same client token
+            return the result from the original successful request and they have no
+            additional effect.
+
+
+            If you don''t specify a client token, the Amazon Web Services SDK automatically
+            generates one.'
+      required:
+      - linkedRegionList
+      - witnessRegion
+    CreateMultiRegionClustersOutput:
+      type: object
+      properties:
+        linkedClusterArns:
+          allOf:
+          - $ref: '#/components/schemas/ClusterArnList'
+          description: An array that contains the ARNs of all linked clusters.
+      required:
+      - linkedClusterArns
+    DeleteClusterInput:
+      type: object
+      properties:
+        identifier:
+          allOf:
+          - $ref: '#/components/schemas/ClusterId'
+          description: The ID of the cluster to delete.
+        clientToken:
+          allOf:
+          - $ref: '#/components/schemas/ClientToken'
+          description: 'A unique, case-sensitive identifier that you provide to ensure
+            the idempotency of the request. Idempotency ensures that an API request
+            completes only once. With an idempotent request, if the original request
+            completes successfully. The subsequent retries with the same client token
+            return the result from the original successful request and they have no
+            additional effect.
+
+
+            If you don''t specify a client token, the Amazon Web Services SDK automatically
+            generates one.'
+      required:
+      - identifier
+    DeleteClusterOutput:
+      type: object
+      properties:
+        identifier:
+          allOf:
+          - $ref: '#/components/schemas/ClusterId'
+          description: The ID of the deleted cluster.
+        arn:
+          allOf:
+          - $ref: '#/components/schemas/ClusterArn'
+          description: The ARN of the deleted cluster.
+        status:
+          allOf:
+          - $ref: '#/components/schemas/ClusterStatus'
+          description: The status of the cluster.
+        creationTime:
+          allOf:
+          - $ref: '#/components/schemas/ClusterCreationTime'
+          description: The time of when the cluster was created.
+        deletionProtectionEnabled:
+          allOf:
+          - $ref: '#/components/schemas/DeletionProtectionEnabled'
+          description: Specifies whether deletion protection was enabled on the cluster.
+      required:
+      - identifier
+      - arn
+      - status
+      - creationTime
+      - deletionProtectionEnabled
+      description: Output Mixin
+    DeleteMultiRegionClustersInput:
+      type: object
+      properties:
+        linkedClusterArns:
+          allOf:
+          - $ref: '#/components/schemas/ClusterArnList'
+          description: The ARNs of the clusters linked to the cluster you want to
+            delete. also deletes these clusters as part of the operation.
+        clientToken:
+          allOf:
+          - $ref: '#/components/schemas/ClientToken'
+          description: 'A unique, case-sensitive identifier that you provide to ensure
+            the idempotency of the request. Idempotency ensures that an API request
+            completes only once. With an idempotent request, if the original request
+            completes successfully. The subsequent retries with the same client token
+            return the result from the original successful request and they have no
+            additional effect.
+
+
+            If you don''t specify a client token, the Amazon Web Services SDK automatically
+            generates one.'
+      required:
+      - linkedClusterArns
     DeletionProtectionEnabled:
       type: boolean
       description: Deletion Protection
+    GetClusterInput:
+      type: object
+      properties:
+        identifier:
+          allOf:
+          - $ref: '#/components/schemas/ClusterId'
+          description: The ID of the cluster to retrieve.
+      required:
+      - identifier
+    GetClusterOutput:
+      type: object
+      properties:
+        identifier:
+          allOf:
+          - $ref: '#/components/schemas/ClusterId'
+          description: The ID of the retrieved cluster.
+        arn:
+          allOf:
+          - $ref: '#/components/schemas/ClusterArn'
+          description: The ARN of the retrieved cluster.
+        status:
+          allOf:
+          - $ref: '#/components/schemas/ClusterStatus'
+          description: The status of the retrieved cluster.
+        creationTime:
+          allOf:
+          - $ref: '#/components/schemas/ClusterCreationTime'
+          description: The time of when the cluster was created.
+        deletionProtectionEnabled:
+          allOf:
+          - $ref: '#/components/schemas/DeletionProtectionEnabled'
+          description: Whether deletion protection is enabled in this cluster.
+        witnessRegion:
+          allOf:
+          - $ref: '#/components/schemas/Region'
+          description: The witness Region of the cluster. Applicable only for multi-Region
+            clusters.
+        linkedClusterArns:
+          allOf:
+          - $ref: '#/components/schemas/ClusterArnList'
+          description: The ARNs of the clusters linked to the retrieved cluster.
+      required:
+      - identifier
+      - arn
+      - status
+      - creationTime
+      - deletionProtectionEnabled
+      description: Output Mixin
+    GetVpcEndpointServiceNameInput:
+      type: object
+      properties:
+        identifier:
+          allOf:
+          - $ref: '#/components/schemas/ClusterId'
+          description: The ID of the cluster to retrieve.
+      required:
+      - identifier
+    GetVpcEndpointServiceNameOutput:
+      type: object
+      properties:
+        serviceName:
+          allOf:
+          - $ref: '#/components/schemas/ServiceName'
+          description: The VPC endpoint service name.
+      required:
+      - serviceName
+    InternalServerException:
+      type: object
+      properties:
+        message:
+          $ref: '#/components/schemas/String'
+        retryAfterSeconds:
+          allOf:
+          - $ref: '#/components/schemas/Integer'
+          description: Retry after seconds.
+      required:
+      - message
+      description: The request processing has failed because of an unknown error,
+        exception or failure.
+    LinkedClusterProperties:
+      type: object
+      properties:
+        deletionProtectionEnabled:
+          allOf:
+          - $ref: '#/components/schemas/DeletionProtectionEnabled'
+          description: Whether deletion protection is enabled.
+        tags:
+          allOf:
+          - $ref: '#/components/schemas/TagMap'
+          description: A map of key and value pairs the linked cluster is tagged with.
+      description: Properties of linked clusters.
+    ListClustersInput:
+      type: object
+      properties:
+        maxResults:
+          allOf:
+          - $ref: '#/components/schemas/MaxResults'
+          description: An optional parameter that specifies the maximum number of
+            results to return. You can use nextToken to display the next page of results.
+        nextToken:
+          allOf:
+          - $ref: '#/components/schemas/NextToken'
+          description: If your initial ListClusters operation returns a nextToken,
+            you can include the returned nextToken in following ListClusters operations,
+            which returns results in the next page.
+    ListClustersOutput:
+      type: object
+      properties:
+        nextToken:
+          allOf:
+          - $ref: '#/components/schemas/NextToken'
+          description: If nextToken is returned, there are more results available.
+            The value of nextToken is a unique pagination token for each page. To
+            retrieve the next page, make the call again using the returned token.
+        clusters:
+          allOf:
+          - $ref: '#/components/schemas/ClusterList'
+          description: An array of the returned clusters.
+      required:
+      - clusters
+    ListTagsForResourceInput:
+      type: object
+      properties:
+        resourceArn:
+          allOf:
+          - $ref: '#/components/schemas/Arn'
+          description: The ARN of the resource for which you want to list the tags.
+      required:
+      - resourceArn
+    ListTagsForResourceOutput:
+      type: object
+      properties:
+        tags:
+          allOf:
+          - $ref: '#/components/schemas/TagMap'
+          description: A map of key and value pairs that you used to tag your resource.
     MaxResults:
       type: integer
       minimum: 1
@@ -110,11 +791,59 @@ components:
       items:
         $ref: '#/components/schemas/Region'
       description: List of regions
+    ResourceNotFoundException:
+      type: object
+      properties:
+        message:
+          $ref: '#/components/schemas/String'
+        resourceId:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: Hypothetical identifier of the resource which does not exist
+        resourceType:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: Hypothetical type of the resource which does not exist
+      required:
+      - message
+      - resourceId
+      - resourceType
+      description: The resource could not be found.
     ServiceName:
       type: string
       pattern: ^com\.amazonaws\.[a-z0-9-]+\.dsql-[a-f0-9]{6}$
       minLength: 1
       maxLength: 128
+    ServiceQuotaExceededException:
+      type: object
+      properties:
+        message:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: Description of the error
+        resourceId:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: Identifier of the resource affected
+        resourceType:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: Type of the resource affected
+        serviceCode:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: Service Quotas requirement to identify originating service
+        quotaCode:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: Service Quotas requirement to identify originating quota
+      required:
+      - message
+      - resourceId
+      - resourceType
+      - serviceCode
+      - quotaCode
+      description: The service limit was exceeded.
     TagKey:
       type: string
       pattern: ^[a-zA-Z0-9_.:/=+\-@ ]*$
@@ -130,11 +859,156 @@ components:
       additionalProperties:
         $ref: '#/components/schemas/TagValue'
       description: Map of tags
+    TagResourceInput:
+      type: object
+      properties:
+        resourceArn:
+          allOf:
+          - $ref: '#/components/schemas/Arn'
+          description: The ARN of the resource that you want to tag.
+        tags:
+          allOf:
+          - $ref: '#/components/schemas/TagMap'
+          description: A map of key and value pairs to use to tag your resource.
+      required:
+      - resourceArn
+      - tags
     TagValue:
       type: string
       pattern: ^[a-zA-Z0-9_.:/=+\-@ ]*$
       minLength: 0
       maxLength: 256
+    ThrottlingException:
+      type: object
+      properties:
+        message:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: Description of the error
+        serviceCode:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: Service Quotas requirement to identify originating service
+        quotaCode:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: Service Quotas requirement to identify originating quota
+        retryAfterSeconds:
+          allOf:
+          - $ref: '#/components/schemas/Integer'
+          description: Advice to clients on when the call can be safely retried
+      required:
+      - message
+      description: The request was denied due to request throttling.
+    UntagResourceInput:
+      type: object
+      properties:
+        resourceArn:
+          allOf:
+          - $ref: '#/components/schemas/Arn'
+          description: The ARN of the resource from which to remove tags.
+        tagKeys:
+          allOf:
+          - $ref: '#/components/schemas/TagKeyList'
+          description: The array of keys of the tags that you want to remove.
+      required:
+      - resourceArn
+      - tagKeys
+    UpdateClusterInput:
+      type: object
+      properties:
+        identifier:
+          allOf:
+          - $ref: '#/components/schemas/ClusterId'
+          description: The ID of the cluster you want to update.
+        deletionProtectionEnabled:
+          allOf:
+          - $ref: '#/components/schemas/DeletionProtectionEnabled'
+          description: Specifies whether to enable deletion protection in your cluster.
+        clientToken:
+          allOf:
+          - $ref: '#/components/schemas/ClientToken'
+          description: 'A unique, case-sensitive identifier that you provide to ensure
+            the idempotency of the request. Idempotency ensures that an API request
+            completes only once. With an idempotent request, if the original request
+            completes successfully. The subsequent retries with the same client token
+            return the result from the original successful request and they have no
+            additional effect.
+
+
+            If you don''t specify a client token, the Amazon Web Services SDK automatically
+            generates one.'
+      required:
+      - identifier
+    UpdateClusterOutput:
+      type: object
+      properties:
+        identifier:
+          allOf:
+          - $ref: '#/components/schemas/ClusterId'
+          description: The ID of the cluster to update.
+        arn:
+          allOf:
+          - $ref: '#/components/schemas/ClusterArn'
+          description: The ARN of the updated cluster.
+        status:
+          allOf:
+          - $ref: '#/components/schemas/ClusterStatus'
+          description: The status of the updated cluster.
+        creationTime:
+          allOf:
+          - $ref: '#/components/schemas/ClusterCreationTime'
+          description: The time of when the cluster was created.
+        deletionProtectionEnabled:
+          allOf:
+          - $ref: '#/components/schemas/DeletionProtectionEnabled'
+          description: Whether deletion protection is enabled for the updated cluster.
+        witnessRegion:
+          allOf:
+          - $ref: '#/components/schemas/Region'
+          description: The Region that receives all data you write to linked clusters.
+        linkedClusterArns:
+          allOf:
+          - $ref: '#/components/schemas/ClusterArnList'
+          description: The ARNs of the clusters linked to the updated cluster. Applicable
+            only for multi-Region clusters.
+      required:
+      - identifier
+      - arn
+      - status
+      - creationTime
+      - deletionProtectionEnabled
+      description: Output Mixin
+    ValidationException:
+      type: object
+      properties:
+        message:
+          $ref: '#/components/schemas/String'
+        reason:
+          $ref: '#/components/schemas/ValidationExceptionReason'
+        fieldList:
+          $ref: '#/components/schemas/ValidationExceptionFieldList'
+      required:
+      - message
+      - reason
+      description: The input failed to satisfy the constraints specified by an Amazon
+        Web Services service.
+    ValidationExceptionField:
+      type: object
+      properties:
+        name:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The name of the field.
+        message:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: A message describing why this field failed validation.
+      required:
+      - name
+      - message
+      description: Stores information about a field passed inside a request that resulted
+        in an validation error.
     ValidationExceptionFieldList:
       type: array
       items:

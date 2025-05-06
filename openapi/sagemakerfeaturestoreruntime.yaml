@@ -7,7 +7,7 @@ info:
   x-stackql-serviceName: sagemaker_featurestore_runtime
   x-aws-serviceName: sagemakerfeaturestoreruntime
   x-aws-protocol: aws.protocols#restJson1
-  x-dateGenerated: '2025-05-05'
+  x-dateGenerated: '2025-05-07'
   version: '2020-07-01'
   title: Amazon SageMaker Feature Store Runtime
   description: |-
@@ -53,21 +53,412 @@ servers:
       - sa-east-1
       - me-south-1
       default: us-east-1
-paths: {}
+paths:
+  /BatchGetRecord:
+    post:
+      operationId: BatchGetRecord
+      description: |-
+        Retrieves a batch of `Records` from a `FeatureGroup`.
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                Identifiers:
+                  $ref: '#/components/schemas/BatchGetRecordIdentifiers'
+                ExpirationTimeResponse:
+                  $ref: '#/components/schemas/ExpirationTimeResponse'
+      responses:
+        '200': {}
+        '403':
+          description: |-
+            You do not have permission to perform an action.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessForbidden'
+        '500':
+          description: |-
+            An internal failure occurred. Try your request again. If the problem persists, contact Amazon Web Services customer support.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalFailure'
+        '503':
+          description: |-
+            The service is currently unavailable.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServiceUnavailable'
+        '400':
+          description: |-
+            There was an error validating your request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationError'
+  /FeatureGroup/{FeatureGroupName}:
+    delete:
+      operationId: DeleteRecord
+      description: |-
+        Deletes a `Record` from a `FeatureGroup` in the `OnlineStore`. Feature Store supports both `SoftDelete` and `HardDelete`. For `SoftDelete` (default), feature columns are set to `null` and the record is no longer retrievable by `GetRecord` or `BatchGetRecord`. For `HardDelete`, the complete `Record` is removed from the `OnlineStore`. In both cases, Feature Store appends the deleted record marker to the `OfflineStore`. The deleted record marker is a record with the same `RecordIdentifer` as the original, but with `is_deleted` value set to `True`, `EventTime` set to the delete input `EventTime`, and other feature values set to `null`.
+
+        Note that the `EventTime` specified in `DeleteRecord` should be set later than the `EventTime` of the existing record in the `OnlineStore` for that `RecordIdentifer`. If it is not, the deletion does not occur:
+
+          * For `SoftDelete`, the existing (not deleted) record remains in the `OnlineStore`, though the delete record marker is still written to the `OfflineStore`.
+
+          * `HardDelete` returns `EventTime`: `400 ValidationException` to indicate that the delete operation failed. No delete record marker is written to the `OfflineStore`.
+
+        When a record is deleted from the `OnlineStore`, the deleted record marker is appended to the `OfflineStore`. If you have the Iceberg table format enabled for your `OfflineStore`, you can remove all history of a record from the `OfflineStore` using Amazon Athena or Apache Spark. For information on how to hard delete a record from the `OfflineStore` with the Iceberg table format enabled, see [Delete records from the offline store](https://docs.aws.amazon.com/sagemaker/latest/dg/feature-store-delete-records-offline-store.html#feature-store-delete-records-offline-store).
+      parameters:
+      - name: FeatureGroupName
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/FeatureGroupNameOrArn'
+      - name: RecordIdentifierValueAsString
+        in: query
+        required: true
+        schema:
+          $ref: '#/components/schemas/ValueAsString'
+      - name: EventTime
+        in: query
+        required: true
+        schema:
+          $ref: '#/components/schemas/ValueAsString'
+      - name: TargetStores
+        in: query
+        required: false
+        schema:
+          $ref: '#/components/schemas/TargetStores'
+      - name: DeletionMode
+        in: query
+        required: false
+        schema:
+          $ref: '#/components/schemas/DeletionMode'
+      responses:
+        '200': {}
+        '403':
+          description: |-
+            You do not have permission to perform an action.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessForbidden'
+        '500':
+          description: |-
+            An internal failure occurred. Try your request again. If the problem persists, contact Amazon Web Services customer support.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalFailure'
+        '503':
+          description: |-
+            The service is currently unavailable.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServiceUnavailable'
+        '400':
+          description: |-
+            There was an error validating your request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationError'
+    get:
+      operationId: GetRecord
+      description: |-
+        Use for `OnlineStore` serving from a `FeatureStore`. Only the latest records stored in the `OnlineStore` can be retrieved. If no Record with `RecordIdentifierValue` is found, then an empty result is returned.
+      parameters:
+      - name: FeatureGroupName
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/FeatureGroupNameOrArn'
+      - name: RecordIdentifierValueAsString
+        in: query
+        required: true
+        schema:
+          $ref: '#/components/schemas/ValueAsString'
+      - name: FeatureName
+        in: query
+        required: false
+        schema:
+          $ref: '#/components/schemas/FeatureNames'
+      - name: ExpirationTimeResponse
+        in: query
+        required: false
+        schema:
+          $ref: '#/components/schemas/ExpirationTimeResponse'
+      responses:
+        '200': {}
+        '403':
+          description: |-
+            You do not have permission to perform an action.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessForbidden'
+        '500':
+          description: |-
+            An internal failure occurred. Try your request again. If the problem persists, contact Amazon Web Services customer support.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalFailure'
+        '404':
+          description: |-
+            A resource that is required to perform an action was not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFound'
+        '503':
+          description: |-
+            The service is currently unavailable.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServiceUnavailable'
+        '400':
+          description: |-
+            There was an error validating your request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationError'
+    put:
+      operationId: PutRecord
+      description: |-
+        The `PutRecord` API is used to ingest a list of `Records` into your feature group.
+
+        If a new record’s `EventTime` is greater, the new record is written to both the `OnlineStore` and `OfflineStore`. Otherwise, the record is a historic record and it is written only to the `OfflineStore`.
+
+        You can specify the ingestion to be applied to the `OnlineStore`, `OfflineStore`, or both by using the `TargetStores` request parameter.
+
+        You can set the ingested record to expire at a given time to live (TTL) duration after the record’s event time, `ExpiresAt` = `EventTime` \+ `TtlDuration`, by specifying the `TtlDuration` parameter. A record level `TtlDuration` is set when specifying the `TtlDuration` parameter using the `PutRecord` API call. If the input `TtlDuration` is `null` or unspecified, `TtlDuration` is set to the default feature group level `TtlDuration`. A record level `TtlDuration` supersedes the group level `TtlDuration`.
+      parameters:
+      - name: FeatureGroupName
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/FeatureGroupNameOrArn'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                Record:
+                  $ref: '#/components/schemas/Record'
+                TargetStores:
+                  $ref: '#/components/schemas/TargetStores'
+                TtlDuration:
+                  $ref: '#/components/schemas/TtlDuration'
+      responses:
+        '200': {}
+        '403':
+          description: |-
+            You do not have permission to perform an action.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessForbidden'
+        '500':
+          description: |-
+            An internal failure occurred. Try your request again. If the problem persists, contact Amazon Web Services customer support.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalFailure'
+        '503':
+          description: |-
+            The service is currently unavailable.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServiceUnavailable'
+        '400':
+          description: |-
+            There was an error validating your request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationError'
 components:
   schemas:
+    AccessForbidden:
+      type: object
+      properties:
+        Message:
+          $ref: '#/components/schemas/Message'
+      description: You do not have permission to perform an action.
+    BatchGetRecordError:
+      type: object
+      properties:
+        FeatureGroupName:
+          allOf:
+          - $ref: '#/components/schemas/ValueAsString'
+          description: The name of the feature group that the record belongs to.
+        RecordIdentifierValueAsString:
+          allOf:
+          - $ref: '#/components/schemas/ValueAsString'
+          description: The value for the `RecordIdentifier` in string format of a
+            Record from a `FeatureGroup` that is causing an error when attempting
+            to be retrieved.
+        ErrorCode:
+          allOf:
+          - $ref: '#/components/schemas/ValueAsString'
+          description: The error code of an error that has occurred when attempting
+            to retrieve a batch of Records. For more information on errors, see [Errors](https://docs.aws.amazon.com/sagemaker/latest/APIReference/API_feature_store_GetRecord.html#API_feature_store_GetRecord_Errors).
+        ErrorMessage:
+          allOf:
+          - $ref: '#/components/schemas/Message'
+          description: The error message of an error that has occurred when attempting
+            to retrieve a record in the batch.
+      required:
+      - FeatureGroupName
+      - RecordIdentifierValueAsString
+      - ErrorCode
+      - ErrorMessage
+      description: The error that has occurred when attempting to retrieve a batch
+        of Records.
     BatchGetRecordErrors:
       type: array
       items:
         $ref: '#/components/schemas/BatchGetRecordError'
+    BatchGetRecordIdentifier:
+      type: object
+      properties:
+        FeatureGroupName:
+          allOf:
+          - $ref: '#/components/schemas/FeatureGroupNameOrArn'
+          description: The name or Amazon Resource Name (ARN) of the `FeatureGroup`
+            containing the records you are retrieving in a batch.
+        RecordIdentifiersValueAsString:
+          allOf:
+          - $ref: '#/components/schemas/RecordIdentifiers'
+          description: The value for a list of record identifiers in string format.
+        FeatureNames:
+          allOf:
+          - $ref: '#/components/schemas/FeatureNames'
+          description: List of names of Features to be retrieved. If not specified,
+            the latest value for all the Features are returned.
+      required:
+      - FeatureGroupName
+      - RecordIdentifiersValueAsString
+      description: The identifier that identifies the batch of Records you are retrieving
+        in a batch.
     BatchGetRecordIdentifiers:
       type: array
       items:
         $ref: '#/components/schemas/BatchGetRecordIdentifier'
+    BatchGetRecordRequest:
+      type: object
+      properties:
+        Identifiers:
+          allOf:
+          - $ref: '#/components/schemas/BatchGetRecordIdentifiers'
+          description: A list containing the name or Amazon Resource Name (ARN) of
+            the `FeatureGroup`, the list of names of `Feature`s to be retrieved, and
+            the corresponding `RecordIdentifier` values as strings.
+        ExpirationTimeResponse:
+          allOf:
+          - $ref: '#/components/schemas/ExpirationTimeResponse'
+          description: Parameter to request `ExpiresAt` in response. If `Enabled`,
+            `BatchGetRecord` will return the value of `ExpiresAt`, if it is not null.
+            If `Disabled` and null, `BatchGetRecord` will return null.
+      required:
+      - Identifiers
+    BatchGetRecordResponse:
+      type: object
+      properties:
+        Records:
+          allOf:
+          - $ref: '#/components/schemas/BatchGetRecordResultDetails'
+          description: A list of Records you requested to be retrieved in batch.
+        Errors:
+          allOf:
+          - $ref: '#/components/schemas/BatchGetRecordErrors'
+          description: A list of errors that have occurred when retrieving a batch
+            of Records.
+        UnprocessedIdentifiers:
+          allOf:
+          - $ref: '#/components/schemas/UnprocessedIdentifiers'
+          description: A unprocessed list of `FeatureGroup` names, with their corresponding
+            `RecordIdentifier` value, and Feature name.
+      required:
+      - Records
+      - Errors
+      - UnprocessedIdentifiers
+    BatchGetRecordResultDetail:
+      type: object
+      properties:
+        FeatureGroupName:
+          allOf:
+          - $ref: '#/components/schemas/ValueAsString'
+          description: The `FeatureGroupName` containing Records you retrieved in
+            a batch.
+        RecordIdentifierValueAsString:
+          allOf:
+          - $ref: '#/components/schemas/ValueAsString'
+          description: The value of the record identifier in string format.
+        Record:
+          allOf:
+          - $ref: '#/components/schemas/Record'
+          description: The `Record` retrieved.
+        ExpiresAt:
+          allOf:
+          - $ref: '#/components/schemas/ExpiresAt'
+          description: The `ExpiresAt` ISO string of the requested record.
+      required:
+      - FeatureGroupName
+      - RecordIdentifierValueAsString
+      - Record
+      description: The output of records that have been retrieved in a batch.
     BatchGetRecordResultDetails:
       type: array
       items:
         $ref: '#/components/schemas/BatchGetRecordResultDetail'
+    DeleteRecordRequest:
+      type: object
+      properties:
+        FeatureGroupName:
+          allOf:
+          - $ref: '#/components/schemas/FeatureGroupNameOrArn'
+          description: The name or Amazon Resource Name (ARN) of the feature group
+            to delete the record from.
+        RecordIdentifierValueAsString:
+          allOf:
+          - $ref: '#/components/schemas/ValueAsString'
+          description: The value for the `RecordIdentifier` that uniquely identifies
+            the record, in string format.
+        EventTime:
+          allOf:
+          - $ref: '#/components/schemas/ValueAsString'
+          description: Timestamp indicating when the deletion event occurred. `EventTime`
+            can be used to query data at a certain point in time.
+        TargetStores:
+          allOf:
+          - $ref: '#/components/schemas/TargetStores'
+          description: A list of stores from which you're deleting the record. By
+            default, Feature Store deletes the record from all of the stores that
+            you're using for the `FeatureGroup`.
+        DeletionMode:
+          allOf:
+          - $ref: '#/components/schemas/DeletionMode'
+          description: The name of the deletion mode for deleting the record. By default,
+            the deletion mode is set to `SoftDelete`.
+      required:
+      - FeatureGroupName
+      - RecordIdentifierValueAsString
+      - EventTime
     DeletionMode:
       type: string
       enum:
@@ -94,10 +485,111 @@ components:
       type: array
       items:
         $ref: '#/components/schemas/FeatureName'
+    FeatureValue:
+      type: object
+      properties:
+        FeatureName:
+          allOf:
+          - $ref: '#/components/schemas/FeatureName'
+          description: The name of a feature that a feature value corresponds to.
+        ValueAsString:
+          allOf:
+          - $ref: '#/components/schemas/ValueAsString'
+          description: The value in string format associated with a feature. Used
+            when your `CollectionType` is `None`. Note that features types can be
+            `String`, `Integral`, or `Fractional`. This value represents all three
+            types as a string.
+        ValueAsStringList:
+          allOf:
+          - $ref: '#/components/schemas/ValueAsStringList'
+          description: The list of values in string format associated with a feature.
+            Used when your `CollectionType` is a `List`, `Set`, or `Vector`. Note
+            that features types can be `String`, `Integral`, or `Fractional`. These
+            values represents all three types as a string.
+      required:
+      - FeatureName
+      description: The value associated with a feature.
+    GetRecordRequest:
+      type: object
+      properties:
+        FeatureGroupName:
+          allOf:
+          - $ref: '#/components/schemas/FeatureGroupNameOrArn'
+          description: The name or Amazon Resource Name (ARN) of the feature group
+            from which you want to retrieve a record.
+        RecordIdentifierValueAsString:
+          allOf:
+          - $ref: '#/components/schemas/ValueAsString'
+          description: The value that corresponds to `RecordIdentifier` type and uniquely
+            identifies the record in the `FeatureGroup`.
+        FeatureNames:
+          allOf:
+          - $ref: '#/components/schemas/FeatureNames'
+          description: List of names of Features to be retrieved. If not specified,
+            the latest value for all the Features are returned.
+        ExpirationTimeResponse:
+          allOf:
+          - $ref: '#/components/schemas/ExpirationTimeResponse'
+          description: Parameter to request `ExpiresAt` in response. If `Enabled`,
+            `GetRecord` will return the value of `ExpiresAt`, if it is not null. If
+            `Disabled` and null, `GetRecord` will return null.
+      required:
+      - FeatureGroupName
+      - RecordIdentifierValueAsString
+    GetRecordResponse:
+      type: object
+      properties:
+        Record:
+          allOf:
+          - $ref: '#/components/schemas/Record'
+          description: The record you requested. A list of `FeatureValues`.
+        ExpiresAt:
+          allOf:
+          - $ref: '#/components/schemas/ExpiresAt'
+          description: The `ExpiresAt` ISO string of the requested record.
+    InternalFailure:
+      type: object
+      properties:
+        Message:
+          $ref: '#/components/schemas/Message'
+      description: An internal failure occurred. Try your request again. If the problem
+        persists, contact Amazon Web Services customer support.
     Message:
       type: string
       minLength: 0
       maxLength: 2048
+    PutRecordRequest:
+      type: object
+      properties:
+        FeatureGroupName:
+          allOf:
+          - $ref: '#/components/schemas/FeatureGroupNameOrArn'
+          description: The name or Amazon Resource Name (ARN) of the feature group
+            that you want to insert the record into.
+        Record:
+          allOf:
+          - $ref: '#/components/schemas/Record'
+          description: "List of FeatureValues to be inserted. This will be a full\
+            \ over-write. If you only want to update few of the feature values, do\
+            \ the following:\n\n  * Use `GetRecord` to retrieve the latest record.\n\
+            \n  * Update the record returned from `GetRecord`. \n\n  * Use `PutRecord`\
+            \ to update feature values."
+        TargetStores:
+          allOf:
+          - $ref: '#/components/schemas/TargetStores'
+          description: A list of stores to which you're adding the record. By default,
+            Feature Store adds the record to all of the stores that you're using for
+            the `FeatureGroup`.
+        TtlDuration:
+          allOf:
+          - $ref: '#/components/schemas/TtlDuration'
+          description: Time to live duration, where the record is hard deleted after
+            the expiration time is reached; `ExpiresAt` = `EventTime` \+ `TtlDuration`.
+            For information on HardDelete, see the [DeleteRecord](https://docs.aws.amazon.com/sagemaker/latest/APIReference/API_feature_store_DeleteRecord.html)
+            API in the Amazon SageMaker API Reference guide.
+      required:
+      - FeatureGroupName
+      - Record
     Record:
       type: array
       items:
@@ -106,6 +598,18 @@ components:
       type: array
       items:
         $ref: '#/components/schemas/ValueAsString'
+    ResourceNotFound:
+      type: object
+      properties:
+        Message:
+          $ref: '#/components/schemas/Message'
+      description: A resource that is required to perform an action was not found.
+    ServiceUnavailable:
+      type: object
+      properties:
+        Message:
+          $ref: '#/components/schemas/Message'
+      description: The service is currently unavailable.
     TargetStore:
       type: string
       enum:
@@ -115,6 +619,24 @@ components:
       type: array
       items:
         $ref: '#/components/schemas/TargetStore'
+    TtlDuration:
+      type: object
+      properties:
+        Unit:
+          allOf:
+          - $ref: '#/components/schemas/TtlDurationUnit'
+          description: '`TtlDuration` time unit.'
+        Value:
+          allOf:
+          - $ref: '#/components/schemas/TtlDurationValue'
+          description: '`TtlDuration` time value.'
+      required:
+      - Unit
+      - Value
+      description: Time to live duration, where the record is hard deleted after the
+        expiration time is reached; `ExpiresAt` = `EventTime` \+ `TtlDuration`. For
+        information on HardDelete, see the [DeleteRecord](https://docs.aws.amazon.com/sagemaker/latest/APIReference/API_feature_store_DeleteRecord.html)
+        API in the Amazon SageMaker API Reference guide.
     TtlDurationUnit:
       type: string
       enum:
@@ -130,6 +652,12 @@ components:
       type: array
       items:
         $ref: '#/components/schemas/BatchGetRecordIdentifier'
+    ValidationError:
+      type: object
+      properties:
+        Message:
+          $ref: '#/components/schemas/Message'
+      description: There was an error validating your request.
     ValueAsString:
       type: string
       pattern: .*

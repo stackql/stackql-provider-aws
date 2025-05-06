@@ -7,7 +7,7 @@ info:
   x-stackql-serviceName: rds_data
   x-aws-serviceName: rdsdata
   x-aws-protocol: aws.protocols#restJson1
-  x-dateGenerated: '2025-05-05'
+  x-dateGenerated: '2025-05-07'
   version: '2018-08-01'
   title: AWS RDS DataService
   description: |-
@@ -53,9 +53,435 @@ servers:
       - sa-east-1
       - me-south-1
       default: us-east-1
-paths: {}
+paths:
+  /BatchExecute:
+    post:
+      operationId: BatchExecuteStatement
+      description: |-
+        Runs a batch SQL statement over an array of data.
+
+        You can run bulk update and insert operations for multiple records using a DML statement with different parameter sets. Bulk operations can provide a significant performance improvement over individual insert and update operations.
+
+        If a call isn't part of a transaction because it doesn't include the `transactionID` parameter, changes that result from the call are committed automatically.
+
+        There isn't a fixed upper limit on the number of parameter sets. However, the maximum size of the HTTP request submitted through the Data API is 4 MiB. If the request exceeds this limit, the Data API returns an error and doesn't process the request. This 4-MiB limit includes the size of the HTTP headers and the JSON notation in the request. Thus, the number of parameter sets that you can include depends on a combination of factors, such as the size of the SQL statement and the size of each parameter set.
+
+        The response size limit is 1 MiB. If the call returns more than 1 MiB of response data, the call is terminated.
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                resourceArn:
+                  $ref: '#/components/schemas/Arn'
+                secretArn:
+                  $ref: '#/components/schemas/Arn'
+                sql:
+                  $ref: '#/components/schemas/SqlStatement'
+                database:
+                  $ref: '#/components/schemas/DbName'
+                schema:
+                  $ref: '#/components/schemas/DbName'
+                parameterSets:
+                  $ref: '#/components/schemas/SqlParameterSets'
+                transactionId:
+                  $ref: '#/components/schemas/Id'
+      responses:
+        '200': {}
+        '403':
+          description: |-
+            There are insufficient privileges to make the call.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ForbiddenException'
+        '400':
+          description: |-
+            The execution of the SQL statement timed out.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StatementTimeoutException'
+        '404':
+          description: |-
+            The transaction ID wasn't found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TransactionNotFoundException'
+        '504':
+          description: |-
+            The writer instance in the DB cluster isn't available.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DatabaseUnavailableException'
+        '500':
+          description: |-
+            An internal error occurred.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerErrorException'
+        '503':
+          description: |-
+            The service specified by the `resourceArn` parameter isn't available.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServiceUnavailableError'
+  /BeginTransaction:
+    post:
+      operationId: BeginTransaction
+      description: |-
+        Starts a SQL transaction.
+
+        A transaction can run for a maximum of 24 hours. A transaction is terminated and rolled back automatically after 24 hours.
+
+        A transaction times out if no calls use its transaction ID in three minutes. If a transaction times out before it's committed, it's rolled back automatically.
+
+        For Aurora MySQL, DDL statements inside a transaction cause an implicit commit. We recommend that you run each MySQL DDL statement in a separate `ExecuteStatement` call with `continueAfterTimeout` enabled.
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                resourceArn:
+                  $ref: '#/components/schemas/Arn'
+                secretArn:
+                  $ref: '#/components/schemas/Arn'
+                database:
+                  $ref: '#/components/schemas/DbName'
+                schema:
+                  $ref: '#/components/schemas/DbName'
+      responses:
+        '200': {}
+        '403':
+          description: |-
+            There are insufficient privileges to make the call.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ForbiddenException'
+        '400':
+          description: |-
+            The execution of the SQL statement timed out.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StatementTimeoutException'
+        '404':
+          description: |-
+            The transaction ID wasn't found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TransactionNotFoundException'
+        '504':
+          description: |-
+            The writer instance in the DB cluster isn't available.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DatabaseUnavailableException'
+        '500':
+          description: |-
+            An internal error occurred.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerErrorException'
+        '503':
+          description: |-
+            The service specified by the `resourceArn` parameter isn't available.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServiceUnavailableError'
+  /CommitTransaction:
+    post:
+      operationId: CommitTransaction
+      description: |-
+        Ends a SQL transaction started with the `BeginTransaction` operation and commits the changes.
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                resourceArn:
+                  $ref: '#/components/schemas/Arn'
+                secretArn:
+                  $ref: '#/components/schemas/Arn'
+                transactionId:
+                  $ref: '#/components/schemas/Id'
+      responses:
+        '200': {}
+        '403':
+          description: |-
+            There are insufficient privileges to make the call.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ForbiddenException'
+        '400':
+          description: |-
+            The execution of the SQL statement timed out.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StatementTimeoutException'
+        '404':
+          description: |-
+            The transaction ID wasn't found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TransactionNotFoundException'
+        '504':
+          description: |-
+            The writer instance in the DB cluster isn't available.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DatabaseUnavailableException'
+        '500':
+          description: |-
+            An internal error occurred.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerErrorException'
+        '503':
+          description: |-
+            The service specified by the `resourceArn` parameter isn't available.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServiceUnavailableError'
+  /ExecuteSql:
+    post:
+      operationId: ExecuteSql
+      description: |-
+        Runs one or more SQL statements.
+
+        This operation isn't supported for Aurora Serverless v2 and provisioned DB clusters. For Aurora Serverless v1 DB clusters, the operation is deprecated. Use the `BatchExecuteStatement` or `ExecuteStatement` operation.
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                dbClusterOrInstanceArn:
+                  $ref: '#/components/schemas/Arn'
+                awsSecretStoreArn:
+                  $ref: '#/components/schemas/Arn'
+                sqlStatements:
+                  $ref: '#/components/schemas/SqlStatement'
+                database:
+                  $ref: '#/components/schemas/DbName'
+                schema:
+                  $ref: '#/components/schemas/DbName'
+      responses:
+        '200': {}
+        '403':
+          description: |-
+            There are insufficient privileges to make the call.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ForbiddenException'
+        '400':
+          description: |-
+            There is an error in the call or in a SQL statement. (This error only appears in calls from Aurora Serverless v1 databases.)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequestException'
+        '500':
+          description: |-
+            An internal error occurred.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerErrorException'
+        '503':
+          description: |-
+            The service specified by the `resourceArn` parameter isn't available.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServiceUnavailableError'
+  /Execute:
+    post:
+      operationId: ExecuteStatement
+      description: |-
+        Runs a SQL statement against a database.
+
+        If a call isn't part of a transaction because it doesn't include the `transactionID` parameter, changes that result from the call are committed automatically.
+
+        If the binary response data from the database is more than 1 MB, the call is terminated.
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                resourceArn:
+                  $ref: '#/components/schemas/Arn'
+                secretArn:
+                  $ref: '#/components/schemas/Arn'
+                sql:
+                  $ref: '#/components/schemas/SqlStatement'
+                database:
+                  $ref: '#/components/schemas/DbName'
+                schema:
+                  $ref: '#/components/schemas/DbName'
+                parameters:
+                  $ref: '#/components/schemas/SqlParametersList'
+                transactionId:
+                  $ref: '#/components/schemas/Id'
+                includeResultMetadata:
+                  $ref: '#/components/schemas/Boolean'
+                continueAfterTimeout:
+                  $ref: '#/components/schemas/Boolean'
+                resultSetOptions:
+                  $ref: '#/components/schemas/ResultSetOptions'
+                formatRecordsAs:
+                  $ref: '#/components/schemas/RecordsFormatType'
+      responses:
+        '200': {}
+        '403':
+          description: |-
+            There are insufficient privileges to make the call.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ForbiddenException'
+        '400':
+          description: |-
+            There was a problem with the result because of one of the following conditions:
+
+              * It contained an unsupported data type.
+
+              * It contained a multidimensional array.
+
+              * The size was too large.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnsupportedResultException'
+        '404':
+          description: |-
+            The transaction ID wasn't found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TransactionNotFoundException'
+        '504':
+          description: |-
+            The writer instance in the DB cluster isn't available.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DatabaseUnavailableException'
+        '500':
+          description: |-
+            An internal error occurred.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerErrorException'
+        '503':
+          description: |-
+            The service specified by the `resourceArn` parameter isn't available.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServiceUnavailableError'
+  /RollbackTransaction:
+    post:
+      operationId: RollbackTransaction
+      description: |-
+        Performs a rollback of a transaction. Rolling back a transaction cancels its changes.
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                resourceArn:
+                  $ref: '#/components/schemas/Arn'
+                secretArn:
+                  $ref: '#/components/schemas/Arn'
+                transactionId:
+                  $ref: '#/components/schemas/Id'
+      responses:
+        '200': {}
+        '403':
+          description: |-
+            There are insufficient privileges to make the call.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ForbiddenException'
+        '400':
+          description: |-
+            The execution of the SQL statement timed out.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StatementTimeoutException'
+        '404':
+          description: |-
+            The transaction ID wasn't found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TransactionNotFoundException'
+        '504':
+          description: |-
+            The writer instance in the DB cluster isn't available.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DatabaseUnavailableException'
+        '500':
+          description: |-
+            An internal error occurred.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerErrorException'
+        '503':
+          description: |-
+            The service specified by the `resourceArn` parameter isn't available.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServiceUnavailableError'
 components:
   schemas:
+    AccessDeniedException:
+      type: object
+      properties:
+        message:
+          $ref: '#/components/schemas/ErrorMessage'
+      description: You don't have sufficient access to perform this action.
     Arn:
       type: string
       minLength: 11
@@ -94,6 +520,115 @@ components:
       type: array
       items:
         $ref: '#/components/schemas/Value'
+    BadRequestException:
+      type: object
+      properties:
+        message:
+          allOf:
+          - $ref: '#/components/schemas/ErrorMessage'
+          description: The error message returned by this `BadRequestException` error.
+      description: There is an error in the call or in a SQL statement. (This error
+        only appears in calls from Aurora Serverless v1 databases.)
+    BatchExecuteStatementRequest:
+      type: object
+      properties:
+        resourceArn:
+          allOf:
+          - $ref: '#/components/schemas/Arn'
+          description: The Amazon Resource Name (ARN) of the Aurora Serverless DB
+            cluster.
+        secretArn:
+          allOf:
+          - $ref: '#/components/schemas/Arn'
+          description: 'The ARN of the secret that enables access to the DB cluster.
+            Enter the database user name and password for the credentials in the secret.
+
+
+            For information about creating the secret, see [Create a database secret](https://docs.aws.amazon.com/secretsmanager/latest/userguide/create_database_secret.html).'
+        sql:
+          allOf:
+          - $ref: '#/components/schemas/SqlStatement'
+          description: The SQL statement to run. Don't include a semicolon (;) at
+            the end of the SQL statement.
+        database:
+          allOf:
+          - $ref: '#/components/schemas/DbName'
+          description: The name of the database.
+        schema:
+          allOf:
+          - $ref: '#/components/schemas/DbName'
+          description: 'The name of the database schema.
+
+
+            Currently, the `schema` parameter isn''t supported.'
+        parameterSets:
+          allOf:
+          - $ref: '#/components/schemas/SqlParameterSets'
+          description: "The parameter set for the batch operation.\n\nThe SQL statement\
+            \ is executed as many times as the number of parameter sets provided.\
+            \ To execute a SQL statement with no parameters, use one of the following\
+            \ options:\n\n  * Specify one or more empty parameter sets.\n\n  * Use\
+            \ the `ExecuteStatement` operation instead of the `BatchExecuteStatement`\
+            \ operation.\n\nArray parameters are not supported."
+        transactionId:
+          allOf:
+          - $ref: '#/components/schemas/Id'
+          description: 'The identifier of a transaction that was started by using
+            the `BeginTransaction` operation. Specify the transaction ID of the transaction
+            that you want to include the SQL statement in.
+
+
+            If the SQL statement is not part of a transaction, don''t set this parameter.'
+      required:
+      - resourceArn
+      - secretArn
+      - sql
+      description: The request parameters represent the input of a SQL statement over
+        an array of data.
+    BatchExecuteStatementResponse:
+      type: object
+      properties:
+        updateResults:
+          allOf:
+          - $ref: '#/components/schemas/UpdateResults'
+          description: The execution results of each batch entry.
+      description: The response elements represent the output of a SQL statement over
+        an array of data.
+    BeginTransactionRequest:
+      type: object
+      properties:
+        resourceArn:
+          allOf:
+          - $ref: '#/components/schemas/Arn'
+          description: The Amazon Resource Name (ARN) of the Aurora Serverless DB
+            cluster.
+        secretArn:
+          allOf:
+          - $ref: '#/components/schemas/Arn'
+          description: The name or ARN of the secret that enables access to the DB
+            cluster.
+        database:
+          allOf:
+          - $ref: '#/components/schemas/DbName'
+          description: The name of the database.
+        schema:
+          allOf:
+          - $ref: '#/components/schemas/DbName'
+          description: The name of the database schema.
+      required:
+      - resourceArn
+      - secretArn
+      description: The request parameters represent the input of a request to start
+        a SQL transaction.
+    BeginTransactionResponse:
+      type: object
+      properties:
+        transactionId:
+          allOf:
+          - $ref: '#/components/schemas/Id'
+          description: The transaction ID of the transaction started by the call.
+      description: The response elements represent the output of a request to start
+        a SQL transaction.
     Blob:
       type: string
       format: byte
@@ -119,6 +654,124 @@ components:
     BoxedLong:
       type: integer
       format: int64
+    ColumnMetadata:
+      type: object
+      properties:
+        name:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The name of the column.
+        type:
+          allOf:
+          - $ref: '#/components/schemas/Integer'
+          description: The type of the column.
+        typeName:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The database-specific data type of the column.
+        label:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The label for the column.
+        schemaName:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The name of the schema that owns the table that includes the
+            column.
+        tableName:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The name of the table that includes the column.
+        isAutoIncrement:
+          allOf:
+          - $ref: '#/components/schemas/Boolean'
+          description: A value that indicates whether the column increments automatically.
+        isSigned:
+          allOf:
+          - $ref: '#/components/schemas/Boolean'
+          description: A value that indicates whether an integer column is signed.
+        isCurrency:
+          allOf:
+          - $ref: '#/components/schemas/Boolean'
+          description: A value that indicates whether the column contains currency
+            values.
+        isCaseSensitive:
+          allOf:
+          - $ref: '#/components/schemas/Boolean'
+          description: A value that indicates whether the column is case-sensitive.
+        nullable:
+          allOf:
+          - $ref: '#/components/schemas/Integer'
+          description: A value that indicates whether the column is nullable.
+        precision:
+          allOf:
+          - $ref: '#/components/schemas/Integer'
+          description: The precision value of a decimal number column.
+        scale:
+          allOf:
+          - $ref: '#/components/schemas/Integer'
+          description: The scale value of a decimal number column.
+        arrayBaseColumnType:
+          allOf:
+          - $ref: '#/components/schemas/Integer'
+          description: The type of the column.
+      description: Contains the metadata for a column.
+    CommitTransactionRequest:
+      type: object
+      properties:
+        resourceArn:
+          allOf:
+          - $ref: '#/components/schemas/Arn'
+          description: The Amazon Resource Name (ARN) of the Aurora Serverless DB
+            cluster.
+        secretArn:
+          allOf:
+          - $ref: '#/components/schemas/Arn'
+          description: The name or ARN of the secret that enables access to the DB
+            cluster.
+        transactionId:
+          allOf:
+          - $ref: '#/components/schemas/Id'
+          description: The identifier of the transaction to end and commit.
+      required:
+      - resourceArn
+      - secretArn
+      - transactionId
+      description: The request parameters represent the input of a commit transaction
+        request.
+    CommitTransactionResponse:
+      type: object
+      properties:
+        transactionStatus:
+          allOf:
+          - $ref: '#/components/schemas/TransactionStatus'
+          description: The status of the commit operation.
+      description: The response elements represent the output of a commit transaction
+        request.
+    DatabaseErrorException:
+      type: object
+      properties:
+        message:
+          $ref: '#/components/schemas/ErrorMessage'
+      description: There was an error in processing the SQL statement.
+    DatabaseNotFoundException:
+      type: object
+      properties:
+        message:
+          $ref: '#/components/schemas/ErrorMessage'
+      description: The DB cluster doesn't have a DB instance.
+    DatabaseResumingException:
+      type: object
+      properties:
+        message:
+          $ref: '#/components/schemas/ErrorMessage'
+      description: A request was cancelled because the Aurora Serverless v2 DB instance
+        was paused. The Data API request automatically resumes the DB instance. Wait
+        a few seconds and try again.
+    DatabaseUnavailableException:
+      type: object
+      properties: {}
+      description: The writer instance in the DB cluster isn't available.
     DbName:
       type: string
       maxLength: 64
@@ -135,6 +788,179 @@ components:
         \            <p>Some array entries can be null.</p>\n         </note>"
     ErrorMessage:
       type: string
+    ExecuteSqlRequest:
+      type: object
+      properties:
+        dbClusterOrInstanceArn:
+          allOf:
+          - $ref: '#/components/schemas/Arn'
+          description: The ARN of the Aurora Serverless DB cluster.
+        awsSecretStoreArn:
+          allOf:
+          - $ref: '#/components/schemas/Arn'
+          description: 'The Amazon Resource Name (ARN) of the secret that enables
+            access to the DB cluster. Enter the database user name and password for
+            the credentials in the secret.
+
+
+            For information about creating the secret, see [Create a database secret](https://docs.aws.amazon.com/secretsmanager/latest/userguide/create_database_secret.html).'
+        sqlStatements:
+          allOf:
+          - $ref: '#/components/schemas/SqlStatement'
+          description: 'One or more SQL statements to run on the DB cluster.
+
+
+            You can separate SQL statements from each other with a semicolon (;).
+            Any valid SQL statement is permitted, including data definition, data
+            manipulation, and commit statements.'
+        database:
+          allOf:
+          - $ref: '#/components/schemas/DbName'
+          description: The name of the database.
+        schema:
+          allOf:
+          - $ref: '#/components/schemas/DbName'
+          description: The name of the database schema.
+      required:
+      - dbClusterOrInstanceArn
+      - awsSecretStoreArn
+      - sqlStatements
+      description: The request parameters represent the input of a request to run
+        one or more SQL statements.
+    ExecuteSqlResponse:
+      type: object
+      properties:
+        sqlStatementResults:
+          allOf:
+          - $ref: '#/components/schemas/SqlStatementResults'
+          description: The results of the SQL statement or statements.
+      description: The response elements represent the output of a request to run
+        one or more SQL statements.
+    ExecuteStatementRequest:
+      type: object
+      properties:
+        resourceArn:
+          allOf:
+          - $ref: '#/components/schemas/Arn'
+          description: The Amazon Resource Name (ARN) of the Aurora Serverless DB
+            cluster.
+        secretArn:
+          allOf:
+          - $ref: '#/components/schemas/Arn'
+          description: 'The ARN of the secret that enables access to the DB cluster.
+            Enter the database user name and password for the credentials in the secret.
+
+
+            For information about creating the secret, see [Create a database secret](https://docs.aws.amazon.com/secretsmanager/latest/userguide/create_database_secret.html).'
+        sql:
+          allOf:
+          - $ref: '#/components/schemas/SqlStatement'
+          description: The SQL statement to run.
+        database:
+          allOf:
+          - $ref: '#/components/schemas/DbName'
+          description: The name of the database.
+        schema:
+          allOf:
+          - $ref: '#/components/schemas/DbName'
+          description: 'The name of the database schema.
+
+
+            Currently, the `schema` parameter isn''t supported.'
+        parameters:
+          allOf:
+          - $ref: '#/components/schemas/SqlParametersList'
+          description: 'The parameters for the SQL statement.
+
+
+            Array parameters are not supported.'
+        transactionId:
+          allOf:
+          - $ref: '#/components/schemas/Id'
+          description: 'The identifier of a transaction that was started by using
+            the `BeginTransaction` operation. Specify the transaction ID of the transaction
+            that you want to include the SQL statement in.
+
+
+            If the SQL statement is not part of a transaction, don''t set this parameter.'
+        includeResultMetadata:
+          allOf:
+          - $ref: '#/components/schemas/Boolean'
+          description: A value that indicates whether to include metadata in the results.
+        continueAfterTimeout:
+          allOf:
+          - $ref: '#/components/schemas/Boolean'
+          description: 'A value that indicates whether to continue running the statement
+            after the call times out. By default, the statement stops running when
+            the call times out.
+
+
+            For DDL statements, we recommend continuing to run the statement after
+            the call times out. When a DDL statement terminates before it is finished
+            running, it can result in errors and possibly corrupted data structures.'
+        resultSetOptions:
+          allOf:
+          - $ref: '#/components/schemas/ResultSetOptions'
+          description: Options that control how the result set is returned.
+        formatRecordsAs:
+          allOf:
+          - $ref: '#/components/schemas/RecordsFormatType'
+          description: 'A value that indicates whether to format the result set as
+            a single JSON string. This parameter only applies to `SELECT` statements
+            and is ignored for other types of statements. Allowed values are `NONE`
+            and `JSON`. The default value is `NONE`. The result is returned in the
+            `formattedRecords` field.
+
+
+            For usage information about the JSON format for result sets, see [Using
+            the Data API](https://docs.aws.amazon.com/AmazonRDS/latest/AuroraUserGuide/data-api.html)
+            in the _Amazon Aurora User Guide_.'
+      required:
+      - resourceArn
+      - secretArn
+      - sql
+      description: The request parameters represent the input of a request to run
+        a SQL statement against a database.
+    ExecuteStatementResponse:
+      type: object
+      properties:
+        records:
+          allOf:
+          - $ref: '#/components/schemas/SqlRecords'
+          description: The records returned by the SQL statement. This field is blank
+            if the `formatRecordsAs` parameter is set to `JSON`.
+        columnMetadata:
+          allOf:
+          - $ref: '#/components/schemas/Metadata'
+          description: Metadata for the columns included in the results. This field
+            is blank if the `formatRecordsAs` parameter is set to `JSON`.
+        numberOfRecordsUpdated:
+          allOf:
+          - $ref: '#/components/schemas/RecordsUpdated'
+          description: The number of records updated by the request.
+        generatedFields:
+          allOf:
+          - $ref: '#/components/schemas/FieldList'
+          description: 'Values for fields generated during a DML request.
+
+
+            The `generatedFields` data isn''t supported by Aurora PostgreSQL. To get
+            the values of generated fields, use the `RETURNING` clause. For more information,
+            see [Returning Data From Modified Rows](https://www.postgresql.org/docs/10/dml-returning.html)
+            in the PostgreSQL documentation.'
+        formattedRecords:
+          allOf:
+          - $ref: '#/components/schemas/FormattedSqlRecords'
+          description: 'A string value that represents the result set of a `SELECT`
+            statement in JSON format. This value is only present when the `formatRecordsAs`
+            parameter is set to `JSON`.
+
+
+            The size limit for this field is currently 10 MB. If the JSON-formatted
+            string representing the result set requires more than 10 MB, the call
+            returns an error.'
+      description: The response elements represent the output of a request to run
+        a SQL statement against a database.
     Field:
       allOf:
       - allOf:
@@ -171,14 +997,45 @@ components:
       type: array
       items:
         $ref: '#/components/schemas/Field'
+    ForbiddenException:
+      type: object
+      properties:
+        message:
+          allOf:
+          - $ref: '#/components/schemas/ErrorMessage'
+          description: The error message returned by this `ForbiddenException` error.
+      description: There are insufficient privileges to make the call.
     FormattedSqlRecords:
       type: string
+    HttpEndpointNotEnabledException:
+      type: object
+      properties:
+        message:
+          $ref: '#/components/schemas/ErrorMessage'
+      description: The HTTP endpoint for using RDS Data API isn't enabled for the
+        DB cluster.
     Id:
       type: string
       maxLength: 192
     Integer:
       type: integer
       default: 0
+    InternalServerErrorException:
+      type: object
+      properties: {}
+      description: An internal error occurred.
+    InvalidResourceStateException:
+      type: object
+      properties:
+        message:
+          $ref: '#/components/schemas/ErrorMessage'
+      description: The resource is in an invalid state.
+    InvalidSecretException:
+      type: object
+      properties:
+        message:
+          $ref: '#/components/schemas/ErrorMessage'
+      description: The Secrets Manager secret used with the request isn't valid.
     Long:
       type: integer
       format: int64
@@ -198,8 +1055,29 @@ components:
       type: array
       items:
         $ref: '#/components/schemas/ColumnMetadata'
+    NotFoundException:
+      type: object
+      properties:
+        message:
+          allOf:
+          - $ref: '#/components/schemas/ErrorMessage'
+          description: The error message returned by this `NotFoundException` error.
+      description: The `resourceArn`, `secretArn`, or `transactionId` value can't
+        be found.
     ParameterName:
       type: string
+    Record:
+      type: object
+      properties:
+        values:
+          allOf:
+          - $ref: '#/components/schemas/Row'
+          description: The values returned in the record.
+      description: 'A record returned by a call.
+
+
+        This data structure is only used with the deprecated `ExecuteSql` operation.
+        Use the `BatchExecuteStatement` or `ExecuteStatement` operation instead.'
     Records:
       type: array
       items:
@@ -213,10 +1091,136 @@ components:
       type: integer
       format: int64
       default: 0
+    ResultFrame:
+      type: object
+      properties:
+        resultSetMetadata:
+          allOf:
+          - $ref: '#/components/schemas/ResultSetMetadata'
+          description: The result-set metadata in the result set.
+        records:
+          allOf:
+          - $ref: '#/components/schemas/Records'
+          description: The records in the result set.
+      description: 'The result set returned by a SQL statement.
+
+
+        This data structure is only used with the deprecated `ExecuteSql` operation.
+        Use the `BatchExecuteStatement` or `ExecuteStatement` operation instead.'
+    ResultSetMetadata:
+      type: object
+      properties:
+        columnCount:
+          allOf:
+          - $ref: '#/components/schemas/Long'
+          description: The number of columns in the result set.
+        columnMetadata:
+          allOf:
+          - $ref: '#/components/schemas/Metadata'
+          description: The metadata of the columns in the result set.
+      description: The metadata of the result set returned by a SQL statement.
+    ResultSetOptions:
+      type: object
+      properties:
+        decimalReturnType:
+          allOf:
+          - $ref: '#/components/schemas/DecimalReturnType'
+          description: 'A value that indicates how a field of `DECIMAL` type is represented
+            in the response. The value of `STRING`, the default, specifies that it
+            is converted to a String value. The value of `DOUBLE_OR_LONG` specifies
+            that it is converted to a Long value if its scale is 0, or to a Double
+            value otherwise.
+
+
+            Conversion to Double or Long can result in roundoff errors due to precision
+            loss. We recommend converting to String, especially when working with
+            currency values.'
+        longReturnType:
+          allOf:
+          - $ref: '#/components/schemas/LongReturnType'
+          description: A value that indicates how a field of `LONG` type is represented.
+            Allowed values are `LONG` and `STRING`. The default is `LONG`. Specify
+            `STRING` if the length or precision of numeric values might cause truncation
+            or rounding errors.
+      description: Options that control how the result set is returned.
+    RollbackTransactionRequest:
+      type: object
+      properties:
+        resourceArn:
+          allOf:
+          - $ref: '#/components/schemas/Arn'
+          description: The Amazon Resource Name (ARN) of the Aurora Serverless DB
+            cluster.
+        secretArn:
+          allOf:
+          - $ref: '#/components/schemas/Arn'
+          description: The name or ARN of the secret that enables access to the DB
+            cluster.
+        transactionId:
+          allOf:
+          - $ref: '#/components/schemas/Id'
+          description: The identifier of the transaction to roll back.
+      required:
+      - resourceArn
+      - secretArn
+      - transactionId
+      description: The request parameters represent the input of a request to perform
+        a rollback of a transaction.
+    RollbackTransactionResponse:
+      type: object
+      properties:
+        transactionStatus:
+          allOf:
+          - $ref: '#/components/schemas/TransactionStatus'
+          description: The status of the rollback operation.
+      description: The response elements represent the output of a request to perform
+        a rollback of a transaction.
     Row:
       type: array
       items:
         $ref: '#/components/schemas/Value'
+    SecretsErrorException:
+      type: object
+      properties:
+        message:
+          $ref: '#/components/schemas/ErrorMessage'
+      description: "There was a problem with the Secrets Manager secret used with\
+        \ the request, caused by one of the following conditions:\n\n  * RDS Data\
+        \ API timed out retrieving the secret.\n\n  * The secret provided wasn't found.\n\
+        \n  * The secret couldn't be decrypted."
+    ServiceUnavailableError:
+      type: object
+      properties: {}
+      description: The service specified by the `resourceArn` parameter isn't available.
+    SqlParameter:
+      type: object
+      properties:
+        name:
+          allOf:
+          - $ref: '#/components/schemas/ParameterName'
+          description: The name of the parameter.
+        value:
+          allOf:
+          - $ref: '#/components/schemas/Field'
+          description: The value of the parameter.
+        typeHint:
+          allOf:
+          - $ref: '#/components/schemas/TypeHint'
+          description: "A hint that specifies the correct object type for data type\
+            \ mapping. Possible values are as follows:\n\n  * `DATE` \\- The corresponding\
+            \ `String` parameter value is sent as an object of `DATE` type to the\
+            \ database. The accepted format is `YYYY-MM-DD`.\n\n  * `DECIMAL` \\-\
+            \ The corresponding `String` parameter value is sent as an object of `DECIMAL`\
+            \ type to the database.\n\n  * `JSON` \\- The corresponding `String` parameter\
+            \ value is sent as an object of `JSON` type to the database.\n\n  * `TIME`\
+            \ \\- The corresponding `String` parameter value is sent as an object\
+            \ of `TIME` type to the database. The accepted format is `HH:MM:SS[.FFF]`.\n\
+            \n  * `TIMESTAMP` \\- The corresponding `String` parameter value is sent\
+            \ as an object of `TIMESTAMP` type to the database. The accepted format\
+            \ is `YYYY-MM-DD HH:MM:SS[.FFF]`.\n\n  * `UUID` \\- The corresponding\
+            \ `String` parameter value is sent as an object of `UUID` type to the\
+            \ database."
+      description: A parameter used in a SQL statement.
     SqlParameterSets:
       type: array
       items:
@@ -232,10 +1236,39 @@ components:
     SqlStatement:
       type: string
       maxLength: 65536
+    SqlStatementResult:
+      type: object
+      properties:
+        resultFrame:
+          allOf:
+          - $ref: '#/components/schemas/ResultFrame'
+          description: The result set of the SQL statement.
+        numberOfRecordsUpdated:
+          allOf:
+          - $ref: '#/components/schemas/RecordsUpdated'
+          description: The number of records updated by a SQL statement.
+      description: 'The result of a SQL statement.
+
+
+        This data structure is only used with the deprecated `ExecuteSql` operation.
+        Use the `BatchExecuteStatement` or `ExecuteStatement` operation instead.'
     SqlStatementResults:
       type: array
       items:
         $ref: '#/components/schemas/SqlStatementResult'
+    StatementTimeoutException:
+      type: object
+      properties:
+        message:
+          allOf:
+          - $ref: '#/components/schemas/ErrorMessage'
+          description: The error message returned by this `StatementTimeoutException`
+            error.
+        dbConnectionId:
+          allOf:
+          - $ref: '#/components/schemas/Long'
+          description: The database connection ID that executed the SQL statement.
+      description: The execution of the SQL statement timed out.
     String:
       type: string
     StringArray:
@@ -244,6 +1277,24 @@ components:
         $ref: '#/components/schemas/String'
       description: "<p>An array of strings.</p>\n         <note>\n            <p>Some\
         \ array entries can be null.</p>\n         </note>"
+    StructValue:
+      type: object
+      properties:
+        attributes:
+          allOf:
+          - $ref: '#/components/schemas/ArrayValueList'
+          description: The attributes returned in the record.
+      description: 'A structure value returned by a call.
+
+
+        This data structure is only used with the deprecated `ExecuteSql` operation.
+        Use the `BatchExecuteStatement` or `ExecuteStatement` operation instead.'
+    TransactionNotFoundException:
+      type: object
+      properties:
+        message:
+          $ref: '#/components/schemas/ErrorMessage'
+      description: The transaction ID wasn't found.
     TransactionStatus:
       type: string
       maxLength: 128
@@ -256,6 +1307,22 @@ components:
       - DATE
       - TIME
       - DECIMAL
+    UnsupportedResultException:
+      type: object
+      properties:
+        message:
+          $ref: '#/components/schemas/ErrorMessage'
+      description: "There was a problem with the result because of one of the following\
+        \ conditions:\n\n  * It contained an unsupported data type.\n\n  * It contained\
+        \ a multidimensional array.\n\n  * The size was too large."
+    UpdateResult:
+      type: object
+      properties:
+        generatedFields:
+          allOf:
+          - $ref: '#/components/schemas/FieldList'
+          description: Values for fields generated during the request.
+      description: The response elements represent the results of an update.
     UpdateResults:
       type: array
       items:

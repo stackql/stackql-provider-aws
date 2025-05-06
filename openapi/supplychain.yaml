@@ -7,7 +7,7 @@ info:
   x-stackql-serviceName: supplychain
   x-aws-serviceName: supplychain
   x-aws-protocol: aws.protocols#restJson1
-  x-dateGenerated: '2025-05-05'
+  x-dateGenerated: '2025-05-07'
   version: '2024-01-01'
   title: AWS Supply Chain
   description: |-
@@ -47,9 +47,1261 @@ servers:
       - sa-east-1
       - me-south-1
       default: us-east-1
-paths: {}
+paths:
+  /api/configuration/instances/{instanceId}/bill-of-materials-import-jobs:
+    post:
+      operationId: CreateBillOfMaterialsImportJob
+      description: |-
+        CreateBillOfMaterialsImportJob creates an import job for the Product Bill Of Materials (BOM) entity. For information on the product_bom entity, see the AWS Supply Chain User Guide.
+
+        The CSV file must be located in an Amazon S3 location accessible to AWS Supply Chain. It is recommended to use the same Amazon S3 bucket created during your AWS Supply Chain instance creation.
+      parameters:
+      - name: instanceId
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/UUID'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                s3uri:
+                  $ref: '#/components/schemas/ConfigurationS3Uri'
+                clientToken:
+                  $ref: '#/components/schemas/ClientToken'
+      responses:
+        '200': {}
+        '403':
+          description: |-
+            You do not have the required privileges to perform this action.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '409':
+          description: |-
+            Updating or deleting a resource can cause an inconsistent state.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConflictException'
+        '500':
+          description: |-
+            Unexpected error during processing of request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerException'
+        '402':
+          description: |-
+            Request would cause a service quota to be exceeded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServiceQuotaExceededException'
+        '429':
+          description: |-
+            Request was denied due to request throttling.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThrottlingException'
+        '400':
+          description: |-
+            The input does not satisfy the constraints specified by an AWS service.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+  /api/data-integration/instance/{instanceId}/data-integration-flows/{name}:
+    put:
+      operationId: CreateDataIntegrationFlow
+      description: |-
+        Enables you to programmatically create a data pipeline to ingest data from source systems such as Amazon S3 buckets, to a predefined Amazon Web Services Supply Chain dataset (product, inbound_order) or a temporary dataset along with the data transformation query provided with the API.
+      parameters:
+      - name: instanceId
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/UUID'
+      - name: name
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/DataIntegrationFlowName'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                sources:
+                  $ref: '#/components/schemas/DataIntegrationFlowSourceList'
+                transformation:
+                  $ref: '#/components/schemas/DataIntegrationFlowTransformation'
+                target:
+                  $ref: '#/components/schemas/DataIntegrationFlowTarget'
+                tags:
+                  $ref: '#/components/schemas/TagMap'
+      responses:
+        '200': {}
+        '403':
+          description: |-
+            You do not have the required privileges to perform this action.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '409':
+          description: |-
+            Updating or deleting a resource can cause an inconsistent state.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConflictException'
+        '500':
+          description: |-
+            Unexpected error during processing of request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerException'
+        '402':
+          description: |-
+            Request would cause a service quota to be exceeded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServiceQuotaExceededException'
+        '429':
+          description: |-
+            Request was denied due to request throttling.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThrottlingException'
+        '400':
+          description: |-
+            The input does not satisfy the constraints specified by an AWS service.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+    delete:
+      operationId: DeleteDataIntegrationFlow
+      description: |-
+        Enable you to programmatically delete an existing data pipeline for the provided Amazon Web Services Supply Chain instance and DataIntegrationFlow name.
+      parameters:
+      - name: instanceId
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/UUID'
+      - name: name
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/DataIntegrationFlowName'
+      responses:
+        '200': {}
+        '403':
+          description: |-
+            You do not have the required privileges to perform this action.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '500':
+          description: |-
+            Unexpected error during processing of request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerException'
+        '404':
+          description: |-
+            Request references a resource which does not exist.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+        '429':
+          description: |-
+            Request was denied due to request throttling.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThrottlingException'
+    get:
+      operationId: GetDataIntegrationFlow
+      description: |-
+        Enables you to programmatically view a specific data pipeline for the provided Amazon Web Services Supply Chain instance and DataIntegrationFlow name.
+      parameters:
+      - name: instanceId
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/UUID'
+      - name: name
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/DataIntegrationFlowName'
+      responses:
+        '200': {}
+        '403':
+          description: |-
+            You do not have the required privileges to perform this action.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '500':
+          description: |-
+            Unexpected error during processing of request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerException'
+        '404':
+          description: |-
+            Request references a resource which does not exist.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+        '429':
+          description: |-
+            Request was denied due to request throttling.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThrottlingException'
+        '400':
+          description: |-
+            The input does not satisfy the constraints specified by an AWS service.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+    patch:
+      operationId: UpdateDataIntegrationFlow
+      description: |-
+        Enables you to programmatically update an existing data pipeline to ingest data from the source systems such as, Amazon S3 buckets, to a predefined Amazon Web Services Supply Chain dataset (product, inbound_order) or a temporary dataset along with the data transformation query provided with the API.
+      parameters:
+      - name: instanceId
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/UUID'
+      - name: name
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/DataIntegrationFlowName'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                sources:
+                  $ref: '#/components/schemas/DataIntegrationFlowSourceList'
+                transformation:
+                  $ref: '#/components/schemas/DataIntegrationFlowTransformation'
+                target:
+                  $ref: '#/components/schemas/DataIntegrationFlowTarget'
+      responses:
+        '200': {}
+        '403':
+          description: |-
+            You do not have the required privileges to perform this action.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '500':
+          description: |-
+            Unexpected error during processing of request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerException'
+        '404':
+          description: |-
+            Request references a resource which does not exist.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+        '429':
+          description: |-
+            Request was denied due to request throttling.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThrottlingException'
+        '400':
+          description: |-
+            The input does not satisfy the constraints specified by an AWS service.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+  /api/datalake/instance/{instanceId}/namespaces/{namespace}/datasets/{name}:
+    put:
+      operationId: CreateDataLakeDataset
+      description: |-
+        Enables you to programmatically create an Amazon Web Services Supply Chain data lake dataset. Developers can create the datasets using their pre-defined or custom schema for a given instance ID, namespace, and dataset name.
+      parameters:
+      - name: instanceId
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/UUID'
+      - name: namespace
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/DataLakeDatasetNamespace'
+      - name: name
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/DataLakeDatasetName'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                schema:
+                  $ref: '#/components/schemas/DataLakeDatasetSchema'
+                description:
+                  $ref: '#/components/schemas/DataLakeDatasetDescription'
+                tags:
+                  $ref: '#/components/schemas/TagMap'
+      responses:
+        '200': {}
+        '403':
+          description: |-
+            You do not have the required privileges to perform this action.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '409':
+          description: |-
+            Updating or deleting a resource can cause an inconsistent state.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConflictException'
+        '500':
+          description: |-
+            Unexpected error during processing of request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerException'
+        '402':
+          description: |-
+            Request would cause a service quota to be exceeded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServiceQuotaExceededException'
+        '429':
+          description: |-
+            Request was denied due to request throttling.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThrottlingException'
+        '400':
+          description: |-
+            The input does not satisfy the constraints specified by an AWS service.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+    delete:
+      operationId: DeleteDataLakeDataset
+      description: |-
+        Enables you to programmatically delete an Amazon Web Services Supply Chain data lake dataset. Developers can delete the existing datasets for a given instance ID, namespace, and instance name.
+      parameters:
+      - name: instanceId
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/UUID'
+      - name: namespace
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/DataLakeDatasetNamespace'
+      - name: name
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/DataLakeDatasetName'
+      responses:
+        '200': {}
+        '403':
+          description: |-
+            You do not have the required privileges to perform this action.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '500':
+          description: |-
+            Unexpected error during processing of request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerException'
+        '404':
+          description: |-
+            Request references a resource which does not exist.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+        '429':
+          description: |-
+            Request was denied due to request throttling.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThrottlingException'
+        '400':
+          description: |-
+            The input does not satisfy the constraints specified by an AWS service.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+    get:
+      operationId: GetDataLakeDataset
+      description: |-
+        Enables you to programmatically view an Amazon Web Services Supply Chain data lake dataset. Developers can view the data lake dataset information such as namespace, schema, and so on for a given instance ID, namespace, and dataset name.
+      parameters:
+      - name: instanceId
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/UUID'
+      - name: namespace
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/DataLakeDatasetNamespace'
+      - name: name
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/DataLakeDatasetName'
+      responses:
+        '200': {}
+        '403':
+          description: |-
+            You do not have the required privileges to perform this action.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '500':
+          description: |-
+            Unexpected error during processing of request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerException'
+        '404':
+          description: |-
+            Request references a resource which does not exist.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+        '429':
+          description: |-
+            Request was denied due to request throttling.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThrottlingException'
+        '400':
+          description: |-
+            The input does not satisfy the constraints specified by an AWS service.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+    patch:
+      operationId: UpdateDataLakeDataset
+      description: |-
+        Enables you to programmatically update an Amazon Web Services Supply Chain data lake dataset. Developers can update the description of a data lake dataset for a given instance ID, namespace, and dataset name.
+      parameters:
+      - name: instanceId
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/UUID'
+      - name: namespace
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/DataLakeDatasetNamespace'
+      - name: name
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/DataLakeDatasetName'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                description:
+                  $ref: '#/components/schemas/DataLakeDatasetDescription'
+      responses:
+        '200': {}
+        '403':
+          description: |-
+            You do not have the required privileges to perform this action.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '500':
+          description: |-
+            Unexpected error during processing of request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerException'
+        '404':
+          description: |-
+            Request references a resource which does not exist.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+        '429':
+          description: |-
+            Request was denied due to request throttling.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThrottlingException'
+        '400':
+          description: |-
+            The input does not satisfy the constraints specified by an AWS service.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+  /api/instance:
+    post:
+      operationId: CreateInstance
+      description: |-
+        Enables you to programmatically create an Amazon Web Services Supply Chain instance by applying KMS keys and relevant information associated with the API without using the Amazon Web Services console.
+
+        This is an asynchronous operation. Upon receiving a CreateInstance request, Amazon Web Services Supply Chain immediately returns the instance resource, instance ID, and the initializing state while simultaneously creating all required Amazon Web Services resources for an instance creation. You can use GetInstance to check the status of the instance. If the instance results in an unhealthy state, you need to check the error message, delete the current instance, and recreate a new one based on the mitigation from the error message.
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                instanceName:
+                  $ref: '#/components/schemas/InstanceName'
+                instanceDescription:
+                  $ref: '#/components/schemas/InstanceDescription'
+                kmsKeyArn:
+                  $ref: '#/components/schemas/KmsKeyArn'
+                webAppDnsDomain:
+                  $ref: '#/components/schemas/InstanceWebAppDnsDomain'
+                tags:
+                  $ref: '#/components/schemas/TagMap'
+                clientToken:
+                  $ref: '#/components/schemas/ClientToken'
+      responses:
+        '200': {}
+        '403':
+          description: |-
+            You do not have the required privileges to perform this action.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '409':
+          description: |-
+            Updating or deleting a resource can cause an inconsistent state.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConflictException'
+        '500':
+          description: |-
+            Unexpected error during processing of request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerException'
+        '402':
+          description: |-
+            Request would cause a service quota to be exceeded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServiceQuotaExceededException'
+        '429':
+          description: |-
+            Request was denied due to request throttling.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThrottlingException'
+        '400':
+          description: |-
+            The input does not satisfy the constraints specified by an AWS service.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+    get:
+      operationId: ListInstances
+      description: |-
+        List all Amazon Web Services Supply Chain instances for a specific account. Enables you to programmatically list all Amazon Web Services Supply Chain instances based on their account ID, instance name, and state of the instance (active or delete).
+      parameters:
+      - name: nextToken
+        in: query
+        required: false
+        schema:
+          $ref: '#/components/schemas/InstanceNextToken'
+      - name: maxResults
+        in: query
+        required: false
+        schema:
+          $ref: '#/components/schemas/InstanceMaxResults'
+      - name: instanceNameFilter
+        in: query
+        required: false
+        schema:
+          $ref: '#/components/schemas/InstanceNameList'
+      - name: instanceStateFilter
+        in: query
+        required: false
+        schema:
+          $ref: '#/components/schemas/InstanceStateList'
+      responses:
+        '200': {}
+        '403':
+          description: |-
+            You do not have the required privileges to perform this action.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '500':
+          description: |-
+            Unexpected error during processing of request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerException'
+        '429':
+          description: |-
+            Request was denied due to request throttling.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThrottlingException'
+        '400':
+          description: |-
+            The input does not satisfy the constraints specified by an AWS service.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+  /api/instance/{instanceId}:
+    delete:
+      operationId: DeleteInstance
+      description: |-
+        Enables you to programmatically delete an Amazon Web Services Supply Chain instance by deleting the KMS keys and relevant information associated with the API without using the Amazon Web Services console.
+
+        This is an asynchronous operation. Upon receiving a DeleteInstance request, Amazon Web Services Supply Chain immediately returns a response with the instance resource, delete state while cleaning up all Amazon Web Services resources created during the instance creation process. You can use the GetInstance action to check the instance status.
+      parameters:
+      - name: instanceId
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/UUID'
+      responses:
+        '200': {}
+        '403':
+          description: |-
+            You do not have the required privileges to perform this action.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '500':
+          description: |-
+            Unexpected error during processing of request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerException'
+        '404':
+          description: |-
+            Request references a resource which does not exist.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+        '429':
+          description: |-
+            Request was denied due to request throttling.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThrottlingException'
+        '400':
+          description: |-
+            The input does not satisfy the constraints specified by an AWS service.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+    get:
+      operationId: GetInstance
+      description: |-
+        Enables you to programmatically retrieve the information related to an Amazon Web Services Supply Chain instance ID.
+      parameters:
+      - name: instanceId
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/UUID'
+      responses:
+        '200': {}
+        '403':
+          description: |-
+            You do not have the required privileges to perform this action.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '500':
+          description: |-
+            Unexpected error during processing of request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerException'
+        '404':
+          description: |-
+            Request references a resource which does not exist.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+        '429':
+          description: |-
+            Request was denied due to request throttling.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThrottlingException'
+        '400':
+          description: |-
+            The input does not satisfy the constraints specified by an AWS service.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+    patch:
+      operationId: UpdateInstance
+      description: |-
+        Enables you to programmatically update an Amazon Web Services Supply Chain instance description by providing all the relevant information such as account ID, instance ID and so on without using the AWS console.
+      parameters:
+      - name: instanceId
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/UUID'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                instanceName:
+                  $ref: '#/components/schemas/InstanceName'
+                instanceDescription:
+                  $ref: '#/components/schemas/InstanceDescription'
+      responses:
+        '200': {}
+        '403':
+          description: |-
+            You do not have the required privileges to perform this action.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '500':
+          description: |-
+            Unexpected error during processing of request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerException'
+        '404':
+          description: |-
+            Request references a resource which does not exist.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+        '429':
+          description: |-
+            Request was denied due to request throttling.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThrottlingException'
+        '400':
+          description: |-
+            The input does not satisfy the constraints specified by an AWS service.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+  /api/configuration/instances/{instanceId}/bill-of-materials-import-jobs/{jobId}:
+    get:
+      operationId: GetBillOfMaterialsImportJob
+      description: |-
+        Get status and details of a BillOfMaterialsImportJob.
+      parameters:
+      - name: instanceId
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/UUID'
+      - name: jobId
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/UUID'
+      responses:
+        '200': {}
+        '403':
+          description: |-
+            You do not have the required privileges to perform this action.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '500':
+          description: |-
+            Unexpected error during processing of request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerException'
+        '404':
+          description: |-
+            Request references a resource which does not exist.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+        '429':
+          description: |-
+            Request was denied due to request throttling.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThrottlingException'
+        '400':
+          description: |-
+            The input does not satisfy the constraints specified by an AWS service.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+  /api/data-integration/instance/{instanceId}/data-integration-flows:
+    get:
+      operationId: ListDataIntegrationFlows
+      description: |-
+        Enables you to programmatically list all data pipelines for the provided Amazon Web Services Supply Chain instance.
+      parameters:
+      - name: instanceId
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/UUID'
+      - name: nextToken
+        in: query
+        required: false
+        schema:
+          $ref: '#/components/schemas/DataIntegrationFlowNextToken'
+      - name: maxResults
+        in: query
+        required: false
+        schema:
+          $ref: '#/components/schemas/DataIntegrationFlowMaxResults'
+      responses:
+        '200': {}
+        '403':
+          description: |-
+            You do not have the required privileges to perform this action.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '500':
+          description: |-
+            Unexpected error during processing of request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerException'
+        '429':
+          description: |-
+            Request was denied due to request throttling.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThrottlingException'
+        '400':
+          description: |-
+            The input does not satisfy the constraints specified by an AWS service.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+  /api/datalake/instance/{instanceId}/namespaces/{namespace}/datasets:
+    get:
+      operationId: ListDataLakeDatasets
+      description: |-
+        Enables you to programmatically view the list of Amazon Web Services Supply Chain data lake datasets. Developers can view the datasets and the corresponding information such as namespace, schema, and so on for a given instance ID and namespace.
+      parameters:
+      - name: instanceId
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/UUID'
+      - name: namespace
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/DataLakeDatasetNamespace'
+      - name: nextToken
+        in: query
+        required: false
+        schema:
+          $ref: '#/components/schemas/DataLakeDatasetNextToken'
+      - name: maxResults
+        in: query
+        required: false
+        schema:
+          $ref: '#/components/schemas/DataLakeDatasetMaxResults'
+      responses:
+        '200': {}
+        '403':
+          description: |-
+            You do not have the required privileges to perform this action.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '500':
+          description: |-
+            Unexpected error during processing of request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerException'
+        '404':
+          description: |-
+            Request references a resource which does not exist.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+        '429':
+          description: |-
+            Request was denied due to request throttling.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThrottlingException'
+        '400':
+          description: |-
+            The input does not satisfy the constraints specified by an AWS service.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+  /api/tags/{resourceArn}:
+    get:
+      operationId: ListTagsForResource
+      description: |-
+        List all the tags for an Amazon Web ServicesSupply Chain resource. You can list all the tags added to a resource. By listing the tags, developers can view the tag level information on a resource and perform actions such as, deleting a resource associated with a particular tag.
+      parameters:
+      - name: resourceArn
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/AscResourceArn'
+      responses:
+        '200': {}
+        '403':
+          description: |-
+            You do not have the required privileges to perform this action.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '500':
+          description: |-
+            Unexpected error during processing of request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerException'
+        '404':
+          description: |-
+            Request references a resource which does not exist.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+        '429':
+          description: |-
+            Request was denied due to request throttling.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThrottlingException'
+        '400':
+          description: |-
+            The input does not satisfy the constraints specified by an AWS service.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+    post:
+      operationId: TagResource
+      description: |-
+        You can create tags during or after creating a resource such as instance, data flow, or dataset in AWS Supply chain. During the data ingestion process, you can add tags such as dev, test, or prod to data flows created during the data ingestion process in the AWS Supply Chain datasets. You can use these tags to identify a group of resources or a single resource used by the developer.
+      parameters:
+      - name: resourceArn
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/AscResourceArn'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                tags:
+                  $ref: '#/components/schemas/TagMap'
+      responses:
+        '200': {}
+        '403':
+          description: |-
+            You do not have the required privileges to perform this action.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '500':
+          description: |-
+            Unexpected error during processing of request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerException'
+        '404':
+          description: |-
+            Request references a resource which does not exist.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+        '429':
+          description: |-
+            Request was denied due to request throttling.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThrottlingException'
+        '400':
+          description: |-
+            The input does not satisfy the constraints specified by an AWS service.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+    delete:
+      operationId: UntagResource
+      description: |-
+        You can delete tags for an Amazon Web Services Supply chain resource such as instance, data flow, or dataset in AWS Supply Chain. During the data ingestion process, you can delete tags such as dev, test, or prod to data flows created during the data ingestion process in the AWS Supply Chain datasets.
+      parameters:
+      - name: resourceArn
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/AscResourceArn'
+      - name: tagKeys
+        in: query
+        required: true
+        schema:
+          $ref: '#/components/schemas/TagKeyList'
+      responses:
+        '200': {}
+        '403':
+          description: |-
+            You do not have the required privileges to perform this action.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '500':
+          description: |-
+            Unexpected error during processing of request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerException'
+        '404':
+          description: |-
+            Request references a resource which does not exist.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+        '429':
+          description: |-
+            Request was denied due to request throttling.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThrottlingException'
+        '400':
+          description: |-
+            The input does not satisfy the constraints specified by an AWS service.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+  /api-data/data-integration/instance/{instanceId}/data-integration-events:
+    post:
+      operationId: SendDataIntegrationEvent
+      description: |-
+        Send the transactional data payload for the event with real-time data for analysis or monitoring. The real-time data events are stored in an Amazon Web Services service before being processed and stored in data lake. New data events are synced with data lake at 5 PM GMT everyday. The updated transactional data is available in data lake after ingestion.
+      parameters:
+      - name: instanceId
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/UUID'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                eventType:
+                  $ref: '#/components/schemas/DataIntegrationEventType'
+                data:
+                  $ref: '#/components/schemas/DataIntegrationEventData'
+                eventGroupId:
+                  $ref: '#/components/schemas/DataIntegrationEventGroupId'
+                eventTimestamp:
+                  $ref: '#/components/schemas/Timestamp'
+                clientToken:
+                  $ref: '#/components/schemas/ClientToken'
+      responses:
+        '200': {}
+        '403':
+          description: |-
+            You do not have the required privileges to perform this action.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '409':
+          description: |-
+            Updating or deleting a resource can cause an inconsistent state.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConflictException'
+        '500':
+          description: |-
+            Unexpected error during processing of request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerException'
+        '404':
+          description: |-
+            Request references a resource which does not exist.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+        '402':
+          description: |-
+            Request would cause a service quota to be exceeded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServiceQuotaExceededException'
+        '429':
+          description: |-
+            Request was denied due to request throttling.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThrottlingException'
+        '400':
+          description: |-
+            The input does not satisfy the constraints specified by an AWS service.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
 components:
   schemas:
+    AccessDeniedException:
+      type: object
+      properties:
+        message:
+          $ref: '#/components/schemas/String'
+      description: You do not have the required privileges to perform this action.
     AscResourceArn:
       type: string
       pattern: ^arn:aws:scn(?::([a-z0-9-]+):([0-9]+):instance)?/([a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12})[-_./A-Za-z0-9]*$
@@ -58,6 +1310,36 @@ components:
     AwsAccountId:
       type: string
       pattern: ^[0-9]{12}$
+    BillOfMaterialsImportJob:
+      type: object
+      properties:
+        instanceId:
+          allOf:
+          - $ref: '#/components/schemas/UUID'
+          description: The BillOfMaterialsImportJob instanceId.
+        jobId:
+          allOf:
+          - $ref: '#/components/schemas/UUID'
+          description: The BillOfMaterialsImportJob jobId.
+        status:
+          allOf:
+          - $ref: '#/components/schemas/ConfigurationJobStatus'
+          description: The BillOfMaterialsImportJob ConfigurationJobStatus.
+        s3uri:
+          allOf:
+          - $ref: '#/components/schemas/ConfigurationS3Uri'
+          description: The S3 URI from which the CSV is read.
+        message:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: When the BillOfMaterialsImportJob has reached a terminal state,
+            there will be a message.
+      required:
+      - instanceId
+      - jobId
+      - status
+      - s3uri
+      description: The BillOfMaterialsImportJob details.
     ClientToken:
       type: string
       minLength: 33
@@ -75,6 +1357,188 @@ components:
       type: string
       pattern: ^[sS]3://[a-z0-9][a-z0-9.-]{1,61}[a-z0-9]/.+$
       minLength: 10
+    ConflictException:
+      type: object
+      properties:
+        message:
+          $ref: '#/components/schemas/String'
+      description: Updating or deleting a resource can cause an inconsistent state.
+    CreateBillOfMaterialsImportJobRequest:
+      type: object
+      properties:
+        instanceId:
+          allOf:
+          - $ref: '#/components/schemas/UUID'
+          description: The AWS Supply Chain instance identifier.
+        s3uri:
+          allOf:
+          - $ref: '#/components/schemas/ConfigurationS3Uri'
+          description: The S3 URI of the CSV file to be imported. The bucket must
+            grant permissions for AWS Supply Chain to read the file.
+        clientToken:
+          allOf:
+          - $ref: '#/components/schemas/ClientToken'
+          description: An idempotency token ensures the API request is only completed
+            no more than once. This way, retrying the request will not trigger the
+            operation multiple times. A client token is a unique, case-sensitive string
+            of 33 to 128 ASCII characters. To make an idempotent API request, specify
+            a client token in the request. You should not reuse the same client token
+            for other requests. If you retry a successful request with the same client
+            token, the request will succeed with no further actions being taken, and
+            you will receive the same API response as the original successful request.
+      required:
+      - instanceId
+      - s3uri
+      description: The request parameters for CreateBillOfMaterialsImportJob.
+    CreateBillOfMaterialsImportJobResponse:
+      type: object
+      properties:
+        jobId:
+          allOf:
+          - $ref: '#/components/schemas/UUID'
+          description: The new BillOfMaterialsImportJob identifier.
+      required:
+      - jobId
+      description: The response parameters of CreateBillOfMaterialsImportJob.
+    CreateDataIntegrationFlowRequest:
+      type: object
+      properties:
+        instanceId:
+          allOf:
+          - $ref: '#/components/schemas/UUID'
+          description: The Amazon Web Services Supply Chain instance identifier.
+        name:
+          allOf:
+          - $ref: '#/components/schemas/DataIntegrationFlowName'
+          description: Name of the DataIntegrationFlow.
+        sources:
+          allOf:
+          - $ref: '#/components/schemas/DataIntegrationFlowSourceList'
+          description: The source configurations for DataIntegrationFlow.
+        transformation:
+          allOf:
+          - $ref: '#/components/schemas/DataIntegrationFlowTransformation'
+          description: The transformation configurations for DataIntegrationFlow.
+        target:
+          allOf:
+          - $ref: '#/components/schemas/DataIntegrationFlowTarget'
+          description: The target configurations for DataIntegrationFlow.
+        tags:
+          allOf:
+          - $ref: '#/components/schemas/TagMap'
+          description: The tags of the DataIntegrationFlow to be created
+      required:
+      - instanceId
+      - name
+      - sources
+      - transformation
+      - target
+      description: The request parameters for CreateDataIntegrationFlow.
+    CreateDataIntegrationFlowResponse:
+      type: object
+      properties:
+        instanceId:
+          allOf:
+          - $ref: '#/components/schemas/UUID'
+          description: The Amazon Web Services Supply Chain instance identifier.
+        name:
+          allOf:
+          - $ref: '#/components/schemas/DataIntegrationFlowName'
+          description: The name of the DataIntegrationFlow created.
+      required:
+      - instanceId
+      - name
+      description: The response parameters for CreateDataIntegrationFlow.
+    CreateDataLakeDatasetRequest:
+      type: object
+      properties:
+        instanceId:
+          allOf:
+          - $ref: '#/components/schemas/UUID'
+          description: The Amazon Web Services Supply Chain instance identifier.
+        namespace:
+          allOf:
+          - $ref: '#/components/schemas/DataLakeDatasetNamespace'
+          description: "The name space of the dataset.\n\n  * **asc** \\- For information\
+            \ on the Amazon Web Services Supply Chain supported datasets see <https://docs.aws.amazon.com/aws-supply-chain/latest/userguide/data-model-asc.html>.\n\
+            \n  * **default** \\- For datasets with custom user-defined schemas."
+        name:
+          allOf:
+          - $ref: '#/components/schemas/DataLakeDatasetName'
+          description: The name of the dataset. For **asc** name space, the name must
+            be one of the supported data entities under <https://docs.aws.amazon.com/aws-supply-chain/latest/userguide/data-model-asc.html>.
+        schema:
+          allOf:
+          - $ref: '#/components/schemas/DataLakeDatasetSchema'
+          description: The custom schema of the data lake dataset and is only required
+            when the name space is **default**.
+        description:
+          allOf:
+          - $ref: '#/components/schemas/DataLakeDatasetDescription'
+          description: The description of the dataset.
+        tags:
+          allOf:
+          - $ref: '#/components/schemas/TagMap'
+          description: The tags of the dataset.
+      required:
+      - instanceId
+      - namespace
+      - name
+      description: The request parameters for CreateDataLakeDataset.
+    CreateDataLakeDatasetResponse:
+      type: object
+      properties:
+        dataset:
+          allOf:
+          - $ref: '#/components/schemas/DataLakeDataset'
+          description: The detail of created dataset.
+      required:
+      - dataset
+      description: The response parameters of CreateDataLakeDataset.
+    CreateInstanceRequest:
+      type: object
+      properties:
+        instanceName:
+          allOf:
+          - $ref: '#/components/schemas/InstanceName'
+          description: The AWS Supply Chain instance name.
+        instanceDescription:
+          allOf:
+          - $ref: '#/components/schemas/InstanceDescription'
+          description: The AWS Supply Chain instance description.
+        kmsKeyArn:
+          allOf:
+          - $ref: '#/components/schemas/KmsKeyArn'
+          description: The ARN (Amazon Resource Name) of the Key Management Service
+            (KMS) key you provide for encryption. This is required if you do not want
+            to use the Amazon Web Services owned KMS key. If you don't provide anything
+            here, AWS Supply Chain uses the Amazon Web Services owned KMS key.
+        webAppDnsDomain:
+          allOf:
+          - $ref: '#/components/schemas/InstanceWebAppDnsDomain'
+          description: The DNS subdomain of the web app. This would be "example" in
+            the URL "example.scn.global.on.aws". You can set this to a custom value,
+            as long as the domain isn't already being used by someone else. The name
+            may only include alphanumeric characters and hyphens.
+        tags:
+          allOf:
+          - $ref: '#/components/schemas/TagMap'
+          description: The Amazon Web Services tags of an instance to be created.
+        clientToken:
+          allOf:
+          - $ref: '#/components/schemas/ClientToken'
+          description: The client token for idempotency.
+      description: The request parameters for CreateInstance.
+    CreateInstanceResponse:
+      type: object
+      properties:
+        instance:
+          allOf:
+          - $ref: '#/components/schemas/Instance'
+          description: The AWS Supply Chain instance resource data details.
+      required:
+      - instance
+      description: The response parameters for CreateInstance.
     DataIntegrationEventData:
       type: string
       minLength: 1
@@ -101,6 +1565,86 @@ components:
       - scn.data.shipmentstop
       - scn.data.shipmentstoporder
       - scn.data.supplyplan
+    DataIntegrationFlow:
+      type: object
+      properties:
+        instanceId:
+          allOf:
+          - $ref: '#/components/schemas/UUID'
+          description: The DataIntegrationFlow instance ID.
+        name:
+          allOf:
+          - $ref: '#/components/schemas/DataIntegrationFlowName'
+          description: The DataIntegrationFlow name.
+        sources:
+          allOf:
+          - $ref: '#/components/schemas/DataIntegrationFlowSourceList'
+          description: The DataIntegrationFlow source configurations.
+        transformation:
+          allOf:
+          - $ref: '#/components/schemas/DataIntegrationFlowTransformation'
+          description: The DataIntegrationFlow transformation configurations.
+        target:
+          allOf:
+          - $ref: '#/components/schemas/DataIntegrationFlowTarget'
+          description: The DataIntegrationFlow target configuration.
+        createdTime:
+          allOf:
+          - $ref: '#/components/schemas/Timestamp'
+          description: The DataIntegrationFlow creation timestamp.
+        lastModifiedTime:
+          allOf:
+          - $ref: '#/components/schemas/Timestamp'
+          description: The DataIntegrationFlow last modified timestamp.
+      required:
+      - instanceId
+      - name
+      - sources
+      - transformation
+      - target
+      - createdTime
+      - lastModifiedTime
+      description: The DataIntegrationFlow details.
+    DataIntegrationFlowDatasetOptions:
+      type: object
+      properties:
+        loadType:
+          allOf:
+          - $ref: '#/components/schemas/DataIntegrationFlowLoadType'
+          description: The dataset data load type in dataset options.
+        dedupeRecords:
+          allOf:
+          - $ref: '#/components/schemas/Boolean'
+          description: The dataset load option to remove duplicates.
+      description: The dataset options used in dataset source and target configurations.
+    DataIntegrationFlowDatasetSourceConfiguration:
+      type: object
+      properties:
+        datasetIdentifier:
+          allOf:
+          - $ref: '#/components/schemas/DatasetIdentifier'
+          description: The ARN of the dataset.
+        options:
+          allOf:
+          - $ref: '#/components/schemas/DataIntegrationFlowDatasetOptions'
+          description: The dataset DataIntegrationFlow source options.
+      required:
+      - datasetIdentifier
+      description: The dataset DataIntegrationFlow source configuration parameters.
+    DataIntegrationFlowDatasetTargetConfiguration:
+      type: object
+      properties:
+        datasetIdentifier:
+          allOf:
+          - $ref: '#/components/schemas/DatasetIdentifier'
+          description: The dataset ARN.
+        options:
+          allOf:
+          - $ref: '#/components/schemas/DataIntegrationFlowDatasetOptions'
+          description: The dataset DataIntegrationFlow target options.
+      required:
+      - datasetIdentifier
+      description: The dataset DataIntegrationFlow target configuration parameters.
     DataIntegrationFlowFileType:
       type: string
       enum:
@@ -130,15 +1674,95 @@ components:
       type: string
       minLength: 1
       maxLength: 65535
+    DataIntegrationFlowS3Options:
+      type: object
+      properties:
+        fileType:
+          allOf:
+          - $ref: '#/components/schemas/DataIntegrationFlowFileType'
+          description: The Amazon S3 file type in S3 options.
+      description: The Amazon S3 options used in S3 source and target configurations.
     DataIntegrationFlowS3Prefix:
       type: string
       pattern: ^[/A-Za-z0-9._-]+$
       minLength: 0
       maxLength: 700
+    DataIntegrationFlowS3SourceConfiguration:
+      type: object
+      properties:
+        bucketName:
+          allOf:
+          - $ref: '#/components/schemas/S3BucketName'
+          description: The bucketName of the S3 source objects.
+        prefix:
+          allOf:
+          - $ref: '#/components/schemas/DataIntegrationFlowS3Prefix'
+          description: The prefix of the S3 source objects.
+        options:
+          allOf:
+          - $ref: '#/components/schemas/DataIntegrationFlowS3Options'
+          description: The other options of the S3 DataIntegrationFlow source.
+      required:
+      - bucketName
+      - prefix
+      description: The S3 DataIntegrationFlow source configuration parameters.
+    DataIntegrationFlowS3TargetConfiguration:
+      type: object
+      properties:
+        bucketName:
+          allOf:
+          - $ref: '#/components/schemas/S3BucketName'
+          description: The bucketName of the S3 target objects.
+        prefix:
+          allOf:
+          - $ref: '#/components/schemas/DataIntegrationFlowS3Prefix'
+          description: The prefix of the S3 target objects.
+        options:
+          allOf:
+          - $ref: '#/components/schemas/DataIntegrationFlowS3Options'
+          description: The S3 DataIntegrationFlow target options.
+      required:
+      - bucketName
+      - prefix
+      description: The S3 DataIntegrationFlow target configuration parameters.
     DataIntegrationFlowSQLQuery:
       type: string
       minLength: 1
       maxLength: 65535
+    DataIntegrationFlowSQLTransformationConfiguration:
+      type: object
+      properties:
+        query:
+          allOf:
+          - $ref: '#/components/schemas/DataIntegrationFlowSQLQuery'
+          description: The transformation SQL query body based on SparkSQL.
+      required:
+      - query
+      description: The SQL DataIntegrationFlow transformation configuration parameters.
+    DataIntegrationFlowSource:
+      type: object
+      properties:
+        sourceType:
+          allOf:
+          - $ref: '#/components/schemas/DataIntegrationFlowSourceType'
+          description: The DataIntegrationFlow source type.
+        sourceName:
+          allOf:
+          - $ref: '#/components/schemas/DataIntegrationFlowSourceName'
+          description: The DataIntegrationFlow source name that can be used as table
+            alias in SQL transformation query.
+        s3Source:
+          allOf:
+          - $ref: '#/components/schemas/DataIntegrationFlowS3SourceConfiguration'
+          description: The S3 DataIntegrationFlow source.
+        datasetSource:
+          allOf:
+          - $ref: '#/components/schemas/DataIntegrationFlowDatasetSourceConfiguration'
+          description: The dataset DataIntegrationFlow source.
+      required:
+      - sourceType
+      - sourceName
+      description: The DataIntegrationFlow source parameters.
     DataIntegrationFlowSourceList:
       type: array
       items:
@@ -153,16 +1777,96 @@ components:
       enum:
       - S3
       - DATASET
+    DataIntegrationFlowTarget:
+      type: object
+      properties:
+        targetType:
+          allOf:
+          - $ref: '#/components/schemas/DataIntegrationFlowTargetType'
+          description: The DataIntegrationFlow target type.
+        s3Target:
+          allOf:
+          - $ref: '#/components/schemas/DataIntegrationFlowS3TargetConfiguration'
+          description: The S3 DataIntegrationFlow target.
+        datasetTarget:
+          allOf:
+          - $ref: '#/components/schemas/DataIntegrationFlowDatasetTargetConfiguration'
+          description: The dataset DataIntegrationFlow target.
+      required:
+      - targetType
+      description: The DataIntegrationFlow target parameters.
     DataIntegrationFlowTargetType:
       type: string
       enum:
       - S3
       - DATASET
+    DataIntegrationFlowTransformation:
+      type: object
+      properties:
+        transformationType:
+          allOf:
+          - $ref: '#/components/schemas/DataIntegrationFlowTransformationType'
+          description: The DataIntegrationFlow transformation type.
+        sqlTransformation:
+          allOf:
+          - $ref: '#/components/schemas/DataIntegrationFlowSQLTransformationConfiguration'
+          description: The SQL DataIntegrationFlow transformation configuration.
+      required:
+      - transformationType
+      description: The DataIntegrationFlow transformation parameters.
     DataIntegrationFlowTransformationType:
       type: string
       enum:
       - SQL
       - NONE
+    DataLakeDataset:
+      type: object
+      properties:
+        instanceId:
+          allOf:
+          - $ref: '#/components/schemas/UUID'
+          description: The Amazon Web Services Supply Chain instance identifier.
+        namespace:
+          allOf:
+          - $ref: '#/components/schemas/DataLakeDatasetNamespace'
+          description: "The name space of the dataset. The available values are:\n\
+            \n  * **asc** \\- For information on the Amazon Web Services Supply Chain\
+            \ supported datasets see <https://docs.aws.amazon.com/aws-supply-chain/latest/userguide/data-model-asc.html>.\n\
+            \n  * **default** \\- For datasets with custom user-defined schemas."
+        name:
+          allOf:
+          - $ref: '#/components/schemas/DataLakeDatasetName'
+          description: The name of the dataset. For **asc** name space, the name must
+            be one of the supported data entities under <https://docs.aws.amazon.com/aws-supply-chain/latest/userguide/data-model-asc.html>.
+        arn:
+          allOf:
+          - $ref: '#/components/schemas/AscResourceArn'
+          description: The arn of the dataset.
+        schema:
+          allOf:
+          - $ref: '#/components/schemas/DataLakeDatasetSchema'
+          description: The schema of the dataset.
+        description:
+          allOf:
+          - $ref: '#/components/schemas/DataLakeDatasetDescription'
+          description: The description of the dataset.
+        createdTime:
+          allOf:
+          - $ref: '#/components/schemas/Timestamp'
+          description: The creation time of the dataset.
+        lastModifiedTime:
+          allOf:
+          - $ref: '#/components/schemas/Timestamp'
+          description: The last modified time of the dataset.
+      required:
+      - instanceId
+      - namespace
+      - name
+      - arn
+      - schema
+      - createdTime
+      - lastModifiedTime
+      description: The data lake dataset details.
     DataLakeDatasetDescription:
       type: string
       minLength: 1
@@ -190,6 +1894,41 @@ components:
       type: string
       minLength: 1
       maxLength: 65535
+    DataLakeDatasetSchema:
+      type: object
+      properties:
+        name:
+          allOf:
+          - $ref: '#/components/schemas/DataLakeDatasetSchemaName'
+          description: The name of the dataset schema.
+        fields:
+          allOf:
+          - $ref: '#/components/schemas/DataLakeDatasetSchemaFieldList'
+          description: The list of field details of the dataset schema.
+      required:
+      - name
+      - fields
+      description: The schema details of the dataset.
+    DataLakeDatasetSchemaField:
+      type: object
+      properties:
+        name:
+          allOf:
+          - $ref: '#/components/schemas/DataLakeDatasetSchemaFieldName'
+          description: The dataset field name.
+        type:
+          allOf:
+          - $ref: '#/components/schemas/DataLakeDatasetSchemaFieldType'
+          description: The dataset field type.
+        isRequired:
+          allOf:
+          - $ref: '#/components/schemas/Boolean'
+          description: Indicate if the field is required or not.
+      required:
+      - name
+      - type
+      - isRequired
+      description: The dataset field details.
     DataLakeDatasetSchemaFieldList:
       type: array
       items:
@@ -216,6 +1955,262 @@ components:
       pattern: ^[-_/A-Za-z0-9:]+$
       minLength: 1
       maxLength: 1011
+    DeleteDataIntegrationFlowRequest:
+      type: object
+      properties:
+        instanceId:
+          allOf:
+          - $ref: '#/components/schemas/UUID'
+          description: The Amazon Web Services Supply Chain instance identifier.
+        name:
+          allOf:
+          - $ref: '#/components/schemas/DataIntegrationFlowName'
+          description: The name of the DataIntegrationFlow to be deleted.
+      required:
+      - instanceId
+      - name
+      description: The request parameters for DeleteDataIntegrationFlow.
+    DeleteDataIntegrationFlowResponse:
+      type: object
+      properties:
+        instanceId:
+          allOf:
+          - $ref: '#/components/schemas/UUID'
+          description: The Amazon Web Services Supply Chain instance identifier.
+        name:
+          allOf:
+          - $ref: '#/components/schemas/DataIntegrationFlowName'
+          description: The name of the DataIntegrationFlow deleted.
+      required:
+      - instanceId
+      - name
+      description: The response parameters for DeleteDataIntegrationFlow.
+    DeleteDataLakeDatasetRequest:
+      type: object
+      properties:
+        instanceId:
+          allOf:
+          - $ref: '#/components/schemas/UUID'
+          description: The AWS Supply Chain instance identifier.
+        namespace:
+          allOf:
+          - $ref: '#/components/schemas/DataLakeDatasetNamespace'
+          description: "The name space of the dataset. The available values are:\n\
+            \n  * **asc** \\- For information on the Amazon Web Services Supply Chain\
+            \ supported datasets see <https://docs.aws.amazon.com/aws-supply-chain/latest/userguide/data-model-asc.html>.\n\
+            \n  * **default** \\- For datasets with custom user-defined schemas."
+        name:
+          allOf:
+          - $ref: '#/components/schemas/DataLakeDatasetName'
+          description: The name of the dataset. For **asc** name space, the name must
+            be one of the supported data entities under <https://docs.aws.amazon.com/aws-supply-chain/latest/userguide/data-model-asc.html>.
+      required:
+      - instanceId
+      - namespace
+      - name
+      description: The request parameters of DeleteDataLakeDataset.
+    DeleteDataLakeDatasetResponse:
+      type: object
+      properties:
+        instanceId:
+          allOf:
+          - $ref: '#/components/schemas/UUID'
+          description: The AWS Supply Chain instance identifier.
+        namespace:
+          allOf:
+          - $ref: '#/components/schemas/DataLakeDatasetNamespace'
+          description: The name space of deleted dataset.
+        name:
+          allOf:
+          - $ref: '#/components/schemas/DataLakeDatasetName'
+          description: The name of deleted dataset.
+      required:
+      - instanceId
+      - namespace
+      - name
+      description: The response parameters of DeleteDataLakeDataset.
+    DeleteInstanceRequest:
+      type: object
+      properties:
+        instanceId:
+          allOf:
+          - $ref: '#/components/schemas/UUID'
+          description: The AWS Supply Chain instance identifier.
+      required:
+      - instanceId
+      description: The request parameters for DeleteInstance.
+    DeleteInstanceResponse:
+      type: object
+      properties:
+        instance:
+          allOf:
+          - $ref: '#/components/schemas/Instance'
+          description: The AWS Supply Chain instance resource data details.
+      required:
+      - instance
+      description: The response parameters for DeleteInstance.
+    GetBillOfMaterialsImportJobRequest:
+      type: object
+      properties:
+        instanceId:
+          allOf:
+          - $ref: '#/components/schemas/UUID'
+          description: The AWS Supply Chain instance identifier.
+        jobId:
+          allOf:
+          - $ref: '#/components/schemas/UUID'
+          description: The BillOfMaterialsImportJob identifier.
+      required:
+      - instanceId
+      - jobId
+      description: The request parameters for GetBillOfMaterialsImportJob.
+    GetBillOfMaterialsImportJobResponse:
+      type: object
+      properties:
+        job:
+          allOf:
+          - $ref: '#/components/schemas/BillOfMaterialsImportJob'
+          description: The BillOfMaterialsImportJob.
+      required:
+      - job
+      description: The response parameters for GetBillOfMaterialsImportJob.
+    GetDataIntegrationFlowRequest:
+      type: object
+      properties:
+        instanceId:
+          allOf:
+          - $ref: '#/components/schemas/UUID'
+          description: The Amazon Web Services Supply Chain instance identifier.
+        name:
+          allOf:
+          - $ref: '#/components/schemas/DataIntegrationFlowName'
+          description: The name of the DataIntegrationFlow created.
+      required:
+      - instanceId
+      - name
+      description: The request parameters for GetDataIntegrationFlow.
+    GetDataIntegrationFlowResponse:
+      type: object
+      properties:
+        flow:
+          allOf:
+          - $ref: '#/components/schemas/DataIntegrationFlow'
+          description: The details of the DataIntegrationFlow returned.
+      required:
+      - flow
+      description: The response parameters for GetDataIntegrationFlow.
+    GetDataLakeDatasetRequest:
+      type: object
+      properties:
+        instanceId:
+          allOf:
+          - $ref: '#/components/schemas/UUID'
+          description: The Amazon Web Services Supply Chain instance identifier.
+        namespace:
+          allOf:
+          - $ref: '#/components/schemas/DataLakeDatasetNamespace'
+          description: "The name space of the dataset. The available values are:\n\
+            \n  * **asc** \\- For information on the Amazon Web Services Supply Chain\
+            \ supported datasets see <https://docs.aws.amazon.com/aws-supply-chain/latest/userguide/data-model-asc.html>.\n\
+            \n  * **default** \\- For datasets with custom user-defined schemas."
+        name:
+          allOf:
+          - $ref: '#/components/schemas/DataLakeDatasetName'
+          description: The name of the dataset. For **asc** name space, the name must
+            be one of the supported data entities under <https://docs.aws.amazon.com/aws-supply-chain/latest/userguide/data-model-asc.html>.
+      required:
+      - instanceId
+      - namespace
+      - name
+      description: The request parameters for GetDataLakeDataset.
+    GetDataLakeDatasetResponse:
+      type: object
+      properties:
+        dataset:
+          allOf:
+          - $ref: '#/components/schemas/DataLakeDataset'
+          description: The fetched dataset details.
+      required:
+      - dataset
+      description: The response parameters for UpdateDataLakeDataset.
+    GetInstanceRequest:
+      type: object
+      properties:
+        instanceId:
+          allOf:
+          - $ref: '#/components/schemas/UUID'
+          description: The AWS Supply Chain instance identifier
+      required:
+      - instanceId
+      description: The request parameters for GetInstance.
+    GetInstanceResponse:
+      type: object
+      properties:
+        instance:
+          allOf:
+          - $ref: '#/components/schemas/Instance'
+          description: The instance resource data details.
+      required:
+      - instance
+      description: The response parameters for GetInstance.
+    Instance:
+      type: object
+      properties:
+        instanceId:
+          allOf:
+          - $ref: '#/components/schemas/UUID'
+          description: The Amazon Web Services Supply Chain instance identifier.
+        awsAccountId:
+          allOf:
+          - $ref: '#/components/schemas/AwsAccountId'
+          description: The Amazon Web Services account ID that owns the instance.
+        state:
+          allOf:
+          - $ref: '#/components/schemas/InstanceState'
+          description: The state of the instance.
+        errorMessage:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The Amazon Web Services Supply Chain instance error message.
+            If the instance results in an unhealthy state, customers need to check
+            the error message, delete the current instance, and recreate a new one
+            based on the mitigation from the error message.
+        webAppDnsDomain:
+          allOf:
+          - $ref: '#/components/schemas/InstanceWebAppDnsDomain'
+          description: The WebApp DNS domain name of the instance.
+        createdTime:
+          allOf:
+          - $ref: '#/components/schemas/Timestamp'
+          description: The instance creation timestamp.
+        lastModifiedTime:
+          allOf:
+          - $ref: '#/components/schemas/Timestamp'
+          description: The instance last modified timestamp.
+        instanceName:
+          allOf:
+          - $ref: '#/components/schemas/InstanceName'
+          description: The Amazon Web Services Supply Chain instance name.
+        instanceDescription:
+          allOf:
+          - $ref: '#/components/schemas/InstanceDescription'
+          description: The Amazon Web Services Supply Chain instance description.
+        kmsKeyArn:
+          allOf:
+          - $ref: '#/components/schemas/KmsKeyArn'
+          description: The ARN (Amazon Resource Name) of the Key Management Service
+            (KMS) key you optionally provided for encryption. If you did not provide
+            anything here, AWS Supply Chain uses the Amazon Web Services owned KMS
+            key and nothing is returned.
+        versionNumber:
+          allOf:
+          - $ref: '#/components/schemas/Double'
+          description: The version number of the instance.
+      required:
+      - instanceId
+      - awsAccountId
+      - state
+      description: The details of the instance.
     InstanceDescription:
       type: string
       pattern: ^([a-zA-Z0-9., _ʼ'%-]){0,500}$
@@ -259,15 +2254,207 @@ components:
     InstanceWebAppDnsDomain:
       type: string
       pattern: ^(?![-])[a-zA-Z0-9-]{1,62}[a-zA-Z0-9]$
+    InternalServerException:
+      type: object
+      properties:
+        message:
+          $ref: '#/components/schemas/String'
+      description: Unexpected error during processing of request.
     KmsKeyArn:
       type: string
       pattern: ^arn:[a-z0-9][-.a-z0-9]{0,62}:kms:([a-z0-9][-.a-z0-9]{0,62})?:([a-z0-9][-.a-z0-9]{0,62})?:key/.{0,1019}$
       maxLength: 2048
+    ListDataIntegrationFlowsRequest:
+      type: object
+      properties:
+        instanceId:
+          allOf:
+          - $ref: '#/components/schemas/UUID'
+          description: The Amazon Web Services Supply Chain instance identifier.
+        nextToken:
+          allOf:
+          - $ref: '#/components/schemas/DataIntegrationFlowNextToken'
+          description: The pagination token to fetch the next page of the DataIntegrationFlows.
+        maxResults:
+          allOf:
+          - $ref: '#/components/schemas/DataIntegrationFlowMaxResults'
+          description: Specify the maximum number of DataIntegrationFlows to fetch
+            in one paginated request.
+      required:
+      - instanceId
+      description: The request parameters for ListDataIntegrationFlows.
+    ListDataIntegrationFlowsResponse:
+      type: object
+      properties:
+        flows:
+          allOf:
+          - $ref: '#/components/schemas/DataIntegrationFlowList'
+          description: The response parameters for ListDataIntegrationFlows.
+        nextToken:
+          allOf:
+          - $ref: '#/components/schemas/DataIntegrationFlowNextToken'
+          description: The pagination token to fetch the next page of the DataIntegrationFlows.
+      required:
+      - flows
+      description: The response parameters for ListDataIntegrationFlows.
+    ListDataLakeDatasetsRequest:
+      type: object
+      properties:
+        instanceId:
+          allOf:
+          - $ref: '#/components/schemas/UUID'
+          description: The Amazon Web Services Supply Chain instance identifier.
+        namespace:
+          allOf:
+          - $ref: '#/components/schemas/DataLakeDatasetNamespace'
+          description: "The name space of the dataset. The available values are:\n\
+            \n  * **asc** \\- For information on the Amazon Web Services Supply Chain\
+            \ supported datasets see <https://docs.aws.amazon.com/aws-supply-chain/latest/userguide/data-model-asc.html>.\n\
+            \n  * **default** \\- For datasets with custom user-defined schemas."
+        nextToken:
+          allOf:
+          - $ref: '#/components/schemas/DataLakeDatasetNextToken'
+          description: The pagination token to fetch next page of datasets.
+        maxResults:
+          allOf:
+          - $ref: '#/components/schemas/DataLakeDatasetMaxResults'
+          description: The max number of datasets to fetch in this paginated request.
+      required:
+      - instanceId
+      - namespace
+      description: The request parameters of ListDataLakeDatasets.
+    ListDataLakeDatasetsResponse:
+      type: object
+      properties:
+        datasets:
+          allOf:
+          - $ref: '#/components/schemas/DataLakeDatasetList'
+          description: The list of fetched dataset details.
+        nextToken:
+          allOf:
+          - $ref: '#/components/schemas/DataLakeDatasetNextToken'
+          description: The pagination token to fetch next page of datasets.
+      required:
+      - datasets
+      description: The response parameters of ListDataLakeDatasets.
+    ListInstancesRequest:
+      type: object
+      properties:
+        nextToken:
+          allOf:
+          - $ref: '#/components/schemas/InstanceNextToken'
+          description: The pagination token to fetch the next page of instances.
+        maxResults:
+          allOf:
+          - $ref: '#/components/schemas/InstanceMaxResults'
+          description: Specify the maximum number of instances to fetch in this paginated
+            request.
+        instanceNameFilter:
+          allOf:
+          - $ref: '#/components/schemas/InstanceNameList'
+          description: The filter to ListInstances based on their names.
+        instanceStateFilter:
+          allOf:
+          - $ref: '#/components/schemas/InstanceStateList'
+          description: The filter to ListInstances based on their state.
+      description: The request parameters for ListInstances.
+    ListInstancesResponse:
+      type: object
+      properties:
+        instances:
+          allOf:
+          - $ref: '#/components/schemas/InstanceList'
+          description: The list of instances resource data details.
+        nextToken:
+          allOf:
+          - $ref: '#/components/schemas/InstanceNextToken'
+          description: The pagination token to fetch the next page of instances.
+      required:
+      - instances
+      description: The response parameters for ListInstances.
+    ListTagsForResourceRequest:
+      type: object
+      properties:
+        resourceArn:
+          allOf:
+          - $ref: '#/components/schemas/AscResourceArn'
+          description: The Amazon Web Services Supply chain resource ARN that needs
+            tags to be listed.
+      required:
+      - resourceArn
+      description: The request parameters of ListTagsForResource.
+    ListTagsForResourceResponse:
+      type: object
+      properties:
+        tags:
+          allOf:
+          - $ref: '#/components/schemas/TagMap'
+          description: The tags added to an Amazon Web Services Supply Chain resource.
+      required:
+      - tags
+      description: The response parameters of ListTagsForResource.
+    ResourceNotFoundException:
+      type: object
+      properties:
+        message:
+          $ref: '#/components/schemas/String'
+      description: Request references a resource which does not exist.
     S3BucketName:
       type: string
       pattern: ^[a-z0-9][a-z0-9.-]*[a-z0-9]$
       minLength: 3
       maxLength: 63
+    SendDataIntegrationEventRequest:
+      type: object
+      properties:
+        instanceId:
+          allOf:
+          - $ref: '#/components/schemas/UUID'
+          description: The AWS Supply Chain instance identifier.
+        eventType:
+          allOf:
+          - $ref: '#/components/schemas/DataIntegrationEventType'
+          description: The data event type.
+        data:
+          allOf:
+          - $ref: '#/components/schemas/DataIntegrationEventData'
+          description: The data payload of the event. For more information on the
+            data schema to use, see [Data entities supported in AWS Supply Chain](https://docs.aws.amazon.com/aws-supply-chain/latest/userguide/data-model-asc.html).
+        eventGroupId:
+          allOf:
+          - $ref: '#/components/schemas/DataIntegrationEventGroupId'
+          description: Event identifier (for example, orderId for InboundOrder) used
+            for data sharing or partitioning.
+        eventTimestamp:
+          allOf:
+          - $ref: '#/components/schemas/Timestamp'
+          description: The event timestamp (in epoch seconds).
+        clientToken:
+          allOf:
+          - $ref: '#/components/schemas/ClientToken'
+          description: The idempotent client token.
+      required:
+      - instanceId
+      - eventType
+      - data
+      - eventGroupId
+      description: The request parameters for SendDataIntegrationEvent.
+    SendDataIntegrationEventResponse:
+      type: object
+      properties:
+        eventId:
+          allOf:
+          - $ref: '#/components/schemas/UUID'
+          description: The unique event identifier.
+      required:
+      - eventId
+      description: The response parameters for SendDataIntegrationEvent.
+    ServiceQuotaExceededException:
+      type: object
+      properties:
+        message:
+          $ref: '#/components/schemas/String'
+      description: Request would cause a service quota to be exceeded.
     TagKey:
       type: string
       minLength: 1
@@ -280,12 +2467,170 @@ components:
       type: object
       additionalProperties:
         $ref: '#/components/schemas/TagValue'
+    TagResourceRequest:
+      type: object
+      properties:
+        resourceArn:
+          allOf:
+          - $ref: '#/components/schemas/AscResourceArn'
+          description: The Amazon Web Services Supply chain resource ARN that needs
+            to be tagged.
+        tags:
+          allOf:
+          - $ref: '#/components/schemas/TagMap'
+          description: The tags of the Amazon Web Services Supply chain resource to
+            be created.
+      required:
+      - resourceArn
+      - tags
+      description: The request parameters of TagResource.
+    TagResourceResponse:
+      type: object
+      properties: {}
+      description: The response parameters for TagResource.
     TagValue:
       type: string
       minLength: 0
       maxLength: 256
+    ThrottlingException:
+      type: object
+      properties:
+        message:
+          $ref: '#/components/schemas/String'
+      description: Request was denied due to request throttling.
     UUID:
       type: string
       pattern: ^[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$
       minLength: 36
       maxLength: 36
+    UntagResourceRequest:
+      type: object
+      properties:
+        resourceArn:
+          allOf:
+          - $ref: '#/components/schemas/AscResourceArn'
+          description: The Amazon Web Services Supply chain resource ARN that needs
+            to be untagged.
+        tagKeys:
+          allOf:
+          - $ref: '#/components/schemas/TagKeyList'
+          description: The list of tag keys to be deleted for an Amazon Web Services
+            Supply Chain resource.
+      required:
+      - resourceArn
+      - tagKeys
+      description: The request parameters of UntagResource.
+    UntagResourceResponse:
+      type: object
+      properties: {}
+      description: The response parameters of UntagResource.
+    UpdateDataIntegrationFlowRequest:
+      type: object
+      properties:
+        instanceId:
+          allOf:
+          - $ref: '#/components/schemas/UUID'
+          description: The Amazon Web Services Supply Chain instance identifier.
+        name:
+          allOf:
+          - $ref: '#/components/schemas/DataIntegrationFlowName'
+          description: The name of the DataIntegrationFlow to be updated.
+        sources:
+          allOf:
+          - $ref: '#/components/schemas/DataIntegrationFlowSourceList'
+          description: The new source configurations for the DataIntegrationFlow.
+        transformation:
+          allOf:
+          - $ref: '#/components/schemas/DataIntegrationFlowTransformation'
+          description: The new transformation configurations for the DataIntegrationFlow.
+        target:
+          allOf:
+          - $ref: '#/components/schemas/DataIntegrationFlowTarget'
+          description: The new target configurations for the DataIntegrationFlow.
+      required:
+      - instanceId
+      - name
+      description: The request parameters for UpdateDataIntegrationFlow.
+    UpdateDataIntegrationFlowResponse:
+      type: object
+      properties:
+        flow:
+          allOf:
+          - $ref: '#/components/schemas/DataIntegrationFlow'
+          description: The details of the updated DataIntegrationFlow.
+      required:
+      - flow
+      description: The response parameters for UpdateDataIntegrationFlow.
+    UpdateDataLakeDatasetRequest:
+      type: object
+      properties:
+        instanceId:
+          allOf:
+          - $ref: '#/components/schemas/UUID'
+          description: The Amazon Web Services Chain instance identifier.
+        namespace:
+          allOf:
+          - $ref: '#/components/schemas/DataLakeDatasetNamespace'
+          description: "The name space of the dataset. The available values are:\n\
+            \n  * **asc** \\- For information on the Amazon Web Services Supply Chain\
+            \ supported datasets see <https://docs.aws.amazon.com/aws-supply-chain/latest/userguide/data-model-asc.html>.\n\
+            \n  * **default** \\- For datasets with custom user-defined schemas."
+        name:
+          allOf:
+          - $ref: '#/components/schemas/DataLakeDatasetName'
+          description: The name of the dataset. For **asc** name space, the name must
+            be one of the supported data entities under <https://docs.aws.amazon.com/aws-supply-chain/latest/userguide/data-model-asc.html>.
+        description:
+          allOf:
+          - $ref: '#/components/schemas/DataLakeDatasetDescription'
+          description: The updated description of the data lake dataset.
+      required:
+      - instanceId
+      - namespace
+      - name
+      description: The request parameters of UpdateDataLakeDataset.
+    UpdateDataLakeDatasetResponse:
+      type: object
+      properties:
+        dataset:
+          allOf:
+          - $ref: '#/components/schemas/DataLakeDataset'
+          description: The updated dataset details.
+      required:
+      - dataset
+      description: The response parameters of UpdateDataLakeDataset.
+    UpdateInstanceRequest:
+      type: object
+      properties:
+        instanceId:
+          allOf:
+          - $ref: '#/components/schemas/UUID'
+          description: The AWS Supply Chain instance identifier.
+        instanceName:
+          allOf:
+          - $ref: '#/components/schemas/InstanceName'
+          description: The AWS Supply Chain instance name.
+        instanceDescription:
+          allOf:
+          - $ref: '#/components/schemas/InstanceDescription'
+          description: The AWS Supply Chain instance description.
+      required:
+      - instanceId
+      description: The request parameters for UpdateInstance.
+    UpdateInstanceResponse:
+      type: object
+      properties:
+        instance:
+          allOf:
+          - $ref: '#/components/schemas/Instance'
+          description: The instance resource data details.
+      required:
+      - instance
+      description: The response parameters for UpdateInstance.
+    ValidationException:
+      type: object
+      properties:
+        message:
+          $ref: '#/components/schemas/String'
+      description: The input does not satisfy the constraints specified by an AWS
+        service.

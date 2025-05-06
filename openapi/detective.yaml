@@ -7,7 +7,7 @@ info:
   x-stackql-serviceName: detective
   x-aws-serviceName: detective
   x-aws-protocol: aws.protocols#restJson1
-  x-dateGenerated: '2025-05-05'
+  x-dateGenerated: '2025-05-07'
   version: '2018-10-26'
   title: Amazon Detective
   description: |-
@@ -87,7 +87,1523 @@ servers:
       - sa-east-1
       - me-south-1
       default: us-east-1
-paths: {}
+paths:
+  /invitation:
+    put:
+      operationId: AcceptInvitation
+      description: |-
+        Accepts an invitation for the member account to contribute data to a behavior graph. This operation can only be called by an invited member account.
+
+        The request provides the ARN of behavior graph.
+
+        The member account status in the graph must be `INVITED`.
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                GraphArn:
+                  $ref: '#/components/schemas/GraphArn'
+      responses:
+        '200': {}
+        '403':
+          description: |-
+            The request issuer does not have permission to access this resource or perform this operation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '409':
+          description: |-
+            The request attempted an invalid action.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConflictException'
+        '500':
+          description: |-
+            The request was valid but failed because of a problem with the service.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerException'
+        '404':
+          description: |-
+            The request refers to a nonexistent resource.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+        '400':
+          description: |-
+            The request parameters are invalid.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+  /graph/datasources/get:
+    post:
+      operationId: BatchGetGraphMemberDatasources
+      description: |-
+        Gets data source package information for the behavior graph.
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                GraphArn:
+                  $ref: '#/components/schemas/GraphArn'
+                AccountIds:
+                  $ref: '#/components/schemas/AccountIdExtendedList'
+      responses:
+        '200': {}
+        '403':
+          description: |-
+            The request issuer does not have permission to access this resource or perform this operation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '500':
+          description: |-
+            The request was valid but failed because of a problem with the service.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerException'
+        '404':
+          description: |-
+            The request refers to a nonexistent resource.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+        '400':
+          description: |-
+            The request parameters are invalid.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+  /membership/datasources/get:
+    post:
+      operationId: BatchGetMembershipDatasources
+      description: |-
+        Gets information on the data source package history for an account.
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                GraphArns:
+                  $ref: '#/components/schemas/GraphArnList'
+      responses:
+        '200': {}
+        '403':
+          description: |-
+            The request issuer does not have permission to access this resource or perform this operation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '500':
+          description: |-
+            The request was valid but failed because of a problem with the service.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerException'
+        '404':
+          description: |-
+            The request refers to a nonexistent resource.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+        '400':
+          description: |-
+            The request parameters are invalid.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+  /graph:
+    post:
+      operationId: CreateGraph
+      description: |-
+        Creates a new behavior graph for the calling account, and sets that account as the administrator account. This operation is called by the account that is enabling Detective.
+
+        The operation also enables Detective for the calling account in the currently selected Region. It returns the ARN of the new behavior graph.
+
+        `CreateGraph` triggers a process to create the corresponding data tables for the new behavior graph.
+
+        An account can only be the administrator account for one behavior graph within a Region. If the same account calls `CreateGraph` with the same administrator account, it always returns the same behavior graph ARN. It does not create a new behavior graph.
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                Tags:
+                  $ref: '#/components/schemas/TagMap'
+      responses:
+        '200': {}
+        '403':
+          description: |-
+            The request issuer does not have permission to access this resource or perform this operation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '409':
+          description: |-
+            The request attempted an invalid action.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConflictException'
+        '500':
+          description: |-
+            The request was valid but failed because of a problem with the service.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerException'
+        '402':
+          description: |-
+            This request cannot be completed for one of the following reasons.
+
+              * This request cannot be completed if it would cause the number of member accounts in the behavior graph to exceed the maximum allowed. A behavior graph cannot have more than 1,200 member accounts.
+
+              * This request cannot be completed if the current volume ingested is above the limit of 10 TB per day. Detective will not allow you to add additional member accounts.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServiceQuotaExceededException'
+  /graph/members:
+    post:
+      operationId: CreateMembers
+      description: |-
+        `CreateMembers` is used to send invitations to accounts. For the organization behavior graph, the Detective administrator account uses `CreateMembers` to enable organization accounts as member accounts.
+
+        For invited accounts, `CreateMembers` sends a request to invite the specified Amazon Web Services accounts to be member accounts in the behavior graph. This operation can only be called by the administrator account for a behavior graph.
+
+        `CreateMembers` verifies the accounts and then invites the verified accounts. The administrator can optionally specify to not send invitation emails to the member accounts. This would be used when the administrator manages their member accounts centrally.
+
+        For organization accounts in the organization behavior graph, `CreateMembers` attempts to enable the accounts. The organization accounts do not receive invitations.
+
+        The request provides the behavior graph ARN and the list of accounts to invite or to enable.
+
+        The response separates the requested accounts into two lists:
+
+          * The accounts that `CreateMembers` was able to process. For invited accounts, includes member accounts that are being verified, that have passed verification and are to be invited, and that have failed verification. For organization accounts in the organization behavior graph, includes accounts that can be enabled and that cannot be enabled.
+
+          * The accounts that `CreateMembers` was unable to process. This list includes accounts that were already invited to be member accounts in the behavior graph.
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                GraphArn:
+                  $ref: '#/components/schemas/GraphArn'
+                Message:
+                  $ref: '#/components/schemas/EmailMessage'
+                DisableEmailNotification:
+                  $ref: '#/components/schemas/Boolean'
+                Accounts:
+                  $ref: '#/components/schemas/AccountList'
+      responses:
+        '200': {}
+        '403':
+          description: |-
+            The request issuer does not have permission to access this resource or perform this operation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '500':
+          description: |-
+            The request was valid but failed because of a problem with the service.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerException'
+        '404':
+          description: |-
+            The request refers to a nonexistent resource.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+        '402':
+          description: |-
+            This request cannot be completed for one of the following reasons.
+
+              * This request cannot be completed if it would cause the number of member accounts in the behavior graph to exceed the maximum allowed. A behavior graph cannot have more than 1,200 member accounts.
+
+              * This request cannot be completed if the current volume ingested is above the limit of 10 TB per day. Detective will not allow you to add additional member accounts.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServiceQuotaExceededException'
+        '400':
+          description: |-
+            The request parameters are invalid.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+  /graph/removal:
+    post:
+      operationId: DeleteGraph
+      description: |-
+        Disables the specified behavior graph and queues it to be deleted. This operation removes the behavior graph from each member account's list of behavior graphs.
+
+        `DeleteGraph` can only be called by the administrator account for a behavior graph.
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                GraphArn:
+                  $ref: '#/components/schemas/GraphArn'
+      responses:
+        '200': {}
+        '403':
+          description: |-
+            The request issuer does not have permission to access this resource or perform this operation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '500':
+          description: |-
+            The request was valid but failed because of a problem with the service.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerException'
+        '404':
+          description: |-
+            The request refers to a nonexistent resource.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+        '400':
+          description: |-
+            The request parameters are invalid.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+  /graph/members/removal:
+    post:
+      operationId: DeleteMembers
+      description: |-
+        Removes the specified member accounts from the behavior graph. The removed accounts no longer contribute data to the behavior graph. This operation can only be called by the administrator account for the behavior graph.
+
+        For invited accounts, the removed accounts are deleted from the list of accounts in the behavior graph. To restore the account, the administrator account must send another invitation.
+
+        For organization accounts in the organization behavior graph, the Detective administrator account can always enable the organization account again. Organization accounts that are not enabled as member accounts are not included in the `ListMembers` results for the organization behavior graph.
+
+        An administrator account cannot use `DeleteMembers` to remove their own account from the behavior graph. To disable a behavior graph, the administrator account uses the `DeleteGraph` API method.
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                GraphArn:
+                  $ref: '#/components/schemas/GraphArn'
+                AccountIds:
+                  $ref: '#/components/schemas/AccountIdList'
+      responses:
+        '200': {}
+        '403':
+          description: |-
+            The request issuer does not have permission to access this resource or perform this operation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '409':
+          description: |-
+            The request attempted an invalid action.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConflictException'
+        '500':
+          description: |-
+            The request was valid but failed because of a problem with the service.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerException'
+        '404':
+          description: |-
+            The request refers to a nonexistent resource.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+        '400':
+          description: |-
+            The request parameters are invalid.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+  /orgs/describeOrganizationConfiguration:
+    post:
+      operationId: DescribeOrganizationConfiguration
+      description: |-
+        Returns information about the configuration for the organization behavior graph. Currently indicates whether to automatically enable new organization accounts as member accounts.
+
+        Can only be called by the Detective administrator account for the organization.
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                GraphArn:
+                  $ref: '#/components/schemas/GraphArn'
+      responses:
+        '200': {}
+        '403':
+          description: |-
+            The request issuer does not have permission to access this resource or perform this operation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '500':
+          description: |-
+            The request was valid but failed because of a problem with the service.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerException'
+        '429':
+          description: |-
+            The request cannot be completed because too many other requests are occurring at the same time.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TooManyRequestsException'
+        '400':
+          description: |-
+            The request parameters are invalid.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+  /orgs/disableAdminAccount:
+    post:
+      operationId: DisableOrganizationAdminAccount
+      description: |-
+        Removes the Detective administrator account in the current Region. Deletes the organization behavior graph.
+
+        Can only be called by the organization management account.
+
+        Removing the Detective administrator account does not affect the delegated administrator account for Detective in Organizations.
+
+        To remove the delegated administrator account in Organizations, use the Organizations API. Removing the delegated administrator account also removes the Detective administrator account in all Regions, except for Regions where the Detective administrator account is the organization management account.
+      responses:
+        '200': {}
+        '403':
+          description: |-
+            The request issuer does not have permission to access this resource or perform this operation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '500':
+          description: |-
+            The request was valid but failed because of a problem with the service.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerException'
+        '429':
+          description: |-
+            The request cannot be completed because too many other requests are occurring at the same time.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TooManyRequestsException'
+        '400':
+          description: |-
+            The request parameters are invalid.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+  /membership/removal:
+    post:
+      operationId: DisassociateMembership
+      description: |-
+        Removes the member account from the specified behavior graph. This operation can only be called by an invited member account that has the `ENABLED` status.
+
+        `DisassociateMembership` cannot be called by an organization account in the organization behavior graph. For the organization behavior graph, the Detective administrator account determines which organization accounts to enable or disable as member accounts.
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                GraphArn:
+                  $ref: '#/components/schemas/GraphArn'
+      responses:
+        '200': {}
+        '403':
+          description: |-
+            The request issuer does not have permission to access this resource or perform this operation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '409':
+          description: |-
+            The request attempted an invalid action.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConflictException'
+        '500':
+          description: |-
+            The request was valid but failed because of a problem with the service.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerException'
+        '404':
+          description: |-
+            The request refers to a nonexistent resource.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+        '400':
+          description: |-
+            The request parameters are invalid.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+  /orgs/enableAdminAccount:
+    post:
+      operationId: EnableOrganizationAdminAccount
+      description: |-
+        Designates the Detective administrator account for the organization in the current Region.
+
+        If the account does not have Detective enabled, then enables Detective for that account and creates a new behavior graph.
+
+        Can only be called by the organization management account.
+
+        If the organization has a delegated administrator account in Organizations, then the Detective administrator account must be either the delegated administrator account or the organization management account.
+
+        If the organization does not have a delegated administrator account in Organizations, then you can choose any account in the organization. If you choose an account other than the organization management account, Detective calls Organizations to make that account the delegated administrator account for Detective. The organization management account cannot be the delegated administrator account.
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                AccountId:
+                  $ref: '#/components/schemas/AccountId'
+      responses:
+        '200': {}
+        '403':
+          description: |-
+            The request issuer does not have permission to access this resource or perform this operation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '500':
+          description: |-
+            The request was valid but failed because of a problem with the service.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerException'
+        '429':
+          description: |-
+            The request cannot be completed because too many other requests are occurring at the same time.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TooManyRequestsException'
+        '400':
+          description: |-
+            The request parameters are invalid.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+  /investigations/getInvestigation:
+    post:
+      operationId: GetInvestigation
+      description: |-
+        Detective investigations lets you investigate IAM users and IAM roles using indicators of compromise. An indicator of compromise (IOC) is an artifact observed in or on a network, system, or environment that can (with a high level of confidence) identify malicious activity or a security incident. `GetInvestigation` returns the investigation results of an investigation for a behavior graph.
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                GraphArn:
+                  $ref: '#/components/schemas/GraphArn'
+                InvestigationId:
+                  $ref: '#/components/schemas/InvestigationId'
+      responses:
+        '200': {}
+        '403':
+          description: |-
+            The request issuer does not have permission to access this resource or perform this operation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '500':
+          description: |-
+            The request was valid but failed because of a problem with the service.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerException'
+        '404':
+          description: |-
+            The request refers to a nonexistent resource.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+        '429':
+          description: |-
+            The request cannot be completed because too many other requests are occurring at the same time.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TooManyRequestsException'
+        '400':
+          description: |-
+            The request parameters are invalid.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+  /graph/members/get:
+    post:
+      operationId: GetMembers
+      description: |-
+        Returns the membership details for specified member accounts for a behavior graph.
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                GraphArn:
+                  $ref: '#/components/schemas/GraphArn'
+                AccountIds:
+                  $ref: '#/components/schemas/AccountIdList'
+      responses:
+        '200': {}
+        '403':
+          description: |-
+            The request issuer does not have permission to access this resource or perform this operation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '500':
+          description: |-
+            The request was valid but failed because of a problem with the service.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerException'
+        '404':
+          description: |-
+            The request refers to a nonexistent resource.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+        '400':
+          description: |-
+            The request parameters are invalid.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+  /graph/datasources/list:
+    post:
+      operationId: ListDatasourcePackages
+      description: |-
+        Lists data source packages in the behavior graph.
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                GraphArn:
+                  $ref: '#/components/schemas/GraphArn'
+                NextToken:
+                  $ref: '#/components/schemas/PaginationToken'
+                MaxResults:
+                  $ref: '#/components/schemas/MemberResultsLimit'
+      responses:
+        '200': {}
+        '403':
+          description: |-
+            The request issuer does not have permission to access this resource or perform this operation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '500':
+          description: |-
+            The request was valid but failed because of a problem with the service.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerException'
+        '404':
+          description: |-
+            The request refers to a nonexistent resource.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+        '400':
+          description: |-
+            The request parameters are invalid.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+  /graphs/list:
+    post:
+      operationId: ListGraphs
+      description: |-
+        Returns the list of behavior graphs that the calling account is an administrator account of. This operation can only be called by an administrator account.
+
+        Because an account can currently only be the administrator of one behavior graph within a Region, the results always contain a single behavior graph.
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                NextToken:
+                  $ref: '#/components/schemas/PaginationToken'
+                MaxResults:
+                  $ref: '#/components/schemas/MemberResultsLimit'
+      responses:
+        '200': {}
+        '403':
+          description: |-
+            The request issuer does not have permission to access this resource or perform this operation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '500':
+          description: |-
+            The request was valid but failed because of a problem with the service.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerException'
+        '400':
+          description: |-
+            The request parameters are invalid.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+  /investigations/listIndicators:
+    post:
+      operationId: ListIndicators
+      description: |-
+        Gets the indicators from an investigation. You can use the information from the indicators to determine if an IAM user and/or IAM role is involved in an unusual activity that could indicate malicious behavior and its impact.
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                GraphArn:
+                  $ref: '#/components/schemas/GraphArn'
+                InvestigationId:
+                  $ref: '#/components/schemas/InvestigationId'
+                IndicatorType:
+                  $ref: '#/components/schemas/IndicatorType'
+                NextToken:
+                  $ref: '#/components/schemas/AiPaginationToken'
+                MaxResults:
+                  $ref: '#/components/schemas/MaxResults'
+      responses:
+        '200': {}
+        '403':
+          description: |-
+            The request issuer does not have permission to access this resource or perform this operation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '500':
+          description: |-
+            The request was valid but failed because of a problem with the service.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerException'
+        '404':
+          description: |-
+            The request refers to a nonexistent resource.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+        '429':
+          description: |-
+            The request cannot be completed because too many other requests are occurring at the same time.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TooManyRequestsException'
+        '400':
+          description: |-
+            The request parameters are invalid.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+  /investigations/listInvestigations:
+    post:
+      operationId: ListInvestigations
+      description: |-
+        Detective investigations lets you investigate IAM users and IAM roles using indicators of compromise. An indicator of compromise (IOC) is an artifact observed in or on a network, system, or environment that can (with a high level of confidence) identify malicious activity or a security incident. `ListInvestigations` lists all active Detective investigations.
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                GraphArn:
+                  $ref: '#/components/schemas/GraphArn'
+                NextToken:
+                  $ref: '#/components/schemas/AiPaginationToken'
+                MaxResults:
+                  $ref: '#/components/schemas/MaxResults'
+                FilterCriteria:
+                  $ref: '#/components/schemas/FilterCriteria'
+                SortCriteria:
+                  $ref: '#/components/schemas/SortCriteria'
+      responses:
+        '200': {}
+        '403':
+          description: |-
+            The request issuer does not have permission to access this resource or perform this operation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '500':
+          description: |-
+            The request was valid but failed because of a problem with the service.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerException'
+        '404':
+          description: |-
+            The request refers to a nonexistent resource.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+        '429':
+          description: |-
+            The request cannot be completed because too many other requests are occurring at the same time.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TooManyRequestsException'
+        '400':
+          description: |-
+            The request parameters are invalid.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+  /invitations/list:
+    post:
+      operationId: ListInvitations
+      description: |-
+        Retrieves the list of open and accepted behavior graph invitations for the member account. This operation can only be called by an invited member account.
+
+        Open invitations are invitations that the member account has not responded to.
+
+        The results do not include behavior graphs for which the member account declined the invitation. The results also do not include behavior graphs that the member account resigned from or was removed from.
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                NextToken:
+                  $ref: '#/components/schemas/PaginationToken'
+                MaxResults:
+                  $ref: '#/components/schemas/MemberResultsLimit'
+      responses:
+        '200': {}
+        '403':
+          description: |-
+            The request issuer does not have permission to access this resource or perform this operation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '500':
+          description: |-
+            The request was valid but failed because of a problem with the service.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerException'
+        '400':
+          description: |-
+            The request parameters are invalid.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+  /graph/members/list:
+    post:
+      operationId: ListMembers
+      description: |-
+        Retrieves the list of member accounts for a behavior graph.
+
+        For invited accounts, the results do not include member accounts that were removed from the behavior graph.
+
+        For the organization behavior graph, the results do not include organization accounts that the Detective administrator account has not enabled as member accounts.
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                GraphArn:
+                  $ref: '#/components/schemas/GraphArn'
+                NextToken:
+                  $ref: '#/components/schemas/PaginationToken'
+                MaxResults:
+                  $ref: '#/components/schemas/MemberResultsLimit'
+      responses:
+        '200': {}
+        '403':
+          description: |-
+            The request issuer does not have permission to access this resource or perform this operation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '500':
+          description: |-
+            The request was valid but failed because of a problem with the service.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerException'
+        '404':
+          description: |-
+            The request refers to a nonexistent resource.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+        '400':
+          description: |-
+            The request parameters are invalid.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+  /orgs/adminAccountslist:
+    post:
+      operationId: ListOrganizationAdminAccounts
+      description: |-
+        Returns information about the Detective administrator account for an organization. Can only be called by the organization management account.
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                NextToken:
+                  $ref: '#/components/schemas/PaginationToken'
+                MaxResults:
+                  $ref: '#/components/schemas/MemberResultsLimit'
+      responses:
+        '200': {}
+        '403':
+          description: |-
+            The request issuer does not have permission to access this resource or perform this operation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '500':
+          description: |-
+            The request was valid but failed because of a problem with the service.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerException'
+        '429':
+          description: |-
+            The request cannot be completed because too many other requests are occurring at the same time.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TooManyRequestsException'
+        '400':
+          description: |-
+            The request parameters are invalid.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+  /tags/{ResourceArn}:
+    get:
+      operationId: ListTagsForResource
+      description: |-
+        Returns the tag values that are assigned to a behavior graph.
+      parameters:
+      - name: ResourceArn
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/GraphArn'
+      responses:
+        '200': {}
+        '403':
+          description: |-
+            The request issuer does not have permission to access this resource or perform this operation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '500':
+          description: |-
+            The request was valid but failed because of a problem with the service.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerException'
+        '404':
+          description: |-
+            The request refers to a nonexistent resource.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+        '400':
+          description: |-
+            The request parameters are invalid.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+    post:
+      operationId: TagResource
+      description: |-
+        Applies tag values to a behavior graph.
+      parameters:
+      - name: ResourceArn
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/GraphArn'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                Tags:
+                  $ref: '#/components/schemas/TagMap'
+      responses:
+        '204': {}
+        '403':
+          description: |-
+            The request issuer does not have permission to access this resource or perform this operation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '500':
+          description: |-
+            The request was valid but failed because of a problem with the service.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerException'
+        '404':
+          description: |-
+            The request refers to a nonexistent resource.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+        '400':
+          description: |-
+            The request parameters are invalid.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+    delete:
+      operationId: UntagResource
+      description: |-
+        Removes tags from a behavior graph.
+      parameters:
+      - name: ResourceArn
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/GraphArn'
+      - name: tagKeys
+        in: query
+        required: true
+        schema:
+          $ref: '#/components/schemas/TagKeyList'
+      responses:
+        '204': {}
+        '403':
+          description: |-
+            The request issuer does not have permission to access this resource or perform this operation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '500':
+          description: |-
+            The request was valid but failed because of a problem with the service.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerException'
+        '404':
+          description: |-
+            The request refers to a nonexistent resource.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+        '400':
+          description: |-
+            The request parameters are invalid.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+  /invitation/removal:
+    post:
+      operationId: RejectInvitation
+      description: |-
+        Rejects an invitation to contribute the account data to a behavior graph. This operation must be called by an invited member account that has the `INVITED` status.
+
+        `RejectInvitation` cannot be called by an organization account in the organization behavior graph. In the organization behavior graph, organization accounts do not receive an invitation.
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                GraphArn:
+                  $ref: '#/components/schemas/GraphArn'
+      responses:
+        '200': {}
+        '403':
+          description: |-
+            The request issuer does not have permission to access this resource or perform this operation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '409':
+          description: |-
+            The request attempted an invalid action.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConflictException'
+        '500':
+          description: |-
+            The request was valid but failed because of a problem with the service.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerException'
+        '404':
+          description: |-
+            The request refers to a nonexistent resource.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+        '400':
+          description: |-
+            The request parameters are invalid.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+  /investigations/startInvestigation:
+    post:
+      operationId: StartInvestigation
+      description: |-
+        Detective investigations lets you investigate IAM users and IAM roles using indicators of compromise. An indicator of compromise (IOC) is an artifact observed in or on a network, system, or environment that can (with a high level of confidence) identify malicious activity or a security incident. `StartInvestigation` initiates an investigation on an entity in a behavior graph.
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                GraphArn:
+                  $ref: '#/components/schemas/GraphArn'
+                EntityArn:
+                  $ref: '#/components/schemas/EntityArn'
+                ScopeStartTime:
+                  $ref: '#/components/schemas/Timestamp'
+                ScopeEndTime:
+                  $ref: '#/components/schemas/Timestamp'
+      responses:
+        '200': {}
+        '403':
+          description: |-
+            The request issuer does not have permission to access this resource or perform this operation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '500':
+          description: |-
+            The request was valid but failed because of a problem with the service.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerException'
+        '404':
+          description: |-
+            The request refers to a nonexistent resource.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+        '429':
+          description: |-
+            The request cannot be completed because too many other requests are occurring at the same time.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TooManyRequestsException'
+        '400':
+          description: |-
+            The request parameters are invalid.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+  /graph/member/monitoringstate:
+    post:
+      operationId: StartMonitoringMember
+      description: |-
+        Sends a request to enable data ingest for a member account that has a status of `ACCEPTED_BUT_DISABLED`.
+
+        For valid member accounts, the status is updated as follows.
+
+          * If Detective enabled the member account, then the new status is `ENABLED`.
+
+          * If Detective cannot enable the member account, the status remains `ACCEPTED_BUT_DISABLED`.
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                GraphArn:
+                  $ref: '#/components/schemas/GraphArn'
+                AccountId:
+                  $ref: '#/components/schemas/AccountId'
+      responses:
+        '200': {}
+        '403':
+          description: |-
+            The request issuer does not have permission to access this resource or perform this operation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '409':
+          description: |-
+            The request attempted an invalid action.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConflictException'
+        '500':
+          description: |-
+            The request was valid but failed because of a problem with the service.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerException'
+        '404':
+          description: |-
+            The request refers to a nonexistent resource.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+        '402':
+          description: |-
+            This request cannot be completed for one of the following reasons.
+
+              * This request cannot be completed if it would cause the number of member accounts in the behavior graph to exceed the maximum allowed. A behavior graph cannot have more than 1,200 member accounts.
+
+              * This request cannot be completed if the current volume ingested is above the limit of 10 TB per day. Detective will not allow you to add additional member accounts.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServiceQuotaExceededException'
+        '400':
+          description: |-
+            The request parameters are invalid.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+  /graph/datasources/update:
+    post:
+      operationId: UpdateDatasourcePackages
+      description: |-
+        Starts a data source package for the Detective behavior graph.
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                GraphArn:
+                  $ref: '#/components/schemas/GraphArn'
+                DatasourcePackages:
+                  $ref: '#/components/schemas/DatasourcePackageList'
+      responses:
+        '200': {}
+        '403':
+          description: |-
+            The request issuer does not have permission to access this resource or perform this operation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '500':
+          description: |-
+            The request was valid but failed because of a problem with the service.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerException'
+        '404':
+          description: |-
+            The request refers to a nonexistent resource.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+        '402':
+          description: |-
+            This request cannot be completed for one of the following reasons.
+
+              * This request cannot be completed if it would cause the number of member accounts in the behavior graph to exceed the maximum allowed. A behavior graph cannot have more than 1,200 member accounts.
+
+              * This request cannot be completed if the current volume ingested is above the limit of 10 TB per day. Detective will not allow you to add additional member accounts.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServiceQuotaExceededException'
+        '400':
+          description: |-
+            The request parameters are invalid.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+  /investigations/updateInvestigationState:
+    post:
+      operationId: UpdateInvestigationState
+      description: |-
+        Updates the state of an investigation.
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                GraphArn:
+                  $ref: '#/components/schemas/GraphArn'
+                InvestigationId:
+                  $ref: '#/components/schemas/InvestigationId'
+                State:
+                  $ref: '#/components/schemas/State'
+      responses:
+        '200': {}
+        '403':
+          description: |-
+            The request issuer does not have permission to access this resource or perform this operation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '500':
+          description: |-
+            The request was valid but failed because of a problem with the service.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerException'
+        '404':
+          description: |-
+            The request refers to a nonexistent resource.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+        '429':
+          description: |-
+            The request cannot be completed because too many other requests are occurring at the same time.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TooManyRequestsException'
+        '400':
+          description: |-
+            The request parameters are invalid.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+  /orgs/updateOrganizationConfiguration:
+    post:
+      operationId: UpdateOrganizationConfiguration
+      description: |-
+        Updates the configuration for the Organizations integration in the current Region. Can only be called by the Detective administrator account for the organization.
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                GraphArn:
+                  $ref: '#/components/schemas/GraphArn'
+                AutoEnable:
+                  $ref: '#/components/schemas/Boolean'
+      responses:
+        '200': {}
+        '403':
+          description: |-
+            The request issuer does not have permission to access this resource or perform this operation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '500':
+          description: |-
+            The request was valid but failed because of a problem with the service.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerException'
+        '429':
+          description: |-
+            The request cannot be completed because too many other requests are occurring at the same time.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TooManyRequestsException'
+        '400':
+          description: |-
+            The request parameters are invalid.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
 components:
   schemas:
     APIFailureCount:
@@ -100,6 +1616,60 @@ components:
       type: integer
       format: int64
       default: 0
+    AcceptInvitationRequest:
+      type: object
+      properties:
+        GraphArn:
+          allOf:
+          - $ref: '#/components/schemas/GraphArn'
+          description: 'The ARN of the behavior graph that the member account is accepting
+            the invitation for.
+
+
+            The member account status in the behavior graph must be `INVITED`.'
+      required:
+      - GraphArn
+    AccessDeniedException:
+      type: object
+      properties:
+        Message:
+          $ref: '#/components/schemas/ErrorMessage'
+        ErrorCode:
+          allOf:
+          - $ref: '#/components/schemas/ErrorCode'
+          description: The SDK default error code associated with the access denied
+            exception.
+        ErrorCodeReason:
+          allOf:
+          - $ref: '#/components/schemas/ErrorCodeReason'
+          description: The SDK default explanation of why access was denied.
+        SubErrorCode:
+          allOf:
+          - $ref: '#/components/schemas/ErrorCode'
+          description: The error code associated with the access denied exception.
+        SubErrorCodeReason:
+          allOf:
+          - $ref: '#/components/schemas/ErrorCodeReason'
+          description: An explanation of why access was denied.
+      description: The request issuer does not have permission to access this resource
+        or perform this operation.
+    Account:
+      type: object
+      properties:
+        AccountId:
+          allOf:
+          - $ref: '#/components/schemas/AccountId'
+          description: The account identifier of the Amazon Web Services account.
+        EmailAddress:
+          allOf:
+          - $ref: '#/components/schemas/EmailAddress'
+          description: The Amazon Web Services account root user email address for
+            the Amazon Web Services account.
+      required:
+      - AccountId
+      - EmailAddress
+      description: An Amazon Web Services account that is the administrator account
+        of or a member of a behavior graph.
     AccountId:
       type: string
       pattern: ^[0-9]+$
@@ -117,6 +1687,24 @@ components:
       type: array
       items:
         $ref: '#/components/schemas/Account'
+    Administrator:
+      type: object
+      properties:
+        AccountId:
+          allOf:
+          - $ref: '#/components/schemas/AccountId'
+          description: The Amazon Web Services account identifier of the Detective
+            administrator account for the organization.
+        GraphArn:
+          allOf:
+          - $ref: '#/components/schemas/GraphArn'
+          description: The ARN of the organization behavior graph.
+        DelegationTime:
+          allOf:
+          - $ref: '#/components/schemas/Timestamp'
+          description: The date and time when the Detective administrator account
+            was enabled. The value is an ISO8601 formatted string. For example, `2021-08-18T16:35:56.284Z`.
+      description: Information about the Detective administrator account for an organization.
     AdministratorList:
       type: array
       items:
@@ -127,18 +1715,155 @@ components:
       maxLength: 2048
     Aso:
       type: string
+    BatchGetGraphMemberDatasourcesRequest:
+      type: object
+      properties:
+        GraphArn:
+          allOf:
+          - $ref: '#/components/schemas/GraphArn'
+          description: The ARN of the behavior graph.
+        AccountIds:
+          allOf:
+          - $ref: '#/components/schemas/AccountIdExtendedList'
+          description: The list of Amazon Web Services accounts to get data source
+            package information on.
+      required:
+      - GraphArn
+      - AccountIds
+    BatchGetGraphMemberDatasourcesResponse:
+      type: object
+      properties:
+        MemberDatasources:
+          allOf:
+          - $ref: '#/components/schemas/MembershipDatasourcesList'
+          description: Details on the status of data source packages for members of
+            the behavior graph.
+        UnprocessedAccounts:
+          allOf:
+          - $ref: '#/components/schemas/UnprocessedAccountList'
+          description: Accounts that data source package information could not be
+            retrieved for.
+    BatchGetMembershipDatasourcesRequest:
+      type: object
+      properties:
+        GraphArns:
+          allOf:
+          - $ref: '#/components/schemas/GraphArnList'
+          description: The ARN of the behavior graph.
+      required:
+      - GraphArns
+    BatchGetMembershipDatasourcesResponse:
+      type: object
+      properties:
+        MembershipDatasources:
+          allOf:
+          - $ref: '#/components/schemas/MembershipDatasourcesList'
+          description: Details on the data source package history for an member of
+            the behavior graph.
+        UnprocessedGraphs:
+          allOf:
+          - $ref: '#/components/schemas/UnprocessedGraphList'
+          description: Graphs that data source package information could not be retrieved
+            for.
     Boolean:
       type: boolean
       default: false
     ByteValue:
       type: integer
       format: int64
+    ConflictException:
+      type: object
+      properties:
+        Message:
+          $ref: '#/components/schemas/ErrorMessage'
+      description: The request attempted an invalid action.
+    CreateGraphRequest:
+      type: object
+      properties:
+        Tags:
+          allOf:
+          - $ref: '#/components/schemas/TagMap'
+          description: The tags to assign to the new behavior graph. You can add up
+            to 50 tags. For each tag, you provide the tag key and the tag value. Each
+            tag key can contain up to 128 characters. Each tag value can contain up
+            to 256 characters.
+    CreateGraphResponse:
+      type: object
+      properties:
+        GraphArn:
+          allOf:
+          - $ref: '#/components/schemas/GraphArn'
+          description: The ARN of the new behavior graph.
+    CreateMembersRequest:
+      type: object
+      properties:
+        GraphArn:
+          allOf:
+          - $ref: '#/components/schemas/GraphArn'
+          description: The ARN of the behavior graph.
+        Message:
+          allOf:
+          - $ref: '#/components/schemas/EmailMessage'
+          description: Customized message text to include in the invitation email
+            message to the invited member accounts.
+        DisableEmailNotification:
+          allOf:
+          - $ref: '#/components/schemas/Boolean'
+          description: 'if set to `true`, then the invited accounts do not receive
+            email notifications. By default, this is set to `false`, and the invited
+            accounts receive email notifications.
+
+
+            Organization accounts in the organization behavior graph do not receive
+            email notifications.'
+        Accounts:
+          allOf:
+          - $ref: '#/components/schemas/AccountList'
+          description: The list of Amazon Web Services accounts to invite or to enable.
+            You can invite or enable up to 50 accounts at a time. For each invited
+            account, the account list contains the account identifier and the Amazon
+            Web Services account root user email address. For organization accounts
+            in the organization behavior graph, the email address is not required.
+      required:
+      - GraphArn
+      - Accounts
+    CreateMembersResponse:
+      type: object
+      properties:
+        Members:
+          allOf:
+          - $ref: '#/components/schemas/MemberDetailList'
+          description: The set of member account invitation or enablement requests
+            that Detective was able to process. This includes accounts that are being
+            verified, that failed verification, and that passed verification and are
+            being sent an invitation or are being enabled.
+        UnprocessedAccounts:
+          allOf:
+          - $ref: '#/components/schemas/UnprocessedAccountList'
+          description: The list of accounts for which Detective was unable to process
+            the invitation or enablement request. For each account, the list provides
+            the reason why the request could not be processed. The list includes accounts
+            that are already member accounts in the behavior graph.
     DatasourcePackage:
       type: string
       enum:
       - DETECTIVE_CORE
       - EKS_AUDIT
       - ASFF_SECURITYHUB_FINDING
+    DatasourcePackageIngestDetail:
+      type: object
+      properties:
+        DatasourcePackageIngestState:
+          allOf:
+          - $ref: '#/components/schemas/DatasourcePackageIngestState'
+          description: Details on which data source packages are ingested for a member
+            account.
+        LastIngestStateChange:
+          allOf:
+          - $ref: '#/components/schemas/LastIngestStateChangeDates'
+          description: The date a data source package was enabled for this account
+      description: Details about the data source packages ingested by your behavior
+        graph.
     DatasourcePackageIngestDetails:
       type: object
       additionalProperties:
@@ -161,6 +1886,108 @@ components:
       type: array
       items:
         $ref: '#/components/schemas/DatasourcePackage'
+    DatasourcePackageUsageInfo:
+      type: object
+      properties:
+        VolumeUsageInBytes:
+          allOf:
+          - $ref: '#/components/schemas/ByteValue'
+          description: Total volume of data in bytes per day ingested for a given
+            data source package.
+        VolumeUsageUpdateTime:
+          allOf:
+          - $ref: '#/components/schemas/Timestamp'
+          description: The data and time when the member account data volume was last
+            updated. The value is an ISO8601 formatted string. For example, `2021-08-18T16:35:56.284Z`.
+      description: Information on the usage of a data source package in the behavior
+        graph.
+    DateFilter:
+      type: object
+      properties:
+        StartInclusive:
+          allOf:
+          - $ref: '#/components/schemas/Timestamp'
+          description: A timestamp representing the start of the time period from
+            when data is filtered, including the start date.
+        EndInclusive:
+          allOf:
+          - $ref: '#/components/schemas/Timestamp'
+          description: A timestamp representing the end date of the time period until
+            when data is filtered, including the end date.
+      required:
+      - StartInclusive
+      - EndInclusive
+      description: Contains details on the time range used to filter data.
+    DeleteGraphRequest:
+      type: object
+      properties:
+        GraphArn:
+          allOf:
+          - $ref: '#/components/schemas/GraphArn'
+          description: The ARN of the behavior graph to disable.
+      required:
+      - GraphArn
+    DeleteMembersRequest:
+      type: object
+      properties:
+        GraphArn:
+          allOf:
+          - $ref: '#/components/schemas/GraphArn'
+          description: The ARN of the behavior graph to remove members from.
+        AccountIds:
+          allOf:
+          - $ref: '#/components/schemas/AccountIdList'
+          description: The list of Amazon Web Services account identifiers for the
+            member accounts to remove from the behavior graph. You can remove up to
+            50 member accounts at a time.
+      required:
+      - GraphArn
+      - AccountIds
+    DeleteMembersResponse:
+      type: object
+      properties:
+        AccountIds:
+          allOf:
+          - $ref: '#/components/schemas/AccountIdList'
+          description: The list of Amazon Web Services account identifiers for the
+            member accounts that Detective successfully removed from the behavior
+            graph.
+        UnprocessedAccounts:
+          allOf:
+          - $ref: '#/components/schemas/UnprocessedAccountList'
+          description: The list of member accounts that Detective was not able to
+            remove from the behavior graph. For each member account, provides the
+            reason that the deletion could not be processed.
+    DescribeOrganizationConfigurationRequest:
+      type: object
+      properties:
+        GraphArn:
+          allOf:
+          - $ref: '#/components/schemas/GraphArn'
+          description: The ARN of the organization behavior graph.
+      required:
+      - GraphArn
+    DescribeOrganizationConfigurationResponse:
+      type: object
+      properties:
+        AutoEnable:
+          allOf:
+          - $ref: '#/components/schemas/Boolean'
+          description: Indicates whether to automatically enable new organization
+            accounts as member accounts in the organization behavior graph.
+    DisassociateMembershipRequest:
+      type: object
+      properties:
+        GraphArn:
+          allOf:
+          - $ref: '#/components/schemas/GraphArn'
+          description: 'The ARN of the behavior graph to remove the member account
+            from.
+
+
+            The member account''s member status in the behavior graph must be `ENABLED`.'
+      required:
+      - GraphArn
     EmailAddress:
       type: string
       pattern: ^.+@(?:(?:(?!-)[A-Za-z0-9-]{1,62})?[A-Za-z0-9]{1}\.)+[A-Za-z]{2,63}$
@@ -170,6 +1997,16 @@ components:
       type: string
       minLength: 1
       maxLength: 1000
+    EnableOrganizationAdminAccountRequest:
+      type: object
+      properties:
+        AccountId:
+          allOf:
+          - $ref: '#/components/schemas/AccountId'
+          description: The Amazon Web Services account identifier of the account to
+            designate as the Detective administrator account for the organization.
+      required:
+      - AccountId
     EntityArn:
       type: string
       pattern: '^arn:'
@@ -194,6 +2031,161 @@ components:
       - SEVERITY
       - STATUS
       - CREATED_TIME
+    FilterCriteria:
+      type: object
+      properties:
+        Severity:
+          allOf:
+          - $ref: '#/components/schemas/StringFilter'
+          description: Filter the investigation results based on the severity.
+        Status:
+          allOf:
+          - $ref: '#/components/schemas/StringFilter'
+          description: Filter the investigation results based on the status.
+        State:
+          allOf:
+          - $ref: '#/components/schemas/StringFilter'
+          description: Filter the investigation results based on the state.
+        EntityArn:
+          allOf:
+          - $ref: '#/components/schemas/StringFilter'
+          description: Filter the investigation results based on the Amazon Resource
+            Name (ARN) of the entity.
+        CreatedTime:
+          allOf:
+          - $ref: '#/components/schemas/DateFilter'
+          description: Filter the investigation results based on when the investigation
+            was created.
+      description: Details on the criteria used to define the filter for investigation
+        results.
+    FlaggedIpAddressDetail:
+      type: object
+      properties:
+        IpAddress:
+          allOf:
+          - $ref: '#/components/schemas/IpAddress'
+          description: IP address of the suspicious entity.
+        Reason:
+          allOf:
+          - $ref: '#/components/schemas/Reason'
+          description: Details the reason the IP address was flagged as suspicious.
+      description: Contains information on suspicious IP addresses identified as indicators
+        of compromise. This indicator is derived from Amazon Web Services threat intelligence.
+    GetInvestigationRequest:
+      type: object
+      properties:
+        GraphArn:
+          allOf:
+          - $ref: '#/components/schemas/GraphArn'
+          description: The Amazon Resource Name (ARN) of the behavior graph.
+        InvestigationId:
+          allOf:
+          - $ref: '#/components/schemas/InvestigationId'
+          description: The investigation ID of the investigation report.
+      required:
+      - GraphArn
+      - InvestigationId
+    GetInvestigationResponse:
+      type: object
+      properties:
+        GraphArn:
+          allOf:
+          - $ref: '#/components/schemas/GraphArn'
+          description: The Amazon Resource Name (ARN) of the behavior graph.
+        InvestigationId:
+          allOf:
+          - $ref: '#/components/schemas/InvestigationId'
+          description: The investigation ID of the investigation report.
+        EntityArn:
+          allOf:
+          - $ref: '#/components/schemas/EntityArn'
+          description: The unique Amazon Resource Name (ARN). Detective supports IAM
+            user ARNs and IAM role ARNs.
+        EntityType:
+          allOf:
+          - $ref: '#/components/schemas/EntityType'
+          description: Type of entity. For example, Amazon Web Services accounts,
+            such as an IAM user and/or IAM role.
+        CreatedTime:
+          allOf:
+          - $ref: '#/components/schemas/Timestamp'
+          description: The creation time of the investigation report in UTC time stamp
+            format.
+        ScopeStartTime:
+          allOf:
+          - $ref: '#/components/schemas/Timestamp'
+          description: The start date and time used to set the scope time within which
+            you want to generate the investigation report. The value is an UTC ISO8601
+            formatted string. For example, `2021-08-18T16:35:56.284Z`.
+        ScopeEndTime:
+          allOf:
+          - $ref: '#/components/schemas/Timestamp'
+          description: The data and time when the investigation began. The value is
+            an UTC ISO8601 formatted string. For example, `2021-08-18T16:35:56.284Z`.
+        Status:
+          allOf:
+          - $ref: '#/components/schemas/Status'
+          description: The status based on the completion status of the investigation.
+        Severity:
+          allOf:
+          - $ref: '#/components/schemas/Severity'
+          description: The severity assigned is based on the likelihood and impact
+            of the indicators of compromise discovered in the investigation.
+        State:
+          allOf:
+          - $ref: '#/components/schemas/State'
+          description: The current state of the investigation. An archived investigation
+            indicates that you have completed reviewing the investigation.
+    GetMembersRequest:
+      type: object
+      properties:
+        GraphArn:
+          allOf:
+          - $ref: '#/components/schemas/GraphArn'
+          description: The ARN of the behavior graph for which to request the member
+            details.
+        AccountIds:
+          allOf:
+          - $ref: '#/components/schemas/AccountIdList'
+          description: 'The list of Amazon Web Services account identifiers for the
+            member account for which to return member details. You can request details
+            for up to 50 member accounts at a time.
+
+
+            You cannot use `GetMembers` to retrieve information about member accounts
+            that were removed from the behavior graph.'
+      required:
+      - GraphArn
+      - AccountIds
+    GetMembersResponse:
+      type: object
+      properties:
+        MemberDetails:
+          allOf:
+          - $ref: '#/components/schemas/MemberDetailList'
+          description: The member account details that Detective is returning in response
+            to the request.
+        UnprocessedAccounts:
+          allOf:
+          - $ref: '#/components/schemas/UnprocessedAccountList'
+          description: 'The requested member accounts for which Detective was unable
+            to return member details.
+
+
+            For each account, provides the reason why the request could not be processed.'
+    Graph:
+      type: object
+      properties:
+        Arn:
+          allOf:
+          - $ref: '#/components/schemas/GraphArn'
+          description: The ARN of the behavior graph.
+        CreatedTime:
+          allOf:
+          - $ref: '#/components/schemas/Timestamp'
+          description: The date and time that the behavior graph was created. The
+            value is an ISO8601 formatted string. For example, `2021-08-18T16:35:56.284Z`.
+      description: A behavior graph in Detective.
     GraphArn:
       type: string
       pattern: ^arn:aws[-\w]{0,10}?:detective:[-\w]{2,20}?:\d{12}?:graph:[abcdef\d]{32}?$
@@ -209,6 +2201,99 @@ components:
       type: integer
     Id:
       type: string
+    ImpossibleTravelDetail:
+      type: object
+      properties:
+        StartingIpAddress:
+          allOf:
+          - $ref: '#/components/schemas/IpAddress'
+          description: IP address where the resource was first used in the impossible
+            travel.
+        EndingIpAddress:
+          allOf:
+          - $ref: '#/components/schemas/IpAddress'
+          description: IP address where the resource was last used in the impossible
+            travel.
+        StartingLocation:
+          allOf:
+          - $ref: '#/components/schemas/Location'
+          description: Location where the resource was first used in the impossible
+            travel.
+        EndingLocation:
+          allOf:
+          - $ref: '#/components/schemas/Location'
+          description: Location where the resource was last used in the impossible
+            travel.
+        HourlyTimeDelta:
+          allOf:
+          - $ref: '#/components/schemas/HourlyTimeDelta'
+          description: Returns the time difference between the first and last timestamp
+            the resource was used.
+      description: Contains information on unusual and impossible travel in an account.
+    Indicator:
+      type: object
+      properties:
+        IndicatorType:
+          allOf:
+          - $ref: '#/components/schemas/IndicatorType'
+          description: The type of indicator.
+        IndicatorDetail:
+          allOf:
+          - $ref: '#/components/schemas/IndicatorDetail'
+          description: Details about the indicators of compromise that are used to
+            determine if a resource is involved in a security incident. An indicator
+            of compromise (IOC) is an artifact observed in or on a network, system,
+            or environment that can (with a high level of confidence) identify malicious
+            activity or a security incident.
+      description: Detective investigations triages indicators of compromises such
+        as a finding and surfaces only the most critical and suspicious issues, so
+        you can focus on high-level investigations. An `Indicator` lets you determine
+        if an Amazon Web Services resource is involved in unusual activity that could
+        indicate malicious behavior and its impact.
+    IndicatorDetail:
+      type: object
+      properties:
+        TTPsObservedDetail:
+          allOf:
+          - $ref: '#/components/schemas/TTPsObservedDetail'
+          description: Details about the indicator of compromise.
+        ImpossibleTravelDetail:
+          allOf:
+          - $ref: '#/components/schemas/ImpossibleTravelDetail'
+          description: Identifies unusual and impossible user activity for an account.
+        FlaggedIpAddressDetail:
+          allOf:
+          - $ref: '#/components/schemas/FlaggedIpAddressDetail'
+          description: Suspicious IP addresses that are flagged, which indicates critical
+            or severe threats based on threat intelligence by Detective. This indicator
+            is derived from Amazon Web Services threat intelligence.
+        NewGeolocationDetail:
+          allOf:
+          - $ref: '#/components/schemas/NewGeolocationDetail'
+          description: Contains details about the new geographic location.
+        NewAsoDetail:
+          allOf:
+          - $ref: '#/components/schemas/NewAsoDetail'
+          description: Contains details about the new Autonomous System Organization
+            (ASO).
+        NewUserAgentDetail:
+          allOf:
+          - $ref: '#/components/schemas/NewUserAgentDetail'
+          description: Contains details about the new user agent.
+        RelatedFindingDetail:
+          allOf:
+          - $ref: '#/components/schemas/RelatedFindingDetail'
+          description: Contains details about related findings.
+        RelatedFindingGroupDetail:
+          allOf:
+          - $ref: '#/components/schemas/RelatedFindingGroupDetail'
+          description: Contains details about related finding groups.
+      description: Details about the indicators of compromise which are used to determine
+        if a resource is involved in a security incident. An indicator of compromise
+        (IOC) is an artifact observed in or on a network, system, or environment that
+        can (with a high level of confidence) identify malicious activity or a security
+        incident. For the list of indicators of compromise that are generated by Detective
+        investigations, see [Detective investigations](https://docs.aws.amazon.com/detective/latest/userguide/detective-investigation-about.html).
     IndicatorType:
       type: string
       enum:
@@ -224,6 +2309,51 @@ components:
       type: array
       items:
         $ref: '#/components/schemas/Indicator'
+    InternalServerException:
+      type: object
+      properties:
+        Message:
+          $ref: '#/components/schemas/ErrorMessage'
+      description: The request was valid but failed because of a problem with the
+        service.
+    InvestigationDetail:
+      type: object
+      properties:
+        InvestigationId:
+          allOf:
+          - $ref: '#/components/schemas/InvestigationId'
+          description: The investigation ID of the investigation report.
+        Severity:
+          allOf:
+          - $ref: '#/components/schemas/Severity'
+          description: Severity based on the likelihood and impact of the indicators
+            of compromise discovered in the investigation.
+        Status:
+          allOf:
+          - $ref: '#/components/schemas/Status'
+          description: Status based on the completion status of the investigation.
+        State:
+          allOf:
+          - $ref: '#/components/schemas/State'
+          description: The current state of the investigation. An archived investigation
+            indicates you have completed reviewing the investigation.
+        CreatedTime:
+          allOf:
+          - $ref: '#/components/schemas/Timestamp'
+          description: The time stamp of the creation time of the investigation report.
+            The value is an UTC ISO8601 formatted string. For example, `2021-08-18T16:35:56.284Z`.
+        EntityArn:
+          allOf:
+          - $ref: '#/components/schemas/EntityArn'
+          description: The unique Amazon Resource Name (ARN) of the IAM user and IAM
+            role.
+        EntityType:
+          allOf:
+          - $ref: '#/components/schemas/EntityType'
+          description: Type of entity. For example, Amazon Web Services accounts,
+            such as IAM user and role.
+      description: Details about the investigation related to a potential security
+        event identified by Detective.
     InvestigationDetails:
       type: array
       items:
@@ -247,12 +2377,421 @@ components:
       type: object
       additionalProperties:
         $ref: '#/components/schemas/TimestampForCollection'
+    ListDatasourcePackagesRequest:
+      type: object
+      properties:
+        GraphArn:
+          allOf:
+          - $ref: '#/components/schemas/GraphArn'
+          description: The ARN of the behavior graph.
+        NextToken:
+          allOf:
+          - $ref: '#/components/schemas/PaginationToken'
+          description: For requests to get the next page of results, the pagination
+            token that was returned with the previous set of results. The initial
+            request does not include a pagination token.
+        MaxResults:
+          allOf:
+          - $ref: '#/components/schemas/MemberResultsLimit'
+          description: The maximum number of results to return.
+      required:
+      - GraphArn
+    ListDatasourcePackagesResponse:
+      type: object
+      properties:
+        DatasourcePackages:
+          allOf:
+          - $ref: '#/components/schemas/DatasourcePackageIngestDetails'
+          description: Details on the data source packages active in the behavior
+            graph.
+        NextToken:
+          allOf:
+          - $ref: '#/components/schemas/PaginationToken'
+          description: For requests to get the next page of results, the pagination
+            token that was returned with the previous set of results. The initial
+            request does not include a pagination token.
+    ListGraphsRequest:
+      type: object
+      properties:
+        NextToken:
+          allOf:
+          - $ref: '#/components/schemas/PaginationToken'
+          description: For requests to get the next page of results, the pagination
+            token that was returned with the previous set of results. The initial
+            request does not include a pagination token.
+        MaxResults:
+          allOf:
+          - $ref: '#/components/schemas/MemberResultsLimit'
+          description: The maximum number of graphs to return at a time. The total
+            must be less than the overall limit on the number of results to return,
+            which is currently 200.
+    ListGraphsResponse:
+      type: object
+      properties:
+        GraphList:
+          allOf:
+          - $ref: '#/components/schemas/GraphList'
+          description: A list of behavior graphs that the account is an administrator
+            account for.
+        NextToken:
+          allOf:
+          - $ref: '#/components/schemas/PaginationToken'
+          description: If there are more behavior graphs remaining in the results,
+            then this is the pagination token to use to request the next page of behavior
+            graphs.
+    ListIndicatorsRequest:
+      type: object
+      properties:
+        GraphArn:
+          allOf:
+          - $ref: '#/components/schemas/GraphArn'
+          description: The Amazon Resource Name (ARN) of the behavior graph.
+        InvestigationId:
+          allOf:
+          - $ref: '#/components/schemas/InvestigationId'
+          description: The investigation ID of the investigation report.
+        IndicatorType:
+          allOf:
+          - $ref: '#/components/schemas/IndicatorType'
+          description: For the list of indicators of compromise that are generated
+            by Detective investigations, see [Detective investigations](https://docs.aws.amazon.com/detective/latest/userguide/detective-investigation-about.html).
+        NextToken:
+          allOf:
+          - $ref: '#/components/schemas/AiPaginationToken'
+          description: 'Lists if there are more results available. The value of nextToken
+            is a unique pagination token for each page. Repeat the call using the
+            returned token to retrieve the next page. Keep all other arguments unchanged.
+
+
+            Each pagination token expires after 24 hours. Using an expired pagination
+            token will return a Validation Exception error.'
+        MaxResults:
+          allOf:
+          - $ref: '#/components/schemas/MaxResults'
+          description: Lists the maximum number of indicators in a page.
+      required:
+      - GraphArn
+      - InvestigationId
+    ListIndicatorsResponse:
+      type: object
+      properties:
+        GraphArn:
+          allOf:
+          - $ref: '#/components/schemas/GraphArn'
+          description: The Amazon Resource Name (ARN) of the behavior graph.
+        InvestigationId:
+          allOf:
+          - $ref: '#/components/schemas/InvestigationId'
+          description: The investigation ID of the investigation report.
+        NextToken:
+          allOf:
+          - $ref: '#/components/schemas/AiPaginationToken'
+          description: 'Lists if there are more results available. The value of nextToken
+            is a unique pagination token for each page. Repeat the call using the
+            returned token to retrieve the next page. Keep all other arguments unchanged.
+
+
+            Each pagination token expires after 24 hours. Using an expired pagination
+            token will return a Validation Exception error.'
+        Indicators:
+          allOf:
+          - $ref: '#/components/schemas/Indicators'
+          description: Lists the indicators of compromise.
+    ListInvestigationsRequest:
+      type: object
+      properties:
+        GraphArn:
+          allOf:
+          - $ref: '#/components/schemas/GraphArn'
+          description: The Amazon Resource Name (ARN) of the behavior graph.
+        NextToken:
+          allOf:
+          - $ref: '#/components/schemas/AiPaginationToken'
+          description: 'Lists if there are more results available. The value of nextToken
+            is a unique pagination token for each page. Repeat the call using the
+            returned token to retrieve the next page. Keep all other arguments unchanged.
+
+
+            Each pagination token expires after 24 hours. Using an expired pagination
+            token will return a Validation Exception error.'
+        MaxResults:
+          allOf:
+          - $ref: '#/components/schemas/MaxResults'
+          description: Lists the maximum number of investigations in a page.
+        FilterCriteria:
+          allOf:
+          - $ref: '#/components/schemas/FilterCriteria'
+          description: Filters the investigation results based on a criteria.
+        SortCriteria:
+          allOf:
+          - $ref: '#/components/schemas/SortCriteria'
+          description: Sorts the investigation results based on a criteria.
+      required:
+      - GraphArn
+    ListInvestigationsResponse:
+      type: object
+      properties:
+        InvestigationDetails:
+          allOf:
+          - $ref: '#/components/schemas/InvestigationDetails'
+          description: Lists the summary of uncommon behavior or malicious activity
+            which indicates a compromise.
+        NextToken:
+          allOf:
+          - $ref: '#/components/schemas/AiPaginationToken'
+          description: 'Lists if there are more results available. The value of nextToken
+            is a unique pagination token for each page. Repeat the call using the
+            returned token to retrieve the next page. Keep all other arguments unchanged.
+
+
+            Each pagination token expires after 24 hours.'
+    ListInvitationsRequest:
+      type: object
+      properties:
+        NextToken:
+          allOf:
+          - $ref: '#/components/schemas/PaginationToken'
+          description: For requests to retrieve the next page of results, the pagination
+            token that was returned with the previous page of results. The initial
+            request does not include a pagination token.
+        MaxResults:
+          allOf:
+          - $ref: '#/components/schemas/MemberResultsLimit'
+          description: The maximum number of behavior graph invitations to return
+            in the response. The total must be less than the overall limit on the
+            number of results to return, which is currently 200.
+    ListInvitationsResponse:
+      type: object
+      properties:
+        Invitations:
+          allOf:
+          - $ref: '#/components/schemas/MemberDetailList'
+          description: The list of behavior graphs for which the member account has
+            open or accepted invitations.
+        NextToken:
+          allOf:
+          - $ref: '#/components/schemas/PaginationToken'
+          description: If there are more behavior graphs remaining in the results,
+            then this is the pagination token to use to request the next page of behavior
+            graphs.
+    ListMembersRequest:
+      type: object
+      properties:
+        GraphArn:
+          allOf:
+          - $ref: '#/components/schemas/GraphArn'
+          description: The ARN of the behavior graph for which to retrieve the list
+            of member accounts.
+        NextToken:
+          allOf:
+          - $ref: '#/components/schemas/PaginationToken'
+          description: For requests to retrieve the next page of member account results,
+            the pagination token that was returned with the previous page of results.
+            The initial request does not include a pagination token.
+        MaxResults:
+          allOf:
+          - $ref: '#/components/schemas/MemberResultsLimit'
+          description: The maximum number of member accounts to include in the response.
+            The total must be less than the overall limit on the number of results
+            to return, which is currently 200.
+      required:
+      - GraphArn
+    ListMembersResponse:
+      type: object
+      properties:
+        MemberDetails:
+          allOf:
+          - $ref: '#/components/schemas/MemberDetailList'
+          description: 'The list of member accounts in the behavior graph.
+
+
+            For invited accounts, the results include member accounts that did not
+            pass verification and member accounts that have not yet accepted the invitation
+            to the behavior graph. The results do not include member accounts that
+            were removed from the behavior graph.
+
+
+            For the organization behavior graph, the results do not include organization
+            accounts that the Detective administrator account has not enabled as member
+            accounts.'
+        NextToken:
+          allOf:
+          - $ref: '#/components/schemas/PaginationToken'
+          description: If there are more member accounts remaining in the results,
+            then use this pagination token to request the next page of member accounts.
+    ListOrganizationAdminAccountsRequest:
+      type: object
+      properties:
+        NextToken:
+          allOf:
+          - $ref: '#/components/schemas/PaginationToken'
+          description: For requests to get the next page of results, the pagination
+            token that was returned with the previous set of results. The initial
+            request does not include a pagination token.
+        MaxResults:
+          allOf:
+          - $ref: '#/components/schemas/MemberResultsLimit'
+          description: The maximum number of results to return.
+    ListOrganizationAdminAccountsResponse:
+      type: object
+      properties:
+        Administrators:
+          allOf:
+          - $ref: '#/components/schemas/AdministratorList'
+          description: The list of Detective administrator accounts.
+        NextToken:
+          allOf:
+          - $ref: '#/components/schemas/PaginationToken'
+          description: If there are more accounts remaining in the results, then this
+            is the pagination token to use to request the next page of accounts.
+    ListTagsForResourceRequest:
+      type: object
+      properties:
+        ResourceArn:
+          allOf:
+          - $ref: '#/components/schemas/GraphArn'
+          description: The ARN of the behavior graph for which to retrieve the tag
+            values.
+      required:
+      - ResourceArn
+    ListTagsForResourceResponse:
+      type: object
+      properties:
+        Tags:
+          allOf:
+          - $ref: '#/components/schemas/TagMap'
+          description: The tag values that are assigned to the behavior graph. The
+            request returns up to 50 tag values.
     Location:
       type: string
     MaxResults:
       type: integer
       minimum: 1
       maximum: 100
+    MemberDetail:
+      type: object
+      properties:
+        AccountId:
+          allOf:
+          - $ref: '#/components/schemas/AccountId'
+          description: The Amazon Web Services account identifier for the member account.
+        EmailAddress:
+          allOf:
+          - $ref: '#/components/schemas/EmailAddress'
+          description: The Amazon Web Services account root user email address for
+            the member account.
+        GraphArn:
+          allOf:
+          - $ref: '#/components/schemas/GraphArn'
+          description: The ARN of the behavior graph.
+        MasterId:
+          allOf:
+          - $ref: '#/components/schemas/AccountId'
+          description: The Amazon Web Services account identifier of the administrator
+            account for the behavior graph.
+        AdministratorId:
+          allOf:
+          - $ref: '#/components/schemas/AccountId'
+          description: The Amazon Web Services account identifier of the administrator
+            account for the behavior graph.
+        Status:
+          allOf:
+          - $ref: '#/components/schemas/MemberStatus'
+          description: "The current membership status of the member account. The status\
+            \ can have one of the following values:\n\n  * `INVITED` \\- For invited\
+            \ accounts only. Indicates that the member was sent an invitation but\
+            \ has not yet responded.\n\n  * `VERIFICATION_IN_PROGRESS` \\- For invited\
+            \ accounts only, indicates that Detective is verifying that the account\
+            \ identifier and email address provided for the member account match.\
+            \ If they do match, then Detective sends the invitation. If the email\
+            \ address and account identifier don't match, then the member cannot be\
+            \ added to the behavior graph.\n\nFor organization accounts in the organization\
+            \ behavior graph, indicates that Detective is verifying that the account\
+            \ belongs to the organization.\n\n  * `VERIFICATION_FAILED` \\- For invited\
+            \ accounts only. Indicates that the account and email address provided\
+            \ for the member account do not match, and Detective did not send an invitation\
+            \ to the account.\n\n  * `ENABLED` \\- Indicates that the member account\
+            \ currently contributes data to the behavior graph. For invited accounts,\
+            \ the member account accepted the invitation. For organization accounts\
+            \ in the organization behavior graph, the Detective administrator account\
+            \ enabled the organization account as a member account.\n\n  * `ACCEPTED_BUT_DISABLED`\
+            \ \\- The account accepted the invitation, or was enabled by the Detective\
+            \ administrator account, but is prevented from contributing data to the\
+            \ behavior graph. `DisabledReason` provides the reason why the member\
+            \ account is not enabled.\n\nInvited accounts that declined an invitation\
+            \ or that were removed from the behavior graph are not included. In the\
+            \ organization behavior graph, organization accounts that the Detective\
+            \ administrator account did not enable are not included."
+        DisabledReason:
+          allOf:
+          - $ref: '#/components/schemas/MemberDisabledReason'
+          description: "For member accounts with a status of `ACCEPTED_BUT_DISABLED`,\
+            \ the reason that the member account is not enabled.\n\nThe reason can\
+            \ have one of the following values:\n\n  * `VOLUME_TOO_HIGH` \\- Indicates\
+            \ that adding the member account would cause the data volume for the behavior\
+            \ graph to be too high.\n\n  * `VOLUME_UNKNOWN` \\- Indicates that Detective\
+            \ is unable to verify the data volume for the member account. This is\
+            \ usually because the member account is not enrolled in Amazon GuardDuty."
+        InvitedTime:
+          allOf:
+          - $ref: '#/components/schemas/Timestamp'
+          description: For invited accounts, the date and time that Detective sent
+            the invitation to the account. The value is an ISO8601 formatted string.
+            For example, `2021-08-18T16:35:56.284Z`.
+        UpdatedTime:
+          allOf:
+          - $ref: '#/components/schemas/Timestamp'
+          description: The date and time that the member account was last updated.
+            The value is an ISO8601 formatted string. For example, `2021-08-18T16:35:56.284Z`.
+        VolumeUsageInBytes:
+          allOf:
+          - $ref: '#/components/schemas/ByteValue'
+          description: The data volume in bytes per day for the member account.
+        VolumeUsageUpdatedTime:
+          allOf:
+          - $ref: '#/components/schemas/Timestamp'
+          description: The data and time when the member account data volume was last
+            updated. The value is an ISO8601 formatted string. For example, `2021-08-18T16:35:56.284Z`.
+        PercentOfGraphUtilization:
+          allOf:
+          - $ref: '#/components/schemas/Percentage'
+          description: 'The member account data volume as a percentage of the maximum
+            allowed data volume. 0 indicates 0 percent, and 100 indicates 100 percent.
+
+
+            Note that this is not the percentage of the behavior graph data volume.
+
+
+            For example, the data volume for the behavior graph is 80 GB per day.
+            The maximum data volume is 160 GB per day. If the data volume for the
+            member account is 40 GB per day, then `PercentOfGraphUtilization` is 25.
+            It represents 25% of the maximum allowed data volume.'
+        PercentOfGraphUtilizationUpdatedTime:
+          allOf:
+          - $ref: '#/components/schemas/Timestamp'
+          description: The date and time when the graph utilization percentage was
+            last updated. The value is an ISO8601 formatted string. For example, `2021-08-18T16:35:56.284Z`.
+        InvitationType:
+          allOf:
+          - $ref: '#/components/schemas/InvitationType'
+          description: 'The type of behavior graph membership.
+
+
+            For an organization account in the organization behavior graph, the type
+            is `ORGANIZATION`.
+
+
+            For an account that was invited to a behavior graph, the type is `INVITATION`.'
+        VolumeUsageByDatasourcePackage:
+          allOf:
+          - $ref: '#/components/schemas/VolumeUsageByDatasourcePackage'
+          description: Details on the volume of usage for each data source package
+            in a behavior graph.
+        DatasourcePackageIngestStates:
+          allOf:
+          - $ref: '#/components/schemas/DatasourcePackageIngestStates'
+          description: The state of a data source package for the behavior graph.
+      description: Details about a member account in a behavior graph.
     MemberDetailList:
       type: array
       items:
@@ -274,10 +2813,72 @@ components:
       - VERIFICATION_FAILED
       - ENABLED
       - ACCEPTED_BUT_DISABLED
+    MembershipDatasources:
+      type: object
+      properties:
+        AccountId:
+          allOf:
+          - $ref: '#/components/schemas/AccountId'
+          description: The account identifier of the Amazon Web Services account.
+        GraphArn:
+          allOf:
+          - $ref: '#/components/schemas/GraphArn'
+          description: The ARN of the organization behavior graph.
+        DatasourcePackageIngestHistory:
+          allOf:
+          - $ref: '#/components/schemas/DatasourcePackageIngestHistory'
+          description: Details on when a data source package was added to a behavior
+            graph.
+      description: Details on data source packages for members of the behavior graph.
     MembershipDatasourcesList:
       type: array
       items:
         $ref: '#/components/schemas/MembershipDatasources'
+    NewAsoDetail:
+      type: object
+      properties:
+        Aso:
+          allOf:
+          - $ref: '#/components/schemas/Aso'
+          description: Details about the new Autonomous System Organization (ASO).
+        IsNewForEntireAccount:
+          allOf:
+          - $ref: '#/components/schemas/IsNewForEntireAccount'
+          description: Checks if the Autonomous System Organization (ASO) is new for
+            the entire account.
+      description: Details new Autonomous System Organizations (ASOs) used either
+        at the resource or account level.
+    NewGeolocationDetail:
+      type: object
+      properties:
+        Location:
+          allOf:
+          - $ref: '#/components/schemas/Location'
+          description: Location where the resource was accessed.
+        IpAddress:
+          allOf:
+          - $ref: '#/components/schemas/IpAddress'
+          description: IP address using which the resource was accessed.
+        IsNewForEntireAccount:
+          allOf:
+          - $ref: '#/components/schemas/IsNewForEntireAccount'
+          description: Checks if the geolocation is new for the entire account.
+      description: Details new geolocations used either at the resource or account
+        level. For example, lists an observed geolocation that is an infrequent or
+        unused location based on previous user activity.
+    NewUserAgentDetail:
+      type: object
+      properties:
+        UserAgent:
+          allOf:
+          - $ref: '#/components/schemas/UserAgent'
+          description: New user agent which accessed the resource.
+        IsNewForEntireAccount:
+          allOf:
+          - $ref: '#/components/schemas/IsNewForEntireAccount'
+          description: Checks if the user agent is new for the entire account.
+      description: Details new user agents used either at the resource or account
+        level.
     PaginationToken:
       type: string
       minLength: 1
@@ -291,6 +2892,47 @@ components:
       type: string
       enum:
       - AWS_THREAT_INTELLIGENCE
+    RejectInvitationRequest:
+      type: object
+      properties:
+        GraphArn:
+          allOf:
+          - $ref: '#/components/schemas/GraphArn'
+          description: 'The ARN of the behavior graph to reject the invitation to.
+
+
+            The member account''s current member status in the behavior graph must
+            be `INVITED`.'
+      required:
+      - GraphArn
+    RelatedFindingDetail:
+      type: object
+      properties:
+        Arn:
+          allOf:
+          - $ref: '#/components/schemas/EntityArn'
+          description: The Amazon Resource Name (ARN) of the related finding.
+        Type:
+          allOf:
+          - $ref: '#/components/schemas/Type'
+          description: The type of finding.
+        IpAddress:
+          allOf:
+          - $ref: '#/components/schemas/IpAddress'
+          description: The IP address of the finding.
+      description: Details related activities associated with a potential security
+        event. Lists all distinct categories of evidence that are connected to the
+        resource or the finding group.
+    RelatedFindingGroupDetail:
+      type: object
+      properties:
+        Id:
+          allOf:
+          - $ref: '#/components/schemas/Id'
+          description: The unique identifier for the finding group.
+      description: Details multiple activities as they related to a potential security
+        event. Detective uses graph analysis technique that infers relationships between
+        findings and entities, and groups them together as a finding group.
     Resource:
       type: string
       minLength: 1
@@ -299,6 +2941,27 @@ components:
       type: array
       items:
         $ref: '#/components/schemas/Resource'
+    ResourceNotFoundException:
+      type: object
+      properties:
+        Message:
+          $ref: '#/components/schemas/ErrorMessage'
+      description: The request refers to a nonexistent resource.
+    ServiceQuotaExceededException:
+      type: object
+      properties:
+        Message:
+          $ref: '#/components/schemas/ErrorMessage'
+        Resources:
+          allOf:
+          - $ref: '#/components/schemas/ResourceList'
+          description: The type of resource that has exceeded the service quota.
+      description: "This request cannot be completed for one of the following reasons.\n\
+        \n  * This request cannot be completed if it would cause the number of member\
+        \ accounts in the behavior graph to exceed the maximum allowed. A behavior\
+        \ graph cannot have more than 1,200 member accounts.\n\n  * This request cannot\
+        \ be completed if the current volume ingested is above the limit of 10 TB\
+        \ per day. Detective will not allow you to add additional member accounts."
     Severity:
       type: string
       enum:
@@ -307,11 +2970,74 @@ components:
       - MEDIUM
       - HIGH
       - CRITICAL
+    SortCriteria:
+      type: object
+      properties:
+        Field:
+          allOf:
+          - $ref: '#/components/schemas/Field'
+          description: Represents the `Field` attribute to sort investigations.
+        SortOrder:
+          allOf:
+          - $ref: '#/components/schemas/SortOrder'
+          description: The order by which the sorted findings are displayed.
+      description: Details about the criteria used for sorting investigations.
     SortOrder:
       type: string
       enum:
       - ASC
       - DESC
+    StartInvestigationRequest:
+      type: object
+      properties:
+        GraphArn:
+          allOf:
+          - $ref: '#/components/schemas/GraphArn'
+          description: The Amazon Resource Name (ARN) of the behavior graph.
+        EntityArn:
+          allOf:
+          - $ref: '#/components/schemas/EntityArn'
+          description: The unique Amazon Resource Name (ARN) of the IAM user and IAM
+            role.
+        ScopeStartTime:
+          allOf:
+          - $ref: '#/components/schemas/Timestamp'
+          description: The data and time when the investigation began. The value is
+            an UTC ISO8601 formatted string. For example, `2021-08-18T16:35:56.284Z`.
+        ScopeEndTime:
+          allOf:
+          - $ref: '#/components/schemas/Timestamp'
+          description: The data and time when the investigation ended. The value is
+            an UTC ISO8601 formatted string. For example, `2021-08-18T16:35:56.284Z`.
+      required:
+      - GraphArn
+      - EntityArn
+      - ScopeStartTime
+      - ScopeEndTime
+    StartInvestigationResponse:
+      type: object
+      properties:
+        InvestigationId:
+          allOf:
+          - $ref: '#/components/schemas/InvestigationId'
+          description: The investigation ID of the investigation report.
+    StartMonitoringMemberRequest:
+      type: object
+      properties:
+        GraphArn:
+          allOf:
+          - $ref: '#/components/schemas/GraphArn'
+          description: The ARN of the behavior graph.
+        AccountId:
+          allOf:
+          - $ref: '#/components/schemas/AccountId'
+          description: 'The account ID of the member account to try to enable.
+
+
+            The account must be an invited member account with a status of `ACCEPTED_BUT_DISABLED`.'
+      required:
+      - GraphArn
+      - AccountId
     State:
       type: string
       enum:
@@ -323,6 +3049,51 @@ components:
       - RUNNING
       - FAILED
       - SUCCESSFUL
+    StringFilter:
+      type: object
+      properties:
+        Value:
+          allOf:
+          - $ref: '#/components/schemas/Value'
+          description: The string filter value.
+      required:
+      - Value
+      description: A string for filtering Detective investigations.
+    TTPsObservedDetail:
+      type: object
+      properties:
+        Tactic:
+          allOf:
+          - $ref: '#/components/schemas/Tactic'
+          description: The tactic used, identified by the investigation.
+        Technique:
+          allOf:
+          - $ref: '#/components/schemas/Technique'
+          description: The technique used, identified by the investigation.
+        Procedure:
+          allOf:
+          - $ref: '#/components/schemas/Procedure'
+          description: The procedure used, identified by the investigation.
+        IpAddress:
+          allOf:
+          - $ref: '#/components/schemas/IpAddress'
+          description: The IP address where the tactics, techniques, and procedure
+            (TTP) was observed.
+        APIName:
+          allOf:
+          - $ref: '#/components/schemas/APIName'
+          description: The name of the API where the tactics, techniques, and procedure
+            (TTP) was observed.
+        APISuccessCount:
+          allOf:
+          - $ref: '#/components/schemas/APISuccessCount'
+          description: The total number of successful API requests.
+        APIFailureCount:
+          allOf:
+          - $ref: '#/components/schemas/APIFailureCount'
+          description: The total number of failed API requests.
+      description: Details tactics, techniques, and procedures (TTPs) used in a potential
+        security event. Tactics are based on [MITRE ATT&CK; Matrix for Enterprise](https://attack.mitre.org/matrices/enterprise/).
     Tactic:
       type: string
     TagKey:
@@ -338,6 +3109,26 @@ components:
       type: object
       additionalProperties:
         $ref: '#/components/schemas/TagValue'
+    TagResourceRequest:
+      type: object
+      properties:
+        ResourceArn:
+          allOf:
+          - $ref: '#/components/schemas/GraphArn'
+          description: The ARN of the behavior graph to assign the tags to.
+        Tags:
+          allOf:
+          - $ref: '#/components/schemas/TagMap'
+          description: The tags to assign to the behavior graph. You can add up to
+            50 tags. For each tag, you provide the tag key and the tag value. Each
+            tag key can contain up to 128 characters. Each tag value can contain up
+            to 256 characters.
+      required:
+      - ResourceArn
+      - Tags
+    TagResourceResponse:
+      type: object
+      properties: {}
     TagValue:
       type: string
       minLength: 0
@@ -347,20 +3138,143 @@ components:
     Timestamp:
       type: string
       format: date-time
+    TimestampForCollection:
+      type: object
+      properties:
+        Timestamp:
+          allOf:
+          - $ref: '#/components/schemas/Timestamp'
+          description: The data and time when data collection began for a source package.
+            The value is an ISO8601 formatted string. For example, `2021-08-18T16:35:56.284Z`.
+      description: Details on when data collection began for a source package.
+    TooManyRequestsException:
+      type: object
+      properties:
+        Message:
+          $ref: '#/components/schemas/ErrorMessage'
+      description: The request cannot be completed because too many other requests
+        are occurring at the same time.
     Type:
       type: string
+    UnprocessedAccount:
+      type: object
+      properties:
+        AccountId:
+          allOf:
+          - $ref: '#/components/schemas/AccountId'
+          description: The Amazon Web Services account identifier of the member account
+            that was not processed.
+        Reason:
+          allOf:
+          - $ref: '#/components/schemas/UnprocessedReason'
+          description: The reason that the member account request could not be processed.
+      description: A member account that was included in a request but for which the
+        request could not be processed.
     UnprocessedAccountList:
       type: array
       items:
         $ref: '#/components/schemas/UnprocessedAccount'
+    UnprocessedGraph:
+      type: object
+      properties:
+        GraphArn:
+          allOf:
+          - $ref: '#/components/schemas/GraphArn'
+          description: The ARN of the organization behavior graph.
+        Reason:
+          allOf:
+          - $ref: '#/components/schemas/UnprocessedReason'
+          description: The reason data source package information could not be processed
+            for a behavior graph.
+      description: Behavior graphs that could not be processed in the request.
     UnprocessedGraphList:
       type: array
       items:
         $ref: '#/components/schemas/UnprocessedGraph'
     UnprocessedReason:
       type: string
+    UntagResourceRequest:
+      type: object
+      properties:
+        ResourceArn:
+          allOf:
+          - $ref: '#/components/schemas/GraphArn'
+          description: The ARN of the behavior graph to remove the tags from.
+        TagKeys:
+          allOf:
+          - $ref: '#/components/schemas/TagKeyList'
+          description: The tag keys of the tags to remove from the behavior graph.
+            You can remove up to 50 tags at a time.
+      required:
+      - ResourceArn
+      - TagKeys
+    UntagResourceResponse:
+      type: object
+      properties: {}
+    UpdateDatasourcePackagesRequest:
+      type: object
+      properties:
+        GraphArn:
+          allOf:
+          - $ref: '#/components/schemas/GraphArn'
+          description: The ARN of the behavior graph.
+        DatasourcePackages:
+          allOf:
+          - $ref: '#/components/schemas/DatasourcePackageList'
+          description: The data source package to start for the behavior graph.
+      required:
+      - GraphArn
+      - DatasourcePackages
+    UpdateInvestigationStateRequest:
+      type: object
+      properties:
+        GraphArn:
+          allOf:
+          - $ref: '#/components/schemas/GraphArn'
+          description: The Amazon Resource Name (ARN) of the behavior graph.
+        InvestigationId:
+          allOf:
+          - $ref: '#/components/schemas/InvestigationId'
+          description: The investigation ID of the investigation report.
+        State:
+          allOf:
+          - $ref: '#/components/schemas/State'
+          description: The current state of the investigation. An archived investigation
+            indicates you have completed reviewing the investigation.
+      required:
+      - GraphArn
+      - InvestigationId
+      - State
+    UpdateOrganizationConfigurationRequest:
+      type: object
+      properties:
+        GraphArn:
+          allOf:
+          - $ref: '#/components/schemas/GraphArn'
+          description: The ARN of the organization behavior graph.
+        AutoEnable:
+          allOf:
+          - $ref: '#/components/schemas/Boolean'
+          description: Indicates whether to automatically enable new organization
+            accounts as member accounts in the organization behavior graph.
+      required:
+      - GraphArn
     UserAgent:
       type: string
+    ValidationException:
+      type: object
+      properties:
+        Message:
+          $ref: '#/components/schemas/ErrorMessage'
+        ErrorCode:
+          allOf:
+          - $ref: '#/components/schemas/ErrorCode'
+          description: The error code associated with the validation failure.
+        ErrorCodeReason:
+          allOf:
+          - $ref: '#/components/schemas/ErrorCodeReason'
+          description: An explanation of why validation failed.
+      description: The request parameters are invalid.
     Value:
       type: string
       minLength: 1

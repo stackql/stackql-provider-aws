@@ -7,7 +7,7 @@ info:
   x-stackql-serviceName: networkmonitor
   x-aws-serviceName: networkmonitor
   x-aws-protocol: aws.protocols#restJson1
-  x-dateGenerated: '2025-05-05'
+  x-dateGenerated: '2025-05-07'
   version: '2023-08-01'
   title: Amazon CloudWatch Network Monitor
   description: |-
@@ -47,9 +47,757 @@ servers:
       - sa-east-1
       - me-south-1
       default: us-east-1
-paths: {}
+paths:
+  /monitors:
+    post:
+      operationId: CreateMonitor
+      description: |-
+        Creates a monitor between a source subnet and destination IP address. Within a monitor you'll create one or more probes that monitor network traffic between your source Amazon Web Services VPC subnets and your destination IP addresses. Each probe then aggregates and sends metrics to Amazon CloudWatch.
+
+        You can also create a monitor with probes using this command. For each probe, you define the following:
+
+          * `source`—The subnet IDs where the probes will be created.
+
+          * `destination`— The target destination IP address for the probe.
+
+          * `destinationPort`—Required only if the protocol is `TCP`.
+
+          * `protocol`—The communication protocol between the source and destination. This will be either `TCP` or `ICMP`.
+
+          * `packetSize`—The size of the packets. This must be a number between `56` and `8500`.
+
+          * (Optional) `tags` —Key-value pairs created and assigned to the probe.
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                monitorName:
+                  $ref: '#/components/schemas/ResourceName'
+                probes:
+                  $ref: '#/components/schemas/CreateMonitorProbeInputList'
+                aggregationPeriod:
+                  $ref: '#/components/schemas/AggregationPeriod'
+                clientToken:
+                  $ref: '#/components/schemas/String'
+                tags:
+                  $ref: '#/components/schemas/TagMap'
+      responses:
+        '200': {}
+        '403':
+          description: |-
+            You do not have sufficient access to perform this action.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '409':
+          description: |-
+            This operation attempted to create a resource that already exists.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConflictException'
+        '500':
+          description: |-
+            The request processing has failed because of an unknown error, exception or failure.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerException'
+        '402':
+          description: |-
+            This request exceeds a service quota.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServiceQuotaExceededException'
+        '429':
+          description: |-
+            The request was denied due to request throttling
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThrottlingException'
+        '400':
+          description: |-
+            One of the parameters for the request is not valid.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+    get:
+      operationId: ListMonitors
+      description: |-
+        Returns a list of all of your monitors.
+      parameters:
+      - name: nextToken
+        in: query
+        required: false
+        schema:
+          $ref: '#/components/schemas/PaginationToken'
+      - name: maxResults
+        in: query
+        required: false
+        schema:
+          $ref: '#/components/schemas/MaxResults'
+      - name: state
+        in: query
+        required: false
+        schema:
+          $ref: '#/components/schemas/String'
+      responses:
+        '200': {}
+        '403':
+          description: |-
+            You do not have sufficient access to perform this action.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '500':
+          description: |-
+            The request processing has failed because of an unknown error, exception or failure.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerException'
+        '429':
+          description: |-
+            The request was denied due to request throttling
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThrottlingException'
+        '400':
+          description: |-
+            One of the parameters for the request is not valid.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+  /monitors/{monitorName}/probes:
+    post:
+      operationId: CreateProbe
+      description: |-
+        Create a probe within a monitor. Once you create a probe, and it begins monitoring your network traffic, you'll incur billing charges for that probe. This action requires the `monitorName` parameter. Run `ListMonitors` to get a list of monitor names. Note the name of the `monitorName` you want to create the probe for.
+      parameters:
+      - name: monitorName
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/ResourceName'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                probe:
+                  $ref: '#/components/schemas/ProbeInput'
+                clientToken:
+                  $ref: '#/components/schemas/String'
+                tags:
+                  $ref: '#/components/schemas/TagMap'
+      responses:
+        '200': {}
+        '403':
+          description: |-
+            You do not have sufficient access to perform this action.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '500':
+          description: |-
+            The request processing has failed because of an unknown error, exception or failure.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerException'
+        '404':
+          description: |-
+            The specified resource does not exist.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+        '402':
+          description: |-
+            This request exceeds a service quota.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServiceQuotaExceededException'
+        '429':
+          description: |-
+            The request was denied due to request throttling
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThrottlingException'
+        '400':
+          description: |-
+            One of the parameters for the request is not valid.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+  /monitors/{monitorName}:
+    delete:
+      operationId: DeleteMonitor
+      description: |-
+        Deletes a specified monitor.
+
+        This action requires the `monitorName` parameter. Run `ListMonitors` to get a list of monitor names.
+      parameters:
+      - name: monitorName
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/ResourceName'
+      responses:
+        '200': {}
+        '403':
+          description: |-
+            You do not have sufficient access to perform this action.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '500':
+          description: |-
+            The request processing has failed because of an unknown error, exception or failure.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerException'
+        '404':
+          description: |-
+            The specified resource does not exist.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+        '429':
+          description: |-
+            The request was denied due to request throttling
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThrottlingException'
+        '400':
+          description: |-
+            One of the parameters for the request is not valid.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+    get:
+      operationId: GetMonitor
+      description: |-
+        Returns details about a specific monitor.
+
+        This action requires the `monitorName` parameter. Run `ListMonitors` to get a list of monitor names.
+      parameters:
+      - name: monitorName
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/ResourceName'
+      responses:
+        '200': {}
+        '403':
+          description: |-
+            You do not have sufficient access to perform this action.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '500':
+          description: |-
+            The request processing has failed because of an unknown error, exception or failure.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerException'
+        '404':
+          description: |-
+            The specified resource does not exist.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+        '429':
+          description: |-
+            The request was denied due to request throttling
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThrottlingException'
+        '400':
+          description: |-
+            One of the parameters for the request is not valid.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+    patch:
+      operationId: UpdateMonitor
+      description: |-
+        Updates the `aggregationPeriod` for a monitor. Monitors support an `aggregationPeriod` of either `30` or `60` seconds. This action requires the `monitorName` and `probeId` parameter. Run `ListMonitors` to get a list of monitor names.
+      parameters:
+      - name: monitorName
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/ResourceName'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                aggregationPeriod:
+                  $ref: '#/components/schemas/AggregationPeriod'
+      responses:
+        '200': {}
+        '403':
+          description: |-
+            You do not have sufficient access to perform this action.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '500':
+          description: |-
+            The request processing has failed because of an unknown error, exception or failure.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerException'
+        '404':
+          description: |-
+            The specified resource does not exist.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+        '402':
+          description: |-
+            This request exceeds a service quota.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServiceQuotaExceededException'
+        '429':
+          description: |-
+            The request was denied due to request throttling
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThrottlingException'
+        '400':
+          description: |-
+            One of the parameters for the request is not valid.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+  /monitors/{monitorName}/probes/{probeId}:
+    delete:
+      operationId: DeleteProbe
+      description: |-
+        Deletes the specified probe. Once a probe is deleted you'll no longer incur any billing fees for that probe.
+
+        This action requires both the `monitorName` and `probeId` parameters. Run `ListMonitors` to get a list of monitor names. Run `GetMonitor` to get a list of probes and probe IDs. You can only delete a single probe at a time using this action.
+      parameters:
+      - name: monitorName
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/ResourceName'
+      - name: probeId
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/ProbeId'
+      responses:
+        '200': {}
+        '403':
+          description: |-
+            You do not have sufficient access to perform this action.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '500':
+          description: |-
+            The request processing has failed because of an unknown error, exception or failure.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerException'
+        '404':
+          description: |-
+            The specified resource does not exist.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+        '402':
+          description: |-
+            This request exceeds a service quota.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServiceQuotaExceededException'
+        '429':
+          description: |-
+            The request was denied due to request throttling
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThrottlingException'
+        '400':
+          description: |-
+            One of the parameters for the request is not valid.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+    get:
+      operationId: GetProbe
+      description: |-
+        Returns the details about a probe. This action requires both the `monitorName` and `probeId` parameters. Run `ListMonitors` to get a list of monitor names. Run `GetMonitor` to get a list of probes and probe IDs.
+      parameters:
+      - name: monitorName
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/ResourceName'
+      - name: probeId
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/ProbeId'
+      responses:
+        '200': {}
+        '403':
+          description: |-
+            You do not have sufficient access to perform this action.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '500':
+          description: |-
+            The request processing has failed because of an unknown error, exception or failure.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerException'
+        '404':
+          description: |-
+            The specified resource does not exist.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+        '429':
+          description: |-
+            The request was denied due to request throttling
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThrottlingException'
+        '400':
+          description: |-
+            One of the parameters for the request is not valid.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+    patch:
+      operationId: UpdateProbe
+      description: |-
+        Updates a monitor probe. This action requires both the `monitorName` and `probeId` parameters. Run `ListMonitors` to get a list of monitor names. Run `GetMonitor` to get a list of probes and probe IDs.
+
+        You can update the following para create a monitor with probes using this command. For each probe, you define the following:
+
+          * `state`—The state of the probe.
+
+          * `destination`— The target destination IP address for the probe.
+
+          * `destinationPort`—Required only if the protocol is `TCP`.
+
+          * `protocol`—The communication protocol between the source and destination. This will be either `TCP` or `ICMP`.
+
+          * `packetSize`—The size of the packets. This must be a number between `56` and `8500`.
+
+          * (Optional) `tags` —Key-value pairs created and assigned to the probe.
+      parameters:
+      - name: monitorName
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/ResourceName'
+      - name: probeId
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/ProbeId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                state:
+                  $ref: '#/components/schemas/ProbeState'
+                destination:
+                  $ref: '#/components/schemas/Destination'
+                destinationPort:
+                  $ref: '#/components/schemas/Port'
+                protocol:
+                  $ref: '#/components/schemas/Protocol'
+                packetSize:
+                  $ref: '#/components/schemas/PacketSize'
+      responses:
+        '200': {}
+        '403':
+          description: |-
+            You do not have sufficient access to perform this action.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '500':
+          description: |-
+            The request processing has failed because of an unknown error, exception or failure.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerException'
+        '404':
+          description: |-
+            The specified resource does not exist.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+        '402':
+          description: |-
+            This request exceeds a service quota.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServiceQuotaExceededException'
+        '429':
+          description: |-
+            The request was denied due to request throttling
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThrottlingException'
+        '400':
+          description: |-
+            One of the parameters for the request is not valid.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+  /tags/{resourceArn}:
+    get:
+      operationId: ListTagsForResource
+      description: |-
+        Lists the tags assigned to this resource.
+      parameters:
+      - name: resourceArn
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/Arn'
+      responses:
+        '200': {}
+        '403':
+          description: |-
+            You do not have sufficient access to perform this action.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '409':
+          description: |-
+            This operation attempted to create a resource that already exists.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConflictException'
+        '500':
+          description: |-
+            The request processing has failed because of an unknown error, exception or failure.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerException'
+        '404':
+          description: |-
+            The specified resource does not exist.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+        '429':
+          description: |-
+            The request was denied due to request throttling
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThrottlingException'
+        '400':
+          description: |-
+            One of the parameters for the request is not valid.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+    post:
+      operationId: TagResource
+      description: |-
+        Adds key-value pairs to a monitor or probe.
+      parameters:
+      - name: resourceArn
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/Arn'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                tags:
+                  $ref: '#/components/schemas/TagMap'
+      responses:
+        '200': {}
+        '403':
+          description: |-
+            You do not have sufficient access to perform this action.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '409':
+          description: |-
+            This operation attempted to create a resource that already exists.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConflictException'
+        '500':
+          description: |-
+            The request processing has failed because of an unknown error, exception or failure.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerException'
+        '404':
+          description: |-
+            The specified resource does not exist.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+        '429':
+          description: |-
+            The request was denied due to request throttling
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThrottlingException'
+        '400':
+          description: |-
+            One of the parameters for the request is not valid.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+    delete:
+      operationId: UntagResource
+      description: |-
+        Removes a key-value pair from a monitor or probe.
+      parameters:
+      - name: resourceArn
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/Arn'
+      - name: tagKeys
+        in: query
+        required: true
+        schema:
+          $ref: '#/components/schemas/TagKeyList'
+      responses:
+        '200': {}
+        '403':
+          description: |-
+            You do not have sufficient access to perform this action.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '409':
+          description: |-
+            This operation attempted to create a resource that already exists.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConflictException'
+        '500':
+          description: |-
+            The request processing has failed because of an unknown error, exception or failure.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerException'
+        '404':
+          description: |-
+            The specified resource does not exist.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+        '429':
+          description: |-
+            The request was denied due to request throttling
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThrottlingException'
+        '400':
+          description: |-
+            One of the parameters for the request is not valid.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
 components:
   schemas:
+    AccessDeniedException:
+      type: object
+      properties:
+        message:
+          $ref: '#/components/schemas/String'
+      description: You do not have sufficient access to perform this action.
     AddressFamily:
       type: string
       enum:
@@ -64,17 +812,417 @@ components:
       pattern: ^arn:.*$
       minLength: 20
       maxLength: 2048
+    ConflictException:
+      type: object
+      properties:
+        message:
+          $ref: '#/components/schemas/String'
+      description: This operation attempted to create a resource that already exists.
+    CreateMonitorInput:
+      type: object
+      properties:
+        monitorName:
+          allOf:
+          - $ref: '#/components/schemas/ResourceName'
+          description: The name identifying the monitor. It can contain only letters,
+            underscores (_), or dashes (-), and can be up to 200 characters.
+        probes:
+          allOf:
+          - $ref: '#/components/schemas/CreateMonitorProbeInputList'
+          description: Displays a list of all of the probes created for a monitor.
+        aggregationPeriod:
+          allOf:
+          - $ref: '#/components/schemas/AggregationPeriod'
+          description: The time, in seconds, that metrics are aggregated and sent
+            to Amazon CloudWatch. Valid values are either `30` or `60`. `60` is the
+            default if no period is chosen.
+        clientToken:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: Unique, case-sensitive identifier to ensure the idempotency
+            of the request. Only returned if a client token was provided in the request.
+        tags:
+          allOf:
+          - $ref: '#/components/schemas/TagMap'
+          description: The list of key-value pairs created and assigned to the monitor.
+      required:
+      - monitorName
+    CreateMonitorOutput:
+      type: object
+      properties:
+        monitorArn:
+          allOf:
+          - $ref: '#/components/schemas/MonitorArn'
+          description: The ARN of the monitor.
+        monitorName:
+          allOf:
+          - $ref: '#/components/schemas/ResourceName'
+          description: The name of the monitor.
+        state:
+          allOf:
+          - $ref: '#/components/schemas/MonitorState'
+          description: The state of the monitor.
+        aggregationPeriod:
+          allOf:
+          - $ref: '#/components/schemas/AggregationPeriod'
+          description: The number of seconds that metrics are aggregated by and sent
+            to Amazon CloudWatch. This will be either `30` or `60`.
+        tags:
+          allOf:
+          - $ref: '#/components/schemas/TagMap'
+          description: The list of key-value pairs assigned to the monitor.
+      required:
+      - monitorArn
+      - monitorName
+      - state
+    CreateMonitorProbeInput:
+      type: object
+      properties:
+        sourceArn:
+          allOf:
+          - $ref: '#/components/schemas/Arn'
+          description: The ARN of the subnet.
+        destination:
+          allOf:
+          - $ref: '#/components/schemas/Destination'
+          description: The destination IP address. This must be either `IPV4` or `IPV6`.
+        destinationPort:
+          allOf:
+          - $ref: '#/components/schemas/Port'
+          description: The port associated with the `destination`. This is required
+            only if the `protocol` is `TCP` and must be a number between `1` and `65536`.
+        protocol:
+          allOf:
+          - $ref: '#/components/schemas/Protocol'
+          description: The protocol used for the network traffic between the `source`
+            and `destination`. This must be either `TCP` or `ICMP`.
+        packetSize:
+          allOf:
+          - $ref: '#/components/schemas/PacketSize'
+          description: The size of the packets sent between the source and destination.
+            This must be a number between `56` and `8500`.
+        probeTags:
+          allOf:
+          - $ref: '#/components/schemas/TagMap'
+          description: The list of key-value pairs created and assigned to the monitor.
+      required:
+      - sourceArn
+      - destination
+      - protocol
+      description: Creates a monitor probe.
     CreateMonitorProbeInputList:
       type: array
       items:
         $ref: '#/components/schemas/CreateMonitorProbeInput'
+    CreateProbeInput:
+      type: object
+      properties:
+        monitorName:
+          allOf:
+          - $ref: '#/components/schemas/ResourceName'
+          description: The name of the monitor to associated with the probe.
+        probe:
+          allOf:
+          - $ref: '#/components/schemas/ProbeInput'
+          description: Describes the details of an individual probe for a monitor.
+        clientToken:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: Unique, case-sensitive identifier to ensure the idempotency
+            of the request. Only returned if a client token was provided in the request.
+        tags:
+          allOf:
+          - $ref: '#/components/schemas/TagMap'
+          description: The list of key-value pairs created and assigned to the probe.
+      required:
+      - monitorName
+      - probe
+    CreateProbeOutput:
+      type: object
+      properties:
+        probeId:
+          allOf:
+          - $ref: '#/components/schemas/ProbeId'
+          description: The ID of the probe for which details are returned.
+        probeArn:
+          allOf:
+          - $ref: '#/components/schemas/Arn'
+          description: The ARN of the probe.
+        sourceArn:
+          allOf:
+          - $ref: '#/components/schemas/Arn'
+          description: The ARN of the probe.
+        destination:
+          allOf:
+          - $ref: '#/components/schemas/Destination'
+          description: The destination IP address for the monitor. This must be either
+            an IPv4 or IPv6 address.
+        destinationPort:
+          allOf:
+          - $ref: '#/components/schemas/Port'
+          description: The port associated with the `destination`. This is required
+            only if the `protocol` is `TCP` and must be a number between `1` and `65536`.
+        protocol:
+          allOf:
+          - $ref: '#/components/schemas/Protocol'
+          description: The protocol used for the network traffic between the `source`
+            and `destination`. This must be either `TCP` or `ICMP`.
+        packetSize:
+          allOf:
+          - $ref: '#/components/schemas/PacketSize'
+          description: The size of the packets sent between the source and destination.
+            This must be a number between `56` and `8500`.
+        addressFamily:
+          allOf:
+          - $ref: '#/components/schemas/AddressFamily'
+          description: Indicates whether the IP address is `IPV4` or `IPV6`.
+        vpcId:
+          allOf:
+          - $ref: '#/components/schemas/VpcId'
+          description: The ID of the source VPC or subnet.
+        state:
+          allOf:
+          - $ref: '#/components/schemas/ProbeState'
+          description: The state of the probe.
+        createdAt:
+          allOf:
+          - $ref: '#/components/schemas/Iso8601Timestamp'
+          description: The time and date that the probe was created.
+        modifiedAt:
+          allOf:
+          - $ref: '#/components/schemas/Iso8601Timestamp'
+          description: The time and date when the probe was last modified.
+        tags:
+          allOf:
+          - $ref: '#/components/schemas/TagMap'
+          description: The list of key-value pairs assigned to the probe.
+      required:
+      - sourceArn
+      - destination
+      - protocol
+    DeleteMonitorInput:
+      type: object
+      properties:
+        monitorName:
+          allOf:
+          - $ref: '#/components/schemas/ResourceName'
+          description: The name of the monitor to delete.
+      required:
+      - monitorName
+    DeleteMonitorOutput:
+      type: object
+      properties: {}
+    DeleteProbeInput:
+      type: object
+      properties:
+        monitorName:
+          allOf:
+          - $ref: '#/components/schemas/ResourceName'
+          description: The name of the monitor to delete.
+        probeId:
+          allOf:
+          - $ref: '#/components/schemas/ProbeId'
+          description: The ID of the probe to delete.
+      required:
+      - monitorName
+      - probeId
+    DeleteProbeOutput:
+      type: object
+      properties: {}
     Destination:
       type: string
       minLength: 1
       maxLength: 255
+    GetMonitorInput:
+      type: object
+      properties:
+        monitorName:
+          allOf:
+          - $ref: '#/components/schemas/ResourceName'
+          description: The name of the monitor that details are returned for.
+      required:
+      - monitorName
+    GetMonitorOutput:
+      type: object
+      properties:
+        monitorArn:
+          allOf:
+          - $ref: '#/components/schemas/MonitorArn'
+          description: The ARN of the selected monitor.
+        monitorName:
+          allOf:
+          - $ref: '#/components/schemas/ResourceName'
+          description: The name of the monitor.
+        state:
+          allOf:
+          - $ref: '#/components/schemas/MonitorState'
+          description: Lists the status of the `state` of each monitor.
+        aggregationPeriod:
+          allOf:
+          - $ref: '#/components/schemas/AggregationPeriod'
+          description: The aggregation period for the specified monitor.
+        tags:
+          allOf:
+          - $ref: '#/components/schemas/TagMap'
+          description: The list of key-value pairs assigned to the monitor.
+        probes:
+          allOf:
+          - $ref: '#/components/schemas/ProbeList'
+          description: The details about each probe associated with that monitor.
+        createdAt:
+          allOf:
+          - $ref: '#/components/schemas/Iso8601Timestamp'
+          description: The time and date when the monitor was created.
+        modifiedAt:
+          allOf:
+          - $ref: '#/components/schemas/Iso8601Timestamp'
+          description: The time and date when the monitor was last modified.
+      required:
+      - monitorArn
+      - monitorName
+      - state
+      - aggregationPeriod
+      - createdAt
+      - modifiedAt
+    GetProbeInput:
+      type: object
+      properties:
+        monitorName:
+          allOf:
+          - $ref: '#/components/schemas/ResourceName'
+          description: The name of the monitor associated with the probe. Run `ListMonitors`
+            to get a list of monitor names.
+        probeId:
+          allOf:
+          - $ref: '#/components/schemas/ProbeId'
+          description: The ID of the probe to get information about. Run `GetMonitor`
+            action to get a list of probes and probe IDs for the monitor.
+      required:
+      - monitorName
+      - probeId
+    GetProbeOutput:
+      type: object
+      properties:
+        probeId:
+          allOf:
+          - $ref: '#/components/schemas/ProbeId'
+          description: The ID of the probe for which details are returned.
+        probeArn:
+          allOf:
+          - $ref: '#/components/schemas/Arn'
+          description: The ARN of the probe.
+        sourceArn:
+          allOf:
+          - $ref: '#/components/schemas/Arn'
+          description: The ARN of the probe.
+        destination:
+          allOf:
+          - $ref: '#/components/schemas/Destination'
+          description: The destination IP address for the monitor. This must be either
+            an IPv4 or IPv6 address.
+        destinationPort:
+          allOf:
+          - $ref: '#/components/schemas/Port'
+          description: The port associated with the `destination`. This is required
+            only if the `protocol` is `TCP` and must be a number between `1` and `65536`.
+        protocol:
+          allOf:
+          - $ref: '#/components/schemas/Protocol'
+          description: The protocol used for the network traffic between the `source`
+            and `destination`. This must be either `TCP` or `ICMP`.
+        packetSize:
+          allOf:
+          - $ref: '#/components/schemas/PacketSize'
+          description: The size of the packets sent between the source and destination.
+            This must be a number between `56` and `8500`.
+        addressFamily:
+          allOf:
+          - $ref: '#/components/schemas/AddressFamily'
+          description: Indicates whether the IP address is `IPV4` or `IPV6`.
+        vpcId:
+          allOf:
+          - $ref: '#/components/schemas/VpcId'
+          description: The ID of the source VPC or subnet.
+        state:
+          allOf:
+          - $ref: '#/components/schemas/ProbeState'
+          description: The state of the probe.
+        createdAt:
+          allOf:
+          - $ref: '#/components/schemas/Iso8601Timestamp'
+          description: The time and date that the probe was created.
+        modifiedAt:
+          allOf:
+          - $ref: '#/components/schemas/Iso8601Timestamp'
+          description: The time and date that the probe was last modified.
+        tags:
+          allOf:
+          - $ref: '#/components/schemas/TagMap'
+          description: The list of key-value pairs assigned to the probe.
+      required:
+      - sourceArn
+      - destination
+      - protocol
+    InternalServerException:
+      type: object
+      properties:
+        message:
+          $ref: '#/components/schemas/String'
+      description: The request processing has failed because of an unknown error,
+        exception or failure.
     Iso8601Timestamp:
       type: string
       format: date-time
+    ListMonitorsInput:
+      type: object
+      properties:
+        nextToken:
+          allOf:
+          - $ref: '#/components/schemas/PaginationToken'
+          description: The token for the next page of results.
+        maxResults:
+          allOf:
+          - $ref: '#/components/schemas/MaxResults'
+          description: 'The maximum number of results to return with a single call.
+            To retrieve the remaining results, make another call with the returned
+            `nextToken` value.
+
+
+            If `MaxResults` is given a value larger than 100, only 100 results are
+            returned.'
+        state:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The list of all monitors and their states.
+    ListMonitorsOutput:
+      type: object
+      properties:
+        monitors:
+          allOf:
+          - $ref: '#/components/schemas/MonitorList'
+          description: Lists individual details about each of your monitors.
+        nextToken:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The token for the next page of results.
+      required:
+      - monitors
+    ListTagsForResourceInput:
+      type: object
+      properties:
+        resourceArn:
+          allOf:
+          - $ref: '#/components/schemas/Arn'
+          description: The
+      required:
+      - resourceArn
+    ListTagsForResourceOutput:
+      type: object
+      properties:
+        tags:
+          allOf:
+          - $ref: '#/components/schemas/TagMap'
+          description: Lists the tags assigned to the resource.
     MaxResults:
       type: integer
       minimum: 1
@@ -96,6 +1244,35 @@ components:
       - INACTIVE
       - ERROR
       - DELETING
+    MonitorSummary:
+      type: object
+      properties:
+        monitorArn:
+          allOf:
+          - $ref: '#/components/schemas/MonitorArn'
+          description: The ARN of the monitor.
+        monitorName:
+          allOf:
+          - $ref: '#/components/schemas/ResourceName'
+          description: The name of the monitor.
+        state:
+          allOf:
+          - $ref: '#/components/schemas/MonitorState'
+          description: The state of the monitor.
+        aggregationPeriod:
+          allOf:
+          - $ref: '#/components/schemas/AggregationPeriod'
+          description: The time, in seconds, that metrics are collected and sent to
+            Amazon CloudWatch. Valid values are either `30` or `60`.
+        tags:
+          allOf:
+          - $ref: '#/components/schemas/TagMap'
+          description: The list of key-value pairs assigned to the monitor.
+      required:
+      - monitorArn
+      - monitorName
+      - state
+      description: Displays summary information about a monitor.
     PacketSize:
       type: integer
       minimum: 56
@@ -108,9 +1285,108 @@ components:
       type: integer
       minimum: 0
       maximum: 65536
+    Probe:
+      type: object
+      properties:
+        probeId:
+          allOf:
+          - $ref: '#/components/schemas/ProbeId'
+          description: The ID of the probe.
+        probeArn:
+          allOf:
+          - $ref: '#/components/schemas/Arn'
+          description: The ARN of the probe.
+        sourceArn:
+          allOf:
+          - $ref: '#/components/schemas/Arn'
+          description: The ARN of the probe source subnet.
+        destination:
+          allOf:
+          - $ref: '#/components/schemas/Destination'
+          description: The destination for the probe. This should be either an `IPV4`
+            or `IPV6`.
+        destinationPort:
+          allOf:
+          - $ref: '#/components/schemas/Port'
+          description: The destination port for the probe. This is required only if
+            the `protocol` is `TCP` and must be a number between `1` and `65536`.
+        protocol:
+          allOf:
+          - $ref: '#/components/schemas/Protocol'
+          description: The network protocol for the destination. This can be either
+            `TCP` or `ICMP`. If the protocol is `TCP`, then `port` is also required.
+        packetSize:
+          allOf:
+          - $ref: '#/components/schemas/PacketSize'
+          description: The size of the packets traveling between the `source` and
+            `destination`. This must be a number between `56` and
+        addressFamily:
+          allOf:
+          - $ref: '#/components/schemas/AddressFamily'
+          description: The IPv4 or IPv6 address for the probe.
+        vpcId:
+          allOf:
+          - $ref: '#/components/schemas/VpcId'
+          description: The ID of the source VPC subnet.
+        state:
+          allOf:
+          - $ref: '#/components/schemas/ProbeState'
+          description: The state of the probe.
+        createdAt:
+          allOf:
+          - $ref: '#/components/schemas/Iso8601Timestamp'
+          description: The time and date the probe was created.
+        modifiedAt:
+          allOf:
+          - $ref: '#/components/schemas/Iso8601Timestamp'
+          description: The time and date that the probe was last modified.
+        tags:
+          allOf:
+          - $ref: '#/components/schemas/TagMap'
+          description: The list of key-value pairs created and assigned to the probe.
+      required:
+      - sourceArn
+      - destination
+      - protocol
+      description: Describes information about a network monitor probe.
     ProbeId:
       type: string
       pattern: ^probe-[a-z0-9A-Z-]{21,64}$
+    ProbeInput:
+      type: object
+      properties:
+        sourceArn:
+          allOf:
+          - $ref: '#/components/schemas/Arn'
+          description: The ARN of the subnet.
+        destination:
+          allOf:
+          - $ref: '#/components/schemas/Destination'
+          description: The destination IP address. This must be either `IPV4` or `IPV6`.
+        destinationPort:
+          allOf:
+          - $ref: '#/components/schemas/Port'
+          description: The port associated with the `destination`. This is required
+            only if the `protocol` is `TCP` and must be a number between `1` and `65536`.
+        protocol:
+          allOf:
+          - $ref: '#/components/schemas/Protocol'
+          description: The protocol used for the network traffic between the `source`
+            and `destination`. This must be either `TCP` or `ICMP`.
+        packetSize:
+          allOf:
+          - $ref: '#/components/schemas/PacketSize'
+          description: The size of the packets sent between the source and destination.
+            This must be a number between `56` and `8500`.
+        tags:
+          allOf:
+          - $ref: '#/components/schemas/TagMap'
+          description: The list of key-value pairs created and assigned to the monitor.
+      required:
+      - sourceArn
+      - destination
+      - protocol
+      description: Defines a probe when creating a probe or monitor.
     ProbeList:
       type: array
       items:
@@ -134,6 +1410,18 @@ components:
       pattern: ^[a-zA-Z0-9_-]+$
       minLength: 1
       maxLength: 200
+    ResourceNotFoundException:
+      type: object
+      properties:
+        message:
+          $ref: '#/components/schemas/String'
+      description: The specified resource does not exist.
+    ServiceQuotaExceededException:
+      type: object
+      properties:
+        message:
+          $ref: '#/components/schemas/String'
+      description: This request exceeds a service quota.
     TagKey:
       type: string
       minLength: 1
@@ -146,10 +1434,199 @@ components:
       type: object
       additionalProperties:
         $ref: '#/components/schemas/TagValue'
+    TagResourceInput:
+      type: object
+      properties:
+        resourceArn:
+          allOf:
+          - $ref: '#/components/schemas/Arn'
+          description: The ARN of the monitor or probe to tag.
+        tags:
+          allOf:
+          - $ref: '#/components/schemas/TagMap'
+          description: The list of key-value pairs assigned to the monitor or probe.
+      required:
+      - resourceArn
+      - tags
+    TagResourceOutput:
+      type: object
+      properties: {}
     TagValue:
       type: string
       minLength: 0
       maxLength: 256
+    ThrottlingException:
+      type: object
+      properties:
+        message:
+          $ref: '#/components/schemas/String'
+      description: The request was denied due to request throttling
+    UntagResourceInput:
+      type: object
+      properties:
+        resourceArn:
+          allOf:
+          - $ref: '#/components/schemas/Arn'
+          description: The ARN of the monitor or probe that the tag should be removed
+            from.
+        tagKeys:
+          allOf:
+          - $ref: '#/components/schemas/TagKeyList'
+          description: The key-value pa
+      required:
+      - resourceArn
+      - tagKeys
+    UntagResourceOutput:
+      type: object
+      properties: {}
+    UpdateMonitorInput:
+      type: object
+      properties:
+        monitorName:
+          allOf:
+          - $ref: '#/components/schemas/ResourceName'
+          description: The name of the monitor to update.
+        aggregationPeriod:
+          allOf:
+          - $ref: '#/components/schemas/AggregationPeriod'
+          description: The aggregation time, in seconds, to change to. This must be
+            either `30` or `60`.
+      required:
+      - monitorName
+      - aggregationPeriod
+    UpdateMonitorOutput:
+      type: object
+      properties:
+        monitorArn:
+          allOf:
+          - $ref: '#/components/schemas/MonitorArn'
+          description: The ARN of the monitor that was updated.
+        monitorName:
+          allOf:
+          - $ref: '#/components/schemas/ResourceName'
+          description: The name of the monitor that was updated.
+        state:
+          allOf:
+          - $ref: '#/components/schemas/MonitorState'
+          description: The state of the updated monitor.
+        aggregationPeriod:
+          allOf:
+          - $ref: '#/components/schemas/AggregationPeriod'
+          description: The changed aggregation period.
+        tags:
+          allOf:
+          - $ref: '#/components/schemas/TagMap'
+          description: The list of key-value pairs associated with the monitor.
+      required:
+      - monitorArn
+      - monitorName
+      - state
+    UpdateProbeInput:
+      type: object
+      properties:
+        monitorName:
+          allOf:
+          - $ref: '#/components/schemas/ResourceName'
+          description: The name of the monitor that the probe was updated for.
+        probeId:
+          allOf:
+          - $ref: '#/components/schemas/ProbeId'
+          description: The ID of the probe to update.
+        state:
+          allOf:
+          - $ref: '#/components/schemas/ProbeState'
+          description: The state of the probe update.
+        destination:
+          allOf:
+          - $ref: '#/components/schemas/Destination'
+          description: The updated IP address for the probe destination. This must
+            be either an IPv4 or IPv6 address.
+        destinationPort:
+          allOf:
+          - $ref: '#/components/schemas/Port'
+          description: The updated port for the probe destination. This is required
+            only if the `protocol` is `TCP` and must be a number between `1` and `65536`.
+        protocol:
+          allOf:
+          - $ref: '#/components/schemas/Protocol'
+          description: The updated network protocol for the destination. This can
+            be either `TCP` or `ICMP`. If the protocol is `TCP`, then `port` is also
+            required.
+        packetSize:
+          allOf:
+          - $ref: '#/components/schemas/PacketSize'
+          description: he updated packets size for network traffic between the source
+            and destination. This must be a number between `56` and `8500`.
+      required:
+      - monitorName
+      - probeId
+    UpdateProbeOutput:
+      type: object
+      properties:
+        probeId:
+          allOf:
+          - $ref: '#/components/schemas/ProbeId'
+          description: The updated ID of the probe.
+        probeArn:
+          allOf:
+          - $ref: '#/components/schemas/Arn'
+          description: The updated ARN of the probe.
+        sourceArn:
+          allOf:
+          - $ref: '#/components/schemas/Arn'
+          description: The updated ARN of the source subnet.
+        destination:
+          allOf:
+          - $ref: '#/components/schemas/Destination'
+          description: The updated destination IP address for the probe.
+        destinationPort:
+          allOf:
+          - $ref: '#/components/schemas/Port'
+          description: The updated destination port. This must be a number between
+            `1` and `65536`.
+        protocol:
+          allOf:
+          - $ref: '#/components/schemas/Protocol'
+          description: The updated protocol for the probe.
+        packetSize:
+          allOf:
+          - $ref: '#/components/schemas/PacketSize'
+          description: The updated packet size for the probe.
+        addressFamily:
+          allOf:
+          - $ref: '#/components/schemas/AddressFamily'
+          description: The updated IP address family. This must be either `IPV4` or
+            `IPV6`.
+        vpcId:
+          allOf:
+          - $ref: '#/components/schemas/VpcId'
+          description: The updated ID of the source VPC subnet ID.
+        state:
+          allOf:
+          - $ref: '#/components/schemas/ProbeState'
+          description: The state of the updated probe.
+        createdAt:
+          allOf:
+          - $ref: '#/components/schemas/Iso8601Timestamp'
+          description: The time and date that the probe was created.
+        modifiedAt:
+          allOf:
+          - $ref: '#/components/schemas/Iso8601Timestamp'
+          description: The time and date that the probe was last updated.
+        tags:
+          allOf:
+          - $ref: '#/components/schemas/TagMap'
+          description: Update tags for a probe.
+      required:
+      - sourceArn
+      - destination
+      - protocol
+    ValidationException:
+      type: object
+      properties:
+        message:
+          $ref: '#/components/schemas/String'
+      description: One of the parameters for the request is not valid.
     VpcId:
       type: string
       pattern: ^vpc-[a-zA-Z0-9]{8,32}$

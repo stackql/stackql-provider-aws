@@ -7,7 +7,7 @@ info:
   x-stackql-serviceName: connect_contact_lens
   x-aws-serviceName: connectcontactlens
   x-aws-protocol: aws.protocols#restJson1
-  x-dateGenerated: '2025-05-05'
+  x-dateGenerated: '2025-05-07'
   version: '2020-08-21'
   title: Amazon Connect Contact Lens
   description: |-
@@ -49,9 +49,102 @@ servers:
       - sa-east-1
       - me-south-1
       default: us-east-1
-paths: {}
+paths:
+  /realtime-contact-analysis/analysis-segments:
+    post:
+      operationId: ListRealtimeContactAnalysisSegments
+      description: |-
+        Provides a list of analysis segments for a real-time analysis session.
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                InstanceId:
+                  $ref: '#/components/schemas/InstanceId'
+                ContactId:
+                  $ref: '#/components/schemas/ContactId'
+                MaxResults:
+                  $ref: '#/components/schemas/MaxResults'
+                NextToken:
+                  $ref: '#/components/schemas/NextToken'
+      responses:
+        '200': {}
+        '403':
+          description: |-
+            You do not have sufficient access to perform this action.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '500':
+          description: |-
+            Request processing failed due to an error or failure with the service.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServiceException'
+        '400':
+          description: |-
+            The request is not valid.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InvalidRequestException'
+        '404':
+          description: |-
+            The specified resource was not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+        '429':
+          description: |-
+            The throttling limit has been exceeded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThrottlingException'
 components:
   schemas:
+    AccessDeniedException:
+      type: object
+      properties:
+        Message:
+          $ref: '#/components/schemas/Message'
+      required:
+      - Message
+      description: You do not have sufficient access to perform this action.
+    Categories:
+      type: object
+      properties:
+        MatchedCategories:
+          allOf:
+          - $ref: '#/components/schemas/MatchedCategories'
+          description: The category rules that have been matched in the analyzed segment.
+        MatchedDetails:
+          allOf:
+          - $ref: '#/components/schemas/MatchedDetails'
+          description: The category rule that was matched and when it occurred in
+            the transcript.
+      required:
+      - MatchedCategories
+      - MatchedDetails
+      description: Provides the category rules that are used to automatically categorize
+        contacts based on uttered keywords and phrases.
+    CategoryDetails:
+      type: object
+      properties:
+        PointsOfInterest:
+          allOf:
+          - $ref: '#/components/schemas/PointsOfInterest'
+          description: The section of audio where the category rule was detected.
+      required:
+      - PointsOfInterest
+      description: Provides information about the category rule that was matched.
     CategoryName:
       type: string
       pattern: \S
@@ -60,6 +153,22 @@ components:
     CharacterOffset:
       type: integer
       minimum: 0
+    CharacterOffsets:
+      type: object
+      properties:
+        BeginOffsetChar:
+          allOf:
+          - $ref: '#/components/schemas/CharacterOffset'
+          description: The beginning of the issue.
+        EndOffsetChar:
+          allOf:
+          - $ref: '#/components/schemas/CharacterOffset'
+          description: The end of the issue.
+      required:
+      - BeginOffsetChar
+      - EndOffsetChar
+      description: For characters that were detected as issues, where they occur in
+        the transcript.
     ContactId:
       type: string
       pattern: \S
@@ -70,10 +179,77 @@ components:
       pattern: \S
       minLength: 1
       maxLength: 256
+    InternalServiceException:
+      type: object
+      properties:
+        Message:
+          $ref: '#/components/schemas/Message'
+      description: Request processing failed due to an error or failure with the service.
+    InvalidRequestException:
+      type: object
+      properties:
+        Message:
+          $ref: '#/components/schemas/Message'
+      description: The request is not valid.
+    IssueDetected:
+      type: object
+      properties:
+        CharacterOffsets:
+          allOf:
+          - $ref: '#/components/schemas/CharacterOffsets'
+          description: The offset for when the issue was detected in the segment.
+      required:
+      - CharacterOffsets
+      description: Potential issues that are detected based on an artificial intelligence
+        analysis of each turn in the conversation.
     IssuesDetected:
       type: array
       items:
         $ref: '#/components/schemas/IssueDetected'
+    ListRealtimeContactAnalysisSegmentsRequest:
+      type: object
+      properties:
+        InstanceId:
+          allOf:
+          - $ref: '#/components/schemas/InstanceId'
+          description: The identifier of the Amazon Connect instance.
+        ContactId:
+          allOf:
+          - $ref: '#/components/schemas/ContactId'
+          description: The identifier of the contact.
+        MaxResults:
+          allOf:
+          - $ref: '#/components/schemas/MaxResults'
+          description: The maximum number of results to return per page.
+        NextToken:
+          allOf:
+          - $ref: '#/components/schemas/NextToken'
+          description: The token for the next set of results. Use the value returned
+            in the previous response in the next request to retrieve the next set
+            of results.
+      required:
+      - InstanceId
+      - ContactId
+    ListRealtimeContactAnalysisSegmentsResponse:
+      type: object
+      properties:
+        Segments:
+          allOf:
+          - $ref: '#/components/schemas/RealtimeContactAnalysisSegments'
+          description: An analyzed transcript or category.
+        NextToken:
+          allOf:
+          - $ref: '#/components/schemas/NextToken'
+          description: "If there are additional results, this is the token for the\
+            \ next set of results. If response includes `nextToken` there are two\
+            \ possible scenarios:\n\n  * There are more segments so another call is\
+            \ required to get them.\n\n  * There are no more segments at this time,\
+            \ but more may be available later (real-time analysis is in progress)\
+            \ so the client should call the operation again to get new segments.\n\
+            \nIf response does not include `nextToken`, the analysis is completed\
+            \ (successfully or failed) and there are no more segments to retrieve."
+      required:
+      - Segments
     MatchedCategories:
       type: array
       items:
@@ -106,10 +282,55 @@ components:
       pattern: \S
       minLength: 1
       maxLength: 256
+    PointOfInterest:
+      type: object
+      properties:
+        BeginOffsetMillis:
+          allOf:
+          - $ref: '#/components/schemas/OffsetMillis'
+          description: The beginning offset in milliseconds where the category rule
+            was detected.
+        EndOffsetMillis:
+          allOf:
+          - $ref: '#/components/schemas/OffsetMillis'
+          description: The ending offset in milliseconds where the category rule was
+            detected.
+      required:
+      - BeginOffsetMillis
+      - EndOffsetMillis
+      description: The section of the contact audio where that category rule was detected.
     PointsOfInterest:
       type: array
       items:
         $ref: '#/components/schemas/PointOfInterest'
+    PostContactSummary:
+      type: object
+      properties:
+        Content:
+          allOf:
+          - $ref: '#/components/schemas/PostContactSummaryContent'
+          description: The content of the summary.
+        Status:
+          allOf:
+          - $ref: '#/components/schemas/PostContactSummaryStatus'
+          description: Whether the summary was successfully COMPLETED or FAILED to
+            be generated.
+        FailureCode:
+          allOf:
+          - $ref: '#/components/schemas/PostContactSummaryFailureCode'
+          description: "If the summary failed to be generated, one of the following\
+            \ failure codes occurs:\n\n  * `QUOTA_EXCEEDED`: The number of concurrent\
+            \ analytics jobs reached your service quota.\n\n  * `INSUFFICIENT_CONVERSATION_CONTENT`:\
+            \ The conversation needs to have at least one turn from both the participants\
+            \ in order to generate the summary.\n\n  * `FAILED_SAFETY_GUIDELINES`:\
+            \ The generated summary cannot be provided because it failed to meet system\
+            \ safety guidelines.\n\n  * `INVALID_ANALYSIS_CONFIGURATION`: This code\
+            \ occurs when, for example, you're using a [language](https://docs.aws.amazon.com/connect/latest/adminguide/supported-languages.html#supported-languages-contact-lens)\
+            \ that isn't supported by generative AI-powered post-contact summaries.\
+            \ \n\n  * `INTERNAL_ERROR`: Internal system error."
+      required:
+      - Status
+      description: Information about the post-contact summary.
     PostContactSummaryContent:
       type: string
       minLength: 1
@@ -127,16 +348,91 @@ components:
       enum:
       - FAILED
       - COMPLETED
+    RealtimeContactAnalysisSegment:
+      type: object
+      properties:
+        Transcript:
+          allOf:
+          - $ref: '#/components/schemas/Transcript'
+          description: The analyzed transcript.
+        Categories:
+          allOf:
+          - $ref: '#/components/schemas/Categories'
+          description: The matched category rules.
+        PostContactSummary:
+          allOf:
+          - $ref: '#/components/schemas/PostContactSummary'
+          description: Information about the post-contact summary.
+      description: An analyzed segment for a real-time analysis session.
     RealtimeContactAnalysisSegments:
       type: array
       items:
         $ref: '#/components/schemas/RealtimeContactAnalysisSegment'
+    ResourceNotFoundException:
+      type: object
+      properties:
+        Message:
+          $ref: '#/components/schemas/Message'
+      description: The specified resource was not found.
     SentimentValue:
       type: string
       enum:
       - POSITIVE
       - NEUTRAL
       - NEGATIVE
+    ThrottlingException:
+      type: object
+      properties:
+        Message:
+          $ref: '#/components/schemas/Message'
+      required:
+      - Message
+      description: The throttling limit has been exceeded.
+    Transcript:
+      type: object
+      properties:
+        Id:
+          allOf:
+          - $ref: '#/components/schemas/TranscriptId'
+          description: The identifier of the transcript.
+        ParticipantId:
+          allOf:
+          - $ref: '#/components/schemas/ParticipantId'
+          description: The identifier of the participant. Valid values are CUSTOMER
+            or AGENT.
+        ParticipantRole:
+          allOf:
+          - $ref: '#/components/schemas/ParticipantRole'
+          description: The role of participant. For example, is it a customer, agent,
+            or system.
+        Content:
+          allOf:
+          - $ref: '#/components/schemas/TranscriptContent'
+          description: The content of the transcript.
+        BeginOffsetMillis:
+          allOf:
+          - $ref: '#/components/schemas/OffsetMillis'
+          description: The beginning offset in the contact for this transcript.
+        EndOffsetMillis:
+          allOf:
+          - $ref: '#/components/schemas/OffsetMillis'
+          description: The end offset in the contact for this transcript.
+        Sentiment:
+          allOf:
+          - $ref: '#/components/schemas/SentimentValue'
+          description: The sentiment detected for this piece of transcript.
+        IssuesDetected:
+          allOf:
+          - $ref: '#/components/schemas/IssuesDetected'
+          description: List of positions where issues were detected on the transcript.
+      required:
+      - Id
+      - ParticipantId
+      - ParticipantRole
+      - Content
+      - BeginOffsetMillis
+      - EndOffsetMillis
+      description: A list of messages in the session.
     TranscriptContent:
       type: string
       pattern: \S

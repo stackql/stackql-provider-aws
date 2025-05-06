@@ -7,7 +7,7 @@ info:
   x-stackql-serviceName: polly
   x-aws-serviceName: polly
   x-aws-protocol: aws.protocols#restJson1
-  x-dateGenerated: '2025-05-05'
+  x-dateGenerated: '2025-05-07'
   version: '2016-06-10'
   title: Amazon Polly
   description: |-
@@ -45,7 +45,361 @@ servers:
       - sa-east-1
       - me-south-1
       default: us-east-1
-paths: {}
+paths:
+  /v1/lexicons/{Name}:
+    delete:
+      operationId: DeleteLexicon
+      description: |-
+        Deletes the specified pronunciation lexicon stored in an Amazon Web Services Region. A lexicon which has been deleted is not available for speech synthesis, nor is it possible to retrieve it using either the `GetLexicon` or `ListLexicon` APIs.
+
+        For more information, see [Managing Lexicons](https://docs.aws.amazon.com/polly/latest/dg/managing-lexicons.html).
+      parameters:
+      - name: Name
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/LexiconName'
+      responses:
+        '200': {}
+        '404':
+          description: |-
+            Amazon Polly can't find the specified lexicon. This could be caused by a lexicon that is missing, its name is misspelled or specifying a lexicon that is in a different region.
+
+            Verify that the lexicon exists, is in the region (see ListLexicons) and that you spelled its name is spelled correctly. Then try again.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LexiconNotFoundException'
+        '500':
+          description: |-
+            An unknown condition has caused a service failure.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServiceFailureException'
+    get:
+      operationId: GetLexicon
+      description: |-
+        Returns the content of the specified pronunciation lexicon stored in an Amazon Web Services Region. For more information, see [Managing Lexicons](https://docs.aws.amazon.com/polly/latest/dg/managing-lexicons.html).
+      parameters:
+      - name: Name
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/LexiconName'
+      responses:
+        '200': {}
+        '404':
+          description: |-
+            Amazon Polly can't find the specified lexicon. This could be caused by a lexicon that is missing, its name is misspelled or specifying a lexicon that is in a different region.
+
+            Verify that the lexicon exists, is in the region (see ListLexicons) and that you spelled its name is spelled correctly. Then try again.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LexiconNotFoundException'
+        '500':
+          description: |-
+            An unknown condition has caused a service failure.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServiceFailureException'
+    put:
+      operationId: PutLexicon
+      description: |-
+        Stores a pronunciation lexicon in an Amazon Web Services Region. If a lexicon with the same name already exists in the region, it is overwritten by the new lexicon. Lexicon operations have eventual consistency, therefore, it might take some time before the lexicon is available to the SynthesizeSpeech operation.
+
+        For more information, see [Managing Lexicons](https://docs.aws.amazon.com/polly/latest/dg/managing-lexicons.html).
+      parameters:
+      - name: Name
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/LexiconName'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                Content:
+                  $ref: '#/components/schemas/LexiconContent'
+      responses:
+        '200': {}
+        '400':
+          description: |-
+            The language specified in the lexicon is unsupported. For a list of supported languages, see [Lexicon Attributes](https://docs.aws.amazon.com/polly/latest/dg/API_LexiconAttributes.html).
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnsupportedPlsLanguageException'
+        '500':
+          description: |-
+            An unknown condition has caused a service failure.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServiceFailureException'
+  /v1/voices:
+    get:
+      operationId: DescribeVoices
+      description: |-
+        Returns the list of voices that are available for use when requesting speech synthesis. Each voice speaks a specified language, is either male or female, and is identified by an ID, which is the ASCII version of the voice name.
+
+        When synthesizing speech ( `SynthesizeSpeech` ), you provide the voice ID for the voice you want from the list of voices returned by `DescribeVoices`.
+
+        For example, you want your news reader application to read news in a specific language, but giving a user the option to choose the voice. Using the `DescribeVoices` operation you can provide the user with a list of available voices to select from.
+
+        You can optionally specify a language code to filter the available voices. For example, if you specify `en-US`, the operation returns a list of all available US English voices.
+
+        This operation requires permissions to perform the `polly:DescribeVoices` action.
+      parameters:
+      - name: Engine
+        in: query
+        required: false
+        schema:
+          $ref: '#/components/schemas/Engine'
+      - name: LanguageCode
+        in: query
+        required: false
+        schema:
+          $ref: '#/components/schemas/LanguageCode'
+      - name: IncludeAdditionalLanguageCodes
+        in: query
+        required: false
+        schema:
+          $ref: '#/components/schemas/IncludeAdditionalLanguageCodes'
+      - name: NextToken
+        in: query
+        required: false
+        schema:
+          $ref: '#/components/schemas/NextToken'
+      responses:
+        '200': {}
+        '400':
+          description: |-
+            The NextToken is invalid. Verify that it's spelled correctly, and then try again.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InvalidNextTokenException'
+        '500':
+          description: |-
+            An unknown condition has caused a service failure.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServiceFailureException'
+  /v1/synthesisTasks/{TaskId}:
+    get:
+      operationId: GetSpeechSynthesisTask
+      description: |-
+        Retrieves a specific SpeechSynthesisTask object based on its TaskID. This object contains information about the given speech synthesis task, including the status of the task, and a link to the S3 bucket containing the output of the task.
+      parameters:
+      - name: TaskId
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/TaskId'
+      responses:
+        '200': {}
+        '400':
+          description: |-
+            The Speech Synthesis task with requested Task ID cannot be found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SynthesisTaskNotFoundException'
+        '500':
+          description: |-
+            An unknown condition has caused a service failure.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServiceFailureException'
+  /v1/lexicons:
+    get:
+      operationId: ListLexicons
+      description: |-
+        Returns a list of pronunciation lexicons stored in an Amazon Web Services Region. For more information, see [Managing Lexicons](https://docs.aws.amazon.com/polly/latest/dg/managing-lexicons.html).
+      parameters:
+      - name: NextToken
+        in: query
+        required: false
+        schema:
+          $ref: '#/components/schemas/NextToken'
+      responses:
+        '200': {}
+        '400':
+          description: |-
+            The NextToken is invalid. Verify that it's spelled correctly, and then try again.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InvalidNextTokenException'
+        '500':
+          description: |-
+            An unknown condition has caused a service failure.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServiceFailureException'
+  /v1/synthesisTasks:
+    get:
+      operationId: ListSpeechSynthesisTasks
+      description: |-
+        Returns a list of SpeechSynthesisTask objects ordered by their creation date. This operation can filter the tasks by their status, for example, allowing users to list only tasks that are completed.
+      parameters:
+      - name: MaxResults
+        in: query
+        required: false
+        schema:
+          $ref: '#/components/schemas/MaxResults'
+      - name: NextToken
+        in: query
+        required: false
+        schema:
+          $ref: '#/components/schemas/NextToken'
+      - name: Status
+        in: query
+        required: false
+        schema:
+          $ref: '#/components/schemas/TaskStatus'
+      responses:
+        '200': {}
+        '400':
+          description: |-
+            The NextToken is invalid. Verify that it's spelled correctly, and then try again.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InvalidNextTokenException'
+        '500':
+          description: |-
+            An unknown condition has caused a service failure.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServiceFailureException'
+    post:
+      operationId: StartSpeechSynthesisTask
+      description: |-
+        Allows the creation of an asynchronous synthesis task, by starting a new `SpeechSynthesisTask`. This operation requires all the standard information needed for speech synthesis, plus the name of an Amazon S3 bucket for the service to store the output of the synthesis task and two optional parameters (`OutputS3KeyPrefix` and `SnsTopicArn`). Once the synthesis task is created, this operation will return a `SpeechSynthesisTask` object, which will include an identifier of this task as well as the current status. The `SpeechSynthesisTask` object is available for 72 hours after starting the asynchronous synthesis task.
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                Engine:
+                  $ref: '#/components/schemas/Engine'
+                LanguageCode:
+                  $ref: '#/components/schemas/LanguageCode'
+                LexiconNames:
+                  $ref: '#/components/schemas/LexiconNameList'
+                OutputFormat:
+                  $ref: '#/components/schemas/OutputFormat'
+                OutputS3BucketName:
+                  $ref: '#/components/schemas/OutputS3BucketName'
+                OutputS3KeyPrefix:
+                  $ref: '#/components/schemas/OutputS3KeyPrefix'
+                SampleRate:
+                  $ref: '#/components/schemas/SampleRate'
+                SnsTopicArn:
+                  $ref: '#/components/schemas/SnsTopicArn'
+                SpeechMarkTypes:
+                  $ref: '#/components/schemas/SpeechMarkTypeList'
+                Text:
+                  $ref: '#/components/schemas/Text'
+                TextType:
+                  $ref: '#/components/schemas/TextType'
+                VoiceId:
+                  $ref: '#/components/schemas/VoiceId'
+      responses:
+        '200': {}
+        '400':
+          description: |-
+            The value of the "Text" parameter is longer than the accepted limits. For the `SynthesizeSpeech` API, the limit for input text is a maximum of 6000 characters total, of which no more than 3000 can be billed characters. For the `StartSpeechSynthesisTask` API, the maximum is 200,000 characters, of which no more than 100,000 can be billed characters. SSML tags are not counted as billed characters.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TextLengthExceededException'
+        '404':
+          description: |-
+            Amazon Polly can't find the specified lexicon. This could be caused by a lexicon that is missing, its name is misspelled or specifying a lexicon that is in a different region.
+
+            Verify that the lexicon exists, is in the region (see ListLexicons) and that you spelled its name is spelled correctly. Then try again.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LexiconNotFoundException'
+        '500':
+          description: |-
+            An unknown condition has caused a service failure.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServiceFailureException'
+  /v1/speech:
+    post:
+      operationId: SynthesizeSpeech
+      description: |-
+        Synthesizes UTF-8 input, plain text or SSML, to a stream of bytes. SSML input must be valid, well-formed SSML. Some alphabets might not be available with all the voices (for example, Cyrillic might not be read at all by English voices) unless phoneme mapping is used. For more information, see [How it Works](https://docs.aws.amazon.com/polly/latest/dg/how-text-to-speech-works.html).
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                Engine:
+                  $ref: '#/components/schemas/Engine'
+                LanguageCode:
+                  $ref: '#/components/schemas/LanguageCode'
+                LexiconNames:
+                  $ref: '#/components/schemas/LexiconNameList'
+                OutputFormat:
+                  $ref: '#/components/schemas/OutputFormat'
+                SampleRate:
+                  $ref: '#/components/schemas/SampleRate'
+                SpeechMarkTypes:
+                  $ref: '#/components/schemas/SpeechMarkTypeList'
+                Text:
+                  $ref: '#/components/schemas/Text'
+                TextType:
+                  $ref: '#/components/schemas/TextType'
+                VoiceId:
+                  $ref: '#/components/schemas/VoiceId'
+      responses:
+        '200': {}
+        '400':
+          description: |-
+            The value of the "Text" parameter is longer than the accepted limits. For the `SynthesizeSpeech` API, the limit for input text is a maximum of 6000 characters total, of which no more than 3000 can be billed characters. For the `StartSpeechSynthesisTask` API, the maximum is 200,000 characters, of which no more than 100,000 can be billed characters. SSML tags are not counted as billed characters.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TextLengthExceededException'
+        '404':
+          description: |-
+            Amazon Polly can't find the specified lexicon. This could be caused by a lexicon that is missing, its name is misspelled or specifying a lexicon that is in a different region.
+
+            Verify that the lexicon exists, is in the region (see ListLexicons) and that you spelled its name is spelled correctly. Then try again.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LexiconNotFoundException'
+        '500':
+          description: |-
+            An unknown condition has caused a service failure.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServiceFailureException'
 components:
   schemas:
     Alphabet:
@@ -58,6 +412,61 @@ components:
     DateTime:
       type: string
       format: date-time
+    DeleteLexiconInput:
+      type: object
+      properties:
+        Name:
+          allOf:
+          - $ref: '#/components/schemas/LexiconName'
+          description: The name of the lexicon to delete. Must be an existing lexicon
+            in the region.
+      required:
+      - Name
+    DeleteLexiconOutput:
+      type: object
+      properties: {}
+    DescribeVoicesInput:
+      type: object
+      properties:
+        Engine:
+          allOf:
+          - $ref: '#/components/schemas/Engine'
+          description: Specifies the engine (`standard`, `neural`, `long-form` or
+            `generative`) used by Amazon Polly when processing input text for speech
+            synthesis.
+        LanguageCode:
+          allOf:
+          - $ref: '#/components/schemas/LanguageCode'
+          description: The language identification tag (ISO 639 code for the language
+            name-ISO 3166 country code) for filtering the list of voices returned.
+            If you don't specify this optional parameter, all available voices are
+            returned.
+        IncludeAdditionalLanguageCodes:
+          allOf:
+          - $ref: '#/components/schemas/IncludeAdditionalLanguageCodes'
+          description: Boolean value indicating whether to return any bilingual voices
+            that use the specified language as an additional language. For instance,
+            if you request all languages that use US English (es-US), and there is
+            an Italian voice that speaks both Italian (it-IT) and US English, that
+            voice will be included if you specify `yes` but not if you specify `no`.
+        NextToken:
+          allOf:
+          - $ref: '#/components/schemas/NextToken'
+          description: An opaque pagination token returned from the previous `DescribeVoices`
+            operation. If present, this indicates where to continue the listing.
+    DescribeVoicesOutput:
+      type: object
+      properties:
+        Voices:
+          allOf:
+          - $ref: '#/components/schemas/VoiceList'
+          description: A list of voices with their properties.
+        NextToken:
+          allOf:
+          - $ref: '#/components/schemas/NextToken'
+          description: The pagination token to use in the next request to continue
+            the listing of voices. `NextToken` is returned only if the response is
+            truncated.
     Engine:
       type: string
       enum:
@@ -69,6 +478,14 @@ components:
       type: array
       items:
         $ref: '#/components/schemas/Engine'
+    EngineNotSupportedException:
+      type: object
+      properties:
+        message:
+          $ref: '#/components/schemas/ErrorMessage'
+      description: This engine is not compatible with the voice that you have designated.
+        Choose a new voice that is compatible with the engine or change the engine
+        and restart the operation.
     ErrorMessage:
       type: string
     Gender:
@@ -76,9 +493,105 @@ components:
       enum:
       - Female
       - Male
+    GetLexiconInput:
+      type: object
+      properties:
+        Name:
+          allOf:
+          - $ref: '#/components/schemas/LexiconName'
+          description: Name of the lexicon.
+      required:
+      - Name
+    GetLexiconOutput:
+      type: object
+      properties:
+        Lexicon:
+          allOf:
+          - $ref: '#/components/schemas/Lexicon'
+          description: Lexicon object that provides name and the string content of
+            the lexicon.
+        LexiconAttributes:
+          allOf:
+          - $ref: '#/components/schemas/LexiconAttributes'
+          description: Metadata of the lexicon, including phonetic alphabetic used,
+            language code, lexicon ARN, number of lexemes defined in the lexicon,
+            and size of lexicon in bytes.
+    GetSpeechSynthesisTaskInput:
+      type: object
+      properties:
+        TaskId:
+          allOf:
+          - $ref: '#/components/schemas/TaskId'
+          description: The Amazon Polly generated identifier for a speech synthesis
+            task.
+      required:
+      - TaskId
+    GetSpeechSynthesisTaskOutput:
+      type: object
+      properties:
+        SynthesisTask:
+          allOf:
+          - $ref: '#/components/schemas/SynthesisTask'
+          description: SynthesisTask object that provides information from the requested
+            task, including output format, creation time, task status, and so on.
     IncludeAdditionalLanguageCodes:
       type: boolean
       default: false
+    InvalidLexiconException:
+      type: object
+      properties:
+        message:
+          $ref: '#/components/schemas/ErrorMessage'
+      description: Amazon Polly can't find the specified lexicon. Verify that the
+        lexicon's name is spelled correctly, and then try again.
+    InvalidNextTokenException:
+      type: object
+      properties:
+        message:
+          $ref: '#/components/schemas/ErrorMessage'
+      description: The NextToken is invalid. Verify that it's spelled correctly, and
+        then try again.
+    InvalidS3BucketException:
+      type: object
+      properties:
+        message:
+          $ref: '#/components/schemas/ErrorMessage'
+      description: The provided Amazon S3 bucket name is invalid. Please check your
+        input with S3 bucket naming requirements and try again.
+    InvalidS3KeyException:
+      type: object
+      properties:
+        message:
+          $ref: '#/components/schemas/ErrorMessage'
+      description: The provided Amazon S3 key prefix is invalid. Please provide a
+        valid S3 object key name.
+    InvalidSampleRateException:
+      type: object
+      properties:
+        message:
+          $ref: '#/components/schemas/ErrorMessage'
+      description: The specified sample rate is not valid.
+    InvalidSnsTopicArnException:
+      type: object
+      properties:
+        message:
+          $ref: '#/components/schemas/ErrorMessage'
+      description: The provided SNS topic ARN is invalid. Please provide a valid SNS
+        topic ARN and try again.
+    InvalidSsmlException:
+      type: object
+      properties:
+        message:
+          $ref: '#/components/schemas/ErrorMessage'
+      description: The SSML you provided is invalid. Verify the SSML syntax, spelling
+        of tags and values, and then try again.
+    InvalidTaskIdException:
+      type: object
+      properties:
+        message:
+          $ref: '#/components/schemas/ErrorMessage'
+      description: The provided Task ID is not valid. Please provide a valid Task
+        ID and try again.
     LanguageCode:
       type: string
       enum:
@@ -130,16 +643,81 @@ components:
         $ref: '#/components/schemas/LanguageCode'
     LanguageName:
       type: string
+    LanguageNotSupportedException:
+      type: object
+      properties:
+        message:
+          $ref: '#/components/schemas/ErrorMessage'
+      description: The language specified is not currently supported by Amazon Polly
+        in this capacity.
     LastModified:
       type: string
       format: date-time
     LexemesCount:
       type: integer
       default: 0
+    Lexicon:
+      type: object
+      properties:
+        Content:
+          allOf:
+          - $ref: '#/components/schemas/LexiconContent'
+          description: Lexicon content in string format. The content of a lexicon
+            must be in PLS format.
+        Name:
+          allOf:
+          - $ref: '#/components/schemas/LexiconName'
+          description: Name of the lexicon.
+      description: Provides lexicon name and lexicon content in string format. For
+        more information, see [Pronunciation Lexicon Specification (PLS) Version 1.0](https://www.w3.org/TR/pronunciation-lexicon/).
     LexiconArn:
       type: string
+    LexiconAttributes:
+      type: object
+      properties:
+        Alphabet:
+          allOf:
+          - $ref: '#/components/schemas/Alphabet'
+          description: Phonetic alphabet used in the lexicon. Valid values are `ipa`
+            and `x-sampa`.
+        LanguageCode:
+          allOf:
+          - $ref: '#/components/schemas/LanguageCode'
+          description: Language code that the lexicon applies to. A lexicon with a
+            language code such as "en" would be applied to all English languages (en-GB,
+            en-US, en-AUS, en-WLS, and so on.
+        LastModified:
+          allOf:
+          - $ref: '#/components/schemas/LastModified'
+          description: Date lexicon was last modified (a timestamp value).
+        LexiconArn:
+          allOf:
+          - $ref: '#/components/schemas/LexiconArn'
+          description: Amazon Resource Name (ARN) of the lexicon.
+        LexemesCount:
+          allOf:
+          - $ref: '#/components/schemas/LexemesCount'
+          description: Number of lexemes in the lexicon.
+        Size:
+          allOf:
+          - $ref: '#/components/schemas/Size'
+          description: Total size of the lexicon, in characters.
+      description: Contains metadata describing the lexicon such as the number of
+        lexemes, language code, and so on. For more information, see [Managing Lexicons](https://docs.aws.amazon.com/polly/latest/dg/managing-lexicons.html).
     LexiconContent:
       type: string
+    LexiconDescription:
+      type: object
+      properties:
+        Name:
+          allOf:
+          - $ref: '#/components/schemas/LexiconName'
+          description: Name of the lexicon.
+        Attributes:
+          allOf:
+          - $ref: '#/components/schemas/LexiconAttributes'
+          description: Provides lexicon metadata.
+      description: Describes the content of the lexicon.
     LexiconDescriptionList:
       type: array
       items:
@@ -151,6 +729,97 @@ components:
       type: array
       items:
         $ref: '#/components/schemas/LexiconName'
+    LexiconNotFoundException:
+      type: object
+      properties:
+        message:
+          $ref: '#/components/schemas/ErrorMessage'
+      description: 'Amazon Polly can''t find the specified lexicon. This could be
+        caused by a lexicon that is missing, its name is misspelled or specifying
+        a lexicon that is in a different region.
+
+
+        Verify that the lexicon exists, is in the region (see ListLexicons) and that
+        you spelled its name is spelled correctly. Then try again.'
+    LexiconSizeExceededException:
+      type: object
+      properties:
+        message:
+          $ref: '#/components/schemas/ErrorMessage'
+      description: The maximum size of the specified lexicon would be exceeded by
+        this operation.
+    ListLexiconsInput:
+      type: object
+      properties:
+        NextToken:
+          allOf:
+          - $ref: '#/components/schemas/NextToken'
+          description: An opaque pagination token returned from previous `ListLexicons`
+            operation. If present, indicates where to continue the list of lexicons.
+    ListLexiconsOutput:
+      type: object
+      properties:
+        Lexicons:
+          allOf:
+          - $ref: '#/components/schemas/LexiconDescriptionList'
+          description: A list of lexicon names and attributes.
+        NextToken:
+          allOf:
+          - $ref: '#/components/schemas/NextToken'
+          description: The pagination token to use in the next request to continue
+            the listing of lexicons. `NextToken` is returned only if the response
+            is truncated.
+    ListSpeechSynthesisTasksInput:
+      type: object
+      properties:
+        MaxResults:
+          allOf:
+          - $ref: '#/components/schemas/MaxResults'
+          description: Maximum number of speech synthesis tasks returned in a List
+            operation.
+        NextToken:
+          allOf:
+          - $ref: '#/components/schemas/NextToken'
+          description: The pagination token to use in the next request to continue
+            the listing of speech synthesis tasks.
+        Status:
+          allOf:
+          - $ref: '#/components/schemas/TaskStatus'
+          description: Status of the speech synthesis tasks returned in a List operation
+    ListSpeechSynthesisTasksOutput:
+      type: object
+      properties:
+        NextToken:
+          allOf:
+          - $ref: '#/components/schemas/NextToken'
+          description: An opaque pagination token returned from the previous List
+            operation in this request. If present, this indicates where to continue
+            the listing.
+        SynthesisTasks:
+          allOf:
+          - $ref: '#/components/schemas/SynthesisTasks'
+          description: List of SynthesisTask objects that provides information from
+            the specified task in the list request, including output format, creation
+            time, task status, and so on.
+    MarksNotSupportedForFormatException:
+      type: object
+      properties:
+        message:
+          $ref: '#/components/schemas/ErrorMessage'
+      description: Speech marks are not supported for the `OutputFormat` selected.
+        Speech marks are only available for content in `json` format.
+    MaxLexemeLengthExceededException:
+      type: object
+      properties:
+        message:
+          $ref: '#/components/schemas/ErrorMessage'
+      description: The maximum size of the lexeme would be exceeded by this operation.
+    MaxLexiconsNumberExceededException:
+      type: object
+      properties:
+        message:
+          $ref: '#/components/schemas/ErrorMessage'
+      description: The maximum number of lexicons would be exceeded by this operation.
     MaxResults:
       type: integer
       minimum: 1
@@ -174,11 +843,36 @@ components:
       pattern: ^[0-9a-zA-Z\/\!\-_\.\*\'\(\):;\$@=+\,\?&]{0,800}$
     OutputUri:
       type: string
+    PutLexiconInput:
+      type: object
+      properties:
+        Name:
+          allOf:
+          - $ref: '#/components/schemas/LexiconName'
+          description: Name of the lexicon. The name must follow the regular express
+            format [0-9A-Za-z]{1,20}. That is, the name is a case-sensitive alphanumeric
+            string up to 20 characters long.
+        Content:
+          allOf:
+          - $ref: '#/components/schemas/LexiconContent'
+          description: Content of the PLS lexicon as string data.
+      required:
+      - Name
+      - Content
+    PutLexiconOutput:
+      type: object
+      properties: {}
     RequestCharacters:
       type: integer
       default: 0
     SampleRate:
       type: string
+    ServiceFailureException:
+      type: object
+      properties:
+        message:
+          $ref: '#/components/schemas/ErrorMessage'
+      description: An unknown condition has caused a service failure.
     Size:
       type: integer
       default: 0
@@ -196,10 +890,319 @@ components:
       type: array
       items:
         $ref: '#/components/schemas/SpeechMarkType'
+    SsmlMarksNotSupportedForTextTypeException:
+      type: object
+      properties:
+        message:
+          $ref: '#/components/schemas/ErrorMessage'
+      description: SSML speech marks are not supported for plain text-type input.
+    StartSpeechSynthesisTaskInput:
+      type: object
+      properties:
+        Engine:
+          allOf:
+          - $ref: '#/components/schemas/Engine'
+          description: Specifies the engine (`standard`, `neural`, `long-form` or
+            `generative`) for Amazon Polly to use when processing input text for speech
+            synthesis. Using a voice that is not supported for the engine selected
+            will result in an error.
+        LanguageCode:
+          allOf:
+          - $ref: '#/components/schemas/LanguageCode'
+          description: 'Optional language code for the Speech Synthesis request. This
+            is only necessary if using a bilingual voice, such as Aditi, which can
+            be used for either Indian English (en-IN) or Hindi (hi-IN).
+
+
+            If a bilingual voice is used and no language code is specified, Amazon
+            Polly uses the default language of the bilingual voice. The default language
+            for any voice is the one returned by the [DescribeVoices](https://docs.aws.amazon.com/polly/latest/dg/API_DescribeVoices.html)
+            operation for the `LanguageCode` parameter. For example, if no language
+            code is specified, Aditi will use Indian English rather than Hindi.'
+        LexiconNames:
+          allOf:
+          - $ref: '#/components/schemas/LexiconNameList'
+          description: List of one or more pronunciation lexicon names you want the
+            service to apply during synthesis. Lexicons are applied only if the language
+            of the lexicon is the same as the language of the voice.
+        OutputFormat:
+          allOf:
+          - $ref: '#/components/schemas/OutputFormat'
+          description: The format in which the returned output will be encoded. For
+            audio stream, this will be mp3, ogg_vorbis, or pcm. For speech marks,
+            this will be json.
+        OutputS3BucketName:
+          allOf:
+          - $ref: '#/components/schemas/OutputS3BucketName'
+          description: Amazon S3 bucket name to which the output file will be saved.
+        OutputS3KeyPrefix:
+          allOf:
+          - $ref: '#/components/schemas/OutputS3KeyPrefix'
+          description: The Amazon S3 key prefix for the output speech file.
+        SampleRate:
+          allOf:
+          - $ref: '#/components/schemas/SampleRate'
+          description: 'The audio frequency specified in Hz.
+
+
+            The valid values for mp3 and ogg_vorbis are "8000", "16000", "22050",
+            and "24000". The default value for standard voices is "22050". The default
+            value for neural voices is "24000". The default value for long-form voices
+            is "24000". The default value for generative voices is "24000".
+
+
+            Valid values for pcm are "8000" and "16000" The default value is "16000".'
+        SnsTopicArn:
+          allOf:
+          - $ref: '#/components/schemas/SnsTopicArn'
+          description: ARN for the SNS topic optionally used for providing status
+            notification for a speech synthesis task.
+        SpeechMarkTypes:
+          allOf:
+          - $ref: '#/components/schemas/SpeechMarkTypeList'
+          description: The type of speech marks returned for the input text.
+        Text:
+          allOf:
+          - $ref: '#/components/schemas/Text'
+          description: The input text to synthesize. If you specify ssml as the TextType,
+            follow the SSML format for the input text.
+        TextType:
+          allOf:
+          - $ref: '#/components/schemas/TextType'
+          description: Specifies whether the input text is plain text or SSML. The
+            default value is plain text.
+        VoiceId:
+          allOf:
+          - $ref: '#/components/schemas/VoiceId'
+          description: Voice ID to use for the synthesis.
+      required:
+      - OutputFormat
+      - OutputS3BucketName
+      - Text
+      - VoiceId
+    StartSpeechSynthesisTaskOutput:
+      type: object
+      properties:
+        SynthesisTask:
+          allOf:
+          - $ref: '#/components/schemas/SynthesisTask'
+          description: SynthesisTask object that provides information and attributes
+            about a newly submitted speech synthesis task.
+    SynthesisTask:
+      type: object
+      properties:
+        Engine:
+          allOf:
+          - $ref: '#/components/schemas/Engine'
+          description: Specifies the engine (`standard`, `neural`, `long-form` or
+            `generative`) for Amazon Polly to use when processing input text for speech
+            synthesis. Using a voice that is not supported for the engine selected
+            will result in an error.
+        TaskId:
+          allOf:
+          - $ref: '#/components/schemas/TaskId'
+          description: The Amazon Polly generated identifier for a speech synthesis
+            task.
+        TaskStatus:
+          allOf:
+          - $ref: '#/components/schemas/TaskStatus'
+          description: Current status of the individual speech synthesis task.
+        TaskStatusReason:
+          allOf:
+          - $ref: '#/components/schemas/TaskStatusReason'
+          description: Reason for the current status of a specific speech synthesis
+            task, including errors if the task has failed.
+        OutputUri:
+          allOf:
+          - $ref: '#/components/schemas/OutputUri'
+          description: Pathway for the output speech file.
+        CreationTime:
+          allOf:
+          - $ref: '#/components/schemas/DateTime'
+          description: Timestamp for the time the synthesis task was started.
+        RequestCharacters:
+          allOf:
+          - $ref: '#/components/schemas/RequestCharacters'
+          description: Number of billable characters synthesized.
+        SnsTopicArn:
+          allOf:
+          - $ref: '#/components/schemas/SnsTopicArn'
+          description: ARN for the SNS topic optionally used for providing status
+            notification for a speech synthesis task.
+        LexiconNames:
+          allOf:
+          - $ref: '#/components/schemas/LexiconNameList'
+          description: List of one or more pronunciation lexicon names you want the
+            service to apply during synthesis. Lexicons are applied only if the language
+            of the lexicon is the same as the language of the voice.
+        OutputFormat:
+          allOf:
+          - $ref: '#/components/schemas/OutputFormat'
+          description: The format in which the returned output will be encoded. For
+            audio stream, this will be mp3, ogg_vorbis, or pcm. For speech marks,
+            this will be json.
+        SampleRate:
+          allOf:
+          - $ref: '#/components/schemas/SampleRate'
+          description: 'The audio frequency specified in Hz.
+
+
+            The valid values for mp3 and ogg_vorbis are "8000", "16000", "22050",
+            and "24000". The default value for standard voices is "22050". The default
+            value for neural voices is "24000". The default value for long-form voices
+            is "24000". The default value for generative voices is "24000".
+
+
+            Valid values for pcm are "8000" and "16000" The default value is "16000".'
+        SpeechMarkTypes:
+          allOf:
+          - $ref: '#/components/schemas/SpeechMarkTypeList'
+          description: The type of speech marks returned for the input text.
+        TextType:
+          allOf:
+          - $ref: '#/components/schemas/TextType'
+          description: Specifies whether the input text is plain text or SSML. The
+            default value is plain text.
+        VoiceId:
+          allOf:
+          - $ref: '#/components/schemas/VoiceId'
+          description: Voice ID to use for the synthesis.
+        LanguageCode:
+          allOf:
+          - $ref: '#/components/schemas/LanguageCode'
+          description: 'Optional language code for a synthesis task. This is only
+            necessary if using a bilingual voice, such as Aditi, which can be used
+            for either Indian English (en-IN) or Hindi (hi-IN).
+
+
+            If a bilingual voice is used and no language code is specified, Amazon
+            Polly uses the default language of the bilingual voice. The default language
+            for any voice is the one returned by the [DescribeVoices](https://docs.aws.amazon.com/polly/latest/dg/API_DescribeVoices.html)
+            operation for the `LanguageCode` parameter. For example, if no language
+            code is specified, Aditi will use Indian English rather than Hindi.'
+      description: SynthesisTask object that provides information about a speech synthesis
+        task.
+    SynthesisTaskNotFoundException:
+      type: object
+      properties:
+        message:
+          $ref: '#/components/schemas/ErrorMessage'
+      description: The Speech Synthesis task with requested Task ID cannot be found.
     SynthesisTasks:
       type: array
       items:
         $ref: '#/components/schemas/SynthesisTask'
+    SynthesizeSpeechInput:
+      type: object
+      properties:
+        Engine:
+          allOf:
+          - $ref: '#/components/schemas/Engine'
+          description: 'Specifies the engine (`standard`, `neural`, `long-form`, or
+            `generative`) for Amazon Polly to use when processing input text for speech
+            synthesis. Provide an engine that is supported by the voice you select.
+            If you don''t provide an engine, the standard engine is selected by default.
+            If a chosen voice isn''t supported by the standard engine, this will result
+            in an error. For information on Amazon Polly voices and which voices are
+            available for each engine, see [Available Voices](https://docs.aws.amazon.com/polly/latest/dg/voicelist.html).
+
+
+            Type: String
+
+
+            Valid Values: `standard` | `neural` | `long-form` | `generative`
+
+
+            Required: Yes'
+        LanguageCode:
+          allOf:
+          - $ref: '#/components/schemas/LanguageCode'
+          description: 'Optional language code for the Synthesize Speech request.
+            This is only necessary if using a bilingual voice, such as Aditi, which
+            can be used for either Indian English (en-IN) or Hindi (hi-IN).
+
+
+            If a bilingual voice is used and no language code is specified, Amazon
+            Polly uses the default language of the bilingual voice. The default language
+            for any voice is the one returned by the [DescribeVoices](https://docs.aws.amazon.com/polly/latest/dg/API_DescribeVoices.html)
+            operation for the `LanguageCode` parameter. For example, if no language
+            code is specified, Aditi will use Indian English rather than Hindi.'
+        LexiconNames:
+          allOf:
+          - $ref: '#/components/schemas/LexiconNameList'
+          description: List of one or more pronunciation lexicon names you want the
+            service to apply during synthesis. Lexicons are applied only if the language
+            of the lexicon is the same as the language of the voice. For information
+            about storing lexicons, see [PutLexicon](https://docs.aws.amazon.com/polly/latest/dg/API_PutLexicon.html).
+        OutputFormat:
+          allOf:
+          - $ref: '#/components/schemas/OutputFormat'
+          description: 'The format in which the returned output will be encoded. For
+            audio stream, this will be mp3, ogg_vorbis, or pcm. For speech marks,
+            this will be json.
+
+
+            When pcm is used, the content returned is audio/pcm in a signed 16-bit,
+            1 channel (mono), little-endian format.'
+        SampleRate:
+          allOf:
+          - $ref: '#/components/schemas/SampleRate'
+          description: 'The audio frequency specified in Hz.
+
+
+            The valid values for mp3 and ogg_vorbis are "8000", "16000", "22050",
+            and "24000". The default value for standard voices is "22050". The default
+            value for neural voices is "24000". The default value for long-form voices
+            is "24000". The default value for generative voices is "24000".
+
+
+            Valid values for pcm are "8000" and "16000" The default value is "16000".'
+        SpeechMarkTypes:
+          allOf:
+          - $ref: '#/components/schemas/SpeechMarkTypeList'
+          description: The type of speech marks returned for the input text.
+        Text:
+          allOf:
+          - $ref: '#/components/schemas/Text'
+          description: Input text to synthesize. If you specify `ssml` as the `TextType`,
+            follow the SSML format for the input text.
+        TextType:
+          allOf:
+          - $ref: '#/components/schemas/TextType'
+          description: Specifies whether the input text is plain text or SSML. The
+            default value is plain text. For more information, see [Using SSML](https://docs.aws.amazon.com/polly/latest/dg/ssml.html).
+        VoiceId:
+          allOf:
+          - $ref: '#/components/schemas/VoiceId'
+          description: Voice ID to use for the synthesis. You can get a list of available
+            voice IDs by calling the [DescribeVoices](https://docs.aws.amazon.com/polly/latest/dg/API_DescribeVoices.html)
+            operation.
+      required:
+      - OutputFormat
+      - Text
+      - VoiceId
+    SynthesizeSpeechOutput:
+      type: object
+      properties:
+        AudioStream:
+          allOf:
+          - $ref: '#/components/schemas/AudioStream'
+          description: Stream containing the synthesized speech.
+        ContentType:
+          allOf:
+          - $ref: '#/components/schemas/ContentType'
+          description: "Specifies the type audio stream. This should reflect the `OutputFormat`\
+            \ parameter in your request.\n\n  * If you request `mp3` as the `OutputFormat`,\
+            \ the `ContentType` returned is audio/mpeg. \n\n  * If you request `ogg_vorbis`\
+            \ as the `OutputFormat`, the `ContentType` returned is audio/ogg. \n\n\
+            \  * If you request `pcm` as the `OutputFormat`, the `ContentType` returned\
+            \ is audio/pcm in a signed 16-bit, 1 channel (mono), little-endian format.\
+            \ \n\n  * If you request `json` as the `OutputFormat`, the `ContentType`\
+            \ returned is application/x-json-stream."
+        RequestCharacters:
+          allOf:
+          - $ref: '#/components/schemas/RequestCharacters'
+          description: Number of characters synthesized.
     TaskId:
       type: string
       pattern: ^[a-zA-Z0-9_-]{1,100}$
@@ -214,11 +1217,78 @@ components:
       type: string
     Text:
       type: string
+    TextLengthExceededException:
+      type: object
+      properties:
+        message:
+          $ref: '#/components/schemas/ErrorMessage'
+      description: The value of the "Text" parameter is longer than the accepted limits.
+        For the `SynthesizeSpeech` API, the limit for input text is a maximum of 6000
+        characters total, of which no more than 3000 can be billed characters. For
+        the `StartSpeechSynthesisTask` API, the maximum is 200,000 characters, of
+        which no more than 100,000 can be billed characters. SSML tags are not counted
+        as billed characters.
     TextType:
       type: string
       enum:
       - ssml
       - text
+    UnsupportedPlsAlphabetException:
+      type: object
+      properties:
+        message:
+          $ref: '#/components/schemas/ErrorMessage'
+      description: The alphabet specified by the lexicon is not a supported alphabet.
+        Valid values are `x-sampa` and `ipa`.
+    UnsupportedPlsLanguageException:
+      type: object
+      properties:
+        message:
+          $ref: '#/components/schemas/ErrorMessage'
+      description: The language specified in the lexicon is unsupported. For a list
+        of supported languages, see [Lexicon Attributes](https://docs.aws.amazon.com/polly/latest/dg/API_LexiconAttributes.html).
+    Voice:
+      type: object
+      properties:
+        Gender:
+          allOf:
+          - $ref: '#/components/schemas/Gender'
+          description: Gender of the voice.
+        Id:
+          allOf:
+          - $ref: '#/components/schemas/VoiceId'
+          description: Amazon Polly assigned voice ID. This is the ID that you specify
+            when calling the `SynthesizeSpeech` operation.
+        LanguageCode:
+          allOf:
+          - $ref: '#/components/schemas/LanguageCode'
+          description: Language code of the voice.
+        LanguageName:
+          allOf:
+          - $ref: '#/components/schemas/LanguageName'
+          description: Human readable name of the language in English.
+        Name:
+          allOf:
+          - $ref: '#/components/schemas/VoiceName'
+          description: Name of the voice (for example, Salli, Kendra, etc.). This
+            provides a human readable voice name that you might display in your application.
+        AdditionalLanguageCodes:
+          allOf:
+          - $ref: '#/components/schemas/LanguageCodeList'
+          description: 'Additional codes for languages available for the specified
+            voice in addition to its default language.
+
+
+            For example, the default language for Aditi is Indian English (en-IN)
+            because it was first used for that language. Since Aditi is bilingual
+            and fluent in both Indian English and Hindi, this parameter would show
+            the code `hi-IN`.'
+        SupportedEngines:
+          allOf:
+          - $ref: '#/components/schemas/EngineList'
+          description: Specifies which engines (`standard`, `neural`, `long-form`
+            or `generative`) are supported by a given voice.
+      description: Description of the voice.
     VoiceId:
       type: string
       enum:

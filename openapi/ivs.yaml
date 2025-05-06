@@ -7,7 +7,7 @@ info:
   x-stackql-serviceName: ivs
   x-aws-serviceName: ivs
   x-aws-protocol: aws.protocols#restJson1
-  x-dateGenerated: '2025-05-05'
+  x-dateGenerated: '2025-05-07'
   version: '2020-07-14'
   title: Amazon Interactive Video Service
   description: |-
@@ -107,21 +107,1577 @@ servers:
       - sa-east-1
       - me-south-1
       default: us-east-1
-paths: {}
+paths:
+  /BatchGetChannel:
+    post:
+      operationId: BatchGetChannel
+      description: |-
+        Performs GetChannel on multiple ARNs simultaneously.
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                arns:
+                  $ref: '#/components/schemas/ChannelArnList'
+      responses:
+        '200': {}
+  /BatchGetStreamKey:
+    post:
+      operationId: BatchGetStreamKey
+      description: |-
+        Performs GetStreamKey on multiple ARNs simultaneously.
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                arns:
+                  $ref: '#/components/schemas/StreamKeyArnList'
+      responses:
+        '200': {}
+  /BatchStartViewerSessionRevocation:
+    post:
+      operationId: BatchStartViewerSessionRevocation
+      description: |-
+        Performs StartViewerSessionRevocation on multiple channel ARN and viewer ID pairs simultaneously.
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                viewerSessions:
+                  $ref: '#/components/schemas/BatchStartViewerSessionRevocationViewerSessionList'
+      responses:
+        '200': {}
+        '403':
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PendingVerification'
+        '429':
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThrottlingException'
+        '400':
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+  /CreateChannel:
+    post:
+      operationId: CreateChannel
+      description: |-
+        Creates a new channel and an associated stream key to start streaming.
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  $ref: '#/components/schemas/ChannelName'
+                latencyMode:
+                  $ref: '#/components/schemas/ChannelLatencyMode'
+                type:
+                  $ref: '#/components/schemas/ChannelType'
+                authorized:
+                  $ref: '#/components/schemas/Boolean'
+                recordingConfigurationArn:
+                  $ref: '#/components/schemas/ChannelRecordingConfigurationArn'
+                tags:
+                  $ref: '#/components/schemas/Tags'
+                insecureIngest:
+                  $ref: '#/components/schemas/Boolean'
+                preset:
+                  $ref: '#/components/schemas/TranscodePreset'
+                playbackRestrictionPolicyArn:
+                  $ref: '#/components/schemas/ChannelPlaybackRestrictionPolicyArn'
+                multitrackInputConfiguration:
+                  $ref: '#/components/schemas/MultitrackInputConfiguration'
+                containerFormat:
+                  $ref: '#/components/schemas/ContainerFormat'
+      responses:
+        '200': {}
+        '403':
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PendingVerification'
+        '404':
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+        '402':
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServiceQuotaExceededException'
+        '400':
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+  /CreatePlaybackRestrictionPolicy:
+    post:
+      operationId: CreatePlaybackRestrictionPolicy
+      description: |-
+        Creates a new playback restriction policy, for constraining playback by countries and/or origins.
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                allowedCountries:
+                  $ref: '#/components/schemas/PlaybackRestrictionPolicyAllowedCountryList'
+                allowedOrigins:
+                  $ref: '#/components/schemas/PlaybackRestrictionPolicyAllowedOriginList'
+                enableStrictOriginEnforcement:
+                  $ref: '#/components/schemas/PlaybackRestrictionPolicyEnableStrictOriginEnforcement'
+                name:
+                  $ref: '#/components/schemas/PlaybackRestrictionPolicyName'
+                tags:
+                  $ref: '#/components/schemas/Tags'
+      responses:
+        '200': {}
+        '403':
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PendingVerification'
+        '402':
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServiceQuotaExceededException'
+        '429':
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThrottlingException'
+        '400':
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+  /CreateRecordingConfiguration:
+    post:
+      operationId: CreateRecordingConfiguration
+      description: |-
+        Creates a new recording configuration, used to enable recording to Amazon S3.
+
+        **Known issue:** In the us-east-1 region, if you use the Amazon Web Services CLI to create a recording configuration, it returns success even if the S3 bucket is in a different region. In this case, the `state` of the recording configuration is `CREATE_FAILED` (instead of `ACTIVE`). (In other regions, the CLI correctly returns failure if the bucket is in a different region.)
+
+        **Workaround:** Ensure that your S3 bucket is in the same region as the recording configuration. If you create a recording configuration in a different region as your S3 bucket, delete that recording configuration and create a new one with an S3 bucket from the correct region.
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  $ref: '#/components/schemas/RecordingConfigurationName'
+                destinationConfiguration:
+                  $ref: '#/components/schemas/DestinationConfiguration'
+                tags:
+                  $ref: '#/components/schemas/Tags'
+                thumbnailConfiguration:
+                  $ref: '#/components/schemas/ThumbnailConfiguration'
+                recordingReconnectWindowSeconds:
+                  $ref: '#/components/schemas/RecordingReconnectWindowSeconds'
+                renditionConfiguration:
+                  $ref: '#/components/schemas/RenditionConfiguration'
+      responses:
+        '200': {}
+        '403':
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PendingVerification'
+        '409':
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConflictException'
+        '500':
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerException'
+        '402':
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServiceQuotaExceededException'
+        '400':
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+  /CreateStreamKey:
+    post:
+      operationId: CreateStreamKey
+      description: |-
+        Creates a stream key, used to initiate a stream, for the specified channel ARN.
+
+        Note that CreateChannel creates a stream key. If you subsequently use CreateStreamKey on the same channel, it will fail because a stream key already exists and there is a limit of 1 stream key per channel. To reset the stream key on a channel, use DeleteStreamKey and then CreateStreamKey.
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                channelArn:
+                  $ref: '#/components/schemas/ChannelArn'
+                tags:
+                  $ref: '#/components/schemas/Tags'
+      responses:
+        '200': {}
+        '403':
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PendingVerification'
+        '404':
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+        '402':
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServiceQuotaExceededException'
+        '400':
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+  /DeleteChannel:
+    post:
+      operationId: DeleteChannel
+      description: |-
+        Deletes the specified channel and its associated stream keys.
+
+        If you try to delete a live channel, you will get an error (409 ConflictException). To delete a channel that is live, call StopStream, wait for the Amazon EventBridge "Stream End" event (to verify that the stream's state is no longer Live), then call DeleteChannel. (See [ Using EventBridge with Amazon IVS](https://docs.aws.amazon.com/ivs/latest/userguide/eventbridge.html).)
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                arn:
+                  $ref: '#/components/schemas/ChannelArn'
+      responses:
+        '204': {}
+        '403':
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PendingVerification'
+        '409':
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConflictException'
+        '404':
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+        '400':
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+  /DeletePlaybackKeyPair:
+    post:
+      operationId: DeletePlaybackKeyPair
+      description: |-
+        Deletes a specified authorization key pair. This invalidates future viewer tokens generated using the key pair’s `privateKey`. For more information, see [Setting Up Private Channels](https://docs.aws.amazon.com/ivs/latest/userguide/private-channels.html) in the _Amazon IVS User Guide_.
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                arn:
+                  $ref: '#/components/schemas/PlaybackKeyPairArn'
+      responses:
+        '200': {}
+        '403':
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PendingVerification'
+        '404':
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+        '400':
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+  /DeletePlaybackRestrictionPolicy:
+    post:
+      operationId: DeletePlaybackRestrictionPolicy
+      description: |-
+        Deletes the specified playback restriction policy.
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                arn:
+                  $ref: '#/components/schemas/PlaybackRestrictionPolicyArn'
+      responses:
+        '204': {}
+        '403':
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PendingVerification'
+        '409':
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConflictException'
+        '404':
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+        '400':
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+  /DeleteRecordingConfiguration:
+    post:
+      operationId: DeleteRecordingConfiguration
+      description: |-
+        Deletes the recording configuration for the specified ARN.
+
+        If you try to delete a recording configuration that is associated with a channel, you will get an error (409 ConflictException). To avoid this, for all channels that reference the recording configuration, first use UpdateChannel to set the `recordingConfigurationArn` field to an empty string, then use DeleteRecordingConfiguration.
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                arn:
+                  $ref: '#/components/schemas/RecordingConfigurationArn'
+      responses:
+        '204': {}
+        '403':
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '409':
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConflictException'
+        '500':
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerException'
+        '404':
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+        '400':
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+  /DeleteStreamKey:
+    post:
+      operationId: DeleteStreamKey
+      description: |-
+        Deletes the stream key for the specified ARN, so it can no longer be used to stream.
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                arn:
+                  $ref: '#/components/schemas/StreamKeyArn'
+      responses:
+        '204': {}
+        '403':
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PendingVerification'
+        '404':
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+        '400':
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+  /GetChannel:
+    post:
+      operationId: GetChannel
+      description: |-
+        Gets the channel configuration for the specified channel ARN. See also BatchGetChannel.
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                arn:
+                  $ref: '#/components/schemas/ChannelArn'
+      responses:
+        '200': {}
+        '403':
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '404':
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+        '400':
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+  /GetPlaybackKeyPair:
+    post:
+      operationId: GetPlaybackKeyPair
+      description: |-
+        Gets a specified playback authorization key pair and returns the `arn` and `fingerprint`. The `privateKey` held by the caller can be used to generate viewer authorization tokens, to grant viewers access to private channels. For more information, see [Setting Up Private Channels](https://docs.aws.amazon.com/ivs/latest/userguide/private-channels.html) in the _Amazon IVS User Guide_.
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                arn:
+                  $ref: '#/components/schemas/PlaybackKeyPairArn'
+      responses:
+        '200': {}
+        '403':
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '404':
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+        '400':
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+  /GetPlaybackRestrictionPolicy:
+    post:
+      operationId: GetPlaybackRestrictionPolicy
+      description: |-
+        Gets the specified playback restriction policy.
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                arn:
+                  $ref: '#/components/schemas/PlaybackRestrictionPolicyArn'
+      responses:
+        '200': {}
+        '403':
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PendingVerification'
+        '404':
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+        '400':
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+  /GetRecordingConfiguration:
+    post:
+      operationId: GetRecordingConfiguration
+      description: |-
+        Gets the recording configuration for the specified ARN.
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                arn:
+                  $ref: '#/components/schemas/RecordingConfigurationArn'
+      responses:
+        '200': {}
+        '403':
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '500':
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerException'
+        '404':
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+        '400':
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+  /GetStream:
+    post:
+      operationId: GetStream
+      description: |-
+        Gets information about the active (live) stream on a specified channel.
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                channelArn:
+                  $ref: '#/components/schemas/ChannelArn'
+      responses:
+        '200': {}
+        '403':
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '404':
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+        '400':
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+  /GetStreamKey:
+    post:
+      operationId: GetStreamKey
+      description: |-
+        Gets stream-key information for a specified ARN.
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                arn:
+                  $ref: '#/components/schemas/StreamKeyArn'
+      responses:
+        '200': {}
+        '403':
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '404':
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+        '400':
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+  /GetStreamSession:
+    post:
+      operationId: GetStreamSession
+      description: |-
+        Gets metadata on a specified stream.
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                channelArn:
+                  $ref: '#/components/schemas/ChannelArn'
+                streamId:
+                  $ref: '#/components/schemas/StreamId'
+      responses:
+        '200': {}
+        '403':
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '404':
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+        '400':
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+  /ImportPlaybackKeyPair:
+    post:
+      operationId: ImportPlaybackKeyPair
+      description: |-
+        Imports the public portion of a new key pair and returns its `arn` and `fingerprint`. The `privateKey` can then be used to generate viewer authorization tokens, to grant viewers access to private channels. For more information, see [Setting Up Private Channels](https://docs.aws.amazon.com/ivs/latest/userguide/private-channels.html) in the _Amazon IVS User Guide_.
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                publicKeyMaterial:
+                  $ref: '#/components/schemas/PlaybackPublicKeyMaterial'
+                name:
+                  $ref: '#/components/schemas/PlaybackKeyPairName'
+                tags:
+                  $ref: '#/components/schemas/Tags'
+      responses:
+        '200': {}
+        '403':
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PendingVerification'
+        '409':
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConflictException'
+        '402':
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServiceQuotaExceededException'
+        '400':
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+  /ListChannels:
+    post:
+      operationId: ListChannels
+      description: |-
+        Gets summary information about all channels in your account, in the Amazon Web Services region where the API request is processed. This list can be filtered to match a specified name or recording-configuration ARN. Filters are mutually exclusive and cannot be used together. If you try to use both filters, you will get an error (409 ConflictException).
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                filterByName:
+                  $ref: '#/components/schemas/ChannelName'
+                filterByRecordingConfigurationArn:
+                  $ref: '#/components/schemas/ChannelRecordingConfigurationArn'
+                filterByPlaybackRestrictionPolicyArn:
+                  $ref: '#/components/schemas/ChannelPlaybackRestrictionPolicyArn'
+                nextToken:
+                  $ref: '#/components/schemas/PaginationToken'
+                maxResults:
+                  $ref: '#/components/schemas/MaxChannelResults'
+      responses:
+        '200': {}
+        '403':
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '409':
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConflictException'
+        '400':
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+  /ListPlaybackKeyPairs:
+    post:
+      operationId: ListPlaybackKeyPairs
+      description: |-
+        Gets summary information about playback key pairs. For more information, see [Setting Up Private Channels](https://docs.aws.amazon.com/ivs/latest/userguide/private-channels.html) in the _Amazon IVS User Guide_.
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                nextToken:
+                  $ref: '#/components/schemas/PaginationToken'
+                maxResults:
+                  $ref: '#/components/schemas/MaxPlaybackKeyPairResults'
+      responses:
+        '200': {}
+        '403':
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '400':
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+  /ListPlaybackRestrictionPolicies:
+    post:
+      operationId: ListPlaybackRestrictionPolicies
+      description: |-
+        Gets summary information about playback restriction policies.
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                nextToken:
+                  $ref: '#/components/schemas/PaginationToken'
+                maxResults:
+                  $ref: '#/components/schemas/MaxPlaybackRestrictionPolicyResults'
+      responses:
+        '200': {}
+        '403':
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PendingVerification'
+        '409':
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConflictException'
+        '400':
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+  /ListRecordingConfigurations:
+    post:
+      operationId: ListRecordingConfigurations
+      description: |-
+        Gets summary information about all recording configurations in your account, in the Amazon Web Services region where the API request is processed.
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                nextToken:
+                  $ref: '#/components/schemas/PaginationToken'
+                maxResults:
+                  $ref: '#/components/schemas/MaxRecordingConfigurationResults'
+      responses:
+        '200': {}
+        '403':
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '500':
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerException'
+        '400':
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+  /ListStreamKeys:
+    post:
+      operationId: ListStreamKeys
+      description: |-
+        Gets summary information about stream keys for the specified channel.
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                channelArn:
+                  $ref: '#/components/schemas/ChannelArn'
+                nextToken:
+                  $ref: '#/components/schemas/PaginationToken'
+                maxResults:
+                  $ref: '#/components/schemas/MaxStreamKeyResults'
+      responses:
+        '200': {}
+        '403':
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '404':
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+        '400':
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+  /ListStreamSessions:
+    post:
+      operationId: ListStreamSessions
+      description: |-
+        Gets a summary of current and previous streams for a specified channel in your account, in the AWS region where the API request is processed.
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                channelArn:
+                  $ref: '#/components/schemas/ChannelArn'
+                nextToken:
+                  $ref: '#/components/schemas/PaginationToken'
+                maxResults:
+                  $ref: '#/components/schemas/MaxStreamResults'
+      responses:
+        '200': {}
+        '403':
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '404':
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+        '400':
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+  /ListStreams:
+    post:
+      operationId: ListStreams
+      description: |-
+        Gets summary information about live streams in your account, in the Amazon Web Services region where the API request is processed.
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                filterBy:
+                  $ref: '#/components/schemas/StreamFilters'
+                nextToken:
+                  $ref: '#/components/schemas/PaginationToken'
+                maxResults:
+                  $ref: '#/components/schemas/MaxStreamResults'
+      responses:
+        '200': {}
+        '403':
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '400':
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+  /tags/{resourceArn}:
+    get:
+      operationId: ListTagsForResource
+      description: |-
+        Gets information about Amazon Web Services tags for the specified ARN.
+      parameters:
+      - name: resourceArn
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/ResourceArn'
+      responses:
+        '200': {}
+        '500':
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerException'
+        '404':
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+        '400':
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+    post:
+      operationId: TagResource
+      description: |-
+        Adds or updates tags for the Amazon Web Services resource with the specified ARN.
+      parameters:
+      - name: resourceArn
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/ResourceArn'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                tags:
+                  $ref: '#/components/schemas/Tags'
+      responses:
+        '200': {}
+        '500':
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerException'
+        '404':
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+        '400':
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+    delete:
+      operationId: UntagResource
+      description: |-
+        Removes tags from the resource with the specified ARN.
+      parameters:
+      - name: resourceArn
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/ResourceArn'
+      - name: tagKeys
+        in: query
+        required: true
+        schema:
+          $ref: '#/components/schemas/TagKeyList'
+      responses:
+        '200': {}
+        '500':
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerException'
+        '404':
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+        '400':
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+  /PutMetadata:
+    post:
+      operationId: PutMetadata
+      description: |-
+        Inserts metadata into the active stream of the specified channel. At most 5 requests per second per channel are allowed, each with a maximum 1 KB payload. (If 5 TPS is not sufficient for your needs, we recommend batching your data into a single PutMetadata call.) At most 155 requests per second per account are allowed. Also see [Embedding Metadata within a Video Stream](https://docs.aws.amazon.com/ivs/latest/userguide/metadata.html) in the _Amazon IVS User Guide_.
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                channelArn:
+                  $ref: '#/components/schemas/ChannelArn'
+                metadata:
+                  $ref: '#/components/schemas/StreamMetadata'
+      responses:
+        '204': {}
+        '403':
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '404':
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+        '429':
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThrottlingException'
+        '400':
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+  /StartViewerSessionRevocation:
+    post:
+      operationId: StartViewerSessionRevocation
+      description: |-
+        Starts the process of revoking the viewer session associated with a specified channel ARN and viewer ID. Optionally, you can provide a version to revoke viewer sessions less than and including that version. For instructions on associating a viewer ID with a viewer session, see [Setting Up Private Channels](https://docs.aws.amazon.com/ivs/latest/userguide/private-channels.html).
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                channelArn:
+                  $ref: '#/components/schemas/ChannelArn'
+                viewerId:
+                  $ref: '#/components/schemas/ViewerId'
+                viewerSessionVersionsLessThanOrEqualTo:
+                  $ref: '#/components/schemas/ViewerSessionVersion'
+      responses:
+        '200': {}
+        '403':
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PendingVerification'
+        '500':
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerException'
+        '404':
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+        '429':
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThrottlingException'
+        '400':
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+  /StopStream:
+    post:
+      operationId: StopStream
+      description: |-
+        Disconnects the incoming RTMPS stream for the specified channel. Can be used in conjunction with DeleteStreamKey to prevent further streaming to a channel.
+
+        Many streaming client-software libraries automatically reconnect a dropped RTMPS session, so to stop the stream permanently, you may want to first revoke the `streamKey` attached to the channel.
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                channelArn:
+                  $ref: '#/components/schemas/ChannelArn'
+      responses:
+        '200': {}
+        '403':
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '404':
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+        '503':
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StreamUnavailable'
+        '400':
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+  /UpdateChannel:
+    post:
+      operationId: UpdateChannel
+      description: |-
+        Updates a channel's configuration. Live channels cannot be updated. You must stop the ongoing stream, update the channel, and restart the stream for the changes to take effect.
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                arn:
+                  $ref: '#/components/schemas/ChannelArn'
+                name:
+                  $ref: '#/components/schemas/ChannelName'
+                latencyMode:
+                  $ref: '#/components/schemas/ChannelLatencyMode'
+                type:
+                  $ref: '#/components/schemas/ChannelType'
+                authorized:
+                  $ref: '#/components/schemas/Boolean'
+                recordingConfigurationArn:
+                  $ref: '#/components/schemas/ChannelRecordingConfigurationArn'
+                insecureIngest:
+                  $ref: '#/components/schemas/Boolean'
+                preset:
+                  $ref: '#/components/schemas/TranscodePreset'
+                playbackRestrictionPolicyArn:
+                  $ref: '#/components/schemas/ChannelPlaybackRestrictionPolicyArn'
+                multitrackInputConfiguration:
+                  $ref: '#/components/schemas/MultitrackInputConfiguration'
+                containerFormat:
+                  $ref: '#/components/schemas/ContainerFormat'
+      responses:
+        '200': {}
+        '403':
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PendingVerification'
+        '409':
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConflictException'
+        '404':
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+        '400':
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+  /UpdatePlaybackRestrictionPolicy:
+    post:
+      operationId: UpdatePlaybackRestrictionPolicy
+      description: |-
+        Updates a specified playback restriction policy.
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                arn:
+                  $ref: '#/components/schemas/PlaybackRestrictionPolicyArn'
+                allowedCountries:
+                  $ref: '#/components/schemas/PlaybackRestrictionPolicyAllowedCountryList'
+                allowedOrigins:
+                  $ref: '#/components/schemas/PlaybackRestrictionPolicyAllowedOriginList'
+                enableStrictOriginEnforcement:
+                  $ref: '#/components/schemas/PlaybackRestrictionPolicyEnableStrictOriginEnforcement'
+                name:
+                  $ref: '#/components/schemas/PlaybackRestrictionPolicyName'
+      responses:
+        '200': {}
+        '403':
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PendingVerification'
+        '409':
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConflictException'
+        '404':
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+        '400':
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
 components:
   schemas:
+    AccessDeniedException:
+      type: object
+      properties:
+        exceptionMessage:
+          allOf:
+          - $ref: '#/components/schemas/errorMessage'
+          description: User does not have sufficient access to perform this action.
+      description: ''
+    AudioConfiguration:
+      type: object
+      properties:
+        codec:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: Codec used for the audio encoding.
+        targetBitrate:
+          allOf:
+          - $ref: '#/components/schemas/Integer'
+          description: The expected ingest bitrate (bits per second). This is configured
+            in the encoder.
+        sampleRate:
+          allOf:
+          - $ref: '#/components/schemas/Integer'
+          description: Number of audio samples recorded per second.
+        channels:
+          allOf:
+          - $ref: '#/components/schemas/Integer'
+          description: Number of audio channels.
+        track:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: Name of the audio track (if the stream has an audio track).
+            If multitrack is not enabled, this is track0 (the sole track).
+      description: Object specifying a stream’s audio configuration, as set up by
+        the broadcaster (usually in an encoder). This is part of the IngestConfigurations
+        object and the deprecated IngestConfiguration object. It is used for monitoring
+        stream health.
     AudioConfigurationList:
       type: array
       items:
         $ref: '#/components/schemas/AudioConfiguration'
+    BatchError:
+      type: object
+      properties:
+        arn:
+          allOf:
+          - $ref: '#/components/schemas/ResourceArn'
+          description: ARN of an IVS resource; e.g., channel.
+        code:
+          allOf:
+          - $ref: '#/components/schemas/errorCode'
+          description: Error code.
+        message:
+          allOf:
+          - $ref: '#/components/schemas/errorMessage'
+          description: Error message, determined by the application.
+      description: Error related to a specific channel, specified by its ARN.
     BatchErrors:
       type: array
       items:
         $ref: '#/components/schemas/BatchError'
+    BatchGetChannelRequest:
+      type: object
+      properties:
+        arns:
+          allOf:
+          - $ref: '#/components/schemas/ChannelArnList'
+          description: Array of ARNs, one per channel.
+      required:
+      - arns
+    BatchGetChannelResponse:
+      type: object
+      properties:
+        channels:
+          allOf:
+          - $ref: '#/components/schemas/Channels'
+          description: ''
+        errors:
+          allOf:
+          - $ref: '#/components/schemas/BatchErrors'
+          description: Each error object is related to a specific ARN in the request.
+    BatchGetStreamKeyRequest:
+      type: object
+      properties:
+        arns:
+          allOf:
+          - $ref: '#/components/schemas/StreamKeyArnList'
+          description: Array of ARNs, one per stream key.
+      required:
+      - arns
+    BatchGetStreamKeyResponse:
+      type: object
+      properties:
+        streamKeys:
+          allOf:
+          - $ref: '#/components/schemas/StreamKeys'
+          description: ''
+        errors:
+          allOf:
+          - $ref: '#/components/schemas/BatchErrors'
+          description: ''
+    BatchStartViewerSessionRevocationError:
+      type: object
+      properties:
+        channelArn:
+          allOf:
+          - $ref: '#/components/schemas/ChannelArn'
+          description: Channel ARN.
+        viewerId:
+          allOf:
+          - $ref: '#/components/schemas/ViewerId'
+          description: The ID of the viewer session to revoke.
+        code:
+          allOf:
+          - $ref: '#/components/schemas/errorCode'
+          description: Error code.
+        message:
+          allOf:
+          - $ref: '#/components/schemas/errorMessage'
+          description: Error message, determined by the application.
+      required:
+      - channelArn
+      - viewerId
+      description: Error for a request in the batch for BatchStartViewerSessionRevocation.
+        Each error is related to a specific channel-ARN and viewer-ID pair.
     BatchStartViewerSessionRevocationErrors:
       type: array
       items:
         $ref: '#/components/schemas/BatchStartViewerSessionRevocationError'
+    BatchStartViewerSessionRevocationRequest:
+      type: object
+      properties:
+        viewerSessions:
+          allOf:
+          - $ref: '#/components/schemas/BatchStartViewerSessionRevocationViewerSessionList'
+          description: Array of viewer sessions, one per channel-ARN and viewer-ID
+            pair.
+      required:
+      - viewerSessions
+    BatchStartViewerSessionRevocationResponse:
+      type: object
+      properties:
+        errors:
+          allOf:
+          - $ref: '#/components/schemas/BatchStartViewerSessionRevocationErrors'
+          description: Each error object is related to a specific `channelArn` and
+            `viewerId` pair in the request.
+    BatchStartViewerSessionRevocationViewerSession:
+      type: object
+      properties:
+        channelArn:
+          allOf:
+          - $ref: '#/components/schemas/ChannelArn'
+          description: The ARN of the channel associated with the viewer session to
+            revoke.
+        viewerId:
+          allOf:
+          - $ref: '#/components/schemas/ViewerId'
+          description: The ID of the viewer associated with the viewer session to
+            revoke. Do not use this field for personally identifying, confidential,
+            or sensitive information.
+        viewerSessionVersionsLessThanOrEqualTo:
+          allOf:
+          - $ref: '#/components/schemas/ViewerSessionVersion'
+          description: 'An optional filter on which versions of the viewer session
+            to revoke. All versions less than or equal to the specified version will
+            be revoked. Default: 0.'
+      required:
+      - channelArn
+      - viewerId
+      description: A viewer session to revoke in the call to BatchStartViewerSessionRevocation.
     BatchStartViewerSessionRevocationViewerSessionList:
       type: array
       items:
@@ -129,6 +1685,96 @@ components:
     Boolean:
       type: boolean
       default: false
+    Channel:
+      type: object
+      properties:
+        arn:
+          allOf:
+          - $ref: '#/components/schemas/ChannelArn'
+          description: Channel ARN.
+        name:
+          allOf:
+          - $ref: '#/components/schemas/ChannelName'
+          description: Channel name.
+        latencyMode:
+          allOf:
+          - $ref: '#/components/schemas/ChannelLatencyMode'
+          description: 'Channel latency mode. Use `NORMAL` to broadcast and deliver
+            live video up to Full HD. Use `LOW` for near-real-time interaction with
+            viewers. Default: `LOW`.'
+        type:
+          allOf:
+          - $ref: '#/components/schemas/ChannelType'
+          description: 'Channel type, which determines the allowable resolution and
+            bitrate. _If you exceed the allowable input resolution or bitrate, the
+            stream probably will disconnect immediately._ Default: `STANDARD`. For
+            details, see [Channel Types](https://docs.aws.amazon.com/ivs/latest/LowLatencyAPIReference/channel-types.html).'
+        recordingConfigurationArn:
+          allOf:
+          - $ref: '#/components/schemas/ChannelRecordingConfigurationArn'
+          description: 'Recording-configuration ARN. A valid ARN value here both specifies
+            the ARN and enables recording. Default: "" (empty string, recording is
+            disabled).'
+        ingestEndpoint:
+          allOf:
+          - $ref: '#/components/schemas/IngestEndpoint'
+          description: Channel ingest endpoint, part of the definition of an ingest
+            server, used when you set up streaming software.
+        playbackUrl:
+          allOf:
+          - $ref: '#/components/schemas/PlaybackURL'
+          description: Channel playback URL.
+        authorized:
+          allOf:
+          - $ref: '#/components/schemas/IsAuthorized'
+          description: 'Whether the channel is private (enabled for playback authorization).
+            Default: `false`.'
+        tags:
+          allOf:
+          - $ref: '#/components/schemas/Tags'
+          description: Tags attached to the resource. Array of 1-50 maps, each of
+            the form `string:string (key:value)`. See [Best practices and strategies](https://docs.aws.amazon.com/tag-editor/latest/userguide/best-practices-and-strats.html)
+            in _Tagging Amazon Web Services Resources and Tag Editor_ for details,
+            including restrictions that apply to tags and "Tag naming limits and requirements";
+            Amazon IVS has no service-specific constraints beyond what is documented
+            there.
+        insecureIngest:
+          allOf:
+          - $ref: '#/components/schemas/InsecureIngest'
+          description: 'Whether the channel allows insecure RTMP ingest. Default:
+            `false`.'
+        preset:
+          allOf:
+          - $ref: '#/components/schemas/TranscodePreset'
+          description: Optional transcode preset for the channel. This is selectable
+            only for `ADVANCED_HD` and `ADVANCED_SD` channel types. For those channel
+            types, the default `preset` is `HIGHER_BANDWIDTH_DELIVERY`. For other
+            channel types (`BASIC` and `STANDARD`), `preset` is the empty string (`""`).
+        srt:
+          allOf:
+          - $ref: '#/components/schemas/Srt'
+          description: Specifies the endpoint and optional passphrase for streaming
+            with the SRT protocol.
+        playbackRestrictionPolicyArn:
+          allOf:
+          - $ref: '#/components/schemas/ChannelPlaybackRestrictionPolicyArn'
+          description: 'Playback-restriction-policy ARN. A valid ARN value here both
+            specifies the ARN and enables playback restriction. Default: "" (empty
+            string, no playback restriction policy is applied).'
+        multitrackInputConfiguration:
+          allOf:
+          - $ref: '#/components/schemas/MultitrackInputConfiguration'
+          description: 'Object specifying multitrack input configuration. Default:
+            no multitrack input configuration is specified.'
+        containerFormat:
+          allOf:
+          - $ref: '#/components/schemas/ContainerFormat'
+          description: 'Indicates which content-packaging format is used (MPEG-TS
+            or fMP4). If `multitrackInputConfiguration` is specified and `enabled`
+            is `true`, then `containerFormat` is required and must be set to `FRAGMENTED_MP4`.
+            Otherwise, `containerFormat` may be set to `TS` or `FRAGMENTED_MP4`. Default:
+            `TS`.'
+      description: Object specifying a channel.
     ChannelArn:
       type: string
       pattern: ^arn:aws:ivs:[a-z0-9-]+:[0-9]+:channel/[a-zA-Z0-9-]+$
@@ -152,6 +1798,14 @@ components:
       pattern: ^[a-zA-Z0-9-_]*$
       minLength: 0
       maxLength: 128
+    ChannelNotBroadcasting:
+      type: object
+      properties:
+        exceptionMessage:
+          allOf:
+          - $ref: '#/components/schemas/errorMessage'
+          description: The stream is offline for the given channel ARN.
+      description: ''
     ChannelPlaybackRestrictionPolicyArn:
       type: string
       pattern: ^^$|^arn:aws:ivs:[a-z0-9-]+:[0-9]+:playback-restriction-policy/[a-zA-Z0-9-]+$$
@@ -162,6 +1816,69 @@ components:
       pattern: ^^$|^arn:aws:ivs:[a-z0-9-]+:[0-9]+:recording-configuration/[a-zA-Z0-9-]+$$
       minLength: 0
       maxLength: 128
+    ChannelSummary:
+      type: object
+      properties:
+        arn:
+          allOf:
+          - $ref: '#/components/schemas/ChannelArn'
+          description: Channel ARN.
+        name:
+          allOf:
+          - $ref: '#/components/schemas/ChannelName'
+          description: Channel name.
+        latencyMode:
+          allOf:
+          - $ref: '#/components/schemas/ChannelLatencyMode'
+          description: 'Channel latency mode. Use `NORMAL` to broadcast and deliver
+            live video up to Full HD. Use `LOW` for near-real-time interaction with
+            viewers. Default: `LOW`.'
+        authorized:
+          allOf:
+          - $ref: '#/components/schemas/IsAuthorized'
+          description: 'Whether the channel is private (enabled for playback authorization).
+            Default: `false`.'
+        recordingConfigurationArn:
+          allOf:
+          - $ref: '#/components/schemas/ChannelRecordingConfigurationArn'
+          description: 'Recording-configuration ARN. A valid ARN value here both specifies
+            the ARN and enables recording. Default: "" (empty string, recording is
+            disabled).'
+        tags:
+          allOf:
+          - $ref: '#/components/schemas/Tags'
+          description: Tags attached to the resource. Array of 1-50 maps, each of
+            the form `string:string (key:value)`. See [Best practices and strategies](https://docs.aws.amazon.com/tag-editor/latest/userguide/best-practices-and-strats.html)
+            in _Tagging Amazon Web Services Resources and Tag Editor_ for details,
+            including restrictions that apply to tags and "Tag naming limits and requirements";
+            Amazon IVS has no service-specific constraints beyond what is documented
+            there.
+        insecureIngest:
+          allOf:
+          - $ref: '#/components/schemas/InsecureIngest'
+          description: 'Whether the channel allows insecure RTMP ingest. Default:
+            `false`.'
+        type:
+          allOf:
+          - $ref: '#/components/schemas/ChannelType'
+          description: 'Channel type, which determines the allowable resolution and
+            bitrate. _If you exceed the allowable input resolution or bitrate, the
+            stream probably will disconnect immediately._ Default: `STANDARD`. For
+            details, see [Channel Types](https://docs.aws.amazon.com/ivs/latest/LowLatencyAPIReference/channel-types.html).'
+        preset:
+          allOf:
+          - $ref: '#/components/schemas/TranscodePreset'
+          description: Optional transcode preset for the channel. This is selectable
+            only for `ADVANCED_HD` and `ADVANCED_SD` channel types. For those channel
+            types, the default `preset` is `HIGHER_BANDWIDTH_DELIVERY`. For other
+            channel types (`BASIC` and `STANDARD`), `preset` is the empty string (`""`).
+        playbackRestrictionPolicyArn:
+          allOf:
+          - $ref: '#/components/schemas/ChannelPlaybackRestrictionPolicyArn'
+          description: 'Playback-restriction-policy ARN. A valid ARN value here both
+            specifies the ARN and enables playback restriction. Default: "" (empty
+            string, no playback restriction policy is applied).'
+      description: Summary information about a channel.
     ChannelType:
       type: string
       enum:
@@ -173,11 +1890,465 @@ components:
       type: array
       items:
         $ref: '#/components/schemas/Channel'
+    ConflictException:
+      type: object
+      properties:
+        exceptionMessage:
+          allOf:
+          - $ref: '#/components/schemas/errorMessage'
+          description: Updating or deleting a resource can cause an inconsistent state.
+      description: ''
     ContainerFormat:
       type: string
       enum:
       - TS
       - FRAGMENTED_MP4
+    CreateChannelRequest:
+      type: object
+      properties:
+        name:
+          allOf:
+          - $ref: '#/components/schemas/ChannelName'
+          description: Channel name.
+        latencyMode:
+          allOf:
+          - $ref: '#/components/schemas/ChannelLatencyMode'
+          description: 'Channel latency mode. Use `NORMAL` to broadcast and deliver
+            live video up to Full HD. Use `LOW` for near-real-time interaction with
+            viewers. Default: `LOW`.'
+        type:
+          allOf:
+          - $ref: '#/components/schemas/ChannelType'
+          description: 'Channel type, which determines the allowable resolution and
+            bitrate. _If you exceed the allowable input resolution or bitrate, the
+            stream probably will disconnect immediately._ Default: `STANDARD`. For
+            details, see [Channel Types](https://docs.aws.amazon.com/ivs/latest/LowLatencyAPIReference/channel-types.html).'
+        authorized:
+          allOf:
+          - $ref: '#/components/schemas/Boolean'
+          description: 'Whether the channel is private (enabled for playback authorization).
+            Default: `false`.'
+        recordingConfigurationArn:
+          allOf:
+          - $ref: '#/components/schemas/ChannelRecordingConfigurationArn'
+          description: 'Recording-configuration ARN. A valid ARN value here both specifies
+            the ARN and enables recording. Default: "" (empty string, recording is
+            disabled).'
+        tags:
+          allOf:
+          - $ref: '#/components/schemas/Tags'
+          description: Array of 1-50 maps, each of the form `string:string (key:value)`.
+            See [Best practices and strategies](https://docs.aws.amazon.com/tag-editor/latest/userguide/best-practices-and-strats.html)
+            in _Tagging Amazon Web Services Resources and Tag Editor_ for details,
+            including restrictions that apply to tags and "Tag naming limits and requirements";
+            Amazon IVS has no service-specific constraints beyond what is documented
+            there.
+        insecureIngest:
+          allOf:
+          - $ref: '#/components/schemas/Boolean'
+          description: 'Whether the channel allows insecure RTMP and SRT ingest. Default:
+            `false`.'
+        preset:
+          allOf:
+          - $ref: '#/components/schemas/TranscodePreset'
+          description: Optional transcode preset for the channel. This is selectable
+            only for `ADVANCED_HD` and `ADVANCED_SD` channel types. For those channel
+            types, the default `preset` is `HIGHER_BANDWIDTH_DELIVERY`. For other
+            channel types (`BASIC` and `STANDARD`), `preset` is the empty string (`""`).
+        playbackRestrictionPolicyArn:
+          allOf:
+          - $ref: '#/components/schemas/ChannelPlaybackRestrictionPolicyArn'
+          description: 'Playback-restriction-policy ARN. A valid ARN value here both
+            specifies the ARN and enables playback restriction. Default: "" (empty
+            string, no playback restriction policy is applied).'
+        multitrackInputConfiguration:
+          allOf:
+          - $ref: '#/components/schemas/MultitrackInputConfiguration'
+          description: 'Object specifying multitrack input configuration. Default:
+            no multitrack input configuration is specified.'
+        containerFormat:
+          allOf:
+          - $ref: '#/components/schemas/ContainerFormat'
+          description: 'Indicates which content-packaging format is used (MPEG-TS
+            or fMP4). If `multitrackInputConfiguration` is specified and `enabled`
+            is `true`, then `containerFormat` is required and must be set to `FRAGMENTED_MP4`.
+            Otherwise, `containerFormat` may be set to `TS` or `FRAGMENTED_MP4`. Default:
+            `TS`.'
+    CreateChannelResponse:
+      type: object
+      properties:
+        channel:
+          allOf:
+          - $ref: '#/components/schemas/Channel'
+          description: ''
+        streamKey:
+          allOf:
+          - $ref: '#/components/schemas/StreamKey'
+          description: ''
+    CreatePlaybackRestrictionPolicyRequest:
+      type: object
+      properties:
+        allowedCountries:
+          allOf:
+          - $ref: '#/components/schemas/PlaybackRestrictionPolicyAllowedCountryList'
+          description: 'A list of country codes that control geoblocking restriction.
+            Allowed values are the officially assigned [ISO 3166-1 alpha-2](https://en.wikipedia.org/wiki/ISO_3166-1_alpha-2)
+            codes. Default: All countries (an empty array).'
+        allowedOrigins:
+          allOf:
+          - $ref: '#/components/schemas/PlaybackRestrictionPolicyAllowedOriginList'
+          description: 'A list of origin sites that control CORS restriction. Allowed
+            values are the same as valid values of the Origin header defined at <https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Origin>.
+            Default: All origins (an empty array).'
+        enableStrictOriginEnforcement:
+          allOf:
+          - $ref: '#/components/schemas/PlaybackRestrictionPolicyEnableStrictOriginEnforcement'
+          description: 'Whether channel playback is constrained by origin site. Default:
+            `false`.'
+        name:
+          allOf:
+          - $ref: '#/components/schemas/PlaybackRestrictionPolicyName'
+          description: Playback-restriction-policy name. The value does not need to
+            be unique.
+        tags:
+          allOf:
+          - $ref: '#/components/schemas/Tags'
+          description: Array of 1-50 maps, each of the form `string:string (key:value)`.
+            See [Best practices and strategies](https://docs.aws.amazon.com/tag-editor/latest/userguide/best-practices-and-strats.html)
+            in _Tagging Amazon Web Services Resources and Tag Editor_ for details,
+            including restrictions that apply to tags and "Tag naming limits and requirements";
+            Amazon IVS has no service-specific constraints beyond what is documented
+            there.
+    CreatePlaybackRestrictionPolicyResponse:
+      type: object
+      properties:
+        playbackRestrictionPolicy:
+          allOf:
+          - $ref: '#/components/schemas/PlaybackRestrictionPolicy'
+          description: ''
+    CreateRecordingConfigurationRequest:
+      type: object
+      properties:
+        name:
+          allOf:
+          - $ref: '#/components/schemas/RecordingConfigurationName'
+          description: Recording-configuration name. The value does not need to be
+            unique.
+        destinationConfiguration:
+          allOf:
+          - $ref: '#/components/schemas/DestinationConfiguration'
+          description: A complex type that contains a destination configuration for
+            where recorded video will be stored.
+        tags:
+          allOf:
+          - $ref: '#/components/schemas/Tags'
+          description: Array of 1-50 maps, each of the form `string:string (key:value)`.
+            See [Best practices and strategies](https://docs.aws.amazon.com/tag-editor/latest/userguide/best-practices-and-strats.html)
+            in _Tagging Amazon Web Services Resources and Tag Editor_ for details,
+            including restrictions that apply to tags and "Tag naming limits and requirements";
+            Amazon IVS has no service-specific constraints beyond what is documented
+            there.
+        thumbnailConfiguration:
+          allOf:
+          - $ref: '#/components/schemas/ThumbnailConfiguration'
+          description: A complex type that allows you to enable/disable the recording
+            of thumbnails for a live session and modify the interval at which thumbnails
+            are generated for the live session.
+        recordingReconnectWindowSeconds:
+          allOf:
+          - $ref: '#/components/schemas/RecordingReconnectWindowSeconds'
+          description: 'If a broadcast disconnects and then reconnects within the
+            specified interval, the multiple streams will be considered a single broadcast
+            and merged together. Default: 0.'
+        renditionConfiguration:
+          allOf:
+          - $ref: '#/components/schemas/RenditionConfiguration'
+          description: Object that describes which renditions should be recorded for
+            a stream.
+      required:
+      - destinationConfiguration
+    CreateRecordingConfigurationResponse:
+      type: object
+      properties:
+        recordingConfiguration:
+          allOf:
+          - $ref: '#/components/schemas/RecordingConfiguration'
+          description: ''
+    CreateStreamKeyRequest:
+      type: object
+      properties:
+        channelArn:
+          allOf:
+          - $ref: '#/components/schemas/ChannelArn'
+          description: ARN of the channel for which to create the stream key.
+        tags:
+          allOf:
+          - $ref: '#/components/schemas/Tags'
+          description: Array of 1-50 maps, each of the form `string:string (key:value)`.
+            See [Best practices and strategies](https://docs.aws.amazon.com/tag-editor/latest/userguide/best-practices-and-strats.html)
+            in _Tagging Amazon Web Services Resources and Tag Editor_ for details,
+            including restrictions that apply to tags and "Tag naming limits and requirements";
+            Amazon IVS has no service-specific constraints beyond what is documented
+            there.
+      required:
+      - channelArn
+    CreateStreamKeyResponse:
+      type: object
+      properties:
+        streamKey:
+          allOf:
+          - $ref: '#/components/schemas/StreamKey'
+          description: Stream key used to authenticate an RTMPS stream for ingestion.
+    DeleteChannelRequest:
+      type: object
+      properties:
+        arn:
+          allOf:
+          - $ref: '#/components/schemas/ChannelArn'
+          description: ARN of the channel to be deleted.
+      required:
+      - arn
+    DeletePlaybackKeyPairRequest:
+      type: object
+      properties:
+        arn:
+          allOf:
+          - $ref: '#/components/schemas/PlaybackKeyPairArn'
+          description: ARN of the key pair to be deleted.
+      required:
+      - arn
+    DeletePlaybackKeyPairResponse:
+      type: object
+      properties: {}
+    DeletePlaybackRestrictionPolicyRequest:
+      type: object
+      properties:
+        arn:
+          allOf:
+          - $ref: '#/components/schemas/PlaybackRestrictionPolicyArn'
+          description: ARN of the playback restriction policy to be deleted.
+      required:
+      - arn
+    DeleteRecordingConfigurationRequest:
+      type: object
+      properties:
+        arn:
+          allOf:
+          - $ref: '#/components/schemas/RecordingConfigurationArn'
+          description: ARN of the recording configuration to be deleted.
+      required:
+      - arn
+    DeleteStreamKeyRequest:
+      type: object
+      properties:
+        arn:
+          allOf:
+          - $ref: '#/components/schemas/StreamKeyArn'
+          description: ARN of the stream key to be deleted.
+      required:
+      - arn
+    DestinationConfiguration:
+      type: object
+      properties:
+        s3:
+          allOf:
+          - $ref: '#/components/schemas/S3DestinationConfiguration'
+          description: An S3 destination configuration where recorded videos will
+            be stored.
+      description: A complex type that describes a location where recorded videos
+        will be stored. Each member represents a type of destination configuration.
+        For recording, you define one and only one type of destination configuration.
+    GetChannelRequest:
+      type: object
+      properties:
+        arn:
+          allOf:
+          - $ref: '#/components/schemas/ChannelArn'
+          description: ARN of the channel for which the configuration is to be retrieved.
+      required:
+      - arn
+    GetChannelResponse:
+      type: object
+      properties:
+        channel:
+          allOf:
+          - $ref: '#/components/schemas/Channel'
+          description: ''
+    GetPlaybackKeyPairRequest:
+      type: object
+      properties:
+        arn:
+          allOf:
+          - $ref: '#/components/schemas/PlaybackKeyPairArn'
+          description: ARN of the key pair to be returned.
+      required:
+      - arn
+    GetPlaybackKeyPairResponse:
+      type: object
+      properties:
+        keyPair:
+          allOf:
+          - $ref: '#/components/schemas/PlaybackKeyPair'
+          description: ''
+    GetPlaybackRestrictionPolicyRequest:
+      type: object
+      properties:
+        arn:
+          allOf:
+          - $ref: '#/components/schemas/PlaybackRestrictionPolicyArn'
+          description: ARN of the playback restriction policy to be returned.
+      required:
+      - arn
+    GetPlaybackRestrictionPolicyResponse:
+      type: object
+      properties:
+        playbackRestrictionPolicy:
+          allOf:
+          - $ref: '#/components/schemas/PlaybackRestrictionPolicy'
+          description: ''
+    GetRecordingConfigurationRequest:
+      type: object
+      properties:
+        arn:
+          allOf:
+          - $ref: '#/components/schemas/RecordingConfigurationArn'
+          description: ARN of the recording configuration to be retrieved.
+      required:
+      - arn
+    GetRecordingConfigurationResponse:
+      type: object
+      properties:
+        recordingConfiguration:
+          allOf:
+          - $ref: '#/components/schemas/RecordingConfiguration'
+          description: ''
+    GetStreamKeyRequest:
+      type: object
+      properties:
+        arn:
+          allOf:
+          - $ref: '#/components/schemas/StreamKeyArn'
+          description: ARN for the stream key to be retrieved.
+      required:
+      - arn
+    GetStreamKeyResponse:
+      type: object
+      properties:
+        streamKey:
+          allOf:
+          - $ref: '#/components/schemas/StreamKey'
+          description: ''
+    GetStreamRequest:
+      type: object
+      properties:
+        channelArn:
+          allOf:
+          - $ref: '#/components/schemas/ChannelArn'
+          description: Channel ARN for stream to be accessed.
+      required:
+      - channelArn
+    GetStreamResponse:
+      type: object
+      properties:
+        stream:
+          allOf:
+          - $ref: '#/components/schemas/Stream'
+          description: ''
+    GetStreamSessionRequest:
+      type: object
+      properties:
+        channelArn:
+          allOf:
+          - $ref: '#/components/schemas/ChannelArn'
+          description: ARN of the channel resource
+        streamId:
+          allOf:
+          - $ref: '#/components/schemas/StreamId'
+          description: Unique identifier for a live or previously live stream in the
+            specified channel. If no `streamId` is provided, this returns the most
+            recent stream session for the channel, if it exists.
+      required:
+      - channelArn
+    GetStreamSessionResponse:
+      type: object
+      properties:
+        streamSession:
+          allOf:
+          - $ref: '#/components/schemas/StreamSession'
+          description: List of stream details.
+    ImportPlaybackKeyPairRequest:
+      type: object
+      properties:
+        publicKeyMaterial:
+          allOf:
+          - $ref: '#/components/schemas/PlaybackPublicKeyMaterial'
+          description: The public portion of a customer-generated key pair.
+        name:
+          allOf:
+          - $ref: '#/components/schemas/PlaybackKeyPairName'
+          description: Playback-key-pair name. The value does not need to be unique.
+        tags:
+          allOf:
+          - $ref: '#/components/schemas/Tags'
+          description: Any tags provided with the request are added to the playback
+            key pair tags. See [Best practices and strategies](https://docs.aws.amazon.com/tag-editor/latest/userguide/best-practices-and-strats.html)
+            in _Tagging Amazon Web Services Resources and Tag Editor_ for details,
+            including restrictions that apply to tags and "Tag naming limits and requirements";
+            Amazon IVS has no service-specific constraints beyond what is documented
+            there.
+      required:
+      - publicKeyMaterial
+    ImportPlaybackKeyPairResponse:
+      type: object
+      properties:
+        keyPair:
+          allOf:
+          - $ref: '#/components/schemas/PlaybackKeyPair'
+          description: ''
+    IngestConfiguration:
+      type: object
+      properties:
+        video:
+          allOf:
+          - $ref: '#/components/schemas/VideoConfiguration'
+          description: Encoder settings for video.
+        audio:
+          allOf:
+          - $ref: '#/components/schemas/AudioConfiguration'
+          description: Encoder settings for audio.
+      description: 'Object specifying the ingest configuration set up by the broadcaster,
+        usually in an encoder.
+
+
+        **Note:** IngestConfiguration is deprecated in favor of IngestConfigurations
+        but retained to ensure backward compatibility. If multitrack is not enabled,
+        IngestConfiguration and IngestConfigurations contain the same data, namely
+        information about track0 (the sole track). If multitrack is enabled, IngestConfiguration
+        contains data for only the first track (track0) and IngestConfigurations contains
+        data for all tracks.'
+    IngestConfigurations:
+      type: object
+      properties:
+        videoConfigurations:
+          allOf:
+          - $ref: '#/components/schemas/VideoConfigurationList'
+          description: Encoder settings for video
+        audioConfigurations:
+          allOf:
+          - $ref: '#/components/schemas/AudioConfigurationList'
+          description: Encoder settings for audio.
+      required:
+      - videoConfigurations
+      - audioConfigurations
+      description: 'Object specifying the ingest configuration set up by the broadcaster,
+        usually in an encoder.
+
+
+        **Note:** Use IngestConfigurations instead of IngestConfiguration (which is
+        deprecated). If multitrack is not enabled, IngestConfiguration and IngestConfigurations
+        contain the same data, namely information about track0 (the sole track). If
+        multitrack is enabled, IngestConfiguration contains data for only the first
+        track (track0) and IngestConfigurations contains data for all tracks.'
     IngestEndpoint:
       type: string
     InsecureIngest:
@@ -187,12 +2358,252 @@ components:
       type: integer
       format: int64
       default: 0
+    InternalServerException:
+      type: object
+      properties:
+        exceptionMessage:
+          allOf:
+          - $ref: '#/components/schemas/errorMessage'
+          description: Unexpected error during processing of request.
+      description: ''
     IsAuthorized:
       type: boolean
       default: false
     IsMultitrackInputEnabled:
       type: boolean
       default: false
+    ListChannelsRequest:
+      type: object
+      properties:
+        filterByName:
+          allOf:
+          - $ref: '#/components/schemas/ChannelName'
+          description: Filters the channel list to match the specified name.
+        filterByRecordingConfigurationArn:
+          allOf:
+          - $ref: '#/components/schemas/ChannelRecordingConfigurationArn'
+          description: Filters the channel list to match the specified recording-configuration
+            ARN.
+        filterByPlaybackRestrictionPolicyArn:
+          allOf:
+          - $ref: '#/components/schemas/ChannelPlaybackRestrictionPolicyArn'
+          description: Filters the channel list to match the specified policy.
+        nextToken:
+          allOf:
+          - $ref: '#/components/schemas/PaginationToken'
+          description: The first channel to retrieve. This is used for pagination;
+            see the `nextToken` response field.
+        maxResults:
+          allOf:
+          - $ref: '#/components/schemas/MaxChannelResults'
+          description: 'Maximum number of channels to return. Default: 100.'
+    ListChannelsResponse:
+      type: object
+      properties:
+        channels:
+          allOf:
+          - $ref: '#/components/schemas/ChannelList'
+          description: List of the matching channels.
+        nextToken:
+          allOf:
+          - $ref: '#/components/schemas/PaginationToken'
+          description: If there are more channels than `maxResults`, use `nextToken`
+            in the request to get the next set.
+      required:
+      - channels
+    ListPlaybackKeyPairsRequest:
+      type: object
+      properties:
+        nextToken:
+          allOf:
+          - $ref: '#/components/schemas/PaginationToken'
+          description: The first key pair to retrieve. This is used for pagination;
+            see the `nextToken` response field.
+        maxResults:
+          allOf:
+          - $ref: '#/components/schemas/MaxPlaybackKeyPairResults'
+          description: 'Maximum number of key pairs to return. Default: your service
+            quota or 100, whichever is smaller.'
+    ListPlaybackKeyPairsResponse:
+      type: object
+      properties:
+        keyPairs:
+          allOf:
+          - $ref: '#/components/schemas/PlaybackKeyPairList'
+          description: List of key pairs.
+        nextToken:
+          allOf:
+          - $ref: '#/components/schemas/PaginationToken'
+          description: If there are more key pairs than `maxResults`, use `nextToken`
+            in the request to get the next set.
+      required:
+      - keyPairs
+    ListPlaybackRestrictionPoliciesRequest:
+      type: object
+      properties:
+        nextToken:
+          allOf:
+          - $ref: '#/components/schemas/PaginationToken'
+          description: The first policy to retrieve. This is used for pagination;
+            see the `nextToken` response field.
+        maxResults:
+          allOf:
+          - $ref: '#/components/schemas/MaxPlaybackRestrictionPolicyResults'
+          description: 'Maximum number of policies to return. Default: 1.'
+    ListPlaybackRestrictionPoliciesResponse:
+      type: object
+      properties:
+        playbackRestrictionPolicies:
+          allOf:
+          - $ref: '#/components/schemas/PlaybackRestrictionPolicyList'
+          description: List of the matching policies.
+        nextToken:
+          allOf:
+          - $ref: '#/components/schemas/PaginationToken'
+          description: If there are more channels than `maxResults`, use `nextToken`
+            in the request to get the next set.
+      required:
+      - playbackRestrictionPolicies
+    ListRecordingConfigurationsRequest:
+      type: object
+      properties:
+        nextToken:
+          allOf:
+          - $ref: '#/components/schemas/PaginationToken'
+          description: The first recording configuration to retrieve. This is used
+            for pagination; see the `nextToken` response field.
+        maxResults:
+          allOf:
+          - $ref: '#/components/schemas/MaxRecordingConfigurationResults'
+          description: 'Maximum number of recording configurations to return. Default:
+            your service quota or 100, whichever is smaller.'
+    ListRecordingConfigurationsResponse:
+      type: object
+      properties:
+        recordingConfigurations:
+          allOf:
+          - $ref: '#/components/schemas/RecordingConfigurationList'
+          description: List of the matching recording configurations.
+        nextToken:
+          allOf:
+          - $ref: '#/components/schemas/PaginationToken'
+          description: If there are more recording configurations than `maxResults`,
+            use `nextToken` in the request to get the next set.
+      required:
+      - recordingConfigurations
+    ListStreamKeysRequest:
+      type: object
+      properties:
+        channelArn:
+          allOf:
+          - $ref: '#/components/schemas/ChannelArn'
+          description: Channel ARN used to filter the list.
+        nextToken:
+          allOf:
+          - $ref: '#/components/schemas/PaginationToken'
+          description: The first stream key to retrieve. This is used for pagination;
+            see the `nextToken` response field.
+        maxResults:
+          allOf:
+          - $ref: '#/components/schemas/MaxStreamKeyResults'
+          description: 'Maximum number of streamKeys to return. Default: 1.'
+      required:
+      - channelArn
+    ListStreamKeysResponse:
+      type: object
+      properties:
+        streamKeys:
+          allOf:
+          - $ref: '#/components/schemas/StreamKeyList'
+          description: List of stream keys.
+        nextToken:
+          allOf:
+          - $ref: '#/components/schemas/PaginationToken'
+          description: If there are more stream keys than `maxResults`, use `nextToken`
+            in the request to get the next set.
+      required:
+      - streamKeys
+    ListStreamSessionsRequest:
+      type: object
+      properties:
+        channelArn:
+          allOf:
+          - $ref: '#/components/schemas/ChannelArn'
+          description: Channel ARN used to filter the list.
+        nextToken:
+          allOf:
+          - $ref: '#/components/schemas/PaginationToken'
+          description: The first stream to retrieve. This is used for pagination;
+            see the `nextToken` response field.
+        maxResults:
+          allOf:
+          - $ref: '#/components/schemas/MaxStreamResults'
+          description: 'Maximum number of streams to return. Default: 100.'
+      required:
+      - channelArn
+    ListStreamSessionsResponse:
+      type: object
+      properties:
+        streamSessions:
+          allOf:
+          - $ref: '#/components/schemas/StreamSessionList'
+          description: List of stream sessions.
+        nextToken:
+          allOf:
+          - $ref: '#/components/schemas/PaginationToken'
+          description: If there are more streams than `maxResults`, use `nextToken`
+            in the request to get the next set.
+      required:
+      - streamSessions
+    ListStreamsRequest:
+      type: object
+      properties:
+        filterBy:
+          allOf:
+          - $ref: '#/components/schemas/StreamFilters'
+          description: Filters the stream list to match the specified criterion.
+        nextToken:
+          allOf:
+          - $ref: '#/components/schemas/PaginationToken'
+          description: The first stream to retrieve. This is used for pagination;
+            see the `nextToken` response field.
+        maxResults:
+          allOf:
+          - $ref: '#/components/schemas/MaxStreamResults'
+          description: 'Maximum number of streams to return. Default: 100.'
+    ListStreamsResponse:
+      type: object
+      properties:
+        streams:
+          allOf:
+          - $ref: '#/components/schemas/StreamList'
+          description: List of streams.
+        nextToken:
+          allOf:
+          - $ref: '#/components/schemas/PaginationToken'
+          description: If there are more streams than `maxResults`, use `nextToken`
+            in the request to get the next set.
+      required:
+      - streams
+    ListTagsForResourceRequest:
+      type: object
+      properties:
+        resourceArn:
+          allOf:
+          - $ref: '#/components/schemas/ResourceArn'
+          description: The ARN of the resource to be retrieved. The ARN must be URL-encoded.
+      required:
+      - resourceArn
+    ListTagsForResourceResponse:
+      type: object
+      properties:
+        tags:
+          allOf:
+          - $ref: '#/components/schemas/Tags'
+          description: Tags attached to the resource. Array of maps, each of the form
+            `string:string (key:value)`.
+      required:
+      - tags
     MaxChannelResults:
       type: integer
       minimum: 1
@@ -217,6 +2628,28 @@ components:
       type: integer
       minimum: 1
       maximum: 100
+    MultitrackInputConfiguration:
+      type: object
+      properties:
+        enabled:
+          allOf:
+          - $ref: '#/components/schemas/IsMultitrackInputEnabled'
+          description: 'Indicates whether multitrack input is enabled. Can be set
+            to `true` only if channel type is `STANDARD`. Setting `enabled` to `true`
+            with any other channel type will cause an exception. If `true`, then `policy`,
+            `maximumResolution`, and `containerFormat` are required, and `containerFormat`
+            must be set to `FRAGMENTED_MP4`. Default: `false`.'
+        policy:
+          allOf:
+          - $ref: '#/components/schemas/MultitrackPolicy'
+          description: Indicates whether multitrack input is allowed or required.
+            Required if `enabled` is `true`.
+        maximumResolution:
+          allOf:
+          - $ref: '#/components/schemas/MultitrackMaximumResolution'
+          description: Maximum resolution for multitrack input. Required if `enabled`
+            is `true`.
+      description: A complex type that specifies multitrack input configuration.
     MultitrackMaximumResolution:
       type: string
       enum:
@@ -233,6 +2666,39 @@ components:
       pattern: ^[a-zA-Z0-9+/=_-]*$
       minLength: 0
       maxLength: 1024
+    PendingVerification:
+      type: object
+      properties:
+        exceptionMessage:
+          allOf:
+          - $ref: '#/components/schemas/errorMessage'
+          description: Your account is pending verification.
+      description: ''
+    PlaybackKeyPair:
+      type: object
+      properties:
+        arn:
+          allOf:
+          - $ref: '#/components/schemas/PlaybackKeyPairArn'
+          description: Key-pair ARN.
+        name:
+          allOf:
+          - $ref: '#/components/schemas/PlaybackKeyPairName'
+          description: Playback-key-pair name. The value does not need to be unique.
+        fingerprint:
+          allOf:
+          - $ref: '#/components/schemas/PlaybackKeyPairFingerprint'
+          description: Key-pair identifier.
+        tags:
+          allOf:
+          - $ref: '#/components/schemas/Tags'
+          description: Tags attached to the resource. Array of 1-50 maps, each of
+            the form `string:string (key:value)`. See [Best practices and strategies](https://docs.aws.amazon.com/tag-editor/latest/userguide/best-practices-and-strats.html)
+            in _Tagging Amazon Web Services Resources and Tag Editor_ for details,
+            including restrictions that apply to tags and "Tag naming limits and requirements";
+            Amazon IVS has no service-specific constraints beyond what is documented
+            there.
+      description: A key pair used to sign and validate a playback authorization token.
     PlaybackKeyPairArn:
       type: string
       pattern: ^arn:aws:ivs:[a-z0-9-]+:[0-9]+:playback-key/[a-zA-Z0-9-]+$
@@ -249,8 +2715,73 @@ components:
       pattern: ^[a-zA-Z0-9-_]*$
       minLength: 0
       maxLength: 128
+    PlaybackKeyPairSummary:
+      type: object
+      properties:
+        arn:
+          allOf:
+          - $ref: '#/components/schemas/PlaybackKeyPairArn'
+          description: Key-pair ARN.
+        name:
+          allOf:
+          - $ref: '#/components/schemas/PlaybackKeyPairName'
+          description: Playback-key-pair name. The value does not need to be unique.
+        tags:
+          allOf:
+          - $ref: '#/components/schemas/Tags'
+          description: Tags attached to the resource. Array of 1-50 maps, each of
+            the form `string:string (key:value)`. See [Best practices and strategies](https://docs.aws.amazon.com/tag-editor/latest/userguide/best-practices-and-strats.html)
+            in _Tagging Amazon Web Services Resources and Tag Editor_ for details,
+            including restrictions that apply to tags and "Tag naming limits and requirements";
+            Amazon IVS has no service-specific constraints beyond what is documented
+            there.
+      description: Summary information about a playback key pair.
     PlaybackPublicKeyMaterial:
       type: string
+    PlaybackRestrictionPolicy:
+      type: object
+      properties:
+        arn:
+          allOf:
+          - $ref: '#/components/schemas/PlaybackRestrictionPolicyArn'
+          description: Playback-restriction-policy ARN
+        allowedCountries:
+          allOf:
+          - $ref: '#/components/schemas/PlaybackRestrictionPolicyAllowedCountryList'
+          description: 'A list of country codes that control geoblocking restriction.
+            Allowed values are the officially assigned [ISO 3166-1 alpha-2](https://en.wikipedia.org/wiki/ISO_3166-1_alpha-2)
+            codes. Default: All countries (an empty array).'
+        allowedOrigins:
+          allOf:
+          - $ref: '#/components/schemas/PlaybackRestrictionPolicyAllowedOriginList'
+          description: 'A list of origin sites that control CORS restriction. Allowed
+            values are the same as valid values of the Origin header defined at <https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Origin>.
+            Default: All origins (an empty array).'
+        enableStrictOriginEnforcement:
+          allOf:
+          - $ref: '#/components/schemas/PlaybackRestrictionPolicyEnableStrictOriginEnforcement'
+          description: 'Whether channel playback is constrained by origin site. Default:
+            `false`.'
+        name:
+          allOf:
+          - $ref: '#/components/schemas/PlaybackRestrictionPolicyName'
+          description: Playback-restriction-policy name. The value does not need to
+            be unique.
+        tags:
+          allOf:
+          - $ref: '#/components/schemas/Tags'
+          description: Tags attached to the resource. Array of 1-50 maps, each of
+            the form `string:string (key:value)`. See [Best practices and strategies](https://docs.aws.amazon.com/tag-editor/latest/userguide/best-practices-and-strats.html)
+            in _Tagging Amazon Web Services Resources and Tag Editor_ for details,
+            including restrictions that apply to tags and "Tag naming limits and requirements";
+            Amazon IVS has no service-specific constraints beyond what is documented
+            there.
+      required:
+      - arn
+      - allowedCountries
+      - allowedOrigins
+      description: An object representing a policy to constrain playback by country
+        and/or origin sites.
     PlaybackRestrictionPolicyAllowedCountry:
       type: string
       minLength: 2
@@ -283,8 +2814,120 @@ components:
       pattern: ^[a-zA-Z0-9-_]*$
       minLength: 0
       maxLength: 128
+    PlaybackRestrictionPolicySummary:
+      type: object
+      properties:
+        arn:
+          allOf:
+          - $ref: '#/components/schemas/PlaybackRestrictionPolicyArn'
+          description: Playback-restriction-policy ARN
+        allowedCountries:
+          allOf:
+          - $ref: '#/components/schemas/PlaybackRestrictionPolicyAllowedCountryList'
+          description: 'A list of country codes that control geoblocking restriction.
+            Allowed values are the officially assigned [ISO 3166-1 alpha-2](https://en.wikipedia.org/wiki/ISO_3166-1_alpha-2)
+            codes. Default: All countries (an empty array).'
+        allowedOrigins:
+          allOf:
+          - $ref: '#/components/schemas/PlaybackRestrictionPolicyAllowedOriginList'
+          description: 'A list of origin sites that control CORS restriction. Allowed
+            values are the same as valid values of the Origin header defined at <https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Origin>.
+            Default: All origins (an empty array).'
+        enableStrictOriginEnforcement:
+          allOf:
+          - $ref: '#/components/schemas/PlaybackRestrictionPolicyEnableStrictOriginEnforcement'
+          description: 'Whether channel playback is constrained by origin site. Default:
+            `false`.'
+        name:
+          allOf:
+          - $ref: '#/components/schemas/PlaybackRestrictionPolicyName'
+          description: Playback-restriction-policy name. The value does not need to
+            be unique.
+        tags:
+          allOf:
+          - $ref: '#/components/schemas/Tags'
+          description: Tags attached to the resource. Array of 1-50 maps, each of
+            the form `string:string (key:value)`. See [Best practices and strategies](https://docs.aws.amazon.com/tag-editor/latest/userguide/best-practices-and-strats.html)
+            in _Tagging Amazon Web Services Resources and Tag Editor_ for details,
+            including restrictions that apply to tags and "Tag naming limits and requirements";
+            Amazon IVS has no service-specific constraints beyond what is documented
+            there.
+      required:
+      - arn
+      - allowedCountries
+      - allowedOrigins
+      description: Summary information about a PlaybackRestrictionPolicy.
     PlaybackURL:
       type: string
+    PutMetadataRequest:
+      type: object
+      properties:
+        channelArn:
+          allOf:
+          - $ref: '#/components/schemas/ChannelArn'
+          description: ARN of the channel into which metadata is inserted. This channel
+            must have an active stream.
+        metadata:
+          allOf:
+          - $ref: '#/components/schemas/StreamMetadata'
+          description: 'Metadata to insert into the stream. Maximum: 1 KB per request.'
+      required:
+      - channelArn
+      - metadata
+    RecordingConfiguration:
+      type: object
+      properties:
+        arn:
+          allOf:
+          - $ref: '#/components/schemas/RecordingConfigurationArn'
+          description: Recording-configuration ARN.
+        name:
+          allOf:
+          - $ref: '#/components/schemas/RecordingConfigurationName'
+          description: Recording-configuration name. The value does not need to be
+            unique.
+        destinationConfiguration:
+          allOf:
+          - $ref: '#/components/schemas/DestinationConfiguration'
+          description: A complex type that contains information about where recorded
+            video will be stored.
+        state:
+          allOf:
+          - $ref: '#/components/schemas/RecordingConfigurationState'
+          description: Indicates the current state of the recording configuration.
+            When the state is `ACTIVE`, the configuration is ready for recording a
+            channel stream.
+        tags:
+          allOf:
+          - $ref: '#/components/schemas/Tags'
+          description: Tags attached to the resource. Array of 1-50 maps, each of
+            the form `string:string (key:value)`. See [Best practices and strategies](https://docs.aws.amazon.com/tag-editor/latest/userguide/best-practices-and-strats.html)
+            in _Tagging Amazon Web Services Resources and Tag Editor_ for details,
+            including restrictions that apply to tags and "Tag naming limits and requirements";
+            Amazon IVS has no service-specific constraints beyond what is documented
+            there.
+        thumbnailConfiguration:
+          allOf:
+          - $ref: '#/components/schemas/ThumbnailConfiguration'
+          description: A complex type that allows you to enable/disable the recording
+            of thumbnails for a live session and modify the interval at which thumbnails
+            are generated for the live session.
+        recordingReconnectWindowSeconds:
+          allOf:
+          - $ref: '#/components/schemas/RecordingReconnectWindowSeconds'
+          description: 'If a broadcast disconnects and then reconnects within the
+            specified interval, the multiple streams will be considered a single broadcast
+            and merged together. Default: 0.'
+        renditionConfiguration:
+          allOf:
+          - $ref: '#/components/schemas/RenditionConfiguration'
+          description: Object that describes which renditions should be recorded for
+            a stream.
+      required:
+      - arn
+      - destinationConfiguration
+      - state
+      description: An object representing a configuration to record a channel stream.
     RecordingConfigurationArn:
       type: string
       pattern: ^arn:aws:ivs:[a-z0-9-]+:[0-9]+:recording-configuration/[a-zA-Z0-9-]+$
@@ -305,6 +2948,43 @@ components:
       - CREATING
       - CREATE_FAILED
       - ACTIVE
+    RecordingConfigurationSummary:
+      type: object
+      properties:
+        arn:
+          allOf:
+          - $ref: '#/components/schemas/RecordingConfigurationArn'
+          description: Recording-configuration ARN.
+        name:
+          allOf:
+          - $ref: '#/components/schemas/RecordingConfigurationName'
+          description: Recording-configuration name. The value does not need to be
+            unique.
+        destinationConfiguration:
+          allOf:
+          - $ref: '#/components/schemas/DestinationConfiguration'
+          description: A complex type that contains information about where recorded
+            video will be stored.
+        state:
+          allOf:
+          - $ref: '#/components/schemas/RecordingConfigurationState'
+          description: Indicates the current state of the recording configuration.
+            When the state is `ACTIVE`, the configuration is ready for recording a
+            channel stream.
+        tags:
+          allOf:
+          - $ref: '#/components/schemas/Tags'
+          description: Tags attached to the resource. Array of 1-50 maps, each of
+            the form `string:string (key:value)`. See [Best practices and strategies](https://docs.aws.amazon.com/tag-editor/latest/userguide/best-practices-and-strats.html)
+            in _Tagging Amazon Web Services Resources and Tag Editor_ for details,
+            including restrictions that apply to tags and "Tag naming limits and requirements";
+            Amazon IVS has no service-specific constraints beyond what is documented
+            there.
+      required:
+      - arn
+      - destinationConfiguration
+      - state
+      description: Summary information about a RecordingConfiguration.
     RecordingMode:
       type: string
       enum:
@@ -315,6 +2995,27 @@ components:
       default: 0
       minimum: 0
       maximum: 300
+    RenditionConfiguration:
+      type: object
+      properties:
+        renditionSelection:
+          allOf:
+          - $ref: '#/components/schemas/RenditionConfigurationRenditionSelection'
+          description: 'Indicates which set of renditions are recorded for a stream.
+            For `BASIC` channels, the `CUSTOM` value has no effect. If `CUSTOM` is
+            specified, a set of renditions must be specified in the `renditions` field.
+            Default: `ALL`.'
+        renditions:
+          allOf:
+          - $ref: '#/components/schemas/RenditionConfigurationRenditionList'
+          description: Indicates which renditions are recorded for a stream, if `renditionSelection`
+            is `CUSTOM`; otherwise, this field is irrelevant. The selected renditions
+            are recorded if they are available during the stream. If a selected rendition
+            is unavailable, the best available rendition is recorded. For details
+            on the resolution dimensions of each rendition, see [Auto-Record to Amazon
+            S3](https://docs.aws.amazon.com/ivs/latest/userguide/record-to-s3.html).
+      description: Object that describes which renditions should be recorded for a
+        stream.
     RenditionConfigurationRendition:
       type: string
       enum:
@@ -337,19 +3038,196 @@ components:
       pattern: ^arn:aws:ivs:[a-z0-9-]+:[0-9]+:[a-z-]/[a-zA-Z0-9-]+$
       minLength: 1
       maxLength: 128
+    ResourceNotFoundException:
+      type: object
+      properties:
+        exceptionMessage:
+          allOf:
+          - $ref: '#/components/schemas/errorMessage'
+          description: Request references a resource which does not exist.
+      description: ''
     S3DestinationBucketName:
       type: string
       pattern: ^[a-z0-9-.]+$
       minLength: 3
       maxLength: 63
+    S3DestinationConfiguration:
+      type: object
+      properties:
+        bucketName:
+          allOf:
+          - $ref: '#/components/schemas/S3DestinationBucketName'
+          description: Location (S3 bucket name) where recorded videos will be stored.
+      required:
+      - bucketName
+      description: A complex type that describes an S3 location where recorded videos
+        will be stored.
+    ServiceQuotaExceededException:
+      type: object
+      properties:
+        exceptionMessage:
+          allOf:
+          - $ref: '#/components/schemas/errorMessage'
+          description: Request would cause a service quota to be exceeded.
+      description: ''
+    Srt:
+      type: object
+      properties:
+        endpoint:
+          allOf:
+          - $ref: '#/components/schemas/SrtEndpoint'
+          description: The endpoint to be used when streaming with IVS using the SRT
+            protocol.
+        passphrase:
+          allOf:
+          - $ref: '#/components/schemas/SrtPassphrase'
+          description: Auto-generated passphrase to enable encryption. This field
+            is applicable only if the end user has _not_ enabled the `insecureIngest`
+            option for the channel.
+      description: Specifies information needed to stream using the SRT protocol.
     SrtEndpoint:
       type: string
     SrtPassphrase:
       type: string
+    StartViewerSessionRevocationRequest:
+      type: object
+      properties:
+        channelArn:
+          allOf:
+          - $ref: '#/components/schemas/ChannelArn'
+          description: The ARN of the channel associated with the viewer session to
+            revoke.
+        viewerId:
+          allOf:
+          - $ref: '#/components/schemas/ViewerId'
+          description: The ID of the viewer associated with the viewer session to
+            revoke. Do not use this field for personally identifying, confidential,
+            or sensitive information.
+        viewerSessionVersionsLessThanOrEqualTo:
+          allOf:
+          - $ref: '#/components/schemas/ViewerSessionVersion'
+          description: 'An optional filter on which versions of the viewer session
+            to revoke. All versions less than or equal to the specified version will
+            be revoked. Default: 0.'
+      required:
+      - channelArn
+      - viewerId
+    StartViewerSessionRevocationResponse:
+      type: object
+      properties: {}
+    StopStreamRequest:
+      type: object
+      properties:
+        channelArn:
+          allOf:
+          - $ref: '#/components/schemas/ChannelArn'
+          description: ARN of the channel for which the stream is to be stopped.
+      required:
+      - channelArn
+    StopStreamResponse:
+      type: object
+      properties: {}
+    Stream:
+      type: object
+      properties:
+        channelArn:
+          allOf:
+          - $ref: '#/components/schemas/ChannelArn'
+          description: Channel ARN for the stream.
+        streamId:
+          allOf:
+          - $ref: '#/components/schemas/StreamId'
+          description: Unique identifier for a live or previously live stream in the
+            specified channel.
+        playbackUrl:
+          allOf:
+          - $ref: '#/components/schemas/PlaybackURL'
+          description: URL of the master playlist, required by the video player to
+            play the HLS stream.
+        startTime:
+          allOf:
+          - $ref: '#/components/schemas/StreamStartTime'
+          description: Time of the stream’s start. This is an ISO 8601 timestamp;
+            _note that this is returned as a string_.
+        state:
+          allOf:
+          - $ref: '#/components/schemas/StreamState'
+          description: The stream’s state. Do not rely on the `OFFLINE` state, as
+            the API may not return it; instead, a "NotBroadcasting" error will indicate
+            that the stream is not live.
+        health:
+          allOf:
+          - $ref: '#/components/schemas/StreamHealth'
+          description: The stream’s health.
+        viewerCount:
+          allOf:
+          - $ref: '#/components/schemas/StreamViewerCount'
+          description: A count of concurrent views of the stream. Typically, a new
+            view appears in `viewerCount` within 15 seconds of when video playback
+            starts and a view is removed from `viewerCount` within 1 minute of when
+            video playback ends. A value of -1 indicates that the request timed out;
+            in this case, retry.
+      description: Specifies a live video stream that has been ingested and distributed.
+    StreamEvent:
+      type: object
+      properties:
+        name:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: Name that identifies the stream event within a `type`.
+        type:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: Logical group for certain events.
+        eventTime:
+          allOf:
+          - $ref: '#/components/schemas/Time'
+          description: Time when the event occurred. This is an ISO 8601 timestamp;
+            _note that this is returned as a string_.
+        code:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: "Provides additional details about the stream event. There\
+            \ are several values; the long descriptions are provided in the IVS console\
+            \ but not delivered through the IVS API or EventBridge. Multitrack-related\
+            \ codes are used only for certain Session Ended events.\n\n  * `MultitrackInputNotAllowed`\
+            \ — The broadcast client attempted to connect with multitrack input, but\
+            \ multitrack input was not enabled on the channel. Check your broadcast\
+            \ software settings or set `MultitrackInputConfiguration.Policy` to `ALLOW`\
+            \ or `REQUIRE`.\n\n  * `MultitrackInputRequired` — The broadcast client\
+            \ attempted to connect with single-track video, but multitrack input is\
+            \ required on this channel. Enable multitrack video in your broadcast\
+            \ software or configure the channel’s `MultitrackInputConfiguration.Policy`\
+            \ to `ALLOW`.\n\n  * `InvalidGetClientConfigurationStreamKey` — The broadcast\
+            \ client attempted to connect with an invalid, expired, or corrupt stream\
+            \ key.\n\n  * `GetClientConfigurationStreamKeyRequired` — The broadcast\
+            \ client attempted to stream multitrack video without providing an authenticated\
+            \ stream key from GetClientConfiguration.\n\n  * `InvalidMultitrackInputTrackCount`\
+            \ — The multitrack input stream contained an invalid number of tracks.\n\
+            \n  * `InvalidMultitrackInputVideoTrackMediaProperties` — The multitrack\
+            \ input stream contained one or more tracks with an invalid codec, resolution,\
+            \ bitrate, or framerate.\n\n  * `StreamTakeoverMediaMismatch` — The broadcast\
+            \ client attempted to take over with different media properties (e.g.,\
+            \ codec, resolution, or video track type) from the original stream.\n\n\
+            \  * `StreamTakeoverInvalidPriority` — The broadcast client attempted\
+            \ a takeover with either a priority integer value equal to or lower than\
+            \ the original stream's value or a value outside the allowed range of\
+            \ 1 to 2,147,483,647.\n\n`StreamTakeoverLimitBreached` — The broadcast\
+            \ client reached the maximum allowed takeover attempts for this stream."
+      description: Object specifying a stream’s events. For a list of events, see
+        [Using Amazon EventBridge with Amazon IVS](https://docs.aws.amazon.com/ivs/latest/userguide/eventbridge.html).
     StreamEvents:
       type: array
       items:
         $ref: '#/components/schemas/StreamEvent'
+    StreamFilters:
+      type: object
+      properties:
+        health:
+          allOf:
+          - $ref: '#/components/schemas/StreamHealth'
+          description: The stream’s health.
+      description: Object specifying the stream attribute on which to filter.
     StreamHealth:
       type: string
       enum:
@@ -361,6 +3239,31 @@ components:
       pattern: ^st-[a-zA-Z0-9]+$
       minLength: 26
       maxLength: 26
+    StreamKey:
+      type: object
+      properties:
+        arn:
+          allOf:
+          - $ref: '#/components/schemas/StreamKeyArn'
+          description: Stream-key ARN.
+        value:
+          allOf:
+          - $ref: '#/components/schemas/StreamKeyValue'
+          description: Stream-key value.
+        channelArn:
+          allOf:
+          - $ref: '#/components/schemas/ChannelArn'
+          description: Channel ARN for the stream.
+        tags:
+          allOf:
+          - $ref: '#/components/schemas/Tags'
+          description: Tags attached to the resource. Array of 1-50 maps, each of
+            the form `string:string (key:value)`. See [Best practices and strategies](https://docs.aws.amazon.com/tag-editor/latest/userguide/best-practices-and-strats.html)
+            in _Tagging Amazon Web Services Resources and Tag Editor_ for details,
+            including restrictions that apply to tags and "Tag naming limits and requirements";
+            Amazon IVS has no service-specific constraints beyond what is documented
+            there.
+      description: Object specifying a stream key.
     StreamKeyArn:
       type: string
       pattern: ^arn:aws:ivs:[a-z0-9-]+:[0-9]+:stream-key/[a-zA-Z0-9-]+$
@@ -374,6 +3277,27 @@ components:
       type: array
       items:
         $ref: '#/components/schemas/StreamKeySummary'
+    StreamKeySummary:
+      type: object
+      properties:
+        arn:
+          allOf:
+          - $ref: '#/components/schemas/StreamKeyArn'
+          description: Stream-key ARN.
+        channelArn:
+          allOf:
+          - $ref: '#/components/schemas/ChannelArn'
+          description: Channel ARN for the stream.
+        tags:
+          allOf:
+          - $ref: '#/components/schemas/Tags'
+          description: Tags attached to the resource. Array of 1-50 maps, each of
+            the form `string:string (key:value)`. See [Best practices and strategies](https://docs.aws.amazon.com/tag-editor/latest/userguide/best-practices-and-strats.html)
+            in _Tagging Amazon Web Services Resources and Tag Editor_ for details,
+            including restrictions that apply to tags and "Tag naming limits and requirements";
+            Amazon IVS has no service-specific constraints beyond what is documented
+            there.
+      description: Summary information about a stream key.
     StreamKeyValue:
       type: string
     StreamKeys:
@@ -387,10 +3311,86 @@ components:
     StreamMetadata:
       type: string
       minLength: 1
+    StreamSession:
+      type: object
+      properties:
+        streamId:
+          allOf:
+          - $ref: '#/components/schemas/StreamId'
+          description: Unique identifier for a live or previously live stream in the
+            specified channel.
+        startTime:
+          allOf:
+          - $ref: '#/components/schemas/Time'
+          description: Time when the channel went live. This is an ISO 8601 timestamp;
+            _note that this is returned as a string_.
+        endTime:
+          allOf:
+          - $ref: '#/components/schemas/Time'
+          description: Time when the channel went offline. This is an ISO 8601 timestamp;
+            _note that this is returned as a string_. For live streams, this is `NULL`.
+        channel:
+          allOf:
+          - $ref: '#/components/schemas/Channel'
+          description: The properties of the channel at the time of going live.
+        ingestConfiguration:
+          allOf:
+          - $ref: '#/components/schemas/IngestConfiguration'
+          description: 'The properties of the incoming RTMP stream.
+
+
+            **Note:** `ingestConfiguration` is deprecated in favor of `ingestConfigurations`
+            but retained to ensure backward compatibility. If multitrack is not enabled,
+            `ingestConfiguration` and `ingestConfigurations` contain the same data,
+            namely information about track0 (the sole track). If multitrack is enabled,
+            `ingestConfiguration` contains data for only the first track (track0)
+            and `ingestConfigurations` contains data for all tracks.'
+        ingestConfigurations:
+          allOf:
+          - $ref: '#/components/schemas/IngestConfigurations'
+          description: The properties of the incoming RTMP stream. If multitrack is
+            enabled, `ingestConfigurations` contains data for all tracks; otherwise,
+            it contains data only for track0 (the sole track).
+        recordingConfiguration:
+          allOf:
+          - $ref: '#/components/schemas/RecordingConfiguration'
+          description: The properties of recording the live stream.
+        truncatedEvents:
+          allOf:
+          - $ref: '#/components/schemas/StreamEvents'
+          description: List of Amazon IVS events that the stream encountered. The
+            list is sorted by most recent events and contains up to 500 events. For
+            Amazon IVS events, see [Using Amazon EventBridge with Amazon IVS](https://docs.aws.amazon.com/ivs/latest/userguide/eventbridge.html).
+      description: Object that captures the Amazon IVS configuration that the customer
+        provisioned, the ingest configurations that the broadcaster used, and the
+        most recent Amazon IVS stream events it encountered.
     StreamSessionList:
       type: array
       items:
         $ref: '#/components/schemas/StreamSessionSummary'
+    StreamSessionSummary:
+      type: object
+      properties:
+        streamId:
+          allOf:
+          - $ref: '#/components/schemas/StreamId'
+          description: Unique identifier for a live or previously live stream in the
+            specified channel.
+        startTime:
+          allOf:
+          - $ref: '#/components/schemas/Time'
+          description: Time when the channel went live. This is an ISO 8601 timestamp;
+            _note that this is returned as a string_.
+        endTime:
+          allOf:
+          - $ref: '#/components/schemas/Time'
+          description: Time when the channel went offline. This is an ISO 8601 timestamp;
+            _note that this is returned as a string_. For live streams, this is `NULL`.
+        hasErrorEvent:
+          allOf:
+          - $ref: '#/components/schemas/Boolean'
+          description: If `true`, this stream encountered a quota breach or failure.
+      description: Summary information about a stream session.
     StreamStartTime:
       type: string
       format: date-time
@@ -399,6 +3399,50 @@ components:
       enum:
       - LIVE
       - OFFLINE
+    StreamSummary:
+      type: object
+      properties:
+        channelArn:
+          allOf:
+          - $ref: '#/components/schemas/ChannelArn'
+          description: Channel ARN for the stream.
+        streamId:
+          allOf:
+          - $ref: '#/components/schemas/StreamId'
+          description: Unique identifier for a live or previously live stream in the
+            specified channel.
+        state:
+          allOf:
+          - $ref: '#/components/schemas/StreamState'
+          description: The stream’s state. Do not rely on the `OFFLINE` state, as
+            the API may not return it; instead, a "NotBroadcasting" error will indicate
+            that the stream is not live.
+        health:
+          allOf:
+          - $ref: '#/components/schemas/StreamHealth'
+          description: The stream’s health.
+        viewerCount:
+          allOf:
+          - $ref: '#/components/schemas/StreamViewerCount'
+          description: A count of concurrent views of the stream. Typically, a new
+            view appears in `viewerCount` within 15 seconds of when video playback
+            starts and a view is removed from `viewerCount` within 1 minute of when
+            video playback ends. A value of -1 indicates that the request timed out;
+            in this case, retry.
+        startTime:
+          allOf:
+          - $ref: '#/components/schemas/StreamStartTime'
+          description: Time of the stream’s start. This is an ISO 8601 timestamp;
+            _note that this is returned as a string_.
+      description: Summary information about a stream.
+    StreamUnavailable:
+      type: object
+      properties:
+        exceptionMessage:
+          allOf:
+          - $ref: '#/components/schemas/errorMessage'
+          description: The stream is temporarily unavailable.
+      description: ''
     StreamViewerCount:
       type: integer
       format: int64
@@ -413,6 +3457,29 @@ components:
       type: array
       items:
         $ref: '#/components/schemas/TagKey'
+    TagResourceRequest:
+      type: object
+      properties:
+        resourceArn:
+          allOf:
+          - $ref: '#/components/schemas/ResourceArn'
+          description: ARN of the resource for which tags are to be added or updated.
+            The ARN must be URL-encoded.
+        tags:
+          allOf:
+          - $ref: '#/components/schemas/Tags'
+          description: Array of tags to be added or updated. Array of maps, each of
+            the form `string:string (key:value)`. See [Best practices and strategies](https://docs.aws.amazon.com/tag-editor/latest/userguide/best-practices-and-strats.html)
+            in _Tagging Amazon Web Services Resources and Tag Editor_ for details,
+            including restrictions that apply to tags and "Tag naming limits and requirements";
+            Amazon IVS has no service-specific constraints beyond what is documented
+            there.
+      required:
+      - resourceArn
+      - tags
+    TagResourceResponse:
+      type: object
+      properties: {}
     TagValue:
       type: string
       maxLength: 256
@@ -425,6 +3492,56 @@ components:
       format: int64
       minimum: 1
       maximum: 60
+    ThrottlingException:
+      type: object
+      properties:
+        exceptionMessage:
+          allOf:
+          - $ref: '#/components/schemas/errorMessage'
+          description: Request was denied due to request throttling.
+      description: ''
+    ThumbnailConfiguration:
+      type: object
+      properties:
+        recordingMode:
+          allOf:
+          - $ref: '#/components/schemas/RecordingMode'
+          description: 'Thumbnail recording mode. Default: `INTERVAL`.'
+        targetIntervalSeconds:
+          allOf:
+          - $ref: '#/components/schemas/TargetIntervalSeconds'
+          description: 'The targeted thumbnail-generation interval in seconds. This
+            is configurable (and required) only if `recordingMode` is `INTERVAL`.
+            Default: 60.
+
+
+            **Important:** For the `BASIC` channel type, or the `STANDARD` channel
+            type with multitrack input, setting a value for `targetIntervalSeconds`
+            does not guarantee that thumbnails are generated at the specified interval.
+            For thumbnails to be generated at the `targetIntervalSeconds` interval,
+            the `IDR/Keyframe` value for the input video must be less than the `targetIntervalSeconds`
+            value. See [ Amazon IVS Streaming Configuration](https://docs.aws.amazon.com/ivs/latest/userguide/streaming-config.html)
+            for information on setting `IDR/Keyframe` to the recommended value in
+            video-encoder settings.'
+        resolution:
+          allOf:
+          - $ref: '#/components/schemas/ThumbnailConfigurationResolution'
+          description: 'Indicates the desired resolution of recorded thumbnails. Thumbnails
+            are recorded at the selected resolution if the corresponding rendition
+            is available during the stream; otherwise, they are recorded at source
+            resolution. For more information about resolution values and their corresponding
+            height and width dimensions, see [Auto-Record to Amazon S3](https://docs.aws.amazon.com/ivs/latest/userguide/record-to-s3.html).
+            Default: Null (source resolution is returned).'
+        storage:
+          allOf:
+          - $ref: '#/components/schemas/ThumbnailConfigurationStorageList'
+          description: 'Indicates the format in which thumbnails are recorded. `SEQUENTIAL`
+            records all generated thumbnails in a serial manner, to the media/thumbnails
+            directory. `LATEST` saves the latest thumbnail in media/latest_thumbnail/thumb.jpg
+            and overwrites it at the interval specified by `targetIntervalSeconds`.
+            You can enable both `SEQUENTIAL` and `LATEST`. Default: `SEQUENTIAL`.'
+      description: An object representing a configuration of thumbnails for recorded
+        video.
     ThumbnailConfigurationResolution:
       type: string
       enum:
@@ -449,6 +3566,209 @@ components:
       enum:
       - HIGHER_BANDWIDTH_DELIVERY
       - CONSTRAINED_BANDWIDTH_DELIVERY
+    UntagResourceRequest:
+      type: object
+      properties:
+        resourceArn:
+          allOf:
+          - $ref: '#/components/schemas/ResourceArn'
+          description: ARN of the resource for which tags are to be removed. The ARN
+            must be URL-encoded.
+        tagKeys:
+          allOf:
+          - $ref: '#/components/schemas/TagKeyList'
+          description: Array of tags to be removed. Array of maps, each of the form
+            `string:string (key:value)`. See [Best practices and strategies](https://docs.aws.amazon.com/tag-editor/latest/userguide/best-practices-and-strats.html)
+            in _Tagging Amazon Web Services Resources and Tag Editor_ for details,
+            including restrictions that apply to tags and "Tag naming limits and requirements";
+            Amazon IVS has no service-specific constraints beyond what is documented
+            there.
+      required:
+      - resourceArn
+      - tagKeys
+    UntagResourceResponse:
+      type: object
+      properties: {}
+    UpdateChannelRequest:
+      type: object
+      properties:
+        arn:
+          allOf:
+          - $ref: '#/components/schemas/ChannelArn'
+          description: ARN of the channel to be updated.
+        name:
+          allOf:
+          - $ref: '#/components/schemas/ChannelName'
+          description: Channel name.
+        latencyMode:
+          allOf:
+          - $ref: '#/components/schemas/ChannelLatencyMode'
+          description: Channel latency mode. Use `NORMAL` to broadcast and deliver
+            live video up to Full HD. Use `LOW` for near-real-time interaction with
+            viewers.
+        type:
+          allOf:
+          - $ref: '#/components/schemas/ChannelType'
+          description: 'Channel type, which determines the allowable resolution and
+            bitrate. _If you exceed the allowable input resolution or bitrate, the
+            stream probably will disconnect immediately._ Default: `STANDARD`. For
+            details, see [Channel Types](https://docs.aws.amazon.com/ivs/latest/LowLatencyAPIReference/channel-types.html).'
+        authorized:
+          allOf:
+          - $ref: '#/components/schemas/Boolean'
+          description: Whether the channel is private (enabled for playback authorization).
+        recordingConfigurationArn:
+          allOf:
+          - $ref: '#/components/schemas/ChannelRecordingConfigurationArn'
+          description: Recording-configuration ARN. A valid ARN value here both specifies
+            the ARN and enables recording. If this is set to an empty string, recording
+            is disabled.
+        insecureIngest:
+          allOf:
+          - $ref: '#/components/schemas/Boolean'
+          description: 'Whether the channel allows insecure RTMP and SRT ingest. Default:
+            `false`.'
+        preset:
+          allOf:
+          - $ref: '#/components/schemas/TranscodePreset'
+          description: Optional transcode preset for the channel. This is selectable
+            only for `ADVANCED_HD` and `ADVANCED_SD` channel types. For those channel
+            types, the default `preset` is `HIGHER_BANDWIDTH_DELIVERY`. For other
+            channel types (`BASIC` and `STANDARD`), `preset` is the empty string (`""`).
+        playbackRestrictionPolicyArn:
+          allOf:
+          - $ref: '#/components/schemas/ChannelPlaybackRestrictionPolicyArn'
+          description: Playback-restriction-policy ARN. A valid ARN value here both
+            specifies the ARN and enables playback restriction. If this is set to
+            an empty string, playback restriction policy is disabled.
+        multitrackInputConfiguration:
+          allOf:
+          - $ref: '#/components/schemas/MultitrackInputConfiguration'
+          description: 'Object specifying multitrack input configuration. Default:
+            no multitrack input configuration is specified.'
+        containerFormat:
+          allOf:
+          - $ref: '#/components/schemas/ContainerFormat'
+          description: 'Indicates which content-packaging format is used (MPEG-TS
+            or fMP4). If `multitrackInputConfiguration` is specified and `enabled`
+            is `true`, then `containerFormat` is required and must be set to `FRAGMENTED_MP4`.
+            Otherwise, `containerFormat` may be set to `TS` or `FRAGMENTED_MP4`. Default:
+            `TS`.'
+      required:
+      - arn
+    UpdateChannelResponse:
+      type: object
+      properties:
+        channel:
+          allOf:
+          - $ref: '#/components/schemas/Channel'
+          description: Object specifying the updated channel.
+    UpdatePlaybackRestrictionPolicyRequest:
+      type: object
+      properties:
+        arn:
+          allOf:
+          - $ref: '#/components/schemas/PlaybackRestrictionPolicyArn'
+          description: ARN of the playback-restriction-policy to be updated.
+        allowedCountries:
+          allOf:
+          - $ref: '#/components/schemas/PlaybackRestrictionPolicyAllowedCountryList'
+          description: 'A list of country codes that control geoblocking restriction.
+            Allowed values are the officially assigned [ISO 3166-1 alpha-2](https://en.wikipedia.org/wiki/ISO_3166-1_alpha-2)
+            codes. Default: All countries (an empty array).'
+        allowedOrigins:
+          allOf:
+          - $ref: '#/components/schemas/PlaybackRestrictionPolicyAllowedOriginList'
+          description: 'A list of origin sites that control CORS restriction. Allowed
+            values are the same as valid values of the Origin header defined at <https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Origin>.
+            Default: All origins (an empty array).'
+        enableStrictOriginEnforcement:
+          allOf:
+          - $ref: '#/components/schemas/PlaybackRestrictionPolicyEnableStrictOriginEnforcement'
+          description: 'Whether channel playback is constrained by origin site. Default:
+            `false`.'
+        name:
+          allOf:
+          - $ref: '#/components/schemas/PlaybackRestrictionPolicyName'
+          description: Playback-restriction-policy name. The value does not need to
+            be unique.
+      required:
+      - arn
+    UpdatePlaybackRestrictionPolicyResponse:
+      type: object
+      properties:
+        playbackRestrictionPolicy:
+          allOf:
+          - $ref: '#/components/schemas/PlaybackRestrictionPolicy'
+          description: Object specifying the updated policy.
+    ValidationException:
+      type: object
+      properties:
+        exceptionMessage:
+          allOf:
+          - $ref: '#/components/schemas/errorMessage'
+          description: The input fails to satisfy the constraints specified by an
+            Amazon Web Services service.
+      description: ''
+    VideoConfiguration:
+      type: object
+      properties:
+        avcProfile:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: Indicates to the decoder the requirements for decoding the
+            stream. For definitions of the valid values, see the H.264 specification.
+        avcLevel:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: Indicates the degree of required decoder performance for a
+            profile. Normally this is set automatically by the encoder. For details,
+            see the H.264 specification.
+        codec:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: Codec used for the video encoding.
+        encoder:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: Software or hardware used to encode the video.
+        targetBitrate:
+          allOf:
+          - $ref: '#/components/schemas/Integer'
+          description: The expected ingest bitrate (bits per second). This is configured
+            in the encoder.
+        targetFramerate:
+          allOf:
+          - $ref: '#/components/schemas/Integer'
+          description: The expected ingest framerate. This is configured in the encoder.
+        videoHeight:
+          allOf:
+          - $ref: '#/components/schemas/Integer'
+          description: Video-resolution height in pixels.
+        videoWidth:
+          allOf:
+          - $ref: '#/components/schemas/Integer'
+          description: Video-resolution width in pixels.
+        level:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: Indicates the degree of required decoder performance for a
+            profile. Normally this is set automatically by the encoder. When an AVC
+            codec is used, this field has the same value as `avcLevel`.
+        track:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: Name of the video track. If multitrack is not enabled, this
+            is track0 (the sole track).
+        profile:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: Indicates to the decoder the requirements for decoding the
+            stream. When an AVC codec is used, this field has the same value as `avcProfile`.
+      description: Object specifying a stream’s video configuration, as set up by
+        the broadcaster (usually in an encoder). This is part of the IngestConfigurations
+        object and the deprecated IngestConfiguration object. It is used for monitoring
+        stream health.
     VideoConfigurationList:
       type: array
       items:

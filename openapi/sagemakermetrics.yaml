@@ -7,7 +7,7 @@ info:
   x-stackql-serviceName: sagemaker_metrics
   x-aws-serviceName: sagemakermetrics
   x-aws-protocol: aws.protocols#restJson1
-  x-dateGenerated: '2025-05-05'
+  x-dateGenerated: '2025-05-07'
   version: '2022-09-30'
   title: Amazon SageMaker Metrics Service
   description: |-
@@ -45,13 +45,104 @@ servers:
       - sa-east-1
       - me-south-1
       default: us-east-1
-paths: {}
+paths:
+  /BatchGetMetrics:
+    post:
+      operationId: BatchGetMetrics
+      description: |-
+        Used to retrieve training metrics from SageMaker.
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                MetricQueries:
+                  $ref: '#/components/schemas/MetricQueryList'
+      responses:
+        '200': {}
+  /BatchPutMetrics:
+    put:
+      operationId: BatchPutMetrics
+      description: |-
+        Used to ingest training metrics into SageMaker. These metrics can be visualized in SageMaker Studio.
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                TrialComponentName:
+                  $ref: '#/components/schemas/ExperimentEntityName'
+                MetricData:
+                  $ref: '#/components/schemas/RawMetricDataList'
+      responses:
+        '200': {}
 components:
   schemas:
+    BatchGetMetricsRequest:
+      type: object
+      properties:
+        MetricQueries:
+          allOf:
+          - $ref: '#/components/schemas/MetricQueryList'
+          description: Queries made to retrieve training metrics from SageMaker.
+      required:
+      - MetricQueries
+    BatchGetMetricsResponse:
+      type: object
+      properties:
+        MetricQueryResults:
+          allOf:
+          - $ref: '#/components/schemas/MetricQueryResultList'
+          description: The results of a query to retrieve training metrics from SageMaker.
+    BatchPutMetricsError:
+      type: object
+      properties:
+        Code:
+          allOf:
+          - $ref: '#/components/schemas/PutMetricsErrorCode'
+          description: "The error code of an error that occured when attempting to\
+            \ put metrics.\n\n  * `METRIC_LIMIT_EXCEEDED`: The maximum amount of metrics\
+            \ per resource is exceeded.\n\n  * `INTERNAL_ERROR`: An internal error\
+            \ occured.\n\n  * `VALIDATION_ERROR`: The metric data failed validation.\n\
+            \n  * `CONFLICT_ERROR`: Multiple requests attempted to modify the same\
+            \ data simultaneously."
+        MetricIndex:
+          allOf:
+          - $ref: '#/components/schemas/Integer'
+          description: An index that corresponds to the metric in the request.
+      description: An error that occured when putting the metric data.
     BatchPutMetricsErrorList:
       type: array
       items:
         $ref: '#/components/schemas/BatchPutMetricsError'
+    BatchPutMetricsRequest:
+      type: object
+      properties:
+        TrialComponentName:
+          allOf:
+          - $ref: '#/components/schemas/ExperimentEntityName'
+          description: The name of the Trial Component to associate with the metrics.
+            The Trial Component name must be entirely lowercase.
+        MetricData:
+          allOf:
+          - $ref: '#/components/schemas/RawMetricDataList'
+          description: A list of raw metric values to put.
+      required:
+      - TrialComponentName
+      - MetricData
+    BatchPutMetricsResponse:
+      type: object
+      properties:
+        Errors:
+          allOf:
+          - $ref: '#/components/schemas/BatchPutMetricsErrorList'
+          description: Lists any errors that occur when inserting metric data.
     Double:
       type: number
       format: double
@@ -75,10 +166,72 @@ components:
       pattern: ^.+$
       minLength: 1
       maxLength: 255
+    MetricQuery:
+      type: object
+      properties:
+        MetricName:
+          allOf:
+          - $ref: '#/components/schemas/MetricName'
+          description: The name of the metric to retrieve.
+        ResourceArn:
+          allOf:
+          - $ref: '#/components/schemas/SageMakerResourceArn'
+          description: The ARN of the SageMaker resource to retrieve metrics for.
+        MetricStat:
+          allOf:
+          - $ref: '#/components/schemas/MetricStatistic'
+          description: The metrics stat type of metrics to retrieve.
+        Period:
+          allOf:
+          - $ref: '#/components/schemas/Period'
+          description: The time period of metrics to retrieve.
+        XAxisType:
+          allOf:
+          - $ref: '#/components/schemas/XAxisType'
+          description: The x-axis type of metrics to retrieve.
+        Start:
+          allOf:
+          - $ref: '#/components/schemas/Long'
+          description: The start time of metrics to retrieve.
+        End:
+          allOf:
+          - $ref: '#/components/schemas/Long'
+          description: The end time of metrics to retrieve.
+      required:
+      - MetricName
+      - ResourceArn
+      - MetricStat
+      - Period
+      - XAxisType
+      description: Specifies a query to retrieve training metrics from SageMaker.
     MetricQueryList:
       type: array
       items:
         $ref: '#/components/schemas/MetricQuery'
+    MetricQueryResult:
+      type: object
+      properties:
+        Status:
+          allOf:
+          - $ref: '#/components/schemas/MetricQueryResultStatus'
+          description: The status of the metric query.
+        Message:
+          allOf:
+          - $ref: '#/components/schemas/Message'
+          description: A message describing the status of the metric query.
+        XAxisValues:
+          allOf:
+          - $ref: '#/components/schemas/XAxisValues'
+          description: The values for the x-axis of the metrics.
+        MetricValues:
+          allOf:
+          - $ref: '#/components/schemas/MetricValues'
+          description: The metric values retrieved by the query.
+      required:
+      - Status
+      - XAxisValues
+      - MetricValues
+      description: The result of a query to retrieve training metrics from SageMaker.
     MetricQueryResultList:
       type: array
       items:
@@ -117,6 +270,30 @@ components:
       - INTERNAL_ERROR
       - VALIDATION_ERROR
       - CONFLICT_ERROR
+    RawMetricData:
+      type: object
+      properties:
+        MetricName:
+          allOf:
+          - $ref: '#/components/schemas/MetricName'
+          description: The name of the metric.
+        Timestamp:
+          allOf:
+          - $ref: '#/components/schemas/Timestamp'
+          description: The time that the metric was recorded.
+        Step:
+          allOf:
+          - $ref: '#/components/schemas/Step'
+          description: The metric step (epoch).
+        Value:
+          allOf:
+          - $ref: '#/components/schemas/Double'
+          description: The metric value.
+      required:
+      - MetricName
+      - Timestamp
+      - Value
+      description: The raw metric data to associate with the resource.
     RawMetricDataList:
       type: array
       items:

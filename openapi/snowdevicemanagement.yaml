@@ -7,7 +7,7 @@ info:
   x-stackql-serviceName: snow_device_management
   x-aws-serviceName: snowdevicemanagement
   x-aws-protocol: aws.protocols#restJson1
-  x-dateGenerated: '2025-05-05'
+  x-dateGenerated: '2025-05-07'
   version: '2021-08-04'
   title: AWS Snow Device Management
   description: |-
@@ -43,9 +43,682 @@ servers:
       - sa-east-1
       - me-south-1
       default: us-east-1
-paths: {}
+paths:
+  /task/{taskId}/cancel:
+    post:
+      operationId: CancelTask
+      description: |-
+        Sends a cancel request for a specified task. You can cancel a task only if it's still in a `QUEUED` state. Tasks that are already running can't be cancelled.
+
+        A task might still run if it's processed from the queue before the `CancelTask` operation changes the task's state.
+      parameters:
+      - name: taskId
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/TaskId'
+      responses:
+        '200': {}
+        '403':
+          description: |-
+            You don't have sufficient access to perform this action.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '500':
+          description: |-
+            An unexpected error occurred while processing the request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerException'
+        '404':
+          description: |-
+            The request references a resource that doesn't exist.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+        '429':
+          description: |-
+            The request was denied due to request throttling.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThrottlingException'
+        '400':
+          description: |-
+            The input fails to satisfy the constraints specified by an Amazon Web Services service.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+  /task:
+    post:
+      operationId: CreateTask
+      description: |-
+        Instructs one or more devices to start a task, such as unlocking or rebooting.
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                targets:
+                  $ref: '#/components/schemas/TargetList'
+                command:
+                  $ref: '#/components/schemas/Command'
+                description:
+                  $ref: '#/components/schemas/TaskDescriptionString'
+                tags:
+                  $ref: '#/components/schemas/TagMap'
+                clientToken:
+                  $ref: '#/components/schemas/IdempotencyToken'
+      responses:
+        '200': {}
+        '403':
+          description: |-
+            You don't have sufficient access to perform this action.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '500':
+          description: |-
+            An unexpected error occurred while processing the request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerException'
+        '404':
+          description: |-
+            The request references a resource that doesn't exist.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+        '402':
+          description: |-
+            The request would cause a service quota to be exceeded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServiceQuotaExceededException'
+        '429':
+          description: |-
+            The request was denied due to request throttling.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThrottlingException'
+        '400':
+          description: |-
+            The input fails to satisfy the constraints specified by an Amazon Web Services service.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+  /managed-device/{managedDeviceId}/describe:
+    post:
+      operationId: DescribeDevice
+      description: |-
+        Checks device-specific information, such as the device type, software version, IP addresses, and lock status.
+      parameters:
+      - name: managedDeviceId
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/ManagedDeviceId'
+      responses:
+        '200': {}
+        '403':
+          description: |-
+            You don't have sufficient access to perform this action.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '500':
+          description: |-
+            An unexpected error occurred while processing the request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerException'
+        '404':
+          description: |-
+            The request references a resource that doesn't exist.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+        '429':
+          description: |-
+            The request was denied due to request throttling.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThrottlingException'
+        '400':
+          description: |-
+            The input fails to satisfy the constraints specified by an Amazon Web Services service.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+  /managed-device/{managedDeviceId}/resources/ec2/describe:
+    post:
+      operationId: DescribeDeviceEc2Instances
+      description: |-
+        Checks the current state of the Amazon EC2 instances. The output is similar to `describeDevice`, but the results are sourced from the device cache in the Amazon Web Services Cloud and include a subset of the available fields.
+      parameters:
+      - name: managedDeviceId
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/ManagedDeviceId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                instanceIds:
+                  $ref: '#/components/schemas/InstanceIdsList'
+      responses:
+        '200': {}
+        '403':
+          description: |-
+            You don't have sufficient access to perform this action.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '500':
+          description: |-
+            An unexpected error occurred while processing the request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerException'
+        '404':
+          description: |-
+            The request references a resource that doesn't exist.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+        '429':
+          description: |-
+            The request was denied due to request throttling.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThrottlingException'
+        '400':
+          description: |-
+            The input fails to satisfy the constraints specified by an Amazon Web Services service.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+  /task/{taskId}/execution/{managedDeviceId}:
+    post:
+      operationId: DescribeExecution
+      description: |-
+        Checks the status of a remote task running on one or more target devices.
+      parameters:
+      - name: taskId
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/TaskId'
+      - name: managedDeviceId
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/ManagedDeviceId'
+      responses:
+        '200': {}
+        '403':
+          description: |-
+            You don't have sufficient access to perform this action.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '500':
+          description: |-
+            An unexpected error occurred while processing the request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerException'
+        '404':
+          description: |-
+            The request references a resource that doesn't exist.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+        '429':
+          description: |-
+            The request was denied due to request throttling.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThrottlingException'
+        '400':
+          description: |-
+            The input fails to satisfy the constraints specified by an Amazon Web Services service.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+  /task/{taskId}:
+    post:
+      operationId: DescribeTask
+      description: |-
+        Checks the metadata for a given task on a device.
+      parameters:
+      - name: taskId
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/TaskId'
+      responses:
+        '200': {}
+        '403':
+          description: |-
+            You don't have sufficient access to perform this action.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '500':
+          description: |-
+            An unexpected error occurred while processing the request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerException'
+        '404':
+          description: |-
+            The request references a resource that doesn't exist.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+        '429':
+          description: |-
+            The request was denied due to request throttling.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThrottlingException'
+        '400':
+          description: |-
+            The input fails to satisfy the constraints specified by an Amazon Web Services service.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+  /managed-device/{managedDeviceId}/resources:
+    get:
+      operationId: ListDeviceResources
+      description: |-
+        Returns a list of the Amazon Web Services resources available for a device. Currently, Amazon EC2 instances are the only supported resource type.
+      parameters:
+      - name: managedDeviceId
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/ManagedDeviceId'
+      - name: type
+        in: query
+        required: false
+        schema:
+          $ref: '#/components/schemas/String'
+      - name: maxResults
+        in: query
+        required: false
+        schema:
+          $ref: '#/components/schemas/MaxResults'
+      - name: nextToken
+        in: query
+        required: false
+        schema:
+          $ref: '#/components/schemas/NextToken'
+      responses:
+        '200': {}
+        '403':
+          description: |-
+            You don't have sufficient access to perform this action.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '500':
+          description: |-
+            An unexpected error occurred while processing the request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerException'
+        '404':
+          description: |-
+            The request references a resource that doesn't exist.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+        '429':
+          description: |-
+            The request was denied due to request throttling.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThrottlingException'
+        '400':
+          description: |-
+            The input fails to satisfy the constraints specified by an Amazon Web Services service.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+  /managed-devices:
+    get:
+      operationId: ListDevices
+      description: |-
+        Returns a list of all devices on your Amazon Web Services account that have Amazon Web Services Snow Device Management enabled in the Amazon Web Services Region where the command is run.
+      parameters:
+      - name: jobId
+        in: query
+        required: false
+        schema:
+          $ref: '#/components/schemas/JobId'
+      - name: maxResults
+        in: query
+        required: false
+        schema:
+          $ref: '#/components/schemas/MaxResults'
+      - name: nextToken
+        in: query
+        required: false
+        schema:
+          $ref: '#/components/schemas/NextToken'
+      responses:
+        '200': {}
+        '403':
+          description: |-
+            You don't have sufficient access to perform this action.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '500':
+          description: |-
+            An unexpected error occurred while processing the request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerException'
+        '429':
+          description: |-
+            The request was denied due to request throttling.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThrottlingException'
+        '400':
+          description: |-
+            The input fails to satisfy the constraints specified by an Amazon Web Services service.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+  /executions:
+    get:
+      operationId: ListExecutions
+      description: |-
+        Returns the status of tasks for one or more target devices.
+      parameters:
+      - name: taskId
+        in: query
+        required: true
+        schema:
+          $ref: '#/components/schemas/TaskId'
+      - name: state
+        in: query
+        required: false
+        schema:
+          $ref: '#/components/schemas/ExecutionState'
+      - name: maxResults
+        in: query
+        required: false
+        schema:
+          $ref: '#/components/schemas/MaxResults'
+      - name: nextToken
+        in: query
+        required: false
+        schema:
+          $ref: '#/components/schemas/NextToken'
+      responses:
+        '200': {}
+        '403':
+          description: |-
+            You don't have sufficient access to perform this action.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '500':
+          description: |-
+            An unexpected error occurred while processing the request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerException'
+        '404':
+          description: |-
+            The request references a resource that doesn't exist.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+        '429':
+          description: |-
+            The request was denied due to request throttling.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThrottlingException'
+        '400':
+          description: |-
+            The input fails to satisfy the constraints specified by an Amazon Web Services service.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+  /tags/{resourceArn}:
+    get:
+      operationId: ListTagsForResource
+      description: |-
+        Returns a list of tags for a managed device or task.
+      parameters:
+      - name: resourceArn
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/String'
+      responses:
+        '200': {}
+        '500':
+          description: |-
+            An unexpected error occurred while processing the request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerException'
+        '404':
+          description: |-
+            The request references a resource that doesn't exist.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+        '400':
+          description: |-
+            The input fails to satisfy the constraints specified by an Amazon Web Services service.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+    post:
+      operationId: TagResource
+      description: |-
+        Adds or replaces tags on a device or task.
+      parameters:
+      - name: resourceArn
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/String'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                tags:
+                  $ref: '#/components/schemas/TagMap'
+      responses:
+        '200': {}
+        '500':
+          description: |-
+            An unexpected error occurred while processing the request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerException'
+        '404':
+          description: |-
+            The request references a resource that doesn't exist.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+        '400':
+          description: |-
+            The input fails to satisfy the constraints specified by an Amazon Web Services service.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+    delete:
+      operationId: UntagResource
+      description: |-
+        Removes a tag from a device or task.
+      parameters:
+      - name: resourceArn
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/String'
+      - name: tagKeys
+        in: query
+        required: true
+        schema:
+          $ref: '#/components/schemas/TagKeys'
+      responses:
+        '200': {}
+        '500':
+          description: |-
+            An unexpected error occurred while processing the request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerException'
+        '404':
+          description: |-
+            The request references a resource that doesn't exist.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+        '400':
+          description: |-
+            The input fails to satisfy the constraints specified by an Amazon Web Services service.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+  /tasks:
+    get:
+      operationId: ListTasks
+      description: |-
+        Returns a list of tasks that can be filtered by state.
+      parameters:
+      - name: state
+        in: query
+        required: false
+        schema:
+          $ref: '#/components/schemas/TaskState'
+      - name: maxResults
+        in: query
+        required: false
+        schema:
+          $ref: '#/components/schemas/MaxResults'
+      - name: nextToken
+        in: query
+        required: false
+        schema:
+          $ref: '#/components/schemas/NextToken'
+      responses:
+        '200': {}
+        '403':
+          description: |-
+            You don't have sufficient access to perform this action.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '500':
+          description: |-
+            An unexpected error occurred while processing the request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerException'
+        '429':
+          description: |-
+            The request was denied due to request throttling.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThrottlingException'
+        '400':
+          description: |-
+            The input fails to satisfy the constraints specified by an Amazon Web Services service.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
 components:
   schemas:
+    AccessDeniedException:
+      type: object
+      properties:
+        message:
+          $ref: '#/components/schemas/String'
+      required:
+      - message
+      description: You don't have sufficient access to perform this action.
     AttachmentStatus:
       type: string
       enum:
@@ -53,6 +726,47 @@ components:
       - ATTACHED
       - DETACHING
       - DETACHED
+    CancelTaskInput:
+      type: object
+      properties:
+        taskId:
+          allOf:
+          - $ref: '#/components/schemas/TaskId'
+          description: The ID of the task that you are attempting to cancel. You can
+            retrieve a task ID by using the `ListTasks` operation.
+      required:
+      - taskId
+    CancelTaskOutput:
+      type: object
+      properties:
+        taskId:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The ID of the task that you are attempting to cancel.
+    Capacity:
+      type: object
+      properties:
+        name:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The name of the type of capacity, such as memory.
+        unit:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The unit of measure for the type of capacity.
+        total:
+          allOf:
+          - $ref: '#/components/schemas/Long'
+          description: The total capacity on the device.
+        used:
+          allOf:
+          - $ref: '#/components/schemas/Long'
+          description: The amount of capacity used on the device.
+        available:
+          allOf:
+          - $ref: '#/components/schemas/Long'
+          description: The amount of capacity available for use on the device.
+      description: The physical capacity of the Amazon Web Services Snow Family device.
     CapacityList:
       type: array
       items:
@@ -69,10 +783,281 @@ components:
           Reboots the device.
       description: |-
         The command given to the device to execute.
+    CpuOptions:
+      type: object
+      properties:
+        coreCount:
+          allOf:
+          - $ref: '#/components/schemas/Integer'
+          description: The number of cores that the CPU can use.
+        threadsPerCore:
+          allOf:
+          - $ref: '#/components/schemas/Integer'
+          description: The number of threads per core in the CPU.
+      description: The options for how a device's CPU is configured.
+    CreateTaskInput:
+      type: object
+      properties:
+        targets:
+          allOf:
+          - $ref: '#/components/schemas/TargetList'
+          description: A list of managed device IDs.
+        command:
+          allOf:
+          - $ref: '#/components/schemas/Command'
+          description: The task to be performed. Only one task is executed on a device
+            at a time.
+        description:
+          allOf:
+          - $ref: '#/components/schemas/TaskDescriptionString'
+          description: A description of the task and its targets.
+        tags:
+          allOf:
+          - $ref: '#/components/schemas/TagMap'
+          description: Optional metadata that you assign to a resource. You can use
+            tags to categorize a resource in different ways, such as by purpose, owner,
+            or environment.
+        clientToken:
+          allOf:
+          - $ref: '#/components/schemas/IdempotencyToken'
+          description: A token ensuring that the action is called only once with the
+            specified details.
+      required:
+      - targets
+      - command
+    CreateTaskOutput:
+      type: object
+      properties:
+        taskId:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The ID of the task that you created.
+        taskArn:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The Amazon Resource Name (ARN) of the task that you created.
+    DescribeDeviceEc2Input:
+      type: object
+      properties:
+        managedDeviceId:
+          allOf:
+          - $ref: '#/components/schemas/ManagedDeviceId'
+          description: The ID of the managed device.
+        instanceIds:
+          allOf:
+          - $ref: '#/components/schemas/InstanceIdsList'
+          description: A list of instance IDs associated with the managed device.
+      required:
+      - managedDeviceId
+      - instanceIds
+    DescribeDeviceEc2Output:
+      type: object
+      properties:
+        instances:
+          allOf:
+          - $ref: '#/components/schemas/InstanceSummaryList'
+          description: A list of structures containing information about each instance.
+    DescribeDeviceInput:
+      type: object
+      properties:
+        managedDeviceId:
+          allOf:
+          - $ref: '#/components/schemas/ManagedDeviceId'
+          description: The ID of the device that you are checking the information
+            of.
+      required:
+      - managedDeviceId
+    DescribeDeviceOutput:
+      type: object
+      properties:
+        lastReachedOutAt:
+          allOf:
+          - $ref: '#/components/schemas/Timestamp'
+          description: When the device last contacted the Amazon Web Services Cloud.
+            Indicates that the device is online.
+        lastUpdatedAt:
+          allOf:
+          - $ref: '#/components/schemas/Timestamp'
+          description: When the device last pushed an update to the Amazon Web Services
+            Cloud. Indicates when the device cache was refreshed.
+        tags:
+          allOf:
+          - $ref: '#/components/schemas/TagMap'
+          description: Optional metadata that you assign to a resource. You can use
+            tags to categorize a resource in different ways, such as by purpose, owner,
+            or environment.
+        managedDeviceId:
+          allOf:
+          - $ref: '#/components/schemas/ManagedDeviceId'
+          description: The ID of the device that you checked the information for.
+        managedDeviceArn:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The Amazon Resource Name (ARN) of the device.
+        deviceType:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The type of Amazon Web Services Snow Family device.
+        associatedWithJob:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The ID of the job used when ordering the device.
+        deviceState:
+          allOf:
+          - $ref: '#/components/schemas/UnlockState'
+          description: The current state of the device.
+        physicalNetworkInterfaces:
+          allOf:
+          - $ref: '#/components/schemas/PhysicalNetworkInterfaceList'
+          description: The network interfaces available on the device.
+        deviceCapacities:
+          allOf:
+          - $ref: '#/components/schemas/CapacityList'
+          description: The hardware specifications of the device.
+        software:
+          allOf:
+          - $ref: '#/components/schemas/SoftwareInformation'
+          description: The software installed on the device.
+    DescribeExecutionInput:
+      type: object
+      properties:
+        taskId:
+          allOf:
+          - $ref: '#/components/schemas/TaskId'
+          description: The ID of the task that the action is describing.
+        managedDeviceId:
+          allOf:
+          - $ref: '#/components/schemas/ManagedDeviceId'
+          description: The ID of the managed device.
+      required:
+      - taskId
+      - managedDeviceId
+    DescribeExecutionOutput:
+      type: object
+      properties:
+        taskId:
+          allOf:
+          - $ref: '#/components/schemas/TaskId'
+          description: The ID of the task being executed on the device.
+        executionId:
+          allOf:
+          - $ref: '#/components/schemas/ExecutionId'
+          description: The ID of the execution.
+        managedDeviceId:
+          allOf:
+          - $ref: '#/components/schemas/ManagedDeviceId'
+          description: The ID of the managed device that the task is being executed
+            on.
+        state:
+          allOf:
+          - $ref: '#/components/schemas/ExecutionState'
+          description: The current state of the execution.
+        startedAt:
+          allOf:
+          - $ref: '#/components/schemas/Timestamp'
+          description: When the execution began.
+        lastUpdatedAt:
+          allOf:
+          - $ref: '#/components/schemas/Timestamp'
+          description: When the status of the execution was last updated.
+    DescribeTaskInput:
+      type: object
+      properties:
+        taskId:
+          allOf:
+          - $ref: '#/components/schemas/TaskId'
+          description: The ID of the task to be described.
+      required:
+      - taskId
+    DescribeTaskOutput:
+      type: object
+      properties:
+        taskId:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The ID of the task.
+        taskArn:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The Amazon Resource Name (ARN) of the task.
+        targets:
+          allOf:
+          - $ref: '#/components/schemas/TargetList'
+          description: The managed devices that the task was sent to.
+        state:
+          allOf:
+          - $ref: '#/components/schemas/TaskState'
+          description: The current state of the task.
+        createdAt:
+          allOf:
+          - $ref: '#/components/schemas/Timestamp'
+          description: When the `CreateTask` operation was called.
+        lastUpdatedAt:
+          allOf:
+          - $ref: '#/components/schemas/Timestamp'
+          description: When the state of the task was last updated.
+        completedAt:
+          allOf:
+          - $ref: '#/components/schemas/Timestamp'
+          description: When the task was completed.
+        description:
+          allOf:
+          - $ref: '#/components/schemas/TaskDescriptionString'
+          description: The description provided of the task and managed devices.
+        tags:
+          allOf:
+          - $ref: '#/components/schemas/TagMap'
+          description: Optional metadata that you assign to a resource. You can use
+            tags to categorize a resource in different ways, such as by purpose, owner,
+            or environment.
+    DeviceSummary:
+      type: object
+      properties:
+        managedDeviceId:
+          allOf:
+          - $ref: '#/components/schemas/ManagedDeviceId'
+          description: The ID of the device.
+        managedDeviceArn:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The Amazon Resource Name (ARN) of the device.
+        associatedWithJob:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The ID of the job used to order the device.
+        tags:
+          allOf:
+          - $ref: '#/components/schemas/TagMap'
+          description: Optional metadata that you assign to a resource. You can use
+            tags to categorize a resource in different ways, such as by purpose, owner,
+            or environment.
+      description: Identifying information about the device.
     DeviceSummaryList:
       type: array
       items:
         $ref: '#/components/schemas/DeviceSummary'
+    EbsInstanceBlockDevice:
+      type: object
+      properties:
+        attachTime:
+          allOf:
+          - $ref: '#/components/schemas/Timestamp'
+          description: When the attachment was initiated.
+        deleteOnTermination:
+          allOf:
+          - $ref: '#/components/schemas/Boolean'
+          description: A value that indicates whether the volume is deleted on instance
+            termination.
+        status:
+          allOf:
+          - $ref: '#/components/schemas/AttachmentStatus'
+          description: The attachment state.
+        volumeId:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The ID of the Amazon EBS volume.
+      description: Describes a parameter used to set up an Amazon Elastic Block Store
+        (Amazon EBS) volume in a block device mapping.
     ExecutionId:
       type: string
       minLength: 1
@@ -87,6 +1072,27 @@ components:
       - SUCCEEDED
       - REJECTED
       - TIMED_OUT
+    ExecutionSummary:
+      type: object
+      properties:
+        taskId:
+          allOf:
+          - $ref: '#/components/schemas/TaskId'
+          description: The ID of the task.
+        executionId:
+          allOf:
+          - $ref: '#/components/schemas/ExecutionId'
+          description: The ID of the execution.
+        managedDeviceId:
+          allOf:
+          - $ref: '#/components/schemas/ManagedDeviceId'
+          description: The ID of the managed device that the task is being executed
+            on.
+        state:
+          allOf:
+          - $ref: '#/components/schemas/ExecutionState'
+          description: The state of the execution.
+      description: The summary of a task execution on a specified device.
     ExecutionSummaryList:
       type: array
       items:
@@ -96,6 +1102,75 @@ components:
       pattern: '[!-~]+'
       minLength: 1
       maxLength: 64
+    Instance:
+      type: object
+      properties:
+        imageId:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The ID of the AMI used to launch the instance.
+        amiLaunchIndex:
+          allOf:
+          - $ref: '#/components/schemas/Integer'
+          description: The Amazon Machine Image (AMI) launch index, which you can
+            use to find this instance in the launch group.
+        instanceId:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The ID of the instance.
+        state:
+          $ref: '#/components/schemas/InstanceState'
+        instanceType:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The instance type.
+        privateIpAddress:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The private IPv4 address assigned to the instance.
+        publicIpAddress:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The public IPv4 address assigned to the instance.
+        createdAt:
+          allOf:
+          - $ref: '#/components/schemas/Timestamp'
+          description: When the instance was created.
+        updatedAt:
+          allOf:
+          - $ref: '#/components/schemas/Timestamp'
+          description: When the instance was last updated.
+        blockDeviceMappings:
+          allOf:
+          - $ref: '#/components/schemas/InstanceBlockDeviceMappingList'
+          description: Any block device mapping entries for the instance.
+        securityGroups:
+          allOf:
+          - $ref: '#/components/schemas/SecurityGroupIdentifierList'
+          description: The security groups for the instance.
+        cpuOptions:
+          allOf:
+          - $ref: '#/components/schemas/CpuOptions'
+          description: The CPU options for the instance.
+        rootDeviceName:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The device name of the root device volume (for example, `/dev/sda1`).
+      description: The description of an instance. Currently, Amazon EC2 instances
+        are the only supported instance type.
+    InstanceBlockDeviceMapping:
+      type: object
+      properties:
+        deviceName:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The block device name.
+        ebs:
+          allOf:
+          - $ref: '#/components/schemas/EbsInstanceBlockDevice'
+          description: The parameters used to automatically set up Amazon Elastic
+            Block Store (Amazon EBS) volumes when the instance is launched.
+      description: The description of a block device mapping.
     InstanceBlockDeviceMappingList:
       type: array
       items:
@@ -104,6 +1179,27 @@ components:
       type: array
       items:
         type: string
+    InstanceState:
+      type: object
+      properties:
+        code:
+          allOf:
+          - $ref: '#/components/schemas/Integer'
+          description: "The state of the instance as a 16-bit unsigned integer.\n\n\
+            The high byte is all of the bits between 2^8 and (2^16)-1, which equals\
+            \ decimal values between 256 and 65,535. These numerical values are used\
+            \ for internal purposes and should be ignored.\n\nThe low byte is all\
+            \ of the bits between 2^0 and (2^8)-1, which equals decimal values between\
+            \ 0 and 255.\n\nThe valid values for the instance state code are all in\
+            \ the range of the low byte. These values are:\n\n  * `0` : `pending`\n\
+            \n  * `16` : `running`\n\n  * `32` : `shutting-down`\n\n  * `48` : `terminated`\n\
+            \n  * `64` : `stopping`\n\n  * `80` : `stopped`\n\nYou can ignore the\
+            \ high byte value by zeroing out all of the bits above 2^8 or 256 in decimal."
+        name:
+          allOf:
+          - $ref: '#/components/schemas/InstanceStateName'
+          description: The current state of the instance.
+      description: The description of the current state of an instance.
     InstanceStateName:
       type: string
       enum:
@@ -113,10 +1209,30 @@ components:
       - TERMINATED
       - STOPPING
       - STOPPED
+    InstanceSummary:
+      type: object
+      properties:
+        instance:
+          allOf:
+          - $ref: '#/components/schemas/Instance'
+          description: A structure containing details about the instance.
+        lastUpdatedAt:
+          allOf:
+          - $ref: '#/components/schemas/Timestamp'
+          description: When the instance summary was last updated.
+      description: The details about the instance.
     InstanceSummaryList:
       type: array
       items:
         $ref: '#/components/schemas/InstanceSummary'
+    InternalServerException:
+      type: object
+      properties:
+        message:
+          $ref: '#/components/schemas/String'
+      required:
+      - message
+      description: An unexpected error occurred while processing the request.
     IpAddressAssignment:
       type: string
       enum:
@@ -126,6 +1242,143 @@ components:
       type: string
       minLength: 1
       maxLength: 64
+    ListDeviceResourcesInput:
+      type: object
+      properties:
+        managedDeviceId:
+          allOf:
+          - $ref: '#/components/schemas/ManagedDeviceId'
+          description: The ID of the managed device that you are listing the resources
+            of.
+        type:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: A structure used to filter the results by type of resource.
+        maxResults:
+          allOf:
+          - $ref: '#/components/schemas/MaxResults'
+          description: The maximum number of resources per page.
+        nextToken:
+          allOf:
+          - $ref: '#/components/schemas/NextToken'
+          description: A pagination token to continue to the next page of results.
+      required:
+      - managedDeviceId
+    ListDeviceResourcesOutput:
+      type: object
+      properties:
+        resources:
+          allOf:
+          - $ref: '#/components/schemas/ResourceSummaryList'
+          description: A structure defining the resource's type, Amazon Resource Name
+            (ARN), and ID.
+        nextToken:
+          allOf:
+          - $ref: '#/components/schemas/NextToken'
+          description: A pagination token to continue to the next page of results.
+    ListDevicesInput:
+      type: object
+      properties:
+        jobId:
+          allOf:
+          - $ref: '#/components/schemas/JobId'
+          description: The ID of the job used to order the device.
+        maxResults:
+          allOf:
+          - $ref: '#/components/schemas/MaxResults'
+          description: The maximum number of devices to list per page.
+        nextToken:
+          allOf:
+          - $ref: '#/components/schemas/NextToken'
+          description: A pagination token to continue to the next page of results.
+    ListDevicesOutput:
+      type: object
+      properties:
+        devices:
+          allOf:
+          - $ref: '#/components/schemas/DeviceSummaryList'
+          description: A list of device structures that contain information about
+            the device.
+        nextToken:
+          allOf:
+          - $ref: '#/components/schemas/NextToken'
+          description: A pagination token to continue to the next page of devices.
+    ListExecutionsInput:
+      type: object
+      properties:
+        taskId:
+          allOf:
+          - $ref: '#/components/schemas/TaskId'
+          description: The ID of the task.
+        state:
+          allOf:
+          - $ref: '#/components/schemas/ExecutionState'
+          description: A structure used to filter the tasks by their current state.
+        maxResults:
+          allOf:
+          - $ref: '#/components/schemas/MaxResults'
+          description: The maximum number of tasks to list per page.
+        nextToken:
+          allOf:
+          - $ref: '#/components/schemas/NextToken'
+          description: A pagination token to continue to the next page of tasks.
+      required:
+      - taskId
+    ListExecutionsOutput:
+      type: object
+      properties:
+        executions:
+          allOf:
+          - $ref: '#/components/schemas/ExecutionSummaryList'
+          description: A list of executions. Each execution contains the task ID,
+            the device that the task is executing on, the execution ID, and the status
+            of the execution.
+        nextToken:
+          allOf:
+          - $ref: '#/components/schemas/NextToken'
+          description: A pagination token to continue to the next page of executions.
+    ListTagsForResourceInput:
+      type: object
+      properties:
+        resourceArn:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The Amazon Resource Name (ARN) of the device or task.
+      required:
+      - resourceArn
+    ListTagsForResourceOutput:
+      type: object
+      properties:
+        tags:
+          allOf:
+          - $ref: '#/components/schemas/TagMap'
+          description: The list of tags for the device or task.
+    ListTasksInput:
+      type: object
+      properties:
+        state:
+          allOf:
+          - $ref: '#/components/schemas/TaskState'
+          description: A structure used to filter the list of tasks.
+        maxResults:
+          allOf:
+          - $ref: '#/components/schemas/MaxResults'
+          description: The maximum number of tasks per page.
+        nextToken:
+          allOf:
+          - $ref: '#/components/schemas/NextToken'
+          description: A pagination token to continue to the next page of tasks.
+    ListTasksOutput:
+      type: object
+      properties:
+        tasks:
+          allOf:
+          - $ref: '#/components/schemas/TaskSummaryList'
+          description: A list of task structures containing details about each task.
+        nextToken:
+          allOf:
+          - $ref: '#/components/schemas/NextToken'
+          description: A pagination token to continue to the next page of tasks.
     ManagedDeviceId:
       type: string
       minLength: 1
@@ -147,18 +1400,118 @@ components:
       - QSFP
       - RJ45_2
       - WIFI
+    PhysicalNetworkInterface:
+      type: object
+      properties:
+        physicalNetworkInterfaceId:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The physical network interface ID.
+        physicalConnectorType:
+          allOf:
+          - $ref: '#/components/schemas/PhysicalConnectorType'
+          description: The physical connector type.
+        ipAddressAssignment:
+          allOf:
+          - $ref: '#/components/schemas/IpAddressAssignment'
+          description: A value that describes whether the IP address is dynamic or
+            persistent.
+        ipAddress:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The IP address of the device.
+        netmask:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The netmask used to divide the IP address into subnets.
+        defaultGateway:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The default gateway of the device.
+        macAddress:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The MAC address of the device.
+      description: The details about the physical network interface for the device.
     PhysicalNetworkInterfaceList:
       type: array
       items:
         $ref: '#/components/schemas/PhysicalNetworkInterface'
+    Reboot:
+      type: object
+      properties: {}
+      description: A structure used to reboot the device.
+    ResourceNotFoundException:
+      type: object
+      properties:
+        message:
+          $ref: '#/components/schemas/String'
+      required:
+      - message
+      description: The request references a resource that doesn't exist.
+    ResourceSummary:
+      type: object
+      properties:
+        resourceType:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The resource type.
+        arn:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The Amazon Resource Name (ARN) of the resource.
+        id:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The ID of the resource.
+      required:
+      - resourceType
+      description: A summary of a resource available on the device.
     ResourceSummaryList:
       type: array
       items:
         $ref: '#/components/schemas/ResourceSummary'
+    SecurityGroupIdentifier:
+      type: object
+      properties:
+        groupId:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The security group ID.
+        groupName:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The security group name.
+      description: Information about the device's security group.
     SecurityGroupIdentifierList:
       type: array
       items:
         $ref: '#/components/schemas/SecurityGroupIdentifier'
+    ServiceQuotaExceededException:
+      type: object
+      properties:
+        message:
+          $ref: '#/components/schemas/String'
+      required:
+      - message
+      description: The request would cause a service quota to be exceeded.
+    SoftwareInformation:
+      type: object
+      properties:
+        installedVersion:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The version of the software currently installed on the device.
+        installingVersion:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The version of the software being installed on the device.
+        installState:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The state of the software that is installed or that is being
+            installed on the device.
+      description: Information about the software on the device.
     TagKeys:
       type: array
       items:
@@ -167,6 +1520,22 @@ components:
       type: object
       additionalProperties:
         $ref: '#/components/schemas/String'
+    TagResourceInput:
+      type: object
+      properties:
+        resourceArn:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The Amazon Resource Name (ARN) of the device or task.
+        tags:
+          allOf:
+          - $ref: '#/components/schemas/TagMap'
+          description: Optional metadata that you assign to a resource. You can use
+            tags to categorize a resource in different ways, such as by purpose, owner,
+            or environment.
+      required:
+      - resourceArn
+      - tags
     TargetList:
       type: array
       items:
@@ -186,13 +1555,74 @@ components:
       - IN_PROGRESS
       - CANCELED
       - COMPLETED
+    TaskSummary:
+      type: object
+      properties:
+        taskId:
+          allOf:
+          - $ref: '#/components/schemas/TaskId'
+          description: The task ID.
+        taskArn:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The Amazon Resource Name (ARN) of the task.
+        state:
+          allOf:
+          - $ref: '#/components/schemas/TaskState'
+          description: The state of the task assigned to one or many devices.
+        tags:
+          allOf:
+          - $ref: '#/components/schemas/TagMap'
+          description: Optional metadata that you assign to a resource. You can use
+            tags to categorize a resource in different ways, such as by purpose, owner,
+            or environment.
+      required:
+      - taskId
+      description: Information about the task assigned to one or many devices.
     TaskSummaryList:
       type: array
       items:
         $ref: '#/components/schemas/TaskSummary'
+    ThrottlingException:
+      type: object
+      properties:
+        message:
+          $ref: '#/components/schemas/String'
+      required:
+      - message
+      description: The request was denied due to request throttling.
+    Unlock:
+      type: object
+      properties: {}
+      description: A structure used to unlock a device.
     UnlockState:
       type: string
       enum:
       - UNLOCKED
       - LOCKED
       - UNLOCKING
+    UntagResourceInput:
+      type: object
+      properties:
+        resourceArn:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The Amazon Resource Name (ARN) of the device or task.
+        tagKeys:
+          allOf:
+          - $ref: '#/components/schemas/TagKeys'
+          description: Optional metadata that you assign to a resource. You can use
+            tags to categorize a resource in different ways, such as by purpose, owner,
+            or environment.
+      required:
+      - resourceArn
+      - tagKeys
+    ValidationException:
+      type: object
+      properties:
+        message:
+          $ref: '#/components/schemas/String'
+      required:
+      - message
+      description: The input fails to satisfy the constraints specified by an Amazon
+        Web Services service.

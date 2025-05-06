@@ -7,7 +7,7 @@ info:
   x-stackql-serviceName: directory_service_data
   x-aws-serviceName: directoryservicedata
   x-aws-protocol: aws.protocols#restJson1
-  x-dateGenerated: '2025-05-05'
+  x-dateGenerated: '2025-05-07'
   version: '2023-05-31'
   title: AWS Directory Service Data
   description: "Amazon Web Services Directory Service Data is an extension of Directory\
@@ -82,15 +82,1258 @@ servers:
       - sa-east-1
       - me-south-1
       default: us-east-1
-paths: {}
+paths:
+  /GroupMemberships/AddGroupMember:
+    post:
+      operationId: AddGroupMember
+      description: |-
+        Adds an existing user, group, or computer as a group member.
+      parameters:
+      - name: DirectoryId
+        in: query
+        required: true
+        schema:
+          $ref: '#/components/schemas/DirectoryId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                GroupName:
+                  $ref: '#/components/schemas/GroupName'
+                MemberName:
+                  $ref: '#/components/schemas/MemberName'
+                MemberRealm:
+                  $ref: '#/components/schemas/Realm'
+                ClientToken:
+                  $ref: '#/components/schemas/ClientToken'
+      responses:
+        '200': {}
+        '403':
+          description: |-
+            You don't have permission to perform the request or access the directory. It can also occur when the `DirectoryId` doesn't exist or the user, member, or group might be outside of your organizational unit (OU).
+
+            Make sure that you have the authentication and authorization to perform the action. Review the directory information in the request, and make sure that the object isn't outside of your OU.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '409':
+          description: |-
+            This error will occur when you try to create a resource that conflicts with an existing object. It can also occur when adding a member to a group that the member is already in.
+
+            This error can be caused by a request sent within the 8-hour idempotency window with the same client token but different input parameters. Client tokens should not be re-used across different requests. After 8 hours, any request with the same client token is treated as a new request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConflictException'
+        '400':
+          description: |-
+            The request isn't valid. Review the details in the error message to update the invalid parameters or values in your request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+        '500':
+          description: |-
+            The operation didn't succeed because an internal error occurred. Try again later.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerException'
+        '404':
+          description: |-
+            The resource couldn't be found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+        '429':
+          description: |-
+            The limit on the number of requests per second has been exceeded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThrottlingException'
+  /Groups/CreateGroup:
+    post:
+      operationId: CreateGroup
+      description: |-
+        Creates a new group.
+      parameters:
+      - name: DirectoryId
+        in: query
+        required: true
+        schema:
+          $ref: '#/components/schemas/DirectoryId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                SAMAccountName:
+                  $ref: '#/components/schemas/GroupName'
+                GroupType:
+                  $ref: '#/components/schemas/GroupType'
+                GroupScope:
+                  $ref: '#/components/schemas/GroupScope'
+                OtherAttributes:
+                  $ref: '#/components/schemas/Attributes'
+                ClientToken:
+                  $ref: '#/components/schemas/ClientToken'
+      responses:
+        '200': {}
+        '403':
+          description: |-
+            You don't have permission to perform the request or access the directory. It can also occur when the `DirectoryId` doesn't exist or the user, member, or group might be outside of your organizational unit (OU).
+
+            Make sure that you have the authentication and authorization to perform the action. Review the directory information in the request, and make sure that the object isn't outside of your OU.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '409':
+          description: |-
+            This error will occur when you try to create a resource that conflicts with an existing object. It can also occur when adding a member to a group that the member is already in.
+
+            This error can be caused by a request sent within the 8-hour idempotency window with the same client token but different input parameters. Client tokens should not be re-used across different requests. After 8 hours, any request with the same client token is treated as a new request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConflictException'
+        '400':
+          description: |-
+            The request isn't valid. Review the details in the error message to update the invalid parameters or values in your request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+        '500':
+          description: |-
+            The operation didn't succeed because an internal error occurred. Try again later.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerException'
+        '429':
+          description: |-
+            The limit on the number of requests per second has been exceeded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThrottlingException'
+  /Users/CreateUser:
+    post:
+      operationId: CreateUser
+      description: |-
+        Creates a new user.
+      parameters:
+      - name: DirectoryId
+        in: query
+        required: true
+        schema:
+          $ref: '#/components/schemas/DirectoryId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                SAMAccountName:
+                  $ref: '#/components/schemas/UserName'
+                EmailAddress:
+                  $ref: '#/components/schemas/EmailAddress'
+                GivenName:
+                  $ref: '#/components/schemas/GivenName'
+                Surname:
+                  $ref: '#/components/schemas/Surname'
+                OtherAttributes:
+                  $ref: '#/components/schemas/Attributes'
+                ClientToken:
+                  $ref: '#/components/schemas/ClientToken'
+      responses:
+        '200': {}
+        '403':
+          description: |-
+            You don't have permission to perform the request or access the directory. It can also occur when the `DirectoryId` doesn't exist or the user, member, or group might be outside of your organizational unit (OU).
+
+            Make sure that you have the authentication and authorization to perform the action. Review the directory information in the request, and make sure that the object isn't outside of your OU.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '409':
+          description: |-
+            This error will occur when you try to create a resource that conflicts with an existing object. It can also occur when adding a member to a group that the member is already in.
+
+            This error can be caused by a request sent within the 8-hour idempotency window with the same client token but different input parameters. Client tokens should not be re-used across different requests. After 8 hours, any request with the same client token is treated as a new request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConflictException'
+        '400':
+          description: |-
+            The request isn't valid. Review the details in the error message to update the invalid parameters or values in your request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+        '500':
+          description: |-
+            The operation didn't succeed because an internal error occurred. Try again later.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerException'
+        '429':
+          description: |-
+            The limit on the number of requests per second has been exceeded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThrottlingException'
+  /Groups/DeleteGroup:
+    post:
+      operationId: DeleteGroup
+      description: |-
+        Deletes a group.
+      parameters:
+      - name: DirectoryId
+        in: query
+        required: true
+        schema:
+          $ref: '#/components/schemas/DirectoryId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                SAMAccountName:
+                  $ref: '#/components/schemas/GroupName'
+                ClientToken:
+                  $ref: '#/components/schemas/ClientToken'
+      responses:
+        '200': {}
+        '403':
+          description: |-
+            You don't have permission to perform the request or access the directory. It can also occur when the `DirectoryId` doesn't exist or the user, member, or group might be outside of your organizational unit (OU).
+
+            Make sure that you have the authentication and authorization to perform the action. Review the directory information in the request, and make sure that the object isn't outside of your OU.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '409':
+          description: |-
+            This error will occur when you try to create a resource that conflicts with an existing object. It can also occur when adding a member to a group that the member is already in.
+
+            This error can be caused by a request sent within the 8-hour idempotency window with the same client token but different input parameters. Client tokens should not be re-used across different requests. After 8 hours, any request with the same client token is treated as a new request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConflictException'
+        '400':
+          description: |-
+            The request isn't valid. Review the details in the error message to update the invalid parameters or values in your request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+        '500':
+          description: |-
+            The operation didn't succeed because an internal error occurred. Try again later.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerException'
+        '404':
+          description: |-
+            The resource couldn't be found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+        '429':
+          description: |-
+            The limit on the number of requests per second has been exceeded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThrottlingException'
+  /Users/DeleteUser:
+    post:
+      operationId: DeleteUser
+      description: |-
+        Deletes a user.
+      parameters:
+      - name: DirectoryId
+        in: query
+        required: true
+        schema:
+          $ref: '#/components/schemas/DirectoryId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                SAMAccountName:
+                  $ref: '#/components/schemas/UserName'
+                ClientToken:
+                  $ref: '#/components/schemas/ClientToken'
+      responses:
+        '200': {}
+        '403':
+          description: |-
+            You don't have permission to perform the request or access the directory. It can also occur when the `DirectoryId` doesn't exist or the user, member, or group might be outside of your organizational unit (OU).
+
+            Make sure that you have the authentication and authorization to perform the action. Review the directory information in the request, and make sure that the object isn't outside of your OU.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '409':
+          description: |-
+            This error will occur when you try to create a resource that conflicts with an existing object. It can also occur when adding a member to a group that the member is already in.
+
+            This error can be caused by a request sent within the 8-hour idempotency window with the same client token but different input parameters. Client tokens should not be re-used across different requests. After 8 hours, any request with the same client token is treated as a new request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConflictException'
+        '400':
+          description: |-
+            The request isn't valid. Review the details in the error message to update the invalid parameters or values in your request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+        '500':
+          description: |-
+            The operation didn't succeed because an internal error occurred. Try again later.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerException'
+        '404':
+          description: |-
+            The resource couldn't be found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+        '429':
+          description: |-
+            The limit on the number of requests per second has been exceeded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThrottlingException'
+  /Groups/DescribeGroup:
+    post:
+      operationId: DescribeGroup
+      description: |-
+        Returns information about a specific group.
+      parameters:
+      - name: DirectoryId
+        in: query
+        required: true
+        schema:
+          $ref: '#/components/schemas/DirectoryId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                Realm:
+                  $ref: '#/components/schemas/Realm'
+                SAMAccountName:
+                  $ref: '#/components/schemas/GroupName'
+                OtherAttributes:
+                  $ref: '#/components/schemas/LdapDisplayNameList'
+      responses:
+        '200': {}
+        '403':
+          description: |-
+            You don't have permission to perform the request or access the directory. It can also occur when the `DirectoryId` doesn't exist or the user, member, or group might be outside of your organizational unit (OU).
+
+            Make sure that you have the authentication and authorization to perform the action. Review the directory information in the request, and make sure that the object isn't outside of your OU.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '400':
+          description: |-
+            The request isn't valid. Review the details in the error message to update the invalid parameters or values in your request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+        '500':
+          description: |-
+            The operation didn't succeed because an internal error occurred. Try again later.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerException'
+        '404':
+          description: |-
+            The resource couldn't be found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+        '429':
+          description: |-
+            The limit on the number of requests per second has been exceeded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThrottlingException'
+  /Users/DescribeUser:
+    post:
+      operationId: DescribeUser
+      description: |-
+        Returns information about a specific user.
+      parameters:
+      - name: DirectoryId
+        in: query
+        required: true
+        schema:
+          $ref: '#/components/schemas/DirectoryId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                SAMAccountName:
+                  $ref: '#/components/schemas/UserName'
+                OtherAttributes:
+                  $ref: '#/components/schemas/LdapDisplayNameList'
+                Realm:
+                  $ref: '#/components/schemas/Realm'
+      responses:
+        '200': {}
+        '403':
+          description: |-
+            You don't have permission to perform the request or access the directory. It can also occur when the `DirectoryId` doesn't exist or the user, member, or group might be outside of your organizational unit (OU).
+
+            Make sure that you have the authentication and authorization to perform the action. Review the directory information in the request, and make sure that the object isn't outside of your OU.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '400':
+          description: |-
+            The request isn't valid. Review the details in the error message to update the invalid parameters or values in your request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+        '500':
+          description: |-
+            The operation didn't succeed because an internal error occurred. Try again later.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerException'
+        '404':
+          description: |-
+            The resource couldn't be found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+        '429':
+          description: |-
+            The limit on the number of requests per second has been exceeded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThrottlingException'
+  /Users/DisableUser:
+    post:
+      operationId: DisableUser
+      description: |-
+        Deactivates an active user account. For information about how to enable an inactive user account, see [ResetUserPassword](https://docs.aws.amazon.com/directoryservice/latest/devguide/API_ResetUserPassword.html) in the _Directory Service API Reference_.
+      parameters:
+      - name: DirectoryId
+        in: query
+        required: true
+        schema:
+          $ref: '#/components/schemas/DirectoryId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                SAMAccountName:
+                  $ref: '#/components/schemas/UserName'
+                ClientToken:
+                  $ref: '#/components/schemas/ClientToken'
+      responses:
+        '200': {}
+        '403':
+          description: |-
+            You don't have permission to perform the request or access the directory. It can also occur when the `DirectoryId` doesn't exist or the user, member, or group might be outside of your organizational unit (OU).
+
+            Make sure that you have the authentication and authorization to perform the action. Review the directory information in the request, and make sure that the object isn't outside of your OU.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '409':
+          description: |-
+            This error will occur when you try to create a resource that conflicts with an existing object. It can also occur when adding a member to a group that the member is already in.
+
+            This error can be caused by a request sent within the 8-hour idempotency window with the same client token but different input parameters. Client tokens should not be re-used across different requests. After 8 hours, any request with the same client token is treated as a new request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConflictException'
+        '400':
+          description: |-
+            The request isn't valid. Review the details in the error message to update the invalid parameters or values in your request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+        '500':
+          description: |-
+            The operation didn't succeed because an internal error occurred. Try again later.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerException'
+        '404':
+          description: |-
+            The resource couldn't be found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+        '429':
+          description: |-
+            The limit on the number of requests per second has been exceeded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThrottlingException'
+  /GroupMemberships/ListGroupMembers:
+    post:
+      operationId: ListGroupMembers
+      description: |-
+        Returns member information for the specified group.
+
+        This operation supports pagination with the use of the `NextToken` request and response parameters. If more results are available, the `ListGroupMembers.NextToken` member contains a token that you pass in the next call to `ListGroupMembers`. This retrieves the next set of items.
+
+        You can also specify a maximum number of return results with the `MaxResults` parameter.
+      parameters:
+      - name: DirectoryId
+        in: query
+        required: true
+        schema:
+          $ref: '#/components/schemas/DirectoryId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                Realm:
+                  $ref: '#/components/schemas/Realm'
+                MemberRealm:
+                  $ref: '#/components/schemas/Realm'
+                SAMAccountName:
+                  $ref: '#/components/schemas/GroupName'
+                NextToken:
+                  $ref: '#/components/schemas/NextToken'
+                MaxResults:
+                  $ref: '#/components/schemas/MaxResults'
+      responses:
+        '200': {}
+        '403':
+          description: |-
+            You don't have permission to perform the request or access the directory. It can also occur when the `DirectoryId` doesn't exist or the user, member, or group might be outside of your organizational unit (OU).
+
+            Make sure that you have the authentication and authorization to perform the action. Review the directory information in the request, and make sure that the object isn't outside of your OU.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '400':
+          description: |-
+            The request isn't valid. Review the details in the error message to update the invalid parameters or values in your request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+        '500':
+          description: |-
+            The operation didn't succeed because an internal error occurred. Try again later.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerException'
+        '404':
+          description: |-
+            The resource couldn't be found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+        '429':
+          description: |-
+            The limit on the number of requests per second has been exceeded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThrottlingException'
+  /Groups/ListGroups:
+    post:
+      operationId: ListGroups
+      description: |-
+        Returns group information for the specified directory.
+
+        This operation supports pagination with the use of the `NextToken` request and response parameters. If more results are available, the `ListGroups.NextToken` member contains a token that you pass in the next call to `ListGroups`. This retrieves the next set of items.
+
+        You can also specify a maximum number of return results with the `MaxResults` parameter.
+      parameters:
+      - name: DirectoryId
+        in: query
+        required: true
+        schema:
+          $ref: '#/components/schemas/DirectoryId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                Realm:
+                  $ref: '#/components/schemas/Realm'
+                NextToken:
+                  $ref: '#/components/schemas/NextToken'
+                MaxResults:
+                  $ref: '#/components/schemas/MaxResults'
+      responses:
+        '200': {}
+        '403':
+          description: |-
+            You don't have permission to perform the request or access the directory. It can also occur when the `DirectoryId` doesn't exist or the user, member, or group might be outside of your organizational unit (OU).
+
+            Make sure that you have the authentication and authorization to perform the action. Review the directory information in the request, and make sure that the object isn't outside of your OU.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '400':
+          description: |-
+            The request isn't valid. Review the details in the error message to update the invalid parameters or values in your request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+        '500':
+          description: |-
+            The operation didn't succeed because an internal error occurred. Try again later.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerException'
+        '429':
+          description: |-
+            The limit on the number of requests per second has been exceeded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThrottlingException'
+  /GroupMemberships/ListGroupsForMember:
+    post:
+      operationId: ListGroupsForMember
+      description: |-
+        Returns group information for the specified member.
+
+        This operation supports pagination with the use of the `NextToken` request and response parameters. If more results are available, the `ListGroupsForMember.NextToken` member contains a token that you pass in the next call to `ListGroupsForMember`. This retrieves the next set of items.
+
+        You can also specify a maximum number of return results with the `MaxResults` parameter.
+      parameters:
+      - name: DirectoryId
+        in: query
+        required: true
+        schema:
+          $ref: '#/components/schemas/DirectoryId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                Realm:
+                  $ref: '#/components/schemas/Realm'
+                MemberRealm:
+                  $ref: '#/components/schemas/Realm'
+                SAMAccountName:
+                  $ref: '#/components/schemas/MemberName'
+                NextToken:
+                  $ref: '#/components/schemas/NextToken'
+                MaxResults:
+                  $ref: '#/components/schemas/MaxResults'
+      responses:
+        '200': {}
+        '403':
+          description: |-
+            You don't have permission to perform the request or access the directory. It can also occur when the `DirectoryId` doesn't exist or the user, member, or group might be outside of your organizational unit (OU).
+
+            Make sure that you have the authentication and authorization to perform the action. Review the directory information in the request, and make sure that the object isn't outside of your OU.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '400':
+          description: |-
+            The request isn't valid. Review the details in the error message to update the invalid parameters or values in your request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+        '500':
+          description: |-
+            The operation didn't succeed because an internal error occurred. Try again later.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerException'
+        '404':
+          description: |-
+            The resource couldn't be found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+        '429':
+          description: |-
+            The limit on the number of requests per second has been exceeded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThrottlingException'
+  /Users/ListUsers:
+    post:
+      operationId: ListUsers
+      description: |-
+        Returns user information for the specified directory.
+
+        This operation supports pagination with the use of the `NextToken` request and response parameters. If more results are available, the `ListUsers.NextToken` member contains a token that you pass in the next call to `ListUsers`. This retrieves the next set of items.
+
+        You can also specify a maximum number of return results with the `MaxResults` parameter.
+      parameters:
+      - name: DirectoryId
+        in: query
+        required: true
+        schema:
+          $ref: '#/components/schemas/DirectoryId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                Realm:
+                  $ref: '#/components/schemas/Realm'
+                NextToken:
+                  $ref: '#/components/schemas/NextToken'
+                MaxResults:
+                  $ref: '#/components/schemas/MaxResults'
+      responses:
+        '200': {}
+        '403':
+          description: |-
+            You don't have permission to perform the request or access the directory. It can also occur when the `DirectoryId` doesn't exist or the user, member, or group might be outside of your organizational unit (OU).
+
+            Make sure that you have the authentication and authorization to perform the action. Review the directory information in the request, and make sure that the object isn't outside of your OU.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '400':
+          description: |-
+            The request isn't valid. Review the details in the error message to update the invalid parameters or values in your request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+        '500':
+          description: |-
+            The operation didn't succeed because an internal error occurred. Try again later.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerException'
+        '429':
+          description: |-
+            The limit on the number of requests per second has been exceeded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThrottlingException'
+  /GroupMemberships/RemoveGroupMember:
+    post:
+      operationId: RemoveGroupMember
+      description: |-
+        Removes a member from a group.
+      parameters:
+      - name: DirectoryId
+        in: query
+        required: true
+        schema:
+          $ref: '#/components/schemas/DirectoryId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                GroupName:
+                  $ref: '#/components/schemas/GroupName'
+                MemberName:
+                  $ref: '#/components/schemas/MemberName'
+                MemberRealm:
+                  $ref: '#/components/schemas/Realm'
+                ClientToken:
+                  $ref: '#/components/schemas/ClientToken'
+      responses:
+        '200': {}
+        '403':
+          description: |-
+            You don't have permission to perform the request or access the directory. It can also occur when the `DirectoryId` doesn't exist or the user, member, or group might be outside of your organizational unit (OU).
+
+            Make sure that you have the authentication and authorization to perform the action. Review the directory information in the request, and make sure that the object isn't outside of your OU.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '409':
+          description: |-
+            This error will occur when you try to create a resource that conflicts with an existing object. It can also occur when adding a member to a group that the member is already in.
+
+            This error can be caused by a request sent within the 8-hour idempotency window with the same client token but different input parameters. Client tokens should not be re-used across different requests. After 8 hours, any request with the same client token is treated as a new request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConflictException'
+        '400':
+          description: |-
+            The request isn't valid. Review the details in the error message to update the invalid parameters or values in your request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+        '500':
+          description: |-
+            The operation didn't succeed because an internal error occurred. Try again later.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerException'
+        '404':
+          description: |-
+            The resource couldn't be found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+        '429':
+          description: |-
+            The limit on the number of requests per second has been exceeded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThrottlingException'
+  /Groups/SearchGroups:
+    post:
+      operationId: SearchGroups
+      description: |-
+        Searches the specified directory for a group. You can find groups that match the `SearchString` parameter with the value of their attributes included in the `SearchString` parameter.
+
+        This operation supports pagination with the use of the `NextToken` request and response parameters. If more results are available, the `SearchGroups.NextToken` member contains a token that you pass in the next call to `SearchGroups`. This retrieves the next set of items.
+
+        You can also specify a maximum number of return results with the `MaxResults` parameter.
+      parameters:
+      - name: DirectoryId
+        in: query
+        required: true
+        schema:
+          $ref: '#/components/schemas/DirectoryId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                SearchString:
+                  $ref: '#/components/schemas/SearchString'
+                SearchAttributes:
+                  $ref: '#/components/schemas/LdapDisplayNameList'
+                Realm:
+                  $ref: '#/components/schemas/Realm'
+                NextToken:
+                  $ref: '#/components/schemas/NextToken'
+                MaxResults:
+                  $ref: '#/components/schemas/MaxResults'
+      responses:
+        '200': {}
+        '403':
+          description: |-
+            You don't have permission to perform the request or access the directory. It can also occur when the `DirectoryId` doesn't exist or the user, member, or group might be outside of your organizational unit (OU).
+
+            Make sure that you have the authentication and authorization to perform the action. Review the directory information in the request, and make sure that the object isn't outside of your OU.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '400':
+          description: |-
+            The request isn't valid. Review the details in the error message to update the invalid parameters or values in your request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+        '500':
+          description: |-
+            The operation didn't succeed because an internal error occurred. Try again later.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerException'
+        '429':
+          description: |-
+            The limit on the number of requests per second has been exceeded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThrottlingException'
+  /Users/SearchUsers:
+    post:
+      operationId: SearchUsers
+      description: |-
+        Searches the specified directory for a user. You can find users that match the `SearchString` parameter with the value of their attributes included in the `SearchString` parameter.
+
+        This operation supports pagination with the use of the `NextToken` request and response parameters. If more results are available, the `SearchUsers.NextToken` member contains a token that you pass in the next call to `SearchUsers`. This retrieves the next set of items.
+
+        You can also specify a maximum number of return results with the `MaxResults` parameter.
+      parameters:
+      - name: DirectoryId
+        in: query
+        required: true
+        schema:
+          $ref: '#/components/schemas/DirectoryId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                Realm:
+                  $ref: '#/components/schemas/Realm'
+                SearchString:
+                  $ref: '#/components/schemas/SearchString'
+                SearchAttributes:
+                  $ref: '#/components/schemas/LdapDisplayNameList'
+                NextToken:
+                  $ref: '#/components/schemas/NextToken'
+                MaxResults:
+                  $ref: '#/components/schemas/MaxResults'
+      responses:
+        '200': {}
+        '403':
+          description: |-
+            You don't have permission to perform the request or access the directory. It can also occur when the `DirectoryId` doesn't exist or the user, member, or group might be outside of your organizational unit (OU).
+
+            Make sure that you have the authentication and authorization to perform the action. Review the directory information in the request, and make sure that the object isn't outside of your OU.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '400':
+          description: |-
+            The request isn't valid. Review the details in the error message to update the invalid parameters or values in your request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+        '500':
+          description: |-
+            The operation didn't succeed because an internal error occurred. Try again later.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerException'
+        '429':
+          description: |-
+            The limit on the number of requests per second has been exceeded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThrottlingException'
+  /Groups/UpdateGroup:
+    post:
+      operationId: UpdateGroup
+      description: |-
+        Updates group information.
+      parameters:
+      - name: DirectoryId
+        in: query
+        required: true
+        schema:
+          $ref: '#/components/schemas/DirectoryId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                SAMAccountName:
+                  $ref: '#/components/schemas/GroupName'
+                GroupType:
+                  $ref: '#/components/schemas/GroupType'
+                GroupScope:
+                  $ref: '#/components/schemas/GroupScope'
+                OtherAttributes:
+                  $ref: '#/components/schemas/Attributes'
+                UpdateType:
+                  $ref: '#/components/schemas/UpdateType'
+                ClientToken:
+                  $ref: '#/components/schemas/ClientToken'
+      responses:
+        '200': {}
+        '403':
+          description: |-
+            You don't have permission to perform the request or access the directory. It can also occur when the `DirectoryId` doesn't exist or the user, member, or group might be outside of your organizational unit (OU).
+
+            Make sure that you have the authentication and authorization to perform the action. Review the directory information in the request, and make sure that the object isn't outside of your OU.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '409':
+          description: |-
+            This error will occur when you try to create a resource that conflicts with an existing object. It can also occur when adding a member to a group that the member is already in.
+
+            This error can be caused by a request sent within the 8-hour idempotency window with the same client token but different input parameters. Client tokens should not be re-used across different requests. After 8 hours, any request with the same client token is treated as a new request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConflictException'
+        '400':
+          description: |-
+            The request isn't valid. Review the details in the error message to update the invalid parameters or values in your request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+        '500':
+          description: |-
+            The operation didn't succeed because an internal error occurred. Try again later.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerException'
+        '404':
+          description: |-
+            The resource couldn't be found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+        '429':
+          description: |-
+            The limit on the number of requests per second has been exceeded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThrottlingException'
+  /Users/UpdateUser:
+    post:
+      operationId: UpdateUser
+      description: |-
+        Updates user information.
+      parameters:
+      - name: DirectoryId
+        in: query
+        required: true
+        schema:
+          $ref: '#/components/schemas/DirectoryId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                SAMAccountName:
+                  $ref: '#/components/schemas/UserName'
+                EmailAddress:
+                  $ref: '#/components/schemas/EmailAddress'
+                GivenName:
+                  $ref: '#/components/schemas/GivenName'
+                Surname:
+                  $ref: '#/components/schemas/Surname'
+                OtherAttributes:
+                  $ref: '#/components/schemas/Attributes'
+                UpdateType:
+                  $ref: '#/components/schemas/UpdateType'
+                ClientToken:
+                  $ref: '#/components/schemas/ClientToken'
+      responses:
+        '200': {}
+        '403':
+          description: |-
+            You don't have permission to perform the request or access the directory. It can also occur when the `DirectoryId` doesn't exist or the user, member, or group might be outside of your organizational unit (OU).
+
+            Make sure that you have the authentication and authorization to perform the action. Review the directory information in the request, and make sure that the object isn't outside of your OU.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '409':
+          description: |-
+            This error will occur when you try to create a resource that conflicts with an existing object. It can also occur when adding a member to a group that the member is already in.
+
+            This error can be caused by a request sent within the 8-hour idempotency window with the same client token but different input parameters. Client tokens should not be re-used across different requests. After 8 hours, any request with the same client token is treated as a new request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConflictException'
+        '400':
+          description: |-
+            The request isn't valid. Review the details in the error message to update the invalid parameters or values in your request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+        '500':
+          description: |-
+            The operation didn't succeed because an internal error occurred. Try again later.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerException'
+        '404':
+          description: |-
+            The resource couldn't be found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+        '429':
+          description: |-
+            The limit on the number of requests per second has been exceeded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThrottlingException'
 components:
   schemas:
+    AccessDeniedException:
+      type: object
+      properties:
+        Message:
+          $ref: '#/components/schemas/ExceptionMessage'
+        Reason:
+          allOf:
+          - $ref: '#/components/schemas/AccessDeniedReason'
+          description: Reason the request was unauthorized.
+      description: 'You don''t have permission to perform the request or access the
+        directory. It can also occur when the `DirectoryId` doesn''t exist or the
+        user, member, or group might be outside of your organizational unit (OU).
+
+
+        Make sure that you have the authentication and authorization to perform the
+        action. Review the directory information in the request, and make sure that
+        the object isn''t outside of your OU.'
     AccessDeniedReason:
       type: string
       enum:
       - IAM_AUTH
       - DIRECTORY_AUTH
       - DATA_DISABLED
+    AddGroupMemberRequest:
+      type: object
+      properties:
+        DirectoryId:
+          allOf:
+          - $ref: '#/components/schemas/DirectoryId'
+          description: The identifier (ID) of the directory that's associated with
+            the group.
+        GroupName:
+          allOf:
+          - $ref: '#/components/schemas/GroupName'
+          description: The name of the group.
+        MemberName:
+          allOf:
+          - $ref: '#/components/schemas/MemberName'
+          description: The `SAMAccountName` of the user, group, or computer to add
+            as a group member.
+        MemberRealm:
+          allOf:
+          - $ref: '#/components/schemas/Realm'
+          description: 'The domain name that''s associated with the group member.
+            This parameter is required only when adding a member outside of your Managed
+            Microsoft AD domain to a group inside of your Managed Microsoft AD domain.
+            This parameter defaults to the Managed Microsoft AD domain.
+
+
+            This parameter is case insensitive.'
+        ClientToken:
+          allOf:
+          - $ref: '#/components/schemas/ClientToken'
+          description: 'A unique and case-sensitive identifier that you provide to
+            make sure the idempotency of the request, so multiple identical calls
+            have the same effect as one single call.
+
+
+            A client token is valid for 8 hours after the first request that uses
+            it completes. After 8 hours, any request with the same client token is
+            treated as a new request. If the request succeeds, any future uses of
+            that token will be idempotent for another 8 hours.
+
+
+            If you submit a request with the same client token but change one of the
+            other parameters within the 8-hour idempotency window, Directory Service
+            Data returns an `ConflictException`.
+
+
+            This parameter is optional when using the CLI or SDK.'
+      required:
+      - DirectoryId
+      - GroupName
+      - MemberName
+    AddGroupMemberResult:
+      type: object
+      properties: {}
     AttributeValue:
       allOf:
       - allOf:
@@ -130,9 +1373,408 @@ components:
       pattern: ^[\x00-\x7F]+$
       minLength: 1
       maxLength: 128
+    ConflictException:
+      type: object
+      properties:
+        Message:
+          $ref: '#/components/schemas/ExceptionMessage'
+      description: 'This error will occur when you try to create a resource that conflicts
+        with an existing object. It can also occur when adding a member to a group
+        that the member is already in.
+
+
+        This error can be caused by a request sent within the 8-hour idempotency window
+        with the same client token but different input parameters. Client tokens should
+        not be re-used across different requests. After 8 hours, any request with
+        the same client token is treated as a new request.'
+    CreateGroupRequest:
+      type: object
+      properties:
+        DirectoryId:
+          allOf:
+          - $ref: '#/components/schemas/DirectoryId'
+          description: The identifier (ID) of the directory that's associated with
+            the group.
+        SAMAccountName:
+          allOf:
+          - $ref: '#/components/schemas/GroupName'
+          description: The name of the group.
+        GroupType:
+          allOf:
+          - $ref: '#/components/schemas/GroupType'
+          description: The AD group type. For details, see [Active Directory security
+            group type](https://learn.microsoft.com/en-us/windows-server/identity/ad-ds/manage/understand-security-groups#how-active-directory-security-groups-work).
+        GroupScope:
+          allOf:
+          - $ref: '#/components/schemas/GroupScope'
+          description: The scope of the AD group. For details, see [Active Directory
+            security group scope](https://learn.microsoft.com/en-us/windows-server/identity/ad-ds/manage/understand-security-groups#group-scope).
+        OtherAttributes:
+          allOf:
+          - $ref: '#/components/schemas/Attributes'
+          description: An expression that defines one or more attributes with the
+            data type and value of each attribute.
+        ClientToken:
+          allOf:
+          - $ref: '#/components/schemas/ClientToken'
+          description: 'A unique and case-sensitive identifier that you provide to
+            make sure the idempotency of the request, so multiple identical calls
+            have the same effect as one single call.
+
+
+            A client token is valid for 8 hours after the first request that uses
+            it completes. After 8 hours, any request with the same client token is
+            treated as a new request. If the request succeeds, any future uses of
+            that token will be idempotent for another 8 hours.
+
+
+            If you submit a request with the same client token but change one of the
+            other parameters within the 8-hour idempotency window, Directory Service
+            Data returns an `ConflictException`.
+
+
+            This parameter is optional when using the CLI or SDK.'
+      required:
+      - DirectoryId
+      - SAMAccountName
+    CreateGroupResult:
+      type: object
+      properties:
+        DirectoryId:
+          allOf:
+          - $ref: '#/components/schemas/DirectoryId'
+          description: The identifier (ID) of the directory that's associated with
+            the group.
+        SAMAccountName:
+          allOf:
+          - $ref: '#/components/schemas/GroupName'
+          description: The name of the group.
+        SID:
+          allOf:
+          - $ref: '#/components/schemas/SID'
+          description: The unique security identifier (SID) of the group.
+    CreateUserRequest:
+      type: object
+      properties:
+        DirectoryId:
+          allOf:
+          - $ref: '#/components/schemas/DirectoryId'
+          description: The identifier (ID) of the directory that’s associated with
+            the user.
+        SAMAccountName:
+          allOf:
+          - $ref: '#/components/schemas/UserName'
+          description: The name of the user.
+        EmailAddress:
+          allOf:
+          - $ref: '#/components/schemas/EmailAddress'
+          description: The email address of the user.
+        GivenName:
+          allOf:
+          - $ref: '#/components/schemas/GivenName'
+          description: The first name of the user.
+        Surname:
+          allOf:
+          - $ref: '#/components/schemas/Surname'
+          description: The last name of the user.
+        OtherAttributes:
+          allOf:
+          - $ref: '#/components/schemas/Attributes'
+          description: 'An expression that defines one or more attribute names with
+            the data type and value of each attribute. A key is an attribute name,
+            and the value is a list of maps. For a list of supported attributes, see
+            [Directory Service Data Attributes](https://docs.aws.amazon.com/directoryservice/latest/admin-guide/ad_data_attributes.html).
+
+
+            Attribute names are case insensitive.'
+        ClientToken:
+          allOf:
+          - $ref: '#/components/schemas/ClientToken'
+          description: 'A unique and case-sensitive identifier that you provide to
+            make sure the idempotency of the request, so multiple identical calls
+            have the same effect as one single call.
+
+
+            A client token is valid for 8 hours after the first request that uses
+            it completes. After 8 hours, any request with the same client token is
+            treated as a new request. If the request succeeds, any future uses of
+            that token will be idempotent for another 8 hours.
+
+
+            If you submit a request with the same client token but change one of the
+            other parameters within the 8-hour idempotency window, Directory Service
+            Data returns an `ConflictException`.
+
+
+            This parameter is optional when using the CLI or SDK.'
+      required:
+      - DirectoryId
+      - SAMAccountName
+    CreateUserResult:
+      type: object
+      properties:
+        DirectoryId:
+          allOf:
+          - $ref: '#/components/schemas/DirectoryId'
+          description: The identifier (ID) of the directory where the address block
+            is added.
+        SID:
+          allOf:
+          - $ref: '#/components/schemas/SID'
+          description: The unique security identifier (SID) of the user.
+        SAMAccountName:
+          allOf:
+          - $ref: '#/components/schemas/UserName'
+          description: The name of the user.
+    DeleteGroupRequest:
+      type: object
+      properties:
+        DirectoryId:
+          allOf:
+          - $ref: '#/components/schemas/DirectoryId'
+          description: The identifier (ID) of the directory that's associated with
+            the group.
+        SAMAccountName:
+          allOf:
+          - $ref: '#/components/schemas/GroupName'
+          description: The name of the group.
+        ClientToken:
+          allOf:
+          - $ref: '#/components/schemas/ClientToken'
+          description: 'A unique and case-sensitive identifier that you provide to
+            make sure the idempotency of the request, so multiple identical calls
+            have the same effect as one single call.
+
+
+            A client token is valid for 8 hours after the first request that uses
+            it completes. After 8 hours, any request with the same client token is
+            treated as a new request. If the request succeeds, any future uses of
+            that token will be idempotent for another 8 hours.
+
+
+            If you submit a request with the same client token but change one of the
+            other parameters within the 8-hour idempotency window, Directory Service
+            Data returns an `ConflictException`.
+
+
+            This parameter is optional when using the CLI or SDK.'
+      required:
+      - DirectoryId
+      - SAMAccountName
+    DeleteGroupResult:
+      type: object
+      properties: {}
+    DeleteUserRequest:
+      type: object
+      properties:
+        DirectoryId:
+          allOf:
+          - $ref: '#/components/schemas/DirectoryId'
+          description: The identifier (ID) of the directory that's associated with
+            the user.
+        SAMAccountName:
+          allOf:
+          - $ref: '#/components/schemas/UserName'
+          description: The name of the user.
+        ClientToken:
+          allOf:
+          - $ref: '#/components/schemas/ClientToken'
+          description: 'A unique and case-sensitive identifier that you provide to
+            make sure the idempotency of the request, so multiple identical calls
+            have the same effect as one single call.
+
+
+            A client token is valid for 8 hours after the first request that uses
+            it completes. After 8 hours, any request with the same client token is
+            treated as a new request. If the request succeeds, any future uses of
+            that token will be idempotent for another 8 hours.
+
+
+            If you submit a request with the same client token but change one of the
+            other parameters within the 8-hour idempotency window, Directory Service
+            Data returns an `ConflictException`.
+
+
+            This parameter is optional when using the CLI or SDK.'
+      required:
+      - DirectoryId
+      - SAMAccountName
+    DeleteUserResult:
+      type: object
+      properties: {}
+    DescribeGroupRequest:
+      type: object
+      properties:
+        DirectoryId:
+          allOf:
+          - $ref: '#/components/schemas/DirectoryId'
+          description: The Identifier (ID) of the directory associated with the group.
+        Realm:
+          allOf:
+          - $ref: '#/components/schemas/Realm'
+          description: 'The domain name that''s associated with the group.
+
+
+            This parameter is optional, so you can return groups outside of your Managed
+            Microsoft AD domain. When no value is defined, only your Managed Microsoft
+            AD groups are returned.
+
+
+            This value is case insensitive.'
+        SAMAccountName:
+          allOf:
+          - $ref: '#/components/schemas/GroupName'
+          description: The name of the group.
+        OtherAttributes:
+          allOf:
+          - $ref: '#/components/schemas/LdapDisplayNameList'
+          description: One or more attributes to be returned for the group. For a
+            list of supported attributes, see [Directory Service Data Attributes](https://docs.aws.amazon.com/directoryservice/latest/admin-guide/ad_data_attributes.html).
+      required:
+      - DirectoryId
+      - SAMAccountName
+    DescribeGroupResult:
+      type: object
+      properties:
+        DirectoryId:
+          allOf:
+          - $ref: '#/components/schemas/DirectoryId'
+          description: The identifier (ID) of the directory that's associated with
+            the group.
+        Realm:
+          allOf:
+          - $ref: '#/components/schemas/Realm'
+          description: The domain name that's associated with the group.
+        SID:
+          allOf:
+          - $ref: '#/components/schemas/SID'
+          description: The unique security identifier (SID) of the group.
+        SAMAccountName:
+          allOf:
+          - $ref: '#/components/schemas/GroupName'
+          description: The name of the group.
+        DistinguishedName:
+          allOf:
+          - $ref: '#/components/schemas/DistinguishedName'
+          description: The [distinguished name](https://learn.microsoft.com/en-us/windows/win32/ad/object-names-and-identities#distinguished-name)
+            of the object.
+        GroupType:
+          allOf:
+          - $ref: '#/components/schemas/GroupType'
+          description: The AD group type. For details, see [Active Directory security
+            group type](https://learn.microsoft.com/en-us/windows-server/identity/ad-ds/manage/understand-security-groups#how-active-directory-security-groups-work).
+        GroupScope:
+          allOf:
+          - $ref: '#/components/schemas/GroupScope'
+          description: The scope of the AD group. For details, see [Active Directory
+            security groups](https://learn.microsoft.com/en-us/windows-server/identity/ad-ds/manage/understand-security-groups#group-scope).
+        OtherAttributes:
+          allOf:
+          - $ref: '#/components/schemas/Attributes'
+          description: The attribute values that are returned for the attribute names
+            that are included in the request.
+    DescribeUserRequest:
+      type: object
+      properties:
+        DirectoryId:
+          allOf:
+          - $ref: '#/components/schemas/DirectoryId'
+          description: The identifier (ID) of the directory that's associated with
+            the user.
+        SAMAccountName:
+          allOf:
+          - $ref: '#/components/schemas/UserName'
+          description: The name of the user.
+        OtherAttributes:
+          allOf:
+          - $ref: '#/components/schemas/LdapDisplayNameList'
+          description: One or more attribute names to be returned for the user. A
+            key is an attribute name, and the value is a list of maps. For a list
+            of supported attributes, see [Directory Service Data Attributes](https://docs.aws.amazon.com/directoryservice/latest/admin-guide/ad_data_attributes.html).
+        Realm:
+          allOf:
+          - $ref: '#/components/schemas/Realm'
+          description: 'The domain name that''s associated with the user.
+
+
+            This parameter is optional, so you can return users outside your Managed
+            Microsoft AD domain. When no value is defined, only your Managed Microsoft
+            AD users are returned.
+
+
+            This value is case insensitive.'
+      required:
+      - DirectoryId
+      - SAMAccountName
+    DescribeUserResult:
+      type: object
+      properties:
+        DirectoryId:
+          allOf:
+          - $ref: '#/components/schemas/DirectoryId'
+          description: The identifier (ID) of the directory that's associated with
+            the user.
+        Realm:
+          allOf:
+          - $ref: '#/components/schemas/Realm'
+          description: The domain name that's associated with the user.
+        SID:
+          allOf:
+          - $ref: '#/components/schemas/SID'
+          description: The unique security identifier (SID) of the user.
+        SAMAccountName:
+          allOf:
+          - $ref: '#/components/schemas/UserName'
+          description: The name of the user.
+        DistinguishedName:
+          allOf:
+          - $ref: '#/components/schemas/DistinguishedName'
+          description: The [distinguished name](https://learn.microsoft.com/en-us/windows/win32/ad/object-names-and-identities#distinguished-name)
+            of the object.
+        UserPrincipalName:
+          allOf:
+          - $ref: '#/components/schemas/UserPrincipalName'
+          description: The UPN that is an Internet-style login name for a user and
+            is based on the Internet standard [RFC 822](https://datatracker.ietf.org/doc/html/rfc822).
+            The UPN is shorter than the distinguished name and easier to remember.
+        EmailAddress:
+          allOf:
+          - $ref: '#/components/schemas/EmailAddress'
+          description: The email address of the user.
+        GivenName:
+          allOf:
+          - $ref: '#/components/schemas/GivenName'
+          description: The first name of the user.
+        Surname:
+          allOf:
+          - $ref: '#/components/schemas/Surname'
+          description: The last name of the user.
+        Enabled:
+          allOf:
+          - $ref: '#/components/schemas/Boolean'
+          description: Indicates whether the user account is active.
+        OtherAttributes:
+          allOf:
+          - $ref: '#/components/schemas/Attributes'
+          description: 'The attribute values that are returned for the attribute names
+            that are included in the request.
+
+
+            Attribute names are case insensitive.'
     DirectoryId:
       type: string
       pattern: ^d-[0-9a-f]{10}$
+    DirectoryUnavailableException:
+      type: object
+      properties:
+        Message:
+          $ref: '#/components/schemas/ExceptionMessage'
+        Reason:
+          allOf:
+          - $ref: '#/components/schemas/DirectoryUnavailableReason'
+          description: Reason the request failed for the specified directory.
+      description: The request could not be completed due to a problem in the configuration
+        or current state of the specified directory.
     DirectoryUnavailableReason:
       type: string
       enum:
@@ -141,6 +1783,44 @@ components:
       - DIRECTORY_RESOURCES_EXCEEDED
       - NO_DISK_SPACE
       - TRUST_AUTH_FAILURE
+    DisableUserRequest:
+      type: object
+      properties:
+        DirectoryId:
+          allOf:
+          - $ref: '#/components/schemas/DirectoryId'
+          description: The identifier (ID) of the directory that's associated with
+            the user.
+        SAMAccountName:
+          allOf:
+          - $ref: '#/components/schemas/UserName'
+          description: The name of the user.
+        ClientToken:
+          allOf:
+          - $ref: '#/components/schemas/ClientToken'
+          description: 'A unique and case-sensitive identifier that you provide to
+            make sure the idempotency of the request, so multiple identical calls
+            have the same effect as one single call.
+
+
+            A client token is valid for 8 hours after the first request that uses
+            it completes. After 8 hours, any request with the same client token is
+            treated as a new request. If the request succeeds, any future uses of
+            that token will be idempotent for another 8 hours.
+
+
+            If you submit a request with the same client token but change one of the
+            other parameters within the 8-hour idempotency window, Directory Service
+            Data returns an `ConflictException`.
+
+
+            This parameter is optional when using the CLI or SDK.'
+      required:
+      - DirectoryId
+      - SAMAccountName
+    DisableUserResult:
+      type: object
+      properties: {}
     DistinguishedName:
       type: string
       minLength: 1
@@ -155,6 +1835,41 @@ components:
       type: string
       minLength: 1
       maxLength: 64
+    Group:
+      type: object
+      properties:
+        SID:
+          allOf:
+          - $ref: '#/components/schemas/SID'
+          description: The unique security identifier (SID) of the group.
+        SAMAccountName:
+          allOf:
+          - $ref: '#/components/schemas/GroupName'
+          description: The name of the group.
+        DistinguishedName:
+          allOf:
+          - $ref: '#/components/schemas/DistinguishedName'
+          description: The [distinguished name](https://learn.microsoft.com/en-us/windows/win32/ad/object-names-and-identities#distinguished-name)
+            of the object.
+        GroupType:
+          allOf:
+          - $ref: '#/components/schemas/GroupType'
+          description: The AD group type. For details, see [Active Directory security
+            group type](https://learn.microsoft.com/en-us/windows-server/identity/ad-ds/manage/understand-security-groups#how-active-directory-security-groups-work).
+        GroupScope:
+          allOf:
+          - $ref: '#/components/schemas/GroupScope'
+          description: The scope of the AD group. For details, see [Active Directory
+            security groups](https://learn.microsoft.com/en-us/windows-server/identity/ad-ds/manage/understand-security-groups#group-scope)
+        OtherAttributes:
+          allOf:
+          - $ref: '#/components/schemas/Attributes'
+          description: An expression of one or more attributes, data types, and the
+            values of a group.
+      required:
+      - SAMAccountName
+      description: A group object that contains identifying information and attributes
+        for a specified group.
     GroupList:
       type: array
       items:
@@ -171,6 +1886,34 @@ components:
       - Global
       - Universal
       - BuiltinLocal
+    GroupSummary:
+      type: object
+      properties:
+        SID:
+          allOf:
+          - $ref: '#/components/schemas/SID'
+          description: The unique security identifier (SID) of the group.
+        SAMAccountName:
+          allOf:
+          - $ref: '#/components/schemas/GroupName'
+          description: The name of the group.
+        GroupType:
+          allOf:
+          - $ref: '#/components/schemas/GroupType'
+          description: The AD group type. For details, see [Active Directory security
+            group type](https://learn.microsoft.com/en-us/windows-server/identity/ad-ds/manage/understand-security-groups#how-active-directory-security-groups-work).
+        GroupScope:
+          allOf:
+          - $ref: '#/components/schemas/GroupScope'
+          description: The scope of the AD group. For details, see [Active Directory
+            security groups](https://learn.microsoft.com/en-us/windows-server/identity/ad-ds/manage/understand-security-groups#group-scope).
+      required:
+      - SID
+      - SAMAccountName
+      - GroupType
+      - GroupScope
+      description: A structure containing a subset of fields of a group object from
+        a directory.
     GroupSummaryList:
       type: array
       items:
@@ -180,6 +1923,13 @@ components:
       enum:
       - Distribution
       - Security
+    InternalServerException:
+      type: object
+      properties:
+        Message:
+          $ref: '#/components/schemas/ExceptionMessage'
+      description: The operation didn't succeed because an internal error occurred.
+        Try again later.
     LdapDisplayName:
       type: string
       pattern: ^[A-Za-z*][A-Za-z-*]*$
@@ -189,10 +1939,277 @@ components:
       type: array
       items:
         $ref: '#/components/schemas/LdapDisplayName'
+    ListGroupMembersRequest:
+      type: object
+      properties:
+        DirectoryId:
+          allOf:
+          - $ref: '#/components/schemas/DirectoryId'
+          description: The identifier (ID) of the directory that's associated with
+            the group.
+        Realm:
+          allOf:
+          - $ref: '#/components/schemas/Realm'
+          description: 'The domain name that''s associated with the group.
+
+
+            This parameter is optional, so you can return members from a group outside
+            of your Managed Microsoft AD domain. When no value is defined, only members
+            of your Managed Microsoft AD groups are returned.
+
+
+            This value is case insensitive.'
+        MemberRealm:
+          allOf:
+          - $ref: '#/components/schemas/Realm'
+          description: 'The domain name that''s associated with the group member.
+            This parameter defaults to the Managed Microsoft AD domain.
+
+
+            This parameter is optional and case insensitive.'
+        SAMAccountName:
+          allOf:
+          - $ref: '#/components/schemas/GroupName'
+          description: The name of the group.
+        NextToken:
+          allOf:
+          - $ref: '#/components/schemas/NextToken'
+          description: An encoded paging token for paginated calls that can be passed
+            back to retrieve the next page.
+        MaxResults:
+          allOf:
+          - $ref: '#/components/schemas/MaxResults'
+          description: The maximum number of results to be returned per request.
+      required:
+      - DirectoryId
+      - SAMAccountName
+    ListGroupMembersResult:
+      type: object
+      properties:
+        DirectoryId:
+          allOf:
+          - $ref: '#/components/schemas/DirectoryId'
+          description: Identifier (ID) of the directory associated with the group.
+        Realm:
+          allOf:
+          - $ref: '#/components/schemas/Realm'
+          description: The domain name that's associated with the group.
+        MemberRealm:
+          allOf:
+          - $ref: '#/components/schemas/Realm'
+          description: The domain name that's associated with the member.
+        Members:
+          allOf:
+          - $ref: '#/components/schemas/MemberList'
+          description: The member information that the request returns.
+        NextToken:
+          allOf:
+          - $ref: '#/components/schemas/NextToken'
+          description: An encoded paging token for paginated calls that can be passed
+            back to retrieve the next page.
+    ListGroupsForMemberRequest:
+      type: object
+      properties:
+        DirectoryId:
+          allOf:
+          - $ref: '#/components/schemas/DirectoryId'
+          description: The identifier (ID) of the directory that's associated with
+            the member.
+        Realm:
+          allOf:
+          - $ref: '#/components/schemas/Realm'
+          description: 'The domain name that''s associated with the group.
+
+
+            This parameter is optional, so you can return groups outside of your Managed
+            Microsoft AD domain. When no value is defined, only your Managed Microsoft
+            AD groups are returned.
+
+
+            This value is case insensitive and defaults to your Managed Microsoft
+            AD domain.'
+        MemberRealm:
+          allOf:
+          - $ref: '#/components/schemas/Realm'
+          description: 'The domain name that''s associated with the group member.
+
+
+            This parameter is optional, so you can limit your results to the group
+            members in a specific domain.
+
+
+            This parameter is case insensitive and defaults to `Realm`'
+        SAMAccountName:
+          allOf:
+          - $ref: '#/components/schemas/MemberName'
+          description: The `SAMAccountName` of the user, group, or computer that's
+            a member of the group.
+        NextToken:
+          allOf:
+          - $ref: '#/components/schemas/NextToken'
+          description: An encoded paging token for paginated calls that can be passed
+            back to retrieve the next page.
+        MaxResults:
+          allOf:
+          - $ref: '#/components/schemas/MaxResults'
+          description: The maximum number of results to be returned per request.
+      required:
+      - DirectoryId
+      - SAMAccountName
+    ListGroupsForMemberResult:
+      type: object
+      properties:
+        DirectoryId:
+          allOf:
+          - $ref: '#/components/schemas/DirectoryId'
+          description: The identifier (ID) of the directory that's associated with
+            the member.
+        Realm:
+          allOf:
+          - $ref: '#/components/schemas/Realm'
+          description: The domain that's associated with the group.
+        MemberRealm:
+          allOf:
+          - $ref: '#/components/schemas/Realm'
+          description: The domain that's associated with the member.
+        Groups:
+          allOf:
+          - $ref: '#/components/schemas/GroupSummaryList'
+          description: The group information that the request returns.
+        NextToken:
+          allOf:
+          - $ref: '#/components/schemas/NextToken'
+          description: An encoded paging token for paginated calls that can be passed
+            back to retrieve the next page.
+    ListGroupsRequest:
+      type: object
+      properties:
+        DirectoryId:
+          allOf:
+          - $ref: '#/components/schemas/DirectoryId'
+          description: The identifier (ID) of the directory that's associated with
+            the group.
+        Realm:
+          allOf:
+          - $ref: '#/components/schemas/Realm'
+          description: 'The domain name associated with the directory.
+
+
+            This parameter is optional, so you can return groups outside of your Managed
+            Microsoft AD domain. When no value is defined, only your Managed Microsoft
+            AD groups are returned.
+
+
+            This value is case insensitive.'
+        NextToken:
+          allOf:
+          - $ref: '#/components/schemas/NextToken'
+          description: An encoded paging token for paginated calls that can be passed
+            back to retrieve the next page.
+        MaxResults:
+          allOf:
+          - $ref: '#/components/schemas/MaxResults'
+          description: The maximum number of results to be returned per request.
+      required:
+      - DirectoryId
+    ListGroupsResult:
+      type: object
+      properties:
+        DirectoryId:
+          allOf:
+          - $ref: '#/components/schemas/DirectoryId'
+          description: The identifier (ID) of the directory that's associated with
+            the group.
+        Realm:
+          allOf:
+          - $ref: '#/components/schemas/Realm'
+          description: The domain name associated with the group.
+        Groups:
+          allOf:
+          - $ref: '#/components/schemas/GroupSummaryList'
+          description: The group information that the request returns.
+        NextToken:
+          allOf:
+          - $ref: '#/components/schemas/NextToken'
+          description: An encoded paging token for paginated calls that can be passed
+            back to retrieve the next page.
+    ListUsersRequest:
+      type: object
+      properties:
+        DirectoryId:
+          allOf:
+          - $ref: '#/components/schemas/DirectoryId'
+          description: The identifier (ID) of the directory that's associated with
+            the user.
+        Realm:
+          allOf:
+          - $ref: '#/components/schemas/Realm'
+          description: 'The domain name that''s associated with the user.
+
+
+            This parameter is optional, so you can return users outside of your Managed
+            Microsoft AD domain. When no value is defined, only your Managed Microsoft
+            AD users are returned.
+
+
+            This value is case insensitive.'
+        NextToken:
+          allOf:
+          - $ref: '#/components/schemas/NextToken'
+          description: An encoded paging token for paginated calls that can be passed
+            back to retrieve the next page.
+        MaxResults:
+          allOf:
+          - $ref: '#/components/schemas/MaxResults'
+          description: The maximum number of results to be returned per request.
+      required:
+      - DirectoryId
+    ListUsersResult:
+      type: object
+      properties:
+        DirectoryId:
+          allOf:
+          - $ref: '#/components/schemas/DirectoryId'
+          description: The identifier (ID) of the directory that's associated with
+            the user.
+        Realm:
+          allOf:
+          - $ref: '#/components/schemas/Realm'
+          description: The domain that's associated with the user.
+        Users:
+          allOf:
+          - $ref: '#/components/schemas/UserSummaryList'
+          description: The user information that the request returns.
+        NextToken:
+          allOf:
+          - $ref: '#/components/schemas/NextToken'
+          description: An encoded paging token for paginated calls that can be passed
+            back to retrieve the next page.
     MaxResults:
       type: integer
       minimum: 1
       maximum: 250
+    Member:
+      type: object
+      properties:
+        SID:
+          allOf:
+          - $ref: '#/components/schemas/SID'
+          description: The unique security identifier (SID) of the group member.
+        SAMAccountName:
+          allOf:
+          - $ref: '#/components/schemas/MemberName'
+          description: The name of the group member.
+        MemberType:
+          allOf:
+          - $ref: '#/components/schemas/MemberType'
+          description: The AD type of the member object.
+      required:
+      - SID
+      - SAMAccountName
+      - MemberType
+      description: A member object that contains identifying information for a specified
+        member.
     MemberList:
       type: array
       items:
@@ -220,14 +2237,206 @@ components:
       pattern: ^([a-zA-Z0-9]+[\\.-])+([a-zA-Z0-9])+[.]?$
       minLength: 1
       maxLength: 255
+    RemoveGroupMemberRequest:
+      type: object
+      properties:
+        DirectoryId:
+          allOf:
+          - $ref: '#/components/schemas/DirectoryId'
+          description: The identifier (ID) of the directory that's associated with
+            the member.
+        GroupName:
+          allOf:
+          - $ref: '#/components/schemas/GroupName'
+          description: The name of the group.
+        MemberName:
+          allOf:
+          - $ref: '#/components/schemas/MemberName'
+          description: The `SAMAccountName` of the user, group, or computer to remove
+            from the group.
+        MemberRealm:
+          allOf:
+          - $ref: '#/components/schemas/Realm'
+          description: 'The domain name that''s associated with the group member.
+            This parameter defaults to the Managed Microsoft AD domain.
+
+
+            This parameter is optional and case insensitive.'
+        ClientToken:
+          allOf:
+          - $ref: '#/components/schemas/ClientToken'
+          description: 'A unique and case-sensitive identifier that you provide to
+            make sure the idempotency of the request, so multiple identical calls
+            have the same effect as one single call.
+
+
+            A client token is valid for 8 hours after the first request that uses
+            it completes. After 8 hours, any request with the same client token is
+            treated as a new request. If the request succeeds, any future uses of
+            that token will be idempotent for another 8 hours.
+
+
+            If you submit a request with the same client token but change one of the
+            other parameters within the 8-hour idempotency window, Directory Service
+            Data returns an `ConflictException`.
+
+
+            This parameter is optional when using the CLI or SDK.'
+      required:
+      - DirectoryId
+      - GroupName
+      - MemberName
+    RemoveGroupMemberResult:
+      type: object
+      properties: {}
+    ResourceNotFoundException:
+      type: object
+      properties:
+        Message:
+          $ref: '#/components/schemas/ExceptionMessage'
+      description: The resource couldn't be found.
     SID:
       type: string
       minLength: 1
       maxLength: 256
+    SearchGroupsRequest:
+      type: object
+      properties:
+        DirectoryId:
+          allOf:
+          - $ref: '#/components/schemas/DirectoryId'
+          description: The identifier (ID) of the directory that's associated with
+            the group.
+        SearchString:
+          allOf:
+          - $ref: '#/components/schemas/SearchString'
+          description: 'The attribute value that you want to search for.
+
+
+            Wildcard `(*)` searches aren''t supported. For a list of supported attributes,
+            see [Directory Service Data Attributes](https://docs.aws.amazon.com/directoryservice/latest/admin-guide/ad_data_attributes.html).'
+        SearchAttributes:
+          allOf:
+          - $ref: '#/components/schemas/LdapDisplayNameList'
+          description: One or more data attributes that are used to search for a group.
+            For a list of supported attributes, see [Directory Service Data Attributes](https://docs.aws.amazon.com/directoryservice/latest/admin-guide/ad_data_attributes.html).
+        Realm:
+          allOf:
+          - $ref: '#/components/schemas/Realm'
+          description: 'The domain name that''s associated with the group.
+
+
+            This parameter is optional, so you can return groups outside of your Managed
+            Microsoft AD domain. When no value is defined, only your Managed Microsoft
+            AD groups are returned.
+
+
+            This value is case insensitive.'
+        NextToken:
+          allOf:
+          - $ref: '#/components/schemas/NextToken'
+          description: An encoded paging token for paginated calls that can be passed
+            back to retrieve the next page.
+        MaxResults:
+          allOf:
+          - $ref: '#/components/schemas/MaxResults'
+          description: The maximum number of results to be returned per request.
+      required:
+      - DirectoryId
+      - SearchString
+      - SearchAttributes
+    SearchGroupsResult:
+      type: object
+      properties:
+        DirectoryId:
+          allOf:
+          - $ref: '#/components/schemas/DirectoryId'
+          description: The identifier (ID) of the directory that's associated with
+            the group.
+        Realm:
+          allOf:
+          - $ref: '#/components/schemas/Realm'
+          description: The domain that's associated with the group.
+        Groups:
+          allOf:
+          - $ref: '#/components/schemas/GroupList'
+          description: The group information that the request returns.
+        NextToken:
+          allOf:
+          - $ref: '#/components/schemas/NextToken'
+          description: An encoded paging token for paginated calls that can be passed
+            back to retrieve the next page.
     SearchString:
       type: string
       minLength: 1
       maxLength: 64
+    SearchUsersRequest:
+      type: object
+      properties:
+        DirectoryId:
+          allOf:
+          - $ref: '#/components/schemas/DirectoryId'
+          description: The identifier (ID) of the directory that's associated with
+            the user.
+        Realm:
+          allOf:
+          - $ref: '#/components/schemas/Realm'
+          description: 'The domain name that''s associated with the user.
+
+
+            This parameter is optional, so you can return users outside of your Managed
+            Microsoft AD domain. When no value is defined, only your Managed Microsoft
+            AD users are returned.
+
+
+            This value is case insensitive.'
+        SearchString:
+          allOf:
+          - $ref: '#/components/schemas/SearchString'
+          description: 'The attribute value that you want to search for.
+
+
+            Wildcard `(*)` searches aren''t supported. For a list of supported attributes,
+            see [Directory Service Data Attributes](https://docs.aws.amazon.com/directoryservice/latest/admin-guide/ad_data_attributes.html).'
+        SearchAttributes:
+          allOf:
+          - $ref: '#/components/schemas/LdapDisplayNameList'
+          description: One or more data attributes that are used to search for a user.
+            For a list of supported attributes, see [Directory Service Data Attributes](https://docs.aws.amazon.com/directoryservice/latest/admin-guide/ad_data_attributes.html).
+        NextToken:
+          allOf:
+          - $ref: '#/components/schemas/NextToken'
+          description: An encoded paging token for paginated calls that can be passed
+            back to retrieve the next page.
+        MaxResults:
+          allOf:
+          - $ref: '#/components/schemas/MaxResults'
+          description: The maximum number of results to be returned per request.
+      required:
+      - DirectoryId
+      - SearchString
+      - SearchAttributes
+    SearchUsersResult:
+      type: object
+      properties:
+        DirectoryId:
+          allOf:
+          - $ref: '#/components/schemas/DirectoryId'
+          description: The identifier (ID) of the directory where the address block
+            is added.
+        Realm:
+          allOf:
+          - $ref: '#/components/schemas/Realm'
+          description: The domain that's associated with the user.
+        Users:
+          allOf:
+          - $ref: '#/components/schemas/UserList'
+          description: The user information that the request returns.
+        NextToken:
+          allOf:
+          - $ref: '#/components/schemas/NextToken'
+          description: An encoded paging token for paginated calls that can be passed
+            back to retrieve the next page.
     StringAttributeValue:
       type: string
       minLength: 1
@@ -241,12 +2450,197 @@ components:
       type: string
       minLength: 1
       maxLength: 64
+    ThrottlingException:
+      type: object
+      properties:
+        Message:
+          $ref: '#/components/schemas/ExceptionMessage'
+        RetryAfterSeconds:
+          allOf:
+          - $ref: '#/components/schemas/Integer'
+          description: The recommended amount of seconds to retry after a throttling
+            exception.
+      required:
+      - Message
+      description: The limit on the number of requests per second has been exceeded.
+    UpdateGroupRequest:
+      type: object
+      properties:
+        DirectoryId:
+          allOf:
+          - $ref: '#/components/schemas/DirectoryId'
+          description: The identifier (ID) of the directory that's associated with
+            the group.
+        SAMAccountName:
+          allOf:
+          - $ref: '#/components/schemas/GroupName'
+          description: The name of the group.
+        GroupType:
+          allOf:
+          - $ref: '#/components/schemas/GroupType'
+          description: The AD group type. For details, see [Active Directory security
+            group type](https://learn.microsoft.com/en-us/windows-server/identity/ad-ds/manage/understand-security-groups#how-active-directory-security-groups-work).
+        GroupScope:
+          allOf:
+          - $ref: '#/components/schemas/GroupScope'
+          description: The scope of the AD group. For details, see [Active Directory
+            security groups](https://learn.microsoft.com/en-us/windows-server/identity/ad-ds/manage/understand-security-groups#group-scope).
+        OtherAttributes:
+          allOf:
+          - $ref: '#/components/schemas/Attributes'
+          description: An expression that defines one or more attributes with the
+            data type and the value of each attribute.
+        UpdateType:
+          allOf:
+          - $ref: '#/components/schemas/UpdateType'
+          description: The type of update to be performed. If no value exists for
+            the attribute, use `ADD`. Otherwise, use `REPLACE` to change an attribute
+            value or `REMOVE` to clear the attribute value.
+        ClientToken:
+          allOf:
+          - $ref: '#/components/schemas/ClientToken'
+          description: 'A unique and case-sensitive identifier that you provide to
+            make sure the idempotency of the request, so multiple identical calls
+            have the same effect as one single call.
+
+
+            A client token is valid for 8 hours after the first request that uses
+            it completes. After 8 hours, any request with the same client token is
+            treated as a new request. If the request succeeds, any future uses of
+            that token will be idempotent for another 8 hours.
+
+
+            If you submit a request with the same client token but change one of the
+            other parameters within the 8-hour idempotency window, Directory Service
+            Data returns an `ConflictException`.
+
+
+            This parameter is optional when using the CLI or SDK.'
+      required:
+      - DirectoryId
+      - SAMAccountName
+    UpdateGroupResult:
+      type: object
+      properties: {}
     UpdateType:
       type: string
       enum:
       - ADD
       - REPLACE
       - REMOVE
+    UpdateUserRequest:
+      type: object
+      properties:
+        DirectoryId:
+          allOf:
+          - $ref: '#/components/schemas/DirectoryId'
+          description: The identifier (ID) of the directory that's associated with
+            the user.
+        SAMAccountName:
+          allOf:
+          - $ref: '#/components/schemas/UserName'
+          description: The name of the user.
+        EmailAddress:
+          allOf:
+          - $ref: '#/components/schemas/EmailAddress'
+          description: The email address of the user.
+        GivenName:
+          allOf:
+          - $ref: '#/components/schemas/GivenName'
+          description: The first name of the user.
+        Surname:
+          allOf:
+          - $ref: '#/components/schemas/Surname'
+          description: The last name of the user.
+        OtherAttributes:
+          allOf:
+          - $ref: '#/components/schemas/Attributes'
+          description: 'An expression that defines one or more attribute names with
+            the data type and value of each attribute. A key is an attribute name,
+            and the value is a list of maps. For a list of supported attributes, see
+            [Directory Service Data Attributes](https://docs.aws.amazon.com/directoryservice/latest/admin-guide/ad_data_attributes.html).
+
+
+            Attribute names are case insensitive.'
+        UpdateType:
+          allOf:
+          - $ref: '#/components/schemas/UpdateType'
+          description: The type of update to be performed. If no value exists for
+            the attribute, use `ADD`. Otherwise, use `REPLACE` to change an attribute
+            value or `REMOVE` to clear the attribute value.
+        ClientToken:
+          allOf:
+          - $ref: '#/components/schemas/ClientToken'
+          description: 'A unique and case-sensitive identifier that you provide to
+            make sure the idempotency of the request, so multiple identical calls
+            have the same effect as one single call.
+
+
+            A client token is valid for 8 hours after the first request that uses
+            it completes. After 8 hours, any request with the same client token is
+            treated as a new request. If the request succeeds, any future uses of
+            that token will be idempotent for another 8 hours.
+
+
+            If you submit a request with the same client token but change one of the
+            other parameters within the 8-hour idempotency window, Directory Service
+            Data returns an `ConflictException`.
+
+
+            This parameter is optional when using the CLI or SDK.'
+      required:
+      - DirectoryId
+      - SAMAccountName
+    UpdateUserResult:
+      type: object
+      properties: {}
+    User:
+      type: object
+      properties:
+        SID:
+          allOf:
+          - $ref: '#/components/schemas/SID'
+          description: The unique security identifier (SID) of the user.
+        SAMAccountName:
+          allOf:
+          - $ref: '#/components/schemas/UserName'
+          description: The name of the user.
+        DistinguishedName:
+          allOf:
+          - $ref: '#/components/schemas/DistinguishedName'
+          description: The [distinguished name](https://learn.microsoft.com/en-us/windows/win32/ad/object-names-and-identities#distinguished-name)
+            of the object.
+        UserPrincipalName:
+          allOf:
+          - $ref: '#/components/schemas/UserPrincipalName'
+          description: The UPN that is an internet-style login name for a user and
+            based on the internet standard [RFC 822](https://datatracker.ietf.org/doc/html/rfc822).
+            The UPN is shorter than the distinguished name and easier to remember.
+        EmailAddress:
+          allOf:
+          - $ref: '#/components/schemas/EmailAddress'
+          description: The email address of the user.
+        GivenName:
+          allOf:
+          - $ref: '#/components/schemas/GivenName'
+          description: The first name of the user.
+        Surname:
+          allOf:
+          - $ref: '#/components/schemas/Surname'
+          description: The last name of the user.
+        Enabled:
+          allOf:
+          - $ref: '#/components/schemas/Boolean'
+          description: Indicates whether the user account is active.
+        OtherAttributes:
+          allOf:
+          - $ref: '#/components/schemas/Attributes'
+          description: An expression that includes one or more attributes, data types,
+            and values of a user.
+      required:
+      - SAMAccountName
+      description: A user object that contains identifying information and attributes
+        for a specified user.
     UserList:
       type: array
       items:
@@ -260,10 +2654,50 @@ components:
       type: string
       minLength: 1
       maxLength: 256
+    UserSummary:
+      type: object
+      properties:
+        SID:
+          allOf:
+          - $ref: '#/components/schemas/SID'
+          description: The unique security identifier (SID) of the user.
+        SAMAccountName:
+          allOf:
+          - $ref: '#/components/schemas/UserName'
+          description: The name of the user.
+        GivenName:
+          allOf:
+          - $ref: '#/components/schemas/GivenName'
+          description: The first name of the user.
+        Surname:
+          allOf:
+          - $ref: '#/components/schemas/Surname'
+          description: The last name of the user.
+        Enabled:
+          allOf:
+          - $ref: '#/components/schemas/Boolean'
+          description: Indicates whether the user account is active.
+      required:
+      - SID
+      - SAMAccountName
+      - Enabled
+      description: A structure containing a subset of the fields of a user object
+        from a directory.
     UserSummaryList:
       type: array
       items:
         $ref: '#/components/schemas/UserSummary'
+    ValidationException:
+      type: object
+      properties:
+        Message:
+          $ref: '#/components/schemas/ExceptionMessage'
+        Reason:
+          allOf:
+          - $ref: '#/components/schemas/ValidationExceptionReason'
+          description: Reason the request failed validation.
+      description: The request isn't valid. Review the details in the error message
+        to update the invalid parameters or values in your request.
     ValidationExceptionReason:
       type: string
       enum:

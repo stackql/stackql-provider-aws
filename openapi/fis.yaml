@@ -7,7 +7,7 @@ info:
   x-stackql-serviceName: fis
   x-aws-serviceName: fis
   x-aws-protocol: aws.protocols#restJson1
-  x-dateGenerated: '2025-05-05'
+  x-dateGenerated: '2025-05-07'
   version: '2020-12-01'
   title: AWS Fault Injection Simulator
   description: |-
@@ -43,7 +43,870 @@ servers:
       - sa-east-1
       - me-south-1
       default: us-east-1
-paths: {}
+paths:
+  /experimentTemplates:
+    post:
+      operationId: CreateExperimentTemplate
+      description: |-
+        Creates an experiment template.
+
+        An experiment template includes the following components:
+
+          * **Targets** : A target can be a specific resource in your Amazon Web Services environment, or one or more resources that match criteria that you specify, for example, resources that have specific tags.
+
+          * **Actions** : The actions to carry out on the target. You can specify multiple actions, the duration of each action, and when to start each action during an experiment.
+
+          * **Stop conditions** : If a stop condition is triggered while an experiment is running, the experiment is automatically stopped. You can define a stop condition as a CloudWatch alarm.
+
+        For more information, see [experiment templates](https://docs.aws.amazon.com/fis/latest/userguide/experiment-templates.html) in the _Fault Injection Service User Guide_.
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                clientToken:
+                  $ref: '#/components/schemas/ClientToken'
+                description:
+                  $ref: '#/components/schemas/ExperimentTemplateDescription'
+                stopConditions:
+                  $ref: '#/components/schemas/CreateExperimentTemplateStopConditionInputList'
+                targets:
+                  $ref: '#/components/schemas/CreateExperimentTemplateTargetInputMap'
+                actions:
+                  $ref: '#/components/schemas/CreateExperimentTemplateActionInputMap'
+                roleArn:
+                  $ref: '#/components/schemas/RoleArn'
+                tags:
+                  $ref: '#/components/schemas/TagMap'
+                logConfiguration:
+                  $ref: '#/components/schemas/CreateExperimentTemplateLogConfigurationInput'
+                experimentOptions:
+                  $ref: '#/components/schemas/CreateExperimentTemplateExperimentOptionsInput'
+                experimentReportConfiguration:
+                  $ref: '#/components/schemas/CreateExperimentTemplateReportConfigurationInput'
+      responses:
+        '200': {}
+        '409':
+          description: |-
+            The request could not be processed because of a conflict.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConflictException'
+        '404':
+          description: |-
+            The specified resource cannot be found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+        '402':
+          description: |-
+            You have exceeded your service quota.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServiceQuotaExceededException'
+        '400':
+          description: |-
+            The specified input is not valid, or fails to satisfy the constraints for the request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+    get:
+      operationId: ListExperimentTemplates
+      description: |-
+        Lists your experiment templates.
+      parameters:
+      - name: maxResults
+        in: query
+        required: false
+        schema:
+          $ref: '#/components/schemas/ListExperimentTemplatesMaxResults'
+      - name: nextToken
+        in: query
+        required: false
+        schema:
+          $ref: '#/components/schemas/NextToken'
+      responses:
+        '200': {}
+        '400':
+          description: |-
+            The specified input is not valid, or fails to satisfy the constraints for the request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+  /experimentTemplates/{experimentTemplateId}/targetAccountConfigurations/{accountId}:
+    post:
+      operationId: CreateTargetAccountConfiguration
+      description: |-
+        Creates a target account configuration for the experiment template. A target account configuration is required when `accountTargeting` of `experimentOptions` is set to `multi-account`. For more information, see [experiment options](https://docs.aws.amazon.com/fis/latest/userguide/experiment-options.html) in the _Fault Injection Service User Guide_.
+      parameters:
+      - name: experimentTemplateId
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/ExperimentTemplateId'
+      - name: accountId
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/TargetAccountId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                clientToken:
+                  $ref: '#/components/schemas/ClientToken'
+                roleArn:
+                  $ref: '#/components/schemas/RoleArn'
+                description:
+                  $ref: '#/components/schemas/TargetAccountConfigurationDescription'
+      responses:
+        '200': {}
+        '409':
+          description: |-
+            The request could not be processed because of a conflict.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConflictException'
+        '404':
+          description: |-
+            The specified resource cannot be found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+        '402':
+          description: |-
+            You have exceeded your service quota.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServiceQuotaExceededException'
+        '400':
+          description: |-
+            The specified input is not valid, or fails to satisfy the constraints for the request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+    delete:
+      operationId: DeleteTargetAccountConfiguration
+      description: |-
+        Deletes the specified target account configuration of the experiment template.
+      parameters:
+      - name: experimentTemplateId
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/ExperimentTemplateId'
+      - name: accountId
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/TargetAccountId'
+      responses:
+        '200': {}
+        '404':
+          description: |-
+            The specified resource cannot be found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+        '400':
+          description: |-
+            The specified input is not valid, or fails to satisfy the constraints for the request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+    get:
+      operationId: GetTargetAccountConfiguration
+      description: |-
+        Gets information about the specified target account configuration of the experiment template.
+      parameters:
+      - name: experimentTemplateId
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/ExperimentTemplateId'
+      - name: accountId
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/TargetAccountId'
+      responses:
+        '200': {}
+        '404':
+          description: |-
+            The specified resource cannot be found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+        '400':
+          description: |-
+            The specified input is not valid, or fails to satisfy the constraints for the request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+    patch:
+      operationId: UpdateTargetAccountConfiguration
+      description: |-
+        Updates the target account configuration for the specified experiment template.
+      parameters:
+      - name: experimentTemplateId
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/ExperimentTemplateId'
+      - name: accountId
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/TargetAccountId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                roleArn:
+                  $ref: '#/components/schemas/RoleArn'
+                description:
+                  $ref: '#/components/schemas/TargetAccountConfigurationDescription'
+      responses:
+        '200': {}
+        '404':
+          description: |-
+            The specified resource cannot be found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+        '400':
+          description: |-
+            The specified input is not valid, or fails to satisfy the constraints for the request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+  /experimentTemplates/{id}:
+    delete:
+      operationId: DeleteExperimentTemplate
+      description: |-
+        Deletes the specified experiment template.
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/ExperimentTemplateId'
+      responses:
+        '200': {}
+        '404':
+          description: |-
+            The specified resource cannot be found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+        '400':
+          description: |-
+            The specified input is not valid, or fails to satisfy the constraints for the request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+    get:
+      operationId: GetExperimentTemplate
+      description: |-
+        Gets information about the specified experiment template.
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/ExperimentTemplateId'
+      responses:
+        '200': {}
+        '404':
+          description: |-
+            The specified resource cannot be found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+        '400':
+          description: |-
+            The specified input is not valid, or fails to satisfy the constraints for the request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+    patch:
+      operationId: UpdateExperimentTemplate
+      description: |-
+        Updates the specified experiment template.
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/ExperimentTemplateId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                description:
+                  $ref: '#/components/schemas/ExperimentTemplateDescription'
+                stopConditions:
+                  $ref: '#/components/schemas/UpdateExperimentTemplateStopConditionInputList'
+                targets:
+                  $ref: '#/components/schemas/UpdateExperimentTemplateTargetInputMap'
+                actions:
+                  $ref: '#/components/schemas/UpdateExperimentTemplateActionInputMap'
+                roleArn:
+                  $ref: '#/components/schemas/RoleArn'
+                logConfiguration:
+                  $ref: '#/components/schemas/UpdateExperimentTemplateLogConfigurationInput'
+                experimentOptions:
+                  $ref: '#/components/schemas/UpdateExperimentTemplateExperimentOptionsInput'
+                experimentReportConfiguration:
+                  $ref: '#/components/schemas/UpdateExperimentTemplateReportConfigurationInput'
+      responses:
+        '200': {}
+        '404':
+          description: |-
+            The specified resource cannot be found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+        '402':
+          description: |-
+            You have exceeded your service quota.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServiceQuotaExceededException'
+        '400':
+          description: |-
+            The specified input is not valid, or fails to satisfy the constraints for the request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+  /actions/{id}:
+    get:
+      operationId: GetAction
+      description: |-
+        Gets information about the specified FIS action.
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/ActionId'
+      responses:
+        '200': {}
+        '404':
+          description: |-
+            The specified resource cannot be found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+        '400':
+          description: |-
+            The specified input is not valid, or fails to satisfy the constraints for the request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+  /experiments/{id}:
+    get:
+      operationId: GetExperiment
+      description: |-
+        Gets information about the specified experiment.
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/ExperimentId'
+      responses:
+        '200': {}
+        '404':
+          description: |-
+            The specified resource cannot be found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+        '400':
+          description: |-
+            The specified input is not valid, or fails to satisfy the constraints for the request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+    delete:
+      operationId: StopExperiment
+      description: |-
+        Stops the specified experiment.
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/ExperimentId'
+      responses:
+        '200': {}
+        '404':
+          description: |-
+            The specified resource cannot be found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+        '400':
+          description: |-
+            The specified input is not valid, or fails to satisfy the constraints for the request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+  /experiments/{experimentId}/targetAccountConfigurations/{accountId}:
+    get:
+      operationId: GetExperimentTargetAccountConfiguration
+      description: |-
+        Gets information about the specified target account configuration of the experiment.
+      parameters:
+      - name: experimentId
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/ExperimentId'
+      - name: accountId
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/TargetAccountId'
+      responses:
+        '200': {}
+        '404':
+          description: |-
+            The specified resource cannot be found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+        '400':
+          description: |-
+            The specified input is not valid, or fails to satisfy the constraints for the request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+  /safetyLevers/{id}:
+    get:
+      operationId: GetSafetyLever
+      description: |-
+        Gets information about the specified safety lever.
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/SafetyLeverId'
+      responses:
+        '200': {}
+        '404':
+          description: |-
+            The specified resource cannot be found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+  /targetResourceTypes/{resourceType}:
+    get:
+      operationId: GetTargetResourceType
+      description: |-
+        Gets information about the specified resource type.
+      parameters:
+      - name: resourceType
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/TargetResourceTypeId'
+      responses:
+        '200': {}
+        '404':
+          description: |-
+            The specified resource cannot be found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+        '400':
+          description: |-
+            The specified input is not valid, or fails to satisfy the constraints for the request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+  /actions:
+    get:
+      operationId: ListActions
+      description: |-
+        Lists the available FIS actions.
+      parameters:
+      - name: maxResults
+        in: query
+        required: false
+        schema:
+          $ref: '#/components/schemas/ListActionsMaxResults'
+      - name: nextToken
+        in: query
+        required: false
+        schema:
+          $ref: '#/components/schemas/NextToken'
+      responses:
+        '200': {}
+        '400':
+          description: |-
+            The specified input is not valid, or fails to satisfy the constraints for the request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+  /experiments/{experimentId}/resolvedTargets:
+    get:
+      operationId: ListExperimentResolvedTargets
+      description: |-
+        Lists the resolved targets information of the specified experiment.
+      parameters:
+      - name: experimentId
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/ExperimentId'
+      - name: maxResults
+        in: query
+        required: false
+        schema:
+          $ref: '#/components/schemas/ListExperimentResolvedTargetsMaxResults'
+      - name: nextToken
+        in: query
+        required: false
+        schema:
+          $ref: '#/components/schemas/NextToken'
+      - name: targetName
+        in: query
+        required: false
+        schema:
+          $ref: '#/components/schemas/TargetName'
+      responses:
+        '200': {}
+        '404':
+          description: |-
+            The specified resource cannot be found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+        '400':
+          description: |-
+            The specified input is not valid, or fails to satisfy the constraints for the request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+  /experiments/{experimentId}/targetAccountConfigurations:
+    get:
+      operationId: ListExperimentTargetAccountConfigurations
+      description: |-
+        Lists the target account configurations of the specified experiment.
+      parameters:
+      - name: experimentId
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/ExperimentId'
+      - name: nextToken
+        in: query
+        required: false
+        schema:
+          $ref: '#/components/schemas/NextToken'
+      responses:
+        '200': {}
+        '404':
+          description: |-
+            The specified resource cannot be found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+        '400':
+          description: |-
+            The specified input is not valid, or fails to satisfy the constraints for the request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+  /experiments:
+    get:
+      operationId: ListExperiments
+      description: |-
+        Lists your experiments.
+      parameters:
+      - name: maxResults
+        in: query
+        required: false
+        schema:
+          $ref: '#/components/schemas/ListExperimentsMaxResults'
+      - name: nextToken
+        in: query
+        required: false
+        schema:
+          $ref: '#/components/schemas/NextToken'
+      - name: experimentTemplateId
+        in: query
+        required: false
+        schema:
+          $ref: '#/components/schemas/ExperimentTemplateId'
+      responses:
+        '200': {}
+        '400':
+          description: |-
+            The specified input is not valid, or fails to satisfy the constraints for the request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+    post:
+      operationId: StartExperiment
+      description: |-
+        Starts running an experiment from the specified experiment template.
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                clientToken:
+                  $ref: '#/components/schemas/ClientToken'
+                experimentTemplateId:
+                  $ref: '#/components/schemas/ExperimentTemplateId'
+                experimentOptions:
+                  $ref: '#/components/schemas/StartExperimentExperimentOptionsInput'
+                tags:
+                  $ref: '#/components/schemas/TagMap'
+      responses:
+        '200': {}
+        '409':
+          description: |-
+            The request could not be processed because of a conflict.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConflictException'
+        '404':
+          description: |-
+            The specified resource cannot be found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+        '402':
+          description: |-
+            You have exceeded your service quota.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServiceQuotaExceededException'
+        '400':
+          description: |-
+            The specified input is not valid, or fails to satisfy the constraints for the request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+  /tags/{resourceArn}:
+    get:
+      operationId: ListTagsForResource
+      description: |-
+        Lists the tags for the specified resource.
+      parameters:
+      - name: resourceArn
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/ResourceArn'
+      responses:
+        '200': {}
+    post:
+      operationId: TagResource
+      description: |-
+        Applies the specified tags to the specified resource.
+      parameters:
+      - name: resourceArn
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/ResourceArn'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                tags:
+                  $ref: '#/components/schemas/TagMap'
+      responses:
+        '200': {}
+    delete:
+      operationId: UntagResource
+      description: |-
+        Removes the specified tags from the specified resource.
+      parameters:
+      - name: resourceArn
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/ResourceArn'
+      - name: tagKeys
+        in: query
+        required: false
+        schema:
+          $ref: '#/components/schemas/TagKeyList'
+      responses:
+        '200': {}
+  /experimentTemplates/{experimentTemplateId}/targetAccountConfigurations:
+    get:
+      operationId: ListTargetAccountConfigurations
+      description: |-
+        Lists the target account configurations of the specified experiment template.
+      parameters:
+      - name: experimentTemplateId
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/ExperimentTemplateId'
+      - name: maxResults
+        in: query
+        required: false
+        schema:
+          $ref: '#/components/schemas/ListTargetAccountConfigurationsMaxResults'
+      - name: nextToken
+        in: query
+        required: false
+        schema:
+          $ref: '#/components/schemas/NextToken'
+      responses:
+        '200': {}
+        '404':
+          description: |-
+            The specified resource cannot be found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+        '400':
+          description: |-
+            The specified input is not valid, or fails to satisfy the constraints for the request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+  /targetResourceTypes:
+    get:
+      operationId: ListTargetResourceTypes
+      description: |-
+        Lists the target resource types.
+      parameters:
+      - name: maxResults
+        in: query
+        required: false
+        schema:
+          $ref: '#/components/schemas/ListTargetResourceTypesMaxResults'
+      - name: nextToken
+        in: query
+        required: false
+        schema:
+          $ref: '#/components/schemas/NextToken'
+      responses:
+        '200': {}
+        '400':
+          description: |-
+            The specified input is not valid, or fails to satisfy the constraints for the request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+  /safetyLevers/{id}/state:
+    patch:
+      operationId: UpdateSafetyLeverState
+      description: |-
+        Updates the specified safety lever state.
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/SafetyLeverId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                state:
+                  $ref: '#/components/schemas/UpdateSafetyLeverStateInput'
+      responses:
+        '200': {}
+        '409':
+          description: |-
+            The request could not be processed because of a conflict.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConflictException'
+        '404':
+          description: |-
+            The specified resource cannot be found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+        '400':
+          description: |-
+            The specified input is not valid, or fails to satisfy the constraints for the request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
 components:
   schemas:
     AccountTargeting:
@@ -51,6 +914,35 @@ components:
       enum:
       - single-account
       - multi-account
+    Action:
+      type: object
+      properties:
+        id:
+          allOf:
+          - $ref: '#/components/schemas/ActionId'
+          description: The ID of the action.
+        arn:
+          allOf:
+          - $ref: '#/components/schemas/ResourceArn'
+          description: The Amazon Resource Name (ARN) of the action.
+        description:
+          allOf:
+          - $ref: '#/components/schemas/ActionDescription'
+          description: The description for the action.
+        parameters:
+          allOf:
+          - $ref: '#/components/schemas/ActionParameterMap'
+          description: The action parameters, if applicable.
+        targets:
+          allOf:
+          - $ref: '#/components/schemas/ActionTargetMap'
+          description: The supported targets for the action.
+        tags:
+          allOf:
+          - $ref: '#/components/schemas/TagMap'
+          description: The tags for the action.
+      description: Describes an action. For more information, see [FIS actions](https://docs.aws.amazon.com/fis/latest/userguide/fis-actions-reference.html)
+        in the _Fault Injection Service User Guide_.
     ActionDescription:
       type: string
       pattern: ^[\s\S]+$
@@ -61,6 +953,18 @@ components:
       pattern: ^[\S]+$
       minLength: 0
       maxLength: 128
+    ActionParameter:
+      type: object
+      properties:
+        description:
+          allOf:
+          - $ref: '#/components/schemas/ActionParameterDescription'
+          description: The parameter description.
+        required:
+          allOf:
+          - $ref: '#/components/schemas/ActionParameterRequired'
+          description: Indicates whether the parameter is required.
+      description: Describes a parameter for an action.
     ActionParameterDescription:
       type: string
       pattern: ^[\s\S]+$
@@ -78,10 +982,42 @@ components:
     ActionParameterRequired:
       type: boolean
       default: false
+    ActionSummary:
+      type: object
+      properties:
+        id:
+          allOf:
+          - $ref: '#/components/schemas/ActionId'
+          description: The ID of the action.
+        arn:
+          allOf:
+          - $ref: '#/components/schemas/ResourceArn'
+          description: The Amazon Resource Name (ARN) of the action.
+        description:
+          allOf:
+          - $ref: '#/components/schemas/ActionDescription'
+          description: The description for the action.
+        targets:
+          allOf:
+          - $ref: '#/components/schemas/ActionTargetMap'
+          description: The targets for the action.
+        tags:
+          allOf:
+          - $ref: '#/components/schemas/TagMap'
+          description: The tags for the action.
+      description: Provides a summary of an action.
     ActionSummaryList:
       type: array
       items:
         $ref: '#/components/schemas/ActionSummary'
+    ActionTarget:
+      type: object
+      properties:
+        resourceType:
+          allOf:
+          - $ref: '#/components/schemas/TargetResourceTypeId'
+          description: The resource type of the target.
+      description: Describes a target for an action.
     ActionTargetMap:
       type: object
       additionalProperties:
@@ -106,21 +1042,308 @@ components:
       pattern: ^[\S]+$
       minLength: 20
       maxLength: 2048
+    ConflictException:
+      type: object
+      properties:
+        message:
+          $ref: '#/components/schemas/ExceptionMessage'
+      description: The request could not be processed because of a conflict.
+    CreateExperimentTemplateActionInput:
+      type: object
+      properties:
+        actionId:
+          allOf:
+          - $ref: '#/components/schemas/ActionId'
+          description: 'The ID of the action. The format of the action ID is: aws:_service-name_
+            :_action-type_.'
+        description:
+          allOf:
+          - $ref: '#/components/schemas/ExperimentTemplateActionDescription'
+          description: A description for the action.
+        parameters:
+          allOf:
+          - $ref: '#/components/schemas/ExperimentTemplateActionParameterMap'
+          description: The parameters for the action, if applicable.
+        targets:
+          allOf:
+          - $ref: '#/components/schemas/ExperimentTemplateActionTargetMap'
+          description: The targets for the action.
+        startAfter:
+          allOf:
+          - $ref: '#/components/schemas/ExperimentTemplateActionStartAfterList'
+          description: The name of the action that must be completed before the current
+            action starts. Omit this parameter to run the action at the start of the
+            experiment.
+      required:
+      - actionId
+      description: 'Specifies an action for an experiment template.
+
+
+        For more information, see [Actions](https://docs.aws.amazon.com/fis/latest/userguide/actions.html)
+        in the _Fault Injection Service User Guide_.'
     CreateExperimentTemplateActionInputMap:
       type: object
       additionalProperties:
         $ref: '#/components/schemas/CreateExperimentTemplateActionInput'
+    CreateExperimentTemplateExperimentOptionsInput:
+      type: object
+      properties:
+        accountTargeting:
+          allOf:
+          - $ref: '#/components/schemas/AccountTargeting'
+          description: Specifies the account targeting setting for experiment options.
+        emptyTargetResolutionMode:
+          allOf:
+          - $ref: '#/components/schemas/EmptyTargetResolutionMode'
+          description: Specifies the empty target resolution mode for experiment options.
+      description: Specifies experiment options for an experiment template.
+    CreateExperimentTemplateLogConfigurationInput:
+      type: object
+      properties:
+        cloudWatchLogsConfiguration:
+          allOf:
+          - $ref: '#/components/schemas/ExperimentTemplateCloudWatchLogsLogConfigurationInput'
+          description: The configuration for experiment logging to Amazon CloudWatch
+            Logs.
+        s3Configuration:
+          allOf:
+          - $ref: '#/components/schemas/ExperimentTemplateS3LogConfigurationInput'
+          description: The configuration for experiment logging to Amazon S3.
+        logSchemaVersion:
+          allOf:
+          - $ref: '#/components/schemas/LogSchemaVersion'
+          description: The schema version.
+      required:
+      - logSchemaVersion
+      description: Specifies the configuration for experiment logging.
+    CreateExperimentTemplateReportConfigurationInput:
+      type: object
+      properties:
+        outputs:
+          allOf:
+          - $ref: '#/components/schemas/ExperimentTemplateReportConfigurationOutputsInput'
+          description: The output destinations of the experiment report.
+        dataSources:
+          allOf:
+          - $ref: '#/components/schemas/ExperimentTemplateReportConfigurationDataSourcesInput'
+          description: The data sources for the experiment report.
+        preExperimentDuration:
+          allOf:
+          - $ref: '#/components/schemas/ReportConfigurationDuration'
+          description: The duration before the experiment start time for the data
+            sources to include in the report.
+        postExperimentDuration:
+          allOf:
+          - $ref: '#/components/schemas/ReportConfigurationDuration'
+          description: The duration after the experiment end time for the data sources
+            to include in the report.
+      description: Specifies the configuration for experiment reports.
+    CreateExperimentTemplateRequest:
+      type: object
+      properties:
+        clientToken:
+          allOf:
+          - $ref: '#/components/schemas/ClientToken'
+          description: Unique, case-sensitive identifier that you provide to ensure
+            the idempotency of the request.
+        description:
+          allOf:
+          - $ref: '#/components/schemas/ExperimentTemplateDescription'
+          description: A description for the experiment template.
+        stopConditions:
+          allOf:
+          - $ref: '#/components/schemas/CreateExperimentTemplateStopConditionInputList'
+          description: The stop conditions.
+        targets:
+          allOf:
+          - $ref: '#/components/schemas/CreateExperimentTemplateTargetInputMap'
+          description: The targets for the experiment.
+        actions:
+          allOf:
+          - $ref: '#/components/schemas/CreateExperimentTemplateActionInputMap'
+          description: The actions for the experiment.
+        roleArn:
+          allOf:
+          - $ref: '#/components/schemas/RoleArn'
+          description: The Amazon Resource Name (ARN) of an IAM role that grants the
+            FIS service permission to perform service actions on your behalf.
+        tags:
+          allOf:
+          - $ref: '#/components/schemas/TagMap'
+          description: The tags to apply to the experiment template.
+        logConfiguration:
+          allOf:
+          - $ref: '#/components/schemas/CreateExperimentTemplateLogConfigurationInput'
+          description: The configuration for experiment logging.
+        experimentOptions:
+          allOf:
+          - $ref: '#/components/schemas/CreateExperimentTemplateExperimentOptionsInput'
+          description: The experiment options for the experiment template.
+        experimentReportConfiguration:
+          allOf:
+          - $ref: '#/components/schemas/CreateExperimentTemplateReportConfigurationInput'
+          description: The experiment report configuration for the experiment template.
+      required:
+      - clientToken
+      - description
+      - stopConditions
+      - actions
+      - roleArn
+    CreateExperimentTemplateResponse:
+      type: object
+      properties:
+        experimentTemplate:
+          allOf:
+          - $ref: '#/components/schemas/ExperimentTemplate'
+          description: Information about the experiment template.
+    CreateExperimentTemplateStopConditionInput:
+      type: object
+      properties:
+        source:
+          allOf:
+          - $ref: '#/components/schemas/StopConditionSource'
+          description: The source for the stop condition. Specify `aws:cloudwatch:alarm`
+            if the stop condition is defined by a CloudWatch alarm. Specify `none`
+            if there is no stop condition.
+        value:
+          allOf:
+          - $ref: '#/components/schemas/StopConditionValue'
+          description: The Amazon Resource Name (ARN) of the CloudWatch alarm. This
+            is required if the source is a CloudWatch alarm.
+      required:
+      - source
+      description: Specifies a stop condition for an experiment template.
     CreateExperimentTemplateStopConditionInputList:
       type: array
       items:
         $ref: '#/components/schemas/CreateExperimentTemplateStopConditionInput'
+    CreateExperimentTemplateTargetInput:
+      type: object
+      properties:
+        resourceType:
+          allOf:
+          - $ref: '#/components/schemas/TargetResourceTypeId'
+          description: The resource type. The resource type must be supported for
+            the specified action.
+        resourceArns:
+          allOf:
+          - $ref: '#/components/schemas/ResourceArnList'
+          description: The Amazon Resource Names (ARNs) of the resources.
+        resourceTags:
+          allOf:
+          - $ref: '#/components/schemas/TagMap'
+          description: The tags for the target resources.
+        filters:
+          allOf:
+          - $ref: '#/components/schemas/ExperimentTemplateTargetFilterInputList'
+          description: The filters to apply to identify target resources using specific
+            attributes.
+        selectionMode:
+          allOf:
+          - $ref: '#/components/schemas/ExperimentTemplateTargetSelectionMode'
+          description: "Scopes the identified resources to a specific count of the\
+            \ resources at random, or a percentage of the resources. All identified\
+            \ resources are included in the target.\n\n  * ALL - Run the action on\
+            \ all identified targets. This is the default.\n\n  * COUNT(n) - Run the\
+            \ action on the specified number of targets, chosen from the identified\
+            \ targets at random. For example, COUNT(1) selects one of the targets.\n\
+            \n  * PERCENT(n) - Run the action on the specified percentage of targets,\
+            \ chosen from the identified targets at random. For example, PERCENT(25)\
+            \ selects 25% of the targets."
+        parameters:
+          allOf:
+          - $ref: '#/components/schemas/ExperimentTemplateTargetParameterMap'
+          description: The resource type parameters.
+      required:
+      - resourceType
+      - selectionMode
+      description: 'Specifies a target for an experiment. You must specify at least
+        one Amazon Resource Name (ARN) or at least one resource tag. You cannot specify
+        both ARNs and tags.
+
+
+        For more information, see [Targets](https://docs.aws.amazon.com/fis/latest/userguide/targets.html)
+        in the _Fault Injection Service User Guide_.'
     CreateExperimentTemplateTargetInputMap:
       type: object
       additionalProperties:
         $ref: '#/components/schemas/CreateExperimentTemplateTargetInput'
+    CreateTargetAccountConfigurationRequest:
+      type: object
+      properties:
+        clientToken:
+          allOf:
+          - $ref: '#/components/schemas/ClientToken'
+          description: Unique, case-sensitive identifier that you provide to ensure
+            the idempotency of the request.
+        experimentTemplateId:
+          allOf:
+          - $ref: '#/components/schemas/ExperimentTemplateId'
+          description: The experiment template ID.
+        accountId:
+          allOf:
+          - $ref: '#/components/schemas/TargetAccountId'
+          description: The Amazon Web Services account ID of the target account.
+        roleArn:
+          allOf:
+          - $ref: '#/components/schemas/RoleArn'
+          description: The Amazon Resource Name (ARN) of an IAM role for the target
+            account.
+        description:
+          allOf:
+          - $ref: '#/components/schemas/TargetAccountConfigurationDescription'
+          description: The description of the target account.
+      required:
+      - experimentTemplateId
+      - accountId
+      - roleArn
+    CreateTargetAccountConfigurationResponse:
+      type: object
+      properties:
+        targetAccountConfiguration:
+          allOf:
+          - $ref: '#/components/schemas/TargetAccountConfiguration'
+          description: Information about the target account configuration.
     CreationTime:
       type: string
       format: date-time
+    DeleteExperimentTemplateRequest:
+      type: object
+      properties:
+        id:
+          allOf:
+          - $ref: '#/components/schemas/ExperimentTemplateId'
+          description: The ID of the experiment template.
+      required:
+      - id
+    DeleteExperimentTemplateResponse:
+      type: object
+      properties:
+        experimentTemplate:
+          allOf:
+          - $ref: '#/components/schemas/ExperimentTemplate'
+          description: Information about the experiment template.
+    DeleteTargetAccountConfigurationRequest:
+      type: object
+      properties:
+        experimentTemplateId:
+          allOf:
+          - $ref: '#/components/schemas/ExperimentTemplateId'
+          description: The ID of the experiment template.
+        accountId:
+          allOf:
+          - $ref: '#/components/schemas/TargetAccountId'
+          description: The Amazon Web Services account ID of the target account.
+      required:
+      - experimentTemplateId
+      - accountId
+    DeleteTargetAccountConfigurationResponse:
+      type: object
+      properties:
+        targetAccountConfiguration:
+          allOf:
+          - $ref: '#/components/schemas/TargetAccountConfiguration'
+          description: Information about the target account configuration.
     EmptyTargetResolutionMode:
       type: string
       enum:
@@ -131,6 +1354,116 @@ components:
       pattern: ^[\s\S]+$
       minLength: 0
       maxLength: 1024
+    Experiment:
+      type: object
+      properties:
+        id:
+          allOf:
+          - $ref: '#/components/schemas/ExperimentId'
+          description: The ID of the experiment.
+        arn:
+          allOf:
+          - $ref: '#/components/schemas/ResourceArn'
+          description: The Amazon Resource Name (ARN) of the experiment.
+        experimentTemplateId:
+          allOf:
+          - $ref: '#/components/schemas/ExperimentTemplateId'
+          description: The ID of the experiment template.
+        roleArn:
+          allOf:
+          - $ref: '#/components/schemas/RoleArn'
+          description: The Amazon Resource Name (ARN) of an IAM role that grants the
+            FIS service permission to perform service actions on your behalf.
+        state:
+          allOf:
+          - $ref: '#/components/schemas/ExperimentState'
+          description: The state of the experiment.
+        targets:
+          allOf:
+          - $ref: '#/components/schemas/ExperimentTargetMap'
+          description: The targets for the experiment.
+        actions:
+          allOf:
+          - $ref: '#/components/schemas/ExperimentActionMap'
+          description: The actions for the experiment.
+        stopConditions:
+          allOf:
+          - $ref: '#/components/schemas/ExperimentStopConditionList'
+          description: The stop conditions for the experiment.
+        creationTime:
+          allOf:
+          - $ref: '#/components/schemas/CreationTime'
+          description: The time that the experiment was created.
+        startTime:
+          allOf:
+          - $ref: '#/components/schemas/ExperimentStartTime'
+          description: The time that the experiment started.
+        endTime:
+          allOf:
+          - $ref: '#/components/schemas/ExperimentEndTime'
+          description: The time that the experiment ended.
+        tags:
+          allOf:
+          - $ref: '#/components/schemas/TagMap'
+          description: The tags for the experiment.
+        logConfiguration:
+          allOf:
+          - $ref: '#/components/schemas/ExperimentLogConfiguration'
+          description: The configuration for experiment logging.
+        experimentOptions:
+          allOf:
+          - $ref: '#/components/schemas/ExperimentOptions'
+          description: The experiment options for the experiment.
+        targetAccountConfigurationsCount:
+          allOf:
+          - $ref: '#/components/schemas/TargetAccountConfigurationsCount'
+          description: The count of target account configurations for the experiment.
+        experimentReportConfiguration:
+          allOf:
+          - $ref: '#/components/schemas/ExperimentReportConfiguration'
+          description: The experiment report configuration for the experiment.
+        experimentReport:
+          allOf:
+          - $ref: '#/components/schemas/ExperimentReport'
+          description: The experiment report for the experiment.
+      description: Describes an experiment.
+    ExperimentAction:
+      type: object
+      properties:
+        actionId:
+          allOf:
+          - $ref: '#/components/schemas/ActionId'
+          description: The ID of the action.
+        description:
+          allOf:
+          - $ref: '#/components/schemas/ExperimentActionDescription'
+          description: The description for the action.
+        parameters:
+          allOf:
+          - $ref: '#/components/schemas/ExperimentActionParameterMap'
+          description: The parameters for the action.
+        targets:
+          allOf:
+          - $ref: '#/components/schemas/ExperimentActionTargetMap'
+          description: The targets for the action.
+        startAfter:
+          allOf:
+          - $ref: '#/components/schemas/ExperimentActionStartAfterList'
+          description: The name of the action that must be completed before this action
+            starts.
+        state:
+          allOf:
+          - $ref: '#/components/schemas/ExperimentActionState'
+          description: The state of the action.
+        startTime:
+          allOf:
+          - $ref: '#/components/schemas/ExperimentActionStartTime'
+          description: The time that the action started.
+        endTime:
+          allOf:
+          - $ref: '#/components/schemas/ExperimentActionEndTime'
+          description: The time that the action ended.
+      description: Describes the action for an experiment.
     ExperimentActionDescription:
       type: string
       pattern: ^[\s\S]+$
@@ -174,6 +1507,18 @@ components:
     ExperimentActionStartTime:
       type: string
       format: date-time
+    ExperimentActionState:
+      type: object
+      properties:
+        status:
+          allOf:
+          - $ref: '#/components/schemas/ExperimentActionStatus'
+          description: The state of the action.
+        reason:
+          allOf:
+          - $ref: '#/components/schemas/ExperimentActionStatusReason'
+          description: The reason for the state.
+      description: Describes the state of an action.
     ExperimentActionStatus:
       type: string
       enum:
@@ -200,9 +1545,36 @@ components:
       pattern: ^[\S]+$
       minLength: 0
       maxLength: 64
+    ExperimentCloudWatchLogsLogConfiguration:
+      type: object
+      properties:
+        logGroupArn:
+          allOf:
+          - $ref: '#/components/schemas/CloudWatchLogGroupArn'
+          description: The Amazon Resource Name (ARN) of the destination Amazon CloudWatch
+            Logs log group.
+      description: Describes the configuration for experiment logging to Amazon CloudWatch
+        Logs.
     ExperimentEndTime:
       type: string
       format: date-time
+    ExperimentError:
+      type: object
+      properties:
+        accountId:
+          allOf:
+          - $ref: '#/components/schemas/ExperimentErrorAccountId'
+          description: The Amazon Web Services Account ID where the experiment failure
+            occurred.
+        code:
+          allOf:
+          - $ref: '#/components/schemas/ExperimentErrorCode'
+          description: The error code for the failed experiment.
+        location:
+          allOf:
+          - $ref: '#/components/schemas/ExperimentErrorLocation'
+          description: Context for the section of the experiment template that failed.
+      description: Describes the error when an experiment has `failed`.
     ExperimentErrorAccountId:
       type: string
     ExperimentErrorCode:
@@ -217,10 +1589,129 @@ components:
       pattern: ^[\S]+$
       minLength: 0
       maxLength: 64
+    ExperimentLogConfiguration:
+      type: object
+      properties:
+        cloudWatchLogsConfiguration:
+          allOf:
+          - $ref: '#/components/schemas/ExperimentCloudWatchLogsLogConfiguration'
+          description: The configuration for experiment logging to Amazon CloudWatch
+            Logs.
+        s3Configuration:
+          allOf:
+          - $ref: '#/components/schemas/ExperimentS3LogConfiguration'
+          description: The configuration for experiment logging to Amazon S3.
+        logSchemaVersion:
+          allOf:
+          - $ref: '#/components/schemas/LogSchemaVersion'
+          description: The schema version.
+      description: Describes the configuration for experiment logging.
+    ExperimentOptions:
+      type: object
+      properties:
+        accountTargeting:
+          allOf:
+          - $ref: '#/components/schemas/AccountTargeting'
+          description: The account targeting setting for an experiment.
+        emptyTargetResolutionMode:
+          allOf:
+          - $ref: '#/components/schemas/EmptyTargetResolutionMode'
+          description: The empty target resolution mode for an experiment.
+        actionsMode:
+          allOf:
+          - $ref: '#/components/schemas/ActionsMode'
+          description: The actions mode of the experiment that is set from the StartExperiment
+            API command.
+      description: Describes the options for an experiment.
+    ExperimentReport:
+      type: object
+      properties:
+        state:
+          allOf:
+          - $ref: '#/components/schemas/ExperimentReportState'
+          description: The state of the experiment report.
+        s3Reports:
+          allOf:
+          - $ref: '#/components/schemas/ExperimentReportS3ReportList'
+          description: The S3 destination of the experiment report.
+      description: Describes the experiment report.
+    ExperimentReportConfiguration:
+      type: object
+      properties:
+        outputs:
+          allOf:
+          - $ref: '#/components/schemas/ExperimentReportConfigurationOutputs'
+          description: The output destinations of the experiment report.
+        dataSources:
+          allOf:
+          - $ref: '#/components/schemas/ExperimentReportConfigurationDataSources'
+          description: The data sources for the experiment report.
+        preExperimentDuration:
+          allOf:
+          - $ref: '#/components/schemas/ReportConfigurationDuration'
+          description: The duration before the experiment start time for the data
+            sources to include in the report.
+        postExperimentDuration:
+          allOf:
+          - $ref: '#/components/schemas/ReportConfigurationDuration'
+          description: The duration after the experiment end time for the data sources
+            to include in the report.
+      description: Describes the report configuration for the experiment. For more
+        information, see [Experiment report configurations for AWS FIS](https://docs.aws.amazon.com/fis/latest/userguide/experiment-report-configuration).
+    ExperimentReportConfigurationCloudWatchDashboard:
+      type: object
+      properties:
+        dashboardIdentifier:
+          allOf:
+          - $ref: '#/components/schemas/ReportConfigurationCloudWatchDashboardIdentifier'
+          description: The Amazon Resource Name (ARN) of the CloudWatch dashboard
+            to include in the experiment report.
+      description: Specifies the CloudWatch dashboard to include in the experiment
+        report. The dashboard widgets will be captured as snapshot graphs within the
+        report.
     ExperimentReportConfigurationCloudWatchDashboardList:
       type: array
       items:
         $ref: '#/components/schemas/ExperimentReportConfigurationCloudWatchDashboard'
+    ExperimentReportConfigurationDataSources:
+      type: object
+      properties:
+        cloudWatchDashboards:
+          allOf:
+          - $ref: '#/components/schemas/ExperimentReportConfigurationCloudWatchDashboardList'
+          description: The CloudWatch dashboards to include as data sources in the
+            experiment report.
+      description: Describes the data sources for the experiment report.
+    ExperimentReportConfigurationOutputs:
+      type: object
+      properties:
+        s3Configuration:
+          allOf:
+          - $ref: '#/components/schemas/ExperimentReportConfigurationOutputsS3Configuration'
+          description: The S3 destination for the experiment report.
+      description: Describes the output destinations of the experiment report.
+    ExperimentReportConfigurationOutputsS3Configuration:
+      type: object
+      properties:
+        bucketName:
+          allOf:
+          - $ref: '#/components/schemas/S3BucketName'
+          description: The name of the S3 bucket where the experiment report will
+            be stored.
+        prefix:
+          allOf:
+          - $ref: '#/components/schemas/ReportConfigurationS3OutputPrefix'
+          description: The prefix of the S3 bucket where the experiment report will
+            be stored.
+      description: Specifies the S3 destination for the experiment report.
+    ExperimentReportError:
+      type: object
+      properties:
+        code:
+          allOf:
+          - $ref: '#/components/schemas/ExperimentReportErrorCode'
+          description: The error code for the failed experiment report generation.
+      description: Describes the error when experiment report generation has failed.
     ExperimentReportErrorCode:
       type: string
       pattern: ^[\s\S]+$
@@ -231,6 +1722,18 @@ components:
       pattern: ^[\s\S]+$
       minLength: 0
       maxLength: 512
+    ExperimentReportS3Report:
+      type: object
+      properties:
+        arn:
+          allOf:
+          - $ref: '#/components/schemas/ExperimentReportS3ReportArn'
+          description: The Amazon Resource Name (ARN) of the generated report.
+        reportType:
+          allOf:
+          - $ref: '#/components/schemas/ExperimentReportS3ReportType'
+          description: The report type for the experiment report.
+      description: Describes the S3 destination for the report.
     ExperimentReportS3ReportArn:
       type: string
       pattern: ^[\s\S]+$
@@ -241,6 +1744,23 @@ components:
     ExperimentReportS3ReportType:
       type: string
       pattern: ^[\s\S]+$
+    ExperimentReportState:
+      type: object
+      properties:
+        status:
+          allOf:
+          - $ref: '#/components/schemas/ExperimentReportStatus'
+          description: The state of the experiment report generation.
+        reason:
+          allOf:
+          - $ref: '#/components/schemas/ExperimentReportReason'
+          description: The reason for the state of the experiment report generation.
+        error:
+          allOf:
+          - $ref: '#/components/schemas/ExperimentReportError'
+          description: The error information of the experiment when the experiment
+            report generation has failed.
+      description: Describes the state of the experiment report generation.
     ExperimentReportStatus:
       type: string
       enum:
@@ -249,9 +1769,38 @@ components:
       - completed
       - cancelled
       - failed
+    ExperimentS3LogConfiguration:
+      type: object
+      properties:
+        bucketName:
+          allOf:
+          - $ref: '#/components/schemas/S3BucketName'
+          description: The name of the destination bucket.
+        prefix:
+          allOf:
+          - $ref: '#/components/schemas/S3ObjectKey'
+          description: The bucket prefix.
+      description: Describes the configuration for experiment logging to Amazon S3.
     ExperimentStartTime:
       type: string
       format: date-time
+    ExperimentState:
+      type: object
+      properties:
+        status:
+          allOf:
+          - $ref: '#/components/schemas/ExperimentStatus'
+          description: The state of the experiment.
+        reason:
+          allOf:
+          - $ref: '#/components/schemas/ExperimentStatusReason'
+          description: The reason for the state.
+        error:
+          allOf:
+          - $ref: '#/components/schemas/ExperimentError'
+          description: The error information of the experiment when the action has
+            `failed`.
+      description: Describes the state of an experiment.
     ExperimentStatus:
       type: string
       enum:
@@ -268,18 +1817,138 @@ components:
       pattern: ^[\s\S]+$
       minLength: 0
       maxLength: 512
+    ExperimentStopCondition:
+      type: object
+      properties:
+        source:
+          allOf:
+          - $ref: '#/components/schemas/StopConditionSource'
+          description: The source for the stop condition.
+        value:
+          allOf:
+          - $ref: '#/components/schemas/StopConditionValue'
+          description: The Amazon Resource Name (ARN) of the CloudWatch alarm, if
+            applicable.
+      description: Describes the stop condition for an experiment.
     ExperimentStopConditionList:
       type: array
       items:
         $ref: '#/components/schemas/ExperimentStopCondition'
+    ExperimentSummary:
+      type: object
+      properties:
+        id:
+          allOf:
+          - $ref: '#/components/schemas/ExperimentId'
+          description: The ID of the experiment.
+        arn:
+          allOf:
+          - $ref: '#/components/schemas/ResourceArn'
+          description: The Amazon Resource Name (ARN) of the experiment.
+        experimentTemplateId:
+          allOf:
+          - $ref: '#/components/schemas/ExperimentTemplateId'
+          description: The ID of the experiment template.
+        state:
+          allOf:
+          - $ref: '#/components/schemas/ExperimentState'
+          description: The state of the experiment.
+        creationTime:
+          allOf:
+          - $ref: '#/components/schemas/CreationTime'
+          description: The time that the experiment was created.
+        tags:
+          allOf:
+          - $ref: '#/components/schemas/TagMap'
+          description: The tags for the experiment.
+        experimentOptions:
+          allOf:
+          - $ref: '#/components/schemas/ExperimentOptions'
+          description: The experiment options for the experiment.
+      description: Provides a summary of an experiment.
     ExperimentSummaryList:
       type: array
       items:
         $ref: '#/components/schemas/ExperimentSummary'
+    ExperimentTarget:
+      type: object
+      properties:
+        resourceType:
+          allOf:
+          - $ref: '#/components/schemas/TargetResourceTypeId'
+          description: The resource type.
+        resourceArns:
+          allOf:
+          - $ref: '#/components/schemas/ResourceArnList'
+          description: The Amazon Resource Names (ARNs) of the resources.
+        resourceTags:
+          allOf:
+          - $ref: '#/components/schemas/TagMap'
+          description: The tags for the target resources.
+        filters:
+          allOf:
+          - $ref: '#/components/schemas/ExperimentTargetFilterList'
+          description: The filters to apply to identify target resources using specific
+            attributes.
+        selectionMode:
+          allOf:
+          - $ref: '#/components/schemas/ExperimentTargetSelectionMode'
+          description: Scopes the identified resources to a specific count or percentage.
+        parameters:
+          allOf:
+          - $ref: '#/components/schemas/ExperimentTargetParameterMap'
+          description: The resource type parameters.
+      description: Describes a target for an experiment.
+    ExperimentTargetAccountConfiguration:
+      type: object
+      properties:
+        roleArn:
+          allOf:
+          - $ref: '#/components/schemas/RoleArn'
+          description: The Amazon Resource Name (ARN) of an IAM role for the target
+            account.
+        accountId:
+          allOf:
+          - $ref: '#/components/schemas/TargetAccountId'
+          description: The Amazon Web Services account ID of the target account.
+        description:
+          allOf:
+          - $ref: '#/components/schemas/TargetAccountConfigurationDescription'
+          description: The description of the target account.
+      description: Describes a target account configuration for an experiment.
     ExperimentTargetAccountConfigurationList:
       type: array
       items:
         $ref: '#/components/schemas/ExperimentTargetAccountConfigurationSummary'
+    ExperimentTargetAccountConfigurationSummary:
+      type: object
+      properties:
+        roleArn:
+          allOf:
+          - $ref: '#/components/schemas/RoleArn'
+          description: The Amazon Resource Name (ARN) of an IAM role for the target
+            account.
+        accountId:
+          allOf:
+          - $ref: '#/components/schemas/TargetAccountId'
+          description: The Amazon Web Services account ID of the target account.
+        description:
+          allOf:
+          - $ref: '#/components/schemas/TargetAccountConfigurationDescription'
+          description: The description of the target account.
+      description: Provides a summary of a target account configuration.
+    ExperimentTargetFilter:
+      type: object
+      properties:
+        path:
+          allOf:
+          - $ref: '#/components/schemas/ExperimentTargetFilterPath'
+          description: The attribute path for the filter.
+        values:
+          allOf:
+          - $ref: '#/components/schemas/ExperimentTargetFilterValues'
+          description: The attribute values for the filter.
+      description: Describes a filter used for the target resources in an experiment.
     ExperimentTargetFilterList:
       type: array
       items:
@@ -325,6 +1994,92 @@ components:
       pattern: ^[\S]+$
       minLength: 0
       maxLength: 64
+    ExperimentTemplate:
+      type: object
+      properties:
+        id:
+          allOf:
+          - $ref: '#/components/schemas/ExperimentTemplateId'
+          description: The ID of the experiment template.
+        arn:
+          allOf:
+          - $ref: '#/components/schemas/ResourceArn'
+          description: The Amazon Resource Name (ARN) of the experiment template.
+        description:
+          allOf:
+          - $ref: '#/components/schemas/ExperimentTemplateDescription'
+          description: The description for the experiment template.
+        targets:
+          allOf:
+          - $ref: '#/components/schemas/ExperimentTemplateTargetMap'
+          description: The targets for the experiment.
+        actions:
+          allOf:
+          - $ref: '#/components/schemas/ExperimentTemplateActionMap'
+          description: The actions for the experiment.
+        stopConditions:
+          allOf:
+          - $ref: '#/components/schemas/ExperimentTemplateStopConditionList'
+          description: The stop conditions for the experiment.
+        creationTime:
+          allOf:
+          - $ref: '#/components/schemas/CreationTime'
+          description: The time the experiment template was created.
+        lastUpdateTime:
+          allOf:
+          - $ref: '#/components/schemas/LastUpdateTime'
+          description: The time the experiment template was last updated.
+        roleArn:
+          allOf:
+          - $ref: '#/components/schemas/RoleArn'
+          description: The Amazon Resource Name (ARN) of an IAM role.
+        tags:
+          allOf:
+          - $ref: '#/components/schemas/TagMap'
+          description: The tags for the experiment template.
+        logConfiguration:
+          allOf:
+          - $ref: '#/components/schemas/ExperimentTemplateLogConfiguration'
+          description: The configuration for experiment logging.
+        experimentOptions:
+          allOf:
+          - $ref: '#/components/schemas/ExperimentTemplateExperimentOptions'
+          description: The experiment options for an experiment template.
+        targetAccountConfigurationsCount:
+          allOf:
+          - $ref: '#/components/schemas/TargetAccountConfigurationsCount'
+          description: The count of target account configurations for the experiment
+            template.
+        experimentReportConfiguration:
+          allOf:
+          - $ref: '#/components/schemas/ExperimentTemplateReportConfiguration'
+          description: Describes the report configuration for the experiment template.
+      description: Describes an experiment template.
+    ExperimentTemplateAction:
+      type: object
+      properties:
+        actionId:
+          allOf:
+          - $ref: '#/components/schemas/ActionId'
+          description: The ID of the action.
+        description:
+          allOf:
+          - $ref: '#/components/schemas/ExperimentTemplateActionDescription'
+          description: A description for the action.
+        parameters:
+          allOf:
+          - $ref: '#/components/schemas/ExperimentTemplateActionParameterMap'
+          description: The parameters for the action.
+        targets:
+          allOf:
+          - $ref: '#/components/schemas/ExperimentTemplateActionTargetMap'
+          description: The targets for the action.
+        startAfter:
+          allOf:
+          - $ref: '#/components/schemas/ExperimentTemplateActionStartAfterList'
+          description: The name of the action that must be completed before the current
+            action starts.
+      description: Describes an action for an experiment template.
     ExperimentTemplateActionDescription:
       type: string
       pattern: ^[\s\S]+$
@@ -371,28 +2126,255 @@ components:
       pattern: ^[\S]+$
       minLength: 0
       maxLength: 64
+    ExperimentTemplateCloudWatchLogsLogConfiguration:
+      type: object
+      properties:
+        logGroupArn:
+          allOf:
+          - $ref: '#/components/schemas/CloudWatchLogGroupArn'
+          description: The Amazon Resource Name (ARN) of the destination Amazon CloudWatch
+            Logs log group.
+      description: Describes the configuration for experiment logging to Amazon CloudWatch
+        Logs.
+    ExperimentTemplateCloudWatchLogsLogConfigurationInput:
+      type: object
+      properties:
+        logGroupArn:
+          allOf:
+          - $ref: '#/components/schemas/CloudWatchLogGroupArn'
+          description: The Amazon Resource Name (ARN) of the destination Amazon CloudWatch
+            Logs log group.
+      required:
+      - logGroupArn
+      description: Specifies the configuration for experiment logging to Amazon CloudWatch
+        Logs.
     ExperimentTemplateDescription:
       type: string
       pattern: ^[\s\S]+$
       minLength: 0
       maxLength: 512
+    ExperimentTemplateExperimentOptions:
+      type: object
+      properties:
+        accountTargeting:
+          allOf:
+          - $ref: '#/components/schemas/AccountTargeting'
+          description: The account targeting setting for an experiment template.
+        emptyTargetResolutionMode:
+          allOf:
+          - $ref: '#/components/schemas/EmptyTargetResolutionMode'
+          description: The empty target resolution mode for an experiment template.
+      description: Describes the experiment options for an experiment template.
     ExperimentTemplateId:
       type: string
       pattern: ^[\S]+$
       minLength: 0
       maxLength: 64
+    ExperimentTemplateLogConfiguration:
+      type: object
+      properties:
+        cloudWatchLogsConfiguration:
+          allOf:
+          - $ref: '#/components/schemas/ExperimentTemplateCloudWatchLogsLogConfiguration'
+          description: The configuration for experiment logging to Amazon CloudWatch
+            Logs.
+        s3Configuration:
+          allOf:
+          - $ref: '#/components/schemas/ExperimentTemplateS3LogConfiguration'
+          description: The configuration for experiment logging to Amazon S3.
+        logSchemaVersion:
+          allOf:
+          - $ref: '#/components/schemas/LogSchemaVersion'
+          description: The schema version.
+      description: Describes the configuration for experiment logging.
+    ExperimentTemplateReportConfiguration:
+      type: object
+      properties:
+        outputs:
+          allOf:
+          - $ref: '#/components/schemas/ExperimentTemplateReportConfigurationOutputs'
+          description: Describes the output destinations of the experiment report.
+        dataSources:
+          allOf:
+          - $ref: '#/components/schemas/ExperimentTemplateReportConfigurationDataSources'
+          description: The data sources for the experiment report.
+        preExperimentDuration:
+          allOf:
+          - $ref: '#/components/schemas/ReportConfigurationDuration'
+          description: The duration before the experiment start time for the data
+            sources to include in the report.
+        postExperimentDuration:
+          allOf:
+          - $ref: '#/components/schemas/ReportConfigurationDuration'
+          description: The duration after the experiment end time for the data sources
+            to include in the report.
+      description: Describes the experiment report configuration. For more information,
+        see [Experiment report configurations for AWS FIS](https://docs.aws.amazon.com/fis/latest/userguide/experiment-report-configuration).
+    ExperimentTemplateReportConfigurationCloudWatchDashboard:
+      type: object
+      properties:
+        dashboardIdentifier:
+          allOf:
+          - $ref: '#/components/schemas/ReportConfigurationCloudWatchDashboardIdentifier'
+          description: The Amazon Resource Name (ARN) of the CloudWatch dashboard
+            to include in the experiment report.
+      description: The CloudWatch dashboards to include as data sources in the experiment
+        report.
     ExperimentTemplateReportConfigurationCloudWatchDashboardList:
       type: array
       items:
         $ref: '#/components/schemas/ExperimentTemplateReportConfigurationCloudWatchDashboard'
+    ExperimentTemplateReportConfigurationDataSources:
+      type: object
+      properties:
+        cloudWatchDashboards:
+          allOf:
+          - $ref: '#/components/schemas/ExperimentTemplateReportConfigurationCloudWatchDashboardList'
+          description: The CloudWatch dashboards to include as data sources in the
+            experiment report.
+      description: Describes the data sources for the experiment report.
+    ExperimentTemplateReportConfigurationDataSourcesInput:
+      type: object
+      properties:
+        cloudWatchDashboards:
+          allOf:
+          - $ref: '#/components/schemas/ReportConfigurationCloudWatchDashboardInputList'
+          description: The CloudWatch dashboards to include as data sources in the
+            experiment report.
+      description: Specifies the data sources for the experiment report.
+    ExperimentTemplateReportConfigurationOutputs:
+      type: object
+      properties:
+        s3Configuration:
+          allOf:
+          - $ref: '#/components/schemas/ReportConfigurationS3Output'
+          description: The S3 destination for the experiment report.
+      description: The output destinations of the experiment report.
+    ExperimentTemplateReportConfigurationOutputsInput:
+      type: object
+      properties:
+        s3Configuration:
+          allOf:
+          - $ref: '#/components/schemas/ReportConfigurationS3OutputInput'
+          description: The S3 destination for the experiment report.
+      description: Specifies the outputs for the experiment templates.
+    ExperimentTemplateS3LogConfiguration:
+      type: object
+      properties:
+        bucketName:
+          allOf:
+          - $ref: '#/components/schemas/S3BucketName'
+          description: The name of the destination bucket.
+        prefix:
+          allOf:
+          - $ref: '#/components/schemas/S3ObjectKey'
+          description: The bucket prefix.
+      description: Describes the configuration for experiment logging to Amazon S3.
+    ExperimentTemplateS3LogConfigurationInput:
+      type: object
+      properties:
+        bucketName:
+          allOf:
+          - $ref: '#/components/schemas/S3BucketName'
+          description: The name of the destination bucket.
+        prefix:
+          allOf:
+          - $ref: '#/components/schemas/S3ObjectKey'
+          description: The bucket prefix.
+      required:
+      - bucketName
+      description: Specifies the configuration for experiment logging to Amazon S3.
+    ExperimentTemplateStopCondition:
+      type: object
+      properties:
+        source:
+          allOf:
+          - $ref: '#/components/schemas/StopConditionSource'
+          description: The source for the stop condition.
+        value:
+          allOf:
+          - $ref: '#/components/schemas/StopConditionValue'
+          description: The Amazon Resource Name (ARN) of the CloudWatch alarm, if
+            applicable.
+      description: Describes a stop condition for an experiment template.
     ExperimentTemplateStopConditionList:
       type: array
       items:
         $ref: '#/components/schemas/ExperimentTemplateStopCondition'
+    ExperimentTemplateSummary:
+      type: object
+      properties:
+        id:
+          allOf:
+          - $ref: '#/components/schemas/ExperimentTemplateId'
+          description: The ID of the experiment template.
+        arn:
+          allOf:
+          - $ref: '#/components/schemas/ResourceArn'
+          description: The Amazon Resource Name (ARN) of the experiment template.
+        description:
+          allOf:
+          - $ref: '#/components/schemas/ExperimentTemplateDescription'
+          description: The description of the experiment template.
+        creationTime:
+          allOf:
+          - $ref: '#/components/schemas/CreationTime'
+          description: The time that the experiment template was created.
+        lastUpdateTime:
+          allOf:
+          - $ref: '#/components/schemas/LastUpdateTime'
+          description: The time that the experiment template was last updated.
+        tags:
+          allOf:
+          - $ref: '#/components/schemas/TagMap'
+          description: The tags for the experiment template.
+      description: Provides a summary of an experiment template.
     ExperimentTemplateSummaryList:
       type: array
       items:
         $ref: '#/components/schemas/ExperimentTemplateSummary'
+    ExperimentTemplateTarget:
+      type: object
+      properties:
+        resourceType:
+          allOf:
+          - $ref: '#/components/schemas/TargetResourceTypeId'
+          description: The resource type.
+        resourceArns:
+          allOf:
+          - $ref: '#/components/schemas/ResourceArnList'
+          description: The Amazon Resource Names (ARNs) of the targets.
+        resourceTags:
+          allOf:
+          - $ref: '#/components/schemas/TagMap'
+          description: The tags for the target resources.
+        filters:
+          allOf:
+          - $ref: '#/components/schemas/ExperimentTemplateTargetFilterList'
+          description: The filters to apply to identify target resources using specific
+            attributes.
+        selectionMode:
+          allOf:
+          - $ref: '#/components/schemas/ExperimentTemplateTargetSelectionMode'
+          description: Scopes the identified resources to a specific count or percentage.
+        parameters:
+          allOf:
+          - $ref: '#/components/schemas/ExperimentTemplateTargetParameterMap'
+          description: The resource type parameters.
+      description: Describes a target for an experiment template.
+    ExperimentTemplateTargetFilter:
+      type: object
+      properties:
+        path:
+          allOf:
+          - $ref: '#/components/schemas/ExperimentTemplateTargetFilterPath'
+          description: The attribute path for the filter.
+        values:
+          allOf:
+          - $ref: '#/components/schemas/ExperimentTemplateTargetFilterValues'
+          description: The attribute values for the filter.
+      description: Describes a filter used for the target resources in an experiment
+        template.
     ExperimentTemplateTargetFilterInputList:
       type: array
       items:
@@ -415,6 +2397,26 @@ components:
       type: array
       items:
         $ref: '#/components/schemas/ExperimentTemplateTargetFilterValue'
+    ExperimentTemplateTargetInputFilter:
+      type: object
+      properties:
+        path:
+          allOf:
+          - $ref: '#/components/schemas/ExperimentTemplateTargetFilterPath'
+          description: The attribute path for the filter.
+        values:
+          allOf:
+          - $ref: '#/components/schemas/ExperimentTemplateTargetFilterValues'
+          description: The attribute values for the filter.
+      required:
+      - path
+      - values
+      description: 'Specifies a filter used for the target resource input in an experiment
+        template.
+
+
+        For more information, see [Resource filters](https://docs.aws.amazon.com/fis/latest/userguide/targets.html#target-filters)
+        in the _Fault Injection Service User Guide_.'
     ExperimentTemplateTargetMap:
       type: object
       additionalProperties:
@@ -443,6 +2445,128 @@ components:
       pattern: ^[\S]+$
       minLength: 0
       maxLength: 64
+    GetActionRequest:
+      type: object
+      properties:
+        id:
+          allOf:
+          - $ref: '#/components/schemas/ActionId'
+          description: The ID of the action.
+      required:
+      - id
+    GetActionResponse:
+      type: object
+      properties:
+        action:
+          allOf:
+          - $ref: '#/components/schemas/Action'
+          description: Information about the action.
+    GetExperimentRequest:
+      type: object
+      properties:
+        id:
+          allOf:
+          - $ref: '#/components/schemas/ExperimentId'
+          description: The ID of the experiment.
+      required:
+      - id
+    GetExperimentResponse:
+      type: object
+      properties:
+        experiment:
+          allOf:
+          - $ref: '#/components/schemas/Experiment'
+          description: Information about the experiment.
+    GetExperimentTargetAccountConfigurationRequest:
+      type: object
+      properties:
+        experimentId:
+          allOf:
+          - $ref: '#/components/schemas/ExperimentId'
+          description: The ID of the experiment.
+        accountId:
+          allOf:
+          - $ref: '#/components/schemas/TargetAccountId'
+          description: The Amazon Web Services account ID of the target account.
+      required:
+      - experimentId
+      - accountId
+    GetExperimentTargetAccountConfigurationResponse:
+      type: object
+      properties:
+        targetAccountConfiguration:
+          allOf:
+          - $ref: '#/components/schemas/ExperimentTargetAccountConfiguration'
+          description: Information about the target account configuration.
+    GetExperimentTemplateRequest:
+      type: object
+      properties:
+        id:
+          allOf:
+          - $ref: '#/components/schemas/ExperimentTemplateId'
+          description: The ID of the experiment template.
+      required:
+      - id
+    GetExperimentTemplateResponse:
+      type: object
+      properties:
+        experimentTemplate:
+          allOf:
+          - $ref: '#/components/schemas/ExperimentTemplate'
+          description: Information about the experiment template.
+    GetSafetyLeverRequest:
+      type: object
+      properties:
+        id:
+          allOf:
+          - $ref: '#/components/schemas/SafetyLeverId'
+          description: The ID of the safety lever.
+      required:
+      - id
+    GetSafetyLeverResponse:
+      type: object
+      properties:
+        safetyLever:
+          allOf:
+          - $ref: '#/components/schemas/SafetyLever'
+          description: Information about the safety lever.
+    GetTargetAccountConfigurationRequest:
+      type: object
+      properties:
+        experimentTemplateId:
+          allOf:
+          - $ref: '#/components/schemas/ExperimentTemplateId'
+          description: The ID of the experiment template.
+        accountId:
+          allOf:
+          - $ref: '#/components/schemas/TargetAccountId'
+          description: The Amazon Web Services account ID of the target account.
+      required:
+      - experimentTemplateId
+      - accountId
+    GetTargetAccountConfigurationResponse:
+      type: object
+      properties:
+        targetAccountConfiguration:
+          allOf:
+          - $ref: '#/components/schemas/TargetAccountConfiguration'
+          description: Information about the target account configuration.
+    GetTargetResourceTypeRequest:
+      type: object
+      properties:
+        resourceType:
+          allOf:
+          - $ref: '#/components/schemas/TargetResourceTypeId'
+          description: The resource type.
+      required:
+      - resourceType
+    GetTargetResourceTypeResponse:
+      type: object
+      properties:
+        targetResourceType:
+          allOf:
+          - $ref: '#/components/schemas/TargetResourceType'
+          description: Information about the resource type.
     LastUpdateTime:
       type: string
       format: date-time
@@ -450,26 +2574,237 @@ components:
       type: integer
       minimum: 1
       maximum: 100
+    ListActionsRequest:
+      type: object
+      properties:
+        maxResults:
+          allOf:
+          - $ref: '#/components/schemas/ListActionsMaxResults'
+          description: The maximum number of results to return with a single call.
+            To retrieve the remaining results, make another call with the returned
+            `nextToken` value.
+        nextToken:
+          allOf:
+          - $ref: '#/components/schemas/NextToken'
+          description: The token for the next page of results.
+    ListActionsResponse:
+      type: object
+      properties:
+        actions:
+          allOf:
+          - $ref: '#/components/schemas/ActionSummaryList'
+          description: The actions.
+        nextToken:
+          allOf:
+          - $ref: '#/components/schemas/NextToken'
+          description: The token to use to retrieve the next page of results. This
+            value is `null` when there are no more results to return.
     ListExperimentResolvedTargetsMaxResults:
       type: integer
       minimum: 1
       maximum: 100
+    ListExperimentResolvedTargetsRequest:
+      type: object
+      properties:
+        experimentId:
+          allOf:
+          - $ref: '#/components/schemas/ExperimentId'
+          description: The ID of the experiment.
+        maxResults:
+          allOf:
+          - $ref: '#/components/schemas/ListExperimentResolvedTargetsMaxResults'
+          description: The maximum number of results to return with a single call.
+            To retrieve the remaining results, make another call with the returned
+            nextToken value.
+        nextToken:
+          allOf:
+          - $ref: '#/components/schemas/NextToken'
+          description: The token for the next page of results.
+        targetName:
+          allOf:
+          - $ref: '#/components/schemas/TargetName'
+          description: The name of the target.
+      required:
+      - experimentId
+    ListExperimentResolvedTargetsResponse:
+      type: object
+      properties:
+        resolvedTargets:
+          allOf:
+          - $ref: '#/components/schemas/ResolvedTargetList'
+          description: The resolved targets.
+        nextToken:
+          allOf:
+          - $ref: '#/components/schemas/NextToken'
+          description: The token to use to retrieve the next page of results. This
+            value is null when there are no more results to return.
+    ListExperimentTargetAccountConfigurationsRequest:
+      type: object
+      properties:
+        experimentId:
+          allOf:
+          - $ref: '#/components/schemas/ExperimentId'
+          description: The ID of the experiment.
+        nextToken:
+          allOf:
+          - $ref: '#/components/schemas/NextToken'
+          description: The token for the next page of results.
+      required:
+      - experimentId
+    ListExperimentTargetAccountConfigurationsResponse:
+      type: object
+      properties:
+        targetAccountConfigurations:
+          allOf:
+          - $ref: '#/components/schemas/ExperimentTargetAccountConfigurationList'
+          description: The target account configurations.
+        nextToken:
+          allOf:
+          - $ref: '#/components/schemas/NextToken'
+          description: The token to use to retrieve the next page of results. This
+            value is null when there are no more results to return.
     ListExperimentTemplatesMaxResults:
       type: integer
       minimum: 1
       maximum: 100
+    ListExperimentTemplatesRequest:
+      type: object
+      properties:
+        maxResults:
+          allOf:
+          - $ref: '#/components/schemas/ListExperimentTemplatesMaxResults'
+          description: The maximum number of results to return with a single call.
+            To retrieve the remaining results, make another call with the returned
+            `nextToken` value.
+        nextToken:
+          allOf:
+          - $ref: '#/components/schemas/NextToken'
+          description: The token for the next page of results.
+    ListExperimentTemplatesResponse:
+      type: object
+      properties:
+        experimentTemplates:
+          allOf:
+          - $ref: '#/components/schemas/ExperimentTemplateSummaryList'
+          description: The experiment templates.
+        nextToken:
+          allOf:
+          - $ref: '#/components/schemas/NextToken'
+          description: The token to use to retrieve the next page of results. This
+            value is `null` when there are no more results to return.
     ListExperimentsMaxResults:
       type: integer
       minimum: 1
       maximum: 100
+    ListExperimentsRequest:
+      type: object
+      properties:
+        maxResults:
+          allOf:
+          - $ref: '#/components/schemas/ListExperimentsMaxResults'
+          description: The maximum number of results to return with a single call.
+            To retrieve the remaining results, make another call with the returned
+            `nextToken` value.
+        nextToken:
+          allOf:
+          - $ref: '#/components/schemas/NextToken'
+          description: The token for the next page of results.
+        experimentTemplateId:
+          allOf:
+          - $ref: '#/components/schemas/ExperimentTemplateId'
+          description: The ID of the experiment template.
+    ListExperimentsResponse:
+      type: object
+      properties:
+        experiments:
+          allOf:
+          - $ref: '#/components/schemas/ExperimentSummaryList'
+          description: The experiments.
+        nextToken:
+          allOf:
+          - $ref: '#/components/schemas/NextToken'
+          description: The token to use to retrieve the next page of results. This
+            value is `null` when there are no more results to return.
+    ListTagsForResourceRequest:
+      type: object
+      properties:
+        resourceArn:
+          allOf:
+          - $ref: '#/components/schemas/ResourceArn'
+          description: The Amazon Resource Name (ARN) of the resource.
+      required:
+      - resourceArn
+    ListTagsForResourceResponse:
+      type: object
+      properties:
+        tags:
+          allOf:
+          - $ref: '#/components/schemas/TagMap'
+          description: The tags for the resource.
     ListTargetAccountConfigurationsMaxResults:
       type: integer
       minimum: 1
       maximum: 100
+    ListTargetAccountConfigurationsRequest:
+      type: object
+      properties:
+        experimentTemplateId:
+          allOf:
+          - $ref: '#/components/schemas/ExperimentTemplateId'
+          description: The ID of the experiment template.
+        maxResults:
+          allOf:
+          - $ref: '#/components/schemas/ListTargetAccountConfigurationsMaxResults'
+          description: The maximum number of results to return with a single call.
+            To retrieve the remaining results, make another call with the returned
+            nextToken value.
+        nextToken:
+          allOf:
+          - $ref: '#/components/schemas/NextToken'
+          description: The token for the next page of results.
+      required:
+      - experimentTemplateId
+    ListTargetAccountConfigurationsResponse:
+      type: object
+      properties:
+        targetAccountConfigurations:
+          allOf:
+          - $ref: '#/components/schemas/TargetAccountConfigurationList'
+          description: The target account configurations.
+        nextToken:
+          allOf:
+          - $ref: '#/components/schemas/NextToken'
+          description: The token to use to retrieve the next page of results. This
+            value is null when there are no more results to return.
     ListTargetResourceTypesMaxResults:
       type: integer
       minimum: 1
       maximum: 100
+    ListTargetResourceTypesRequest:
+      type: object
+      properties:
+        maxResults:
+          allOf:
+          - $ref: '#/components/schemas/ListTargetResourceTypesMaxResults'
+          description: The maximum number of results to return with a single call.
+            To retrieve the remaining results, make another call with the returned
+            `nextToken` value.
+        nextToken:
+          allOf:
+          - $ref: '#/components/schemas/NextToken'
+          description: The token for the next page of results.
+    ListTargetResourceTypesResponse:
+      type: object
+      properties:
+        targetResourceTypes:
+          allOf:
+          - $ref: '#/components/schemas/TargetResourceTypeSummaryList'
+          description: The target resource types.
+        nextToken:
+          allOf:
+          - $ref: '#/components/schemas/NextToken'
+          description: The token to use to retrieve the next page of results. This
+            value is `null` when there are no more results to return.
     LogSchemaVersion:
       type: integer
     NextToken:
@@ -482,6 +2817,15 @@ components:
       pattern: ^[\S]+$
       minLength: 0
       maxLength: 512
+    ReportConfigurationCloudWatchDashboardInput:
+      type: object
+      properties:
+        dashboardIdentifier:
+          allOf:
+          - $ref: '#/components/schemas/ReportConfigurationCloudWatchDashboardIdentifier'
+          description: The Amazon Resource Name (ARN) of the CloudWatch dashboard
+            to include in the experiment report.
+      description: Specifies the CloudWatch dashboard for the experiment report.
     ReportConfigurationCloudWatchDashboardInputList:
       type: array
       items:
@@ -491,11 +2835,55 @@ components:
       pattern: ^[\S]+$
       minLength: 0
       maxLength: 32
+    ReportConfigurationS3Output:
+      type: object
+      properties:
+        bucketName:
+          allOf:
+          - $ref: '#/components/schemas/S3BucketName'
+          description: The name of the S3 bucket where the experiment report will
+            be stored.
+        prefix:
+          allOf:
+          - $ref: '#/components/schemas/ReportConfigurationS3OutputPrefix'
+          description: The prefix of the S3 bucket where the experiment report will
+            be stored.
+      description: Describes the S3 destination for the experiment report.
+    ReportConfigurationS3OutputInput:
+      type: object
+      properties:
+        bucketName:
+          allOf:
+          - $ref: '#/components/schemas/S3BucketName'
+          description: The name of the S3 bucket where the experiment report will
+            be stored.
+        prefix:
+          allOf:
+          - $ref: '#/components/schemas/ReportConfigurationS3OutputPrefix'
+          description: The prefix of the S3 bucket where the experiment report will
+            be stored.
+      description: Specifies the S3 destination for the experiment report.
     ReportConfigurationS3OutputPrefix:
       type: string
       pattern: ^[\S]+$
       minLength: 0
       maxLength: 256
+    ResolvedTarget:
+      type: object
+      properties:
+        resourceType:
+          allOf:
+          - $ref: '#/components/schemas/TargetResourceTypeId'
+          description: The resource type of the target.
+        targetName:
+          allOf:
+          - $ref: '#/components/schemas/TargetName'
+          description: The name of the target.
+        targetInformation:
+          allOf:
+          - $ref: '#/components/schemas/TargetInformationMap'
+          description: Information about the target.
+      description: Describes a resolved target.
     ResolvedTargetList:
       type: array
       items:
@@ -509,6 +2897,12 @@ components:
       type: array
       items:
         $ref: '#/components/schemas/ResourceArn'
+    ResourceNotFoundException:
+      type: object
+      properties:
+        message:
+          $ref: '#/components/schemas/ExceptionMessage'
+      description: The specified resource cannot be found.
     RoleArn:
       type: string
       pattern: ^[\S]+$
@@ -524,11 +2918,39 @@ components:
       pattern: ^[\s\S]+$
       minLength: 1
       maxLength: 700
+    SafetyLever:
+      type: object
+      properties:
+        id:
+          allOf:
+          - $ref: '#/components/schemas/SafetyLeverId'
+          description: The ID of the safety lever.
+        arn:
+          allOf:
+          - $ref: '#/components/schemas/ResourceArn'
+          description: The Amazon Resource Name (ARN) of the safety lever.
+        state:
+          allOf:
+          - $ref: '#/components/schemas/SafetyLeverState'
+          description: The state of the safety lever.
+      description: Describes a safety lever.
     SafetyLeverId:
       type: string
       pattern: ^[\S]+$
       minLength: 0
       maxLength: 64
+    SafetyLeverState:
+      type: object
+      properties:
+        status:
+          allOf:
+          - $ref: '#/components/schemas/SafetyLeverStatus'
+          description: The state of the safety lever.
+        reason:
+          allOf:
+          - $ref: '#/components/schemas/SafetyLeverStatusReason'
+          description: The reason for the state of the safety lever.
+      description: Describes the state of the safety lever.
     SafetyLeverStatus:
       type: string
       enum:
@@ -542,6 +2964,50 @@ components:
       - engaged
     SafetyLeverStatusReason:
       type: string
+    ServiceQuotaExceededException:
+      type: object
+      properties:
+        message:
+          $ref: '#/components/schemas/ExceptionMessage'
+      description: You have exceeded your service quota.
+    StartExperimentExperimentOptionsInput:
+      type: object
+      properties:
+        actionsMode:
+          allOf:
+          - $ref: '#/components/schemas/ActionsMode'
+          description: Specifies the actions mode for experiment options.
+      description: Specifies experiment options for running an experiment.
+    StartExperimentRequest:
+      type: object
+      properties:
+        clientToken:
+          allOf:
+          - $ref: '#/components/schemas/ClientToken'
+          description: Unique, case-sensitive identifier that you provide to ensure
+            the idempotency of the request.
+        experimentTemplateId:
+          allOf:
+          - $ref: '#/components/schemas/ExperimentTemplateId'
+          description: The ID of the experiment template.
+        experimentOptions:
+          allOf:
+          - $ref: '#/components/schemas/StartExperimentExperimentOptionsInput'
+          description: The experiment options for running the experiment.
+        tags:
+          allOf:
+          - $ref: '#/components/schemas/TagMap'
+          description: The tags to apply to the experiment.
+      required:
+      - clientToken
+      - experimentTemplateId
+    StartExperimentResponse:
+      type: object
+      properties:
+        experiment:
+          allOf:
+          - $ref: '#/components/schemas/Experiment'
+          description: Information about the experiment.
     StopConditionSource:
       type: string
       pattern: ^[\S]+$
@@ -552,6 +3018,22 @@ components:
       pattern: ^[\s\S]+$
       minLength: 20
       maxLength: 2048
+    StopExperimentRequest:
+      type: object
+      properties:
+        id:
+          allOf:
+          - $ref: '#/components/schemas/ExperimentId'
+          description: The ID of the experiment.
+      required:
+      - id
+    StopExperimentResponse:
+      type: object
+      properties:
+        experiment:
+          allOf:
+          - $ref: '#/components/schemas/Experiment'
+          description: Information about the experiment.
     TagKey:
       type: string
       pattern: ^[\s\S]+$
@@ -565,11 +3047,45 @@ components:
       type: object
       additionalProperties:
         $ref: '#/components/schemas/TagValue'
+    TagResourceRequest:
+      type: object
+      properties:
+        resourceArn:
+          allOf:
+          - $ref: '#/components/schemas/ResourceArn'
+          description: The Amazon Resource Name (ARN) of the resource.
+        tags:
+          allOf:
+          - $ref: '#/components/schemas/TagMap'
+          description: The tags for the resource.
+      required:
+      - resourceArn
+      - tags
+    TagResourceResponse:
+      type: object
+      properties: {}
     TagValue:
       type: string
       pattern: ^[\s\S]*$
       minLength: 0
       maxLength: 256
+    TargetAccountConfiguration:
+      type: object
+      properties:
+        roleArn:
+          allOf:
+          - $ref: '#/components/schemas/RoleArn'
+          description: The Amazon Resource Name (ARN) of an IAM role for the target
+            account.
+        accountId:
+          allOf:
+          - $ref: '#/components/schemas/TargetAccountId'
+          description: The Amazon Web Services account ID of the target account.
+        description:
+          allOf:
+          - $ref: '#/components/schemas/TargetAccountConfigurationDescription'
+          description: The description of the target account.
+      description: Describes a target account configuration.
     TargetAccountConfigurationDescription:
       type: string
       pattern: ^[\s\S]*$
@@ -579,6 +3095,23 @@ components:
       type: array
       items:
         $ref: '#/components/schemas/TargetAccountConfigurationSummary'
+    TargetAccountConfigurationSummary:
+      type: object
+      properties:
+        roleArn:
+          allOf:
+          - $ref: '#/components/schemas/RoleArn'
+          description: The Amazon Resource Name (ARN) of an IAM role for the target
+            account.
+        accountId:
+          allOf:
+          - $ref: '#/components/schemas/TargetAccountId'
+          description: The Amazon Web Services account ID of the target account.
+        description:
+          allOf:
+          - $ref: '#/components/schemas/TargetAccountConfigurationDescription'
+          description: The description of the target account.
+      description: Provides a summary of a target account configuration.
     TargetAccountConfigurationsCount:
       type: integer
       format: int64
@@ -607,6 +3140,22 @@ components:
       pattern: ^[\S]+$
       minLength: 0
       maxLength: 64
+    TargetResourceType:
+      type: object
+      properties:
+        resourceType:
+          allOf:
+          - $ref: '#/components/schemas/TargetResourceTypeId'
+          description: The resource type.
+        description:
+          allOf:
+          - $ref: '#/components/schemas/TargetResourceTypeDescription'
+          description: A description of the resource type.
+        parameters:
+          allOf:
+          - $ref: '#/components/schemas/TargetResourceTypeParameterMap'
+          description: The parameters for the resource type.
+      description: Describes a resource type.
     TargetResourceTypeDescription:
       type: string
       pattern: ^[\s\S]+$
@@ -617,6 +3166,19 @@ components:
       pattern: ^[\S]+$
       minLength: 0
       maxLength: 128
+    TargetResourceTypeParameter:
+      type: object
+      properties:
+        description:
+          allOf:
+          - $ref: '#/components/schemas/TargetResourceTypeParameterDescription'
+          description: A description of the parameter.
+        required:
+          allOf:
+          - $ref: '#/components/schemas/TargetResourceTypeParameterRequired'
+          description: Indicates whether the parameter is required.
+      description: Describes the parameters for a resource type. Use parameters to
+        determine which tasks are identified during target resolution.
     TargetResourceTypeParameterDescription:
       type: string
       pattern: ^[\s\S]+$
@@ -634,19 +3196,294 @@ components:
     TargetResourceTypeParameterRequired:
       type: boolean
       default: false
+    TargetResourceTypeSummary:
+      type: object
+      properties:
+        resourceType:
+          allOf:
+          - $ref: '#/components/schemas/TargetResourceTypeId'
+          description: The resource type.
+        description:
+          allOf:
+          - $ref: '#/components/schemas/TargetResourceTypeDescription'
+          description: A description of the resource type.
+      description: Describes a resource type.
     TargetResourceTypeSummaryList:
       type: array
       items:
         $ref: '#/components/schemas/TargetResourceTypeSummary'
+    UntagResourceRequest:
+      type: object
+      properties:
+        resourceArn:
+          allOf:
+          - $ref: '#/components/schemas/ResourceArn'
+          description: The Amazon Resource Name (ARN) of the resource.
+        tagKeys:
+          allOf:
+          - $ref: '#/components/schemas/TagKeyList'
+          description: The tag keys to remove.
+      required:
+      - resourceArn
+    UntagResourceResponse:
+      type: object
+      properties: {}
+    UpdateExperimentTemplateActionInputItem:
+      type: object
+      properties:
+        actionId:
+          allOf:
+          - $ref: '#/components/schemas/ActionId'
+          description: The ID of the action.
+        description:
+          allOf:
+          - $ref: '#/components/schemas/ExperimentTemplateActionDescription'
+          description: A description for the action.
+        parameters:
+          allOf:
+          - $ref: '#/components/schemas/ExperimentTemplateActionParameterMap'
+          description: The parameters for the action, if applicable.
+        targets:
+          allOf:
+          - $ref: '#/components/schemas/ExperimentTemplateActionTargetMap'
+          description: The targets for the action.
+        startAfter:
+          allOf:
+          - $ref: '#/components/schemas/ExperimentTemplateActionStartAfterList'
+          description: The name of the action that must be completed before the current
+            action starts. Omit this parameter to run the action at the start of the
+            experiment.
+      description: Specifies an action for an experiment template.
     UpdateExperimentTemplateActionInputMap:
       type: object
       additionalProperties:
         $ref: '#/components/schemas/UpdateExperimentTemplateActionInputItem'
+    UpdateExperimentTemplateExperimentOptionsInput:
+      type: object
+      properties:
+        emptyTargetResolutionMode:
+          allOf:
+          - $ref: '#/components/schemas/EmptyTargetResolutionMode'
+          description: The empty target resolution mode of the experiment template.
+      description: Specifies an experiment option for an experiment template.
+    UpdateExperimentTemplateLogConfigurationInput:
+      type: object
+      properties:
+        cloudWatchLogsConfiguration:
+          allOf:
+          - $ref: '#/components/schemas/ExperimentTemplateCloudWatchLogsLogConfigurationInput'
+          description: The configuration for experiment logging to Amazon CloudWatch
+            Logs.
+        s3Configuration:
+          allOf:
+          - $ref: '#/components/schemas/ExperimentTemplateS3LogConfigurationInput'
+          description: The configuration for experiment logging to Amazon S3.
+        logSchemaVersion:
+          allOf:
+          - $ref: '#/components/schemas/LogSchemaVersion'
+          description: The schema version.
+      description: Specifies the configuration for experiment logging.
+    UpdateExperimentTemplateReportConfigurationInput:
+      type: object
+      properties:
+        outputs:
+          allOf:
+          - $ref: '#/components/schemas/ExperimentTemplateReportConfigurationOutputsInput'
+          description: Describes the output destinations of the experiment report.
+        dataSources:
+          allOf:
+          - $ref: '#/components/schemas/ExperimentTemplateReportConfigurationDataSourcesInput'
+          description: The data sources for the experiment report.
+        preExperimentDuration:
+          allOf:
+          - $ref: '#/components/schemas/ReportConfigurationDuration'
+          description: The duration before the experiment start time for the data
+            sources to include in the report.
+        postExperimentDuration:
+          allOf:
+          - $ref: '#/components/schemas/ReportConfigurationDuration'
+          description: The duration after the experiment end time for the data sources
+            to include in the report.
+      description: Specifies the input for the experiment report configuration.
+    UpdateExperimentTemplateRequest:
+      type: object
+      properties:
+        id:
+          allOf:
+          - $ref: '#/components/schemas/ExperimentTemplateId'
+          description: The ID of the experiment template.
+        description:
+          allOf:
+          - $ref: '#/components/schemas/ExperimentTemplateDescription'
+          description: A description for the template.
+        stopConditions:
+          allOf:
+          - $ref: '#/components/schemas/UpdateExperimentTemplateStopConditionInputList'
+          description: The stop conditions for the experiment.
+        targets:
+          allOf:
+          - $ref: '#/components/schemas/UpdateExperimentTemplateTargetInputMap'
+          description: The targets for the experiment.
+        actions:
+          allOf:
+          - $ref: '#/components/schemas/UpdateExperimentTemplateActionInputMap'
+          description: The actions for the experiment.
+        roleArn:
+          allOf:
+          - $ref: '#/components/schemas/RoleArn'
+          description: The Amazon Resource Name (ARN) of an IAM role that grants the
+            FIS service permission to perform service actions on your behalf.
+        logConfiguration:
+          allOf:
+          - $ref: '#/components/schemas/UpdateExperimentTemplateLogConfigurationInput'
+          description: The configuration for experiment logging.
+        experimentOptions:
+          allOf:
+          - $ref: '#/components/schemas/UpdateExperimentTemplateExperimentOptionsInput'
+          description: The experiment options for the experiment template.
+        experimentReportConfiguration:
+          allOf:
+          - $ref: '#/components/schemas/UpdateExperimentTemplateReportConfigurationInput'
+          description: The experiment report configuration for the experiment template.
+      required:
+      - id
+    UpdateExperimentTemplateResponse:
+      type: object
+      properties:
+        experimentTemplate:
+          allOf:
+          - $ref: '#/components/schemas/ExperimentTemplate'
+          description: Information about the experiment template.
+    UpdateExperimentTemplateStopConditionInput:
+      type: object
+      properties:
+        source:
+          allOf:
+          - $ref: '#/components/schemas/StopConditionSource'
+          description: The source for the stop condition. Specify `aws:cloudwatch:alarm`
+            if the stop condition is defined by a CloudWatch alarm. Specify `none`
+            if there is no stop condition.
+        value:
+          allOf:
+          - $ref: '#/components/schemas/StopConditionValue'
+          description: The Amazon Resource Name (ARN) of the CloudWatch alarm.
+      required:
+      - source
+      description: Specifies a stop condition for an experiment. You can define a
+        stop condition as a CloudWatch alarm.
     UpdateExperimentTemplateStopConditionInputList:
       type: array
       items:
         $ref: '#/components/schemas/UpdateExperimentTemplateStopConditionInput'
+    UpdateExperimentTemplateTargetInput:
+      type: object
+      properties:
+        resourceType:
+          allOf:
+          - $ref: '#/components/schemas/TargetResourceTypeId'
+          description: The resource type. The resource type must be supported for
+            the specified action.
+        resourceArns:
+          allOf:
+          - $ref: '#/components/schemas/ResourceArnList'
+          description: The Amazon Resource Names (ARNs) of the targets.
+        resourceTags:
+          allOf:
+          - $ref: '#/components/schemas/TagMap'
+          description: The tags for the target resources.
+        filters:
+          allOf:
+          - $ref: '#/components/schemas/ExperimentTemplateTargetFilterInputList'
+          description: The filters to apply to identify target resources using specific
+            attributes.
+        selectionMode:
+          allOf:
+          - $ref: '#/components/schemas/ExperimentTemplateTargetSelectionMode'
+          description: Scopes the identified resources to a specific count or percentage.
+        parameters:
+          allOf:
+          - $ref: '#/components/schemas/ExperimentTemplateTargetParameterMap'
+          description: The resource type parameters.
+      required:
+      - resourceType
+      - selectionMode
+      description: Specifies a target for an experiment. You must specify at least
+        one Amazon Resource Name (ARN) or at least one resource tag. You cannot specify
+        both.
     UpdateExperimentTemplateTargetInputMap:
       type: object
       additionalProperties:
         $ref: '#/components/schemas/UpdateExperimentTemplateTargetInput'
+    UpdateSafetyLeverStateInput:
+      type: object
+      properties:
+        status:
+          allOf:
+          - $ref: '#/components/schemas/SafetyLeverStatusInput'
+          description: The updated state of the safety lever.
+        reason:
+          allOf:
+          - $ref: '#/components/schemas/SafetyLeverStatusReason'
+          description: The reason for updating the state of the safety lever.
+      required:
+      - status
+      - reason
+      description: Specifies a state for a safety lever.
+    UpdateSafetyLeverStateRequest:
+      type: object
+      properties:
+        id:
+          allOf:
+          - $ref: '#/components/schemas/SafetyLeverId'
+          description: The ID of the safety lever.
+        state:
+          allOf:
+          - $ref: '#/components/schemas/UpdateSafetyLeverStateInput'
+          description: The state of the safety lever.
+      required:
+      - id
+      - state
+    UpdateSafetyLeverStateResponse:
+      type: object
+      properties:
+        safetyLever:
+          allOf:
+          - $ref: '#/components/schemas/SafetyLever'
+          description: Information about the safety lever.
+    UpdateTargetAccountConfigurationRequest:
+      type: object
+      properties:
+        experimentTemplateId:
+          allOf:
+          - $ref: '#/components/schemas/ExperimentTemplateId'
+          description: The ID of the experiment template.
+        accountId:
+          allOf:
+          - $ref: '#/components/schemas/TargetAccountId'
+          description: The Amazon Web Services account ID of the target account.
+        roleArn:
+          allOf:
+          - $ref: '#/components/schemas/RoleArn'
+          description: The Amazon Resource Name (ARN) of an IAM role for the target
+            account.
+        description:
+          allOf:
+          - $ref: '#/components/schemas/TargetAccountConfigurationDescription'
+          description: The description of the target account.
+      required:
+      - experimentTemplateId
+      - accountId
+    UpdateTargetAccountConfigurationResponse:
+      type: object
+      properties:
+        targetAccountConfiguration:
+          allOf:
+          - $ref: '#/components/schemas/TargetAccountConfiguration'
+          description: Information about the target account configuration.
+    ValidationException:
+      type: object
+      properties:
+        message:
+          $ref: '#/components/schemas/ExceptionMessage'
+      description: The specified input is not valid, or fails to satisfy the constraints
+        for the request.

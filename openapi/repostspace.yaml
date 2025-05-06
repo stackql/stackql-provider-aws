@@ -7,7 +7,7 @@ info:
   x-stackql-serviceName: repostspace
   x-aws-serviceName: repostspace
   x-aws-protocol: aws.protocols#restJson1
-  x-dateGenerated: '2025-05-05'
+  x-dateGenerated: '2025-05-07'
   version: '2022-05-13'
   title: AWS re:Post Private
   description: |-
@@ -43,9 +43,741 @@ servers:
       - sa-east-1
       - me-south-1
       default: us-east-1
-paths: {}
+paths:
+  /spaces/{spaceId}/roles:
+    post:
+      operationId: BatchAddRole
+      description: |-
+        Add role to multiple users or groups in a private re:Post.
+      parameters:
+      - name: spaceId
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/SpaceId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                accessorIds:
+                  $ref: '#/components/schemas/AccessorIdList'
+                role:
+                  $ref: '#/components/schemas/Role'
+      responses:
+        '200': {}
+        '403':
+          description: |-
+            User does not have sufficient access to perform this action.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '500':
+          description: |-
+            Unexpected error during processing of request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerException'
+        '404':
+          description: |-
+            Request references a resource which does not exist.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+        '429':
+          description: |-
+            Request was denied due to request throttling.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThrottlingException'
+        '400':
+          description: |-
+            The input fails to satisfy the constraints specified by an AWS service.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+    patch:
+      operationId: BatchRemoveRole
+      description: |-
+        Remove role from multiple users or groups in a private re:Post.
+      parameters:
+      - name: spaceId
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/SpaceId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                accessorIds:
+                  $ref: '#/components/schemas/AccessorIdList'
+                role:
+                  $ref: '#/components/schemas/Role'
+      responses:
+        '200': {}
+        '403':
+          description: |-
+            User does not have sufficient access to perform this action.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '500':
+          description: |-
+            Unexpected error during processing of request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerException'
+        '404':
+          description: |-
+            Request references a resource which does not exist.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+        '429':
+          description: |-
+            Request was denied due to request throttling.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThrottlingException'
+        '400':
+          description: |-
+            The input fails to satisfy the constraints specified by an AWS service.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+  /spaces:
+    post:
+      operationId: CreateSpace
+      description: |-
+        Creates an AWS re:Post Private private re:Post.
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  $ref: '#/components/schemas/SpaceName'
+                subdomain:
+                  $ref: '#/components/schemas/SpaceSubdomain'
+                tier:
+                  $ref: '#/components/schemas/TierLevel'
+                description:
+                  $ref: '#/components/schemas/SpaceDescription'
+                userKMSKey:
+                  $ref: '#/components/schemas/KMSKey'
+                tags:
+                  $ref: '#/components/schemas/Tags'
+                roleArn:
+                  $ref: '#/components/schemas/Arn'
+      responses:
+        '200': {}
+        '403':
+          description: |-
+            User does not have sufficient access to perform this action.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '409':
+          description: |-
+            Updating or deleting a resource can cause an inconsistent state.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConflictException'
+        '500':
+          description: |-
+            Unexpected error during processing of request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerException'
+        '404':
+          description: |-
+            Request references a resource which does not exist.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+        '402':
+          description: |-
+            Request would cause a service quota to be exceeded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServiceQuotaExceededException'
+        '429':
+          description: |-
+            Request was denied due to request throttling.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThrottlingException'
+        '400':
+          description: |-
+            The input fails to satisfy the constraints specified by an AWS service.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+    get:
+      operationId: ListSpaces
+      description: |-
+        Returns a list of AWS re:Post Private private re:Posts in the account with some information about each private re:Post.
+      parameters:
+      - name: nextToken
+        in: query
+        required: false
+        schema:
+          $ref: '#/components/schemas/String'
+      - name: maxResults
+        in: query
+        required: false
+        schema:
+          $ref: '#/components/schemas/ListSpacesLimit'
+      responses:
+        '200': {}
+        '403':
+          description: |-
+            User does not have sufficient access to perform this action.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '500':
+          description: |-
+            Unexpected error during processing of request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerException'
+        '429':
+          description: |-
+            Request was denied due to request throttling.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThrottlingException'
+        '400':
+          description: |-
+            The input fails to satisfy the constraints specified by an AWS service.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+  /spaces/{spaceId}:
+    delete:
+      operationId: DeleteSpace
+      description: |-
+        Deletes an AWS re:Post Private private re:Post.
+      parameters:
+      - name: spaceId
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/SpaceId'
+      responses:
+        '200': {}
+        '403':
+          description: |-
+            User does not have sufficient access to perform this action.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '500':
+          description: |-
+            Unexpected error during processing of request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerException'
+        '404':
+          description: |-
+            Request references a resource which does not exist.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+        '429':
+          description: |-
+            Request was denied due to request throttling.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThrottlingException'
+        '400':
+          description: |-
+            The input fails to satisfy the constraints specified by an AWS service.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+    get:
+      operationId: GetSpace
+      description: |-
+        Displays information about the AWS re:Post Private private re:Post.
+      parameters:
+      - name: spaceId
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/SpaceId'
+      responses:
+        '200': {}
+        '403':
+          description: |-
+            User does not have sufficient access to perform this action.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '500':
+          description: |-
+            Unexpected error during processing of request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerException'
+        '404':
+          description: |-
+            Request references a resource which does not exist.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+        '429':
+          description: |-
+            Request was denied due to request throttling.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThrottlingException'
+        '400':
+          description: |-
+            The input fails to satisfy the constraints specified by an AWS service.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+    put:
+      operationId: UpdateSpace
+      description: |-
+        Modifies an existing AWS re:Post Private private re:Post.
+      parameters:
+      - name: spaceId
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/SpaceId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                description:
+                  $ref: '#/components/schemas/SpaceDescription'
+                tier:
+                  $ref: '#/components/schemas/TierLevel'
+                roleArn:
+                  $ref: '#/components/schemas/Arn'
+      responses:
+        '200': {}
+        '403':
+          description: |-
+            User does not have sufficient access to perform this action.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '409':
+          description: |-
+            Updating or deleting a resource can cause an inconsistent state.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConflictException'
+        '500':
+          description: |-
+            Unexpected error during processing of request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerException'
+        '404':
+          description: |-
+            Request references a resource which does not exist.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+        '429':
+          description: |-
+            Request was denied due to request throttling.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThrottlingException'
+        '400':
+          description: |-
+            The input fails to satisfy the constraints specified by an AWS service.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+  /spaces/{spaceId}/admins/{adminId}:
+    delete:
+      operationId: DeregisterAdmin
+      description: |-
+        Removes the user or group from the list of administrators of the private re:Post.
+      parameters:
+      - name: spaceId
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/SpaceId'
+      - name: adminId
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/AdminId'
+      responses:
+        '200': {}
+        '403':
+          description: |-
+            User does not have sufficient access to perform this action.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '500':
+          description: |-
+            Unexpected error during processing of request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerException'
+        '404':
+          description: |-
+            Request references a resource which does not exist.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+        '429':
+          description: |-
+            Request was denied due to request throttling.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThrottlingException'
+        '400':
+          description: |-
+            The input fails to satisfy the constraints specified by an AWS service.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+    post:
+      operationId: RegisterAdmin
+      description: |-
+        Adds a user or group to the list of administrators of the private re:Post.
+      parameters:
+      - name: spaceId
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/SpaceId'
+      - name: adminId
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/AdminId'
+      responses:
+        '200': {}
+        '403':
+          description: |-
+            User does not have sufficient access to perform this action.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '500':
+          description: |-
+            Unexpected error during processing of request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerException'
+        '404':
+          description: |-
+            Request references a resource which does not exist.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+        '429':
+          description: |-
+            Request was denied due to request throttling.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThrottlingException'
+        '400':
+          description: |-
+            The input fails to satisfy the constraints specified by an AWS service.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+  /tags/{resourceArn}:
+    get:
+      operationId: ListTagsForResource
+      description: |-
+        Returns the tags that are associated with the AWS re:Post Private resource specified by the resourceArn. The only resource that can be tagged is a private re:Post.
+      parameters:
+      - name: resourceArn
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/Arn'
+      responses:
+        '200': {}
+        '403':
+          description: |-
+            User does not have sufficient access to perform this action.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '500':
+          description: |-
+            Unexpected error during processing of request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerException'
+        '404':
+          description: |-
+            Request references a resource which does not exist.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+        '429':
+          description: |-
+            Request was denied due to request throttling.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThrottlingException'
+        '400':
+          description: |-
+            The input fails to satisfy the constraints specified by an AWS service.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+    post:
+      operationId: TagResource
+      description: |-
+        Associates tags with an AWS re:Post Private resource. Currently, the only resource that can be tagged is the private re:Post. If you specify a new tag key for the resource, the tag is appended to the list of tags that are associated with the resource. If you specify a tag key that’s already associated with the resource, the new tag value that you specify replaces the previous value for that tag.
+      parameters:
+      - name: resourceArn
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/Arn'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                tags:
+                  $ref: '#/components/schemas/Tags'
+      responses:
+        '200': {}
+        '403':
+          description: |-
+            User does not have sufficient access to perform this action.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '500':
+          description: |-
+            Unexpected error during processing of request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerException'
+        '404':
+          description: |-
+            Request references a resource which does not exist.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+        '429':
+          description: |-
+            Request was denied due to request throttling.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThrottlingException'
+        '400':
+          description: |-
+            The input fails to satisfy the constraints specified by an AWS service.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+    delete:
+      operationId: UntagResource
+      description: |-
+        Removes the association of the tag with the AWS re:Post Private resource.
+      parameters:
+      - name: resourceArn
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/Arn'
+      - name: tagKeys
+        in: query
+        required: true
+        schema:
+          $ref: '#/components/schemas/TagKeyList'
+      responses:
+        '200': {}
+        '403':
+          description: |-
+            User does not have sufficient access to perform this action.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '500':
+          description: |-
+            Unexpected error during processing of request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerException'
+        '404':
+          description: |-
+            Request references a resource which does not exist.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+        '429':
+          description: |-
+            Request was denied due to request throttling.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThrottlingException'
+        '400':
+          description: |-
+            The input fails to satisfy the constraints specified by an AWS service.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+  /spaces/{spaceId}/invite:
+    post:
+      operationId: SendInvites
+      description: |-
+        Sends an invitation email to selected users and groups.
+      parameters:
+      - name: spaceId
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/SpaceId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                accessorIds:
+                  $ref: '#/components/schemas/AccessorIdList'
+                title:
+                  $ref: '#/components/schemas/InviteTitle'
+                body:
+                  $ref: '#/components/schemas/InviteBody'
+      responses:
+        '200': {}
+        '403':
+          description: |-
+            User does not have sufficient access to perform this action.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDeniedException'
+        '500':
+          description: |-
+            Unexpected error during processing of request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerException'
+        '404':
+          description: |-
+            Request references a resource which does not exist.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+        '429':
+          description: |-
+            Request was denied due to request throttling.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThrottlingException'
+        '400':
+          description: |-
+            The input fails to satisfy the constraints specified by an AWS service.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
 components:
   schemas:
+    AccessDeniedException:
+      type: object
+      properties:
+        message:
+          $ref: '#/components/schemas/String'
+      required:
+      - message
+      description: User does not have sufficient access to perform this action.
     AccessorId:
       type: string
     AccessorIdList:
@@ -58,10 +790,96 @@ components:
       type: string
       minLength: 20
       maxLength: 2048
+    BatchAddRoleInput:
+      type: object
+      properties:
+        spaceId:
+          allOf:
+          - $ref: '#/components/schemas/SpaceId'
+          description: The unique ID of the private re:Post.
+        accessorIds:
+          allOf:
+          - $ref: '#/components/schemas/AccessorIdList'
+          description: The user or group accessor identifiers to add the role to.
+        role:
+          allOf:
+          - $ref: '#/components/schemas/Role'
+          description: The role to add to the users or groups.
+      required:
+      - spaceId
+      - accessorIds
+      - role
+    BatchAddRoleOutput:
+      type: object
+      properties:
+        addedAccessorIds:
+          allOf:
+          - $ref: '#/components/schemas/AccessorIdList'
+          description: An array of successfully updated accessor identifiers.
+        errors:
+          allOf:
+          - $ref: '#/components/schemas/BatchErrorList'
+          description: An array of errors that occurred when roles were added.
+      required:
+      - addedAccessorIds
+      - errors
+    BatchError:
+      type: object
+      properties:
+        accessorId:
+          allOf:
+          - $ref: '#/components/schemas/AccessorId'
+          description: The accessor identifier that's related to the error.
+        error:
+          allOf:
+          - $ref: '#/components/schemas/ErrorCode'
+          description: The error code.
+        message:
+          allOf:
+          - $ref: '#/components/schemas/ErrorMessage'
+          description: Description of the error.
+      required:
+      - accessorId
+      - error
+      - message
+      description: An error that occurred during a batch operation.
     BatchErrorList:
       type: array
       items:
         $ref: '#/components/schemas/BatchError'
+    BatchRemoveRoleInput:
+      type: object
+      properties:
+        spaceId:
+          allOf:
+          - $ref: '#/components/schemas/SpaceId'
+          description: The unique ID of the private re:Post.
+        accessorIds:
+          allOf:
+          - $ref: '#/components/schemas/AccessorIdList'
+          description: The user or group accessor identifiers to remove the role from.
+        role:
+          allOf:
+          - $ref: '#/components/schemas/Role'
+          description: The role to remove from the users or groups.
+      required:
+      - spaceId
+      - accessorIds
+      - role
+    BatchRemoveRoleOutput:
+      type: object
+      properties:
+        removedAccessorIds:
+          allOf:
+          - $ref: '#/components/schemas/AccessorIdList'
+          description: An array of successfully updated accessor identifiers.
+        errors:
+          allOf:
+          - $ref: '#/components/schemas/BatchErrorList'
+          description: An array of errors that occurred when roles were removed.
+      required:
+      - removedAccessorIds
+      - errors
     ClientId:
       type: string
     ConfigurationStatus:
@@ -69,17 +887,233 @@ components:
       enum:
       - CONFIGURED
       - UNCONFIGURED
+    ConflictException:
+      type: object
+      properties:
+        message:
+          $ref: '#/components/schemas/String'
+        resourceId:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The ID of the resource.
+        resourceType:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The type of the resource.
+      required:
+      - message
+      - resourceId
+      - resourceType
+      description: Updating or deleting a resource can cause an inconsistent state.
     ContentSize:
       type: integer
       format: int64
+    CreateSpaceInput:
+      type: object
+      properties:
+        name:
+          allOf:
+          - $ref: '#/components/schemas/SpaceName'
+          description: The name for the private re:Post. This must be unique in your
+            account.
+        subdomain:
+          allOf:
+          - $ref: '#/components/schemas/SpaceSubdomain'
+          description: The subdomain that you use to access your AWS re:Post Private
+            private re:Post. All custom subdomains must be approved by AWS before
+            use. In addition to your custom subdomain, all private re:Posts are issued
+            an AWS generated subdomain for immediate use.
+        tier:
+          allOf:
+          - $ref: '#/components/schemas/TierLevel'
+          description: The pricing tier for the private re:Post.
+        description:
+          allOf:
+          - $ref: '#/components/schemas/SpaceDescription'
+          description: A description for the private re:Post. This is used only to
+            help you identify this private re:Post.
+        userKMSKey:
+          allOf:
+          - $ref: '#/components/schemas/KMSKey'
+          description: The AWS KMS key ARN that’s used for the AWS KMS encryption.
+            If you don't provide a key, your data is encrypted by default with a key
+            that AWS owns and manages for you.
+        tags:
+          allOf:
+          - $ref: '#/components/schemas/Tags'
+          description: The list of tags associated with the private re:Post.
+        roleArn:
+          allOf:
+          - $ref: '#/components/schemas/Arn'
+          description: The IAM role that grants permissions to the private re:Post
+            to convert unanswered questions into AWS support tickets.
+      required:
+      - name
+      - subdomain
+      - tier
+    CreateSpaceOutput:
+      type: object
+      properties:
+        spaceId:
+          allOf:
+          - $ref: '#/components/schemas/SpaceId'
+          description: The unique ID of the private re:Post.
+      required:
+      - spaceId
+    DeleteSpaceInput:
+      type: object
+      properties:
+        spaceId:
+          allOf:
+          - $ref: '#/components/schemas/SpaceId'
+          description: The unique ID of the private re:Post.
+      required:
+      - spaceId
+    DeregisterAdminInput:
+      type: object
+      properties:
+        spaceId:
+          allOf:
+          - $ref: '#/components/schemas/SpaceId'
+          description: The ID of the private re:Post to remove the admin from.
+        adminId:
+          allOf:
+          - $ref: '#/components/schemas/AdminId'
+          description: The ID of the admin to remove.
+      required:
+      - spaceId
+      - adminId
     ErrorCode:
       type: integer
     ErrorMessage:
       type: string
+    GetSpaceInput:
+      type: object
+      properties:
+        spaceId:
+          allOf:
+          - $ref: '#/components/schemas/SpaceId'
+          description: The ID of the private re:Post.
+      required:
+      - spaceId
+    GetSpaceOutput:
+      type: object
+      properties:
+        spaceId:
+          allOf:
+          - $ref: '#/components/schemas/SpaceId'
+          description: The unique ID of the private re:Post.
+        arn:
+          allOf:
+          - $ref: '#/components/schemas/Arn'
+          description: The ARN of the private re:Post.
+        name:
+          allOf:
+          - $ref: '#/components/schemas/SpaceName'
+          description: The name of the private re:Post.
+        status:
+          allOf:
+          - $ref: '#/components/schemas/ProvisioningStatus'
+          description: The creation or deletion status of the private re:Post.
+        configurationStatus:
+          allOf:
+          - $ref: '#/components/schemas/ConfigurationStatus'
+          description: The configuration status of the private re:Post.
+        clientId:
+          allOf:
+          - $ref: '#/components/schemas/ClientId'
+          description: The Identity Center identifier for the Application Instance.
+        description:
+          allOf:
+          - $ref: '#/components/schemas/SpaceDescription'
+          description: The description of the private re:Post.
+        vanityDomainStatus:
+          allOf:
+          - $ref: '#/components/schemas/VanityDomainStatus'
+          description: The approval status of the custom subdomain.
+        vanityDomain:
+          allOf:
+          - $ref: '#/components/schemas/Url'
+          description: The custom subdomain that you use to access your private re:Post.
+            All custom subdomains must be approved by AWS before use.
+        randomDomain:
+          allOf:
+          - $ref: '#/components/schemas/Url'
+          description: The AWS generated subdomain of the private re:Post
+        customerRoleArn:
+          allOf:
+          - $ref: '#/components/schemas/Arn'
+          description: The IAM role that grants permissions to the private re:Post
+            to convert unanswered questions into AWS support tickets.
+        createDateTime:
+          allOf:
+          - $ref: '#/components/schemas/Timestamp'
+          description: The date when the private re:Post was created.
+        deleteDateTime:
+          allOf:
+          - $ref: '#/components/schemas/Timestamp'
+          description: The date when the private re:Post was deleted.
+        tier:
+          allOf:
+          - $ref: '#/components/schemas/TierLevel'
+          description: The pricing tier of the private re:Post.
+        storageLimit:
+          allOf:
+          - $ref: '#/components/schemas/StorageLimit'
+          description: The storage limit of the private re:Post.
+        userAdmins:
+          allOf:
+          - $ref: '#/components/schemas/UserAdmins'
+          description: The list of users that are administrators of the private re:Post.
+        groupAdmins:
+          allOf:
+          - $ref: '#/components/schemas/GroupAdmins'
+          description: The list of groups that are administrators of the private re:Post.
+        roles:
+          allOf:
+          - $ref: '#/components/schemas/Roles'
+          description: A map of accessor identifiers and their roles.
+        userKMSKey:
+          allOf:
+          - $ref: '#/components/schemas/KMSKey'
+          description: The custom AWS KMS key ARN that’s used for the AWS KMS encryption.
+        userCount:
+          allOf:
+          - $ref: '#/components/schemas/UserCount'
+          description: The number of users that have onboarded to the private re:Post.
+        contentSize:
+          allOf:
+          - $ref: '#/components/schemas/ContentSize'
+          description: The content size of the private re:Post.
+      required:
+      - spaceId
+      - arn
+      - name
+      - status
+      - configurationStatus
+      - clientId
+      - vanityDomainStatus
+      - vanityDomain
+      - randomDomain
+      - createDateTime
+      - tier
+      - storageLimit
     GroupAdmins:
       type: array
       items:
         $ref: '#/components/schemas/AdminId'
+    InternalServerException:
+      type: object
+      properties:
+        message:
+          $ref: '#/components/schemas/String'
+        retryAfterSeconds:
+          allOf:
+          - $ref: '#/components/schemas/Integer'
+          description: Advice to clients on when the call can be safely retried.
+      required:
+      - message
+      description: Unexpected error during processing of request.
     InviteBody:
       type: string
       minLength: 1
@@ -90,15 +1124,90 @@ components:
       maxLength: 200
     KMSKey:
       type: string
+    ListSpacesInput:
+      type: object
+      properties:
+        nextToken:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The token for the next set of private re:Posts to return. You
+            receive this token from a previous ListSpaces operation.
+        maxResults:
+          allOf:
+          - $ref: '#/components/schemas/ListSpacesLimit'
+          description: The maximum number of private re:Posts to include in the results.
     ListSpacesLimit:
       type: integer
       default: 10
       minimum: 1
       maximum: 100
+    ListSpacesOutput:
+      type: object
+      properties:
+        spaces:
+          allOf:
+          - $ref: '#/components/schemas/SpacesList'
+          description: An array of structures that contain some information about
+            the private re:Posts in the account.
+        nextToken:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The token that you use when you request the next set of private
+            re:Posts.
+      required:
+      - spaces
+    ListTagsForResourceRequest:
+      type: object
+      properties:
+        resourceArn:
+          allOf:
+          - $ref: '#/components/schemas/Arn'
+          description: The ARN of the resource that the tags are associated with.
+      required:
+      - resourceArn
+    ListTagsForResourceResponse:
+      type: object
+      properties:
+        tags:
+          allOf:
+          - $ref: '#/components/schemas/Tags'
+          description: The list of tags that are associated with the resource.
     ProvisioningStatus:
       type: string
       minLength: 1
       maxLength: 30
+    RegisterAdminInput:
+      type: object
+      properties:
+        spaceId:
+          allOf:
+          - $ref: '#/components/schemas/SpaceId'
+          description: The ID of the private re:Post.
+        adminId:
+          allOf:
+          - $ref: '#/components/schemas/AdminId'
+          description: The ID of the administrator.
+      required:
+      - spaceId
+      - adminId
+    ResourceNotFoundException:
+      type: object
+      properties:
+        message:
+          $ref: '#/components/schemas/String'
+        resourceId:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The ID of the resource.
+        resourceType:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The type of the resource.
+      required:
+      - message
+      - resourceId
+      - resourceType
+      description: Request references a resource which does not exist.
     Role:
       type: string
       enum:
@@ -114,6 +1223,141 @@ components:
       type: object
       additionalProperties:
         $ref: '#/components/schemas/RoleList'
+    SendInvitesInput:
+      type: object
+      properties:
+        spaceId:
+          allOf:
+          - $ref: '#/components/schemas/SpaceId'
+          description: The ID of the private re:Post.
+        accessorIds:
+          allOf:
+          - $ref: '#/components/schemas/AccessorIdList'
+          description: The array of identifiers for the users and groups.
+        title:
+          allOf:
+          - $ref: '#/components/schemas/InviteTitle'
+          description: The title of the invite.
+        body:
+          allOf:
+          - $ref: '#/components/schemas/InviteBody'
+          description: The body of the invite.
+      required:
+      - spaceId
+      - accessorIds
+      - title
+      - body
+    ServiceQuotaExceededException:
+      type: object
+      properties:
+        message:
+          $ref: '#/components/schemas/String'
+        resourceId:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The id of the resource.
+        resourceType:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The type of the resource.
+        serviceCode:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The code to identify the service.
+        quotaCode:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The code to identify the quota.
+      required:
+      - message
+      - resourceId
+      - resourceType
+      - serviceCode
+      - quotaCode
+      description: Request would cause a service quota to be exceeded.
+    SpaceData:
+      type: object
+      properties:
+        spaceId:
+          allOf:
+          - $ref: '#/components/schemas/SpaceId'
+          description: The unique ID of the private re:Post.
+        arn:
+          allOf:
+          - $ref: '#/components/schemas/Arn'
+          description: The ARN of the private re:Post.
+        name:
+          allOf:
+          - $ref: '#/components/schemas/SpaceName'
+          description: The name for the private re:Post.
+        description:
+          allOf:
+          - $ref: '#/components/schemas/SpaceDescription'
+          description: The description for the private re:Post. This is used only
+            to help you identify this private re:Post.
+        status:
+          allOf:
+          - $ref: '#/components/schemas/ProvisioningStatus'
+          description: The creation/deletion status of the private re:Post.
+        configurationStatus:
+          allOf:
+          - $ref: '#/components/schemas/ConfigurationStatus'
+          description: The configuration status of the private re:Post.
+        vanityDomainStatus:
+          allOf:
+          - $ref: '#/components/schemas/VanityDomainStatus'
+          description: This approval status of the custom subdomain.
+        vanityDomain:
+          allOf:
+          - $ref: '#/components/schemas/Url'
+          description: This custom subdomain that you use to access your private re:Post.
+            All custom subdomains must be approved by AWS before use.
+        randomDomain:
+          allOf:
+          - $ref: '#/components/schemas/Url'
+          description: The AWS generated subdomain of the private re:Post.
+        tier:
+          allOf:
+          - $ref: '#/components/schemas/TierLevel'
+          description: The pricing tier of the private re:Post.
+        storageLimit:
+          allOf:
+          - $ref: '#/components/schemas/StorageLimit'
+          description: The storage limit of the private re:Post.
+        createDateTime:
+          allOf:
+          - $ref: '#/components/schemas/Timestamp'
+          description: The date when the private re:Post was created.
+        deleteDateTime:
+          allOf:
+          - $ref: '#/components/schemas/Timestamp'
+          description: The date when the private re:Post was deleted.
+        userKMSKey:
+          allOf:
+          - $ref: '#/components/schemas/KMSKey'
+          description: The custom AWS KMS key ARN that’s used for the AWS KMS encryption.
+        userCount:
+          allOf:
+          - $ref: '#/components/schemas/UserCount'
+          description: The number of onboarded users to the private re:Post.
+        contentSize:
+          allOf:
+          - $ref: '#/components/schemas/ContentSize'
+          description: The content size of the private re:Post.
+      required:
+      - spaceId
+      - arn
+      - name
+      - status
+      - configurationStatus
+      - vanityDomainStatus
+      - vanityDomain
+      - randomDomain
+      - tier
+      - storageLimit
+      - createDateTime
+      description: A structure that contains some information about a private re:Post
+        in the account.
     SpaceDescription:
       type: string
       minLength: 1
@@ -144,6 +1388,25 @@ components:
       type: array
       items:
         $ref: '#/components/schemas/TagKey'
+    TagResourceRequest:
+      type: object
+      properties:
+        resourceArn:
+          allOf:
+          - $ref: '#/components/schemas/Arn'
+          description: The ARN of the resource that the tag is associated with.
+        tags:
+          allOf:
+          - $ref: '#/components/schemas/Tags'
+          description: The list of tag keys and values that must be associated with
+            the resource. You can associate tag keys only, tags (key and values) only,
+            or a combination of tag keys and tags.
+      required:
+      - resourceArn
+      - tags
+    TagResourceResponse:
+      type: object
+      properties: {}
     TagValue:
       type: string
       minLength: 1
@@ -152,11 +1415,71 @@ components:
       type: object
       additionalProperties:
         $ref: '#/components/schemas/TagValue'
+    ThrottlingException:
+      type: object
+      properties:
+        message:
+          $ref: '#/components/schemas/String'
+        serviceCode:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The code to identify the service.
+        quotaCode:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The code to identify the quota.
+        retryAfterSeconds:
+          allOf:
+          - $ref: '#/components/schemas/Integer'
+          description: Advice to clients on when the call can be safely retried.
+      required:
+      - message
+      description: Request was denied due to request throttling.
     TierLevel:
       type: string
       enum:
       - BASIC
       - STANDARD
+    UntagResourceRequest:
+      type: object
+      properties:
+        resourceArn:
+          allOf:
+          - $ref: '#/components/schemas/Arn'
+          description: The ARN of the resource.
+        tagKeys:
+          allOf:
+          - $ref: '#/components/schemas/TagKeyList'
+          description: The key values of the tag.
+      required:
+      - resourceArn
+      - tagKeys
+    UntagResourceResponse:
+      type: object
+      properties: {}
+    UpdateSpaceInput:
+      type: object
+      properties:
+        spaceId:
+          allOf:
+          - $ref: '#/components/schemas/SpaceId'
+          description: The unique ID of this private re:Post.
+        description:
+          allOf:
+          - $ref: '#/components/schemas/SpaceDescription'
+          description: A description for the private re:Post. This is used only to
+            help you identify this private re:Post.
+        tier:
+          allOf:
+          - $ref: '#/components/schemas/TierLevel'
+          description: The pricing tier of this private re:Post.
+        roleArn:
+          allOf:
+          - $ref: '#/components/schemas/Arn'
+          description: The IAM role that grants permissions to the private re:Post
+            to convert unanswered questions into AWS support tickets.
+      required:
+      - spaceId
     Url:
       type: string
     UserAdmins:
@@ -165,6 +1488,40 @@ components:
         $ref: '#/components/schemas/AdminId'
     UserCount:
       type: integer
+    ValidationException:
+      type: object
+      properties:
+        message:
+          $ref: '#/components/schemas/String'
+        reason:
+          allOf:
+          - $ref: '#/components/schemas/ValidationExceptionReason'
+          description: The reason why the request failed validation.
+        fieldList:
+          allOf:
+          - $ref: '#/components/schemas/ValidationExceptionFieldList'
+          description: The field that caused the error, if applicable.
+      required:
+      - message
+      - reason
+      description: The input fails to satisfy the constraints specified by an AWS
+        service.
+    ValidationExceptionField:
+      type: object
+      properties:
+        name:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: Message describing why the field failed validation.
+        message:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The name of the field.
+      required:
+      - name
+      - message
+      description: Stores information about a field that’s passed inside a request
+        that resulted in an exception.
     ValidationExceptionFieldList:
       type: array
       items:

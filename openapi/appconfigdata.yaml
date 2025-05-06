@@ -7,7 +7,7 @@ info:
   x-stackql-serviceName: appconfigdata
   x-aws-serviceName: appconfigdata
   x-aws-protocol: aws.protocols#restJson1
-  x-dateGenerated: '2025-05-05'
+  x-dateGenerated: '2025-05-07'
   version: '2021-11-11'
   title: AWS AppConfig Data
   description: |-
@@ -67,7 +67,108 @@ servers:
       - sa-east-1
       - me-south-1
       default: us-east-1
-paths: {}
+paths:
+  /configuration:
+    get:
+      operationId: GetLatestConfiguration
+      description: "Retrieves the latest deployed configuration. This API may return\
+        \ empty configuration data if the client already has the latest version. For\
+        \ more information about this API action and to view example CLI commands\
+        \ that show how to use it with the StartConfigurationSession API action, see\
+        \ [Retrieving the configuration](http://docs.aws.amazon.com/appconfig/latest/userguide/appconfig-retrieving-the-configuration)\
+        \ in the _AppConfig User Guide_.\n\nNote the following important information.\n\
+        \n  * Each configuration token is only valid for one call to `GetLatestConfiguration`.\
+        \ The `GetLatestConfiguration` response includes a `NextPollConfigurationToken`\
+        \ that should always replace the token used for the just-completed call in\
+        \ preparation for the next one. \n\n  * `GetLatestConfiguration` is a priced\
+        \ call. For more information, see [Pricing](https://aws.amazon.com/systems-manager/pricing/)."
+      parameters:
+      - name: configuration_token
+        in: query
+        required: true
+        schema:
+          $ref: '#/components/schemas/Token'
+      responses:
+        '200': {}
+        '400':
+          description: |-
+            The input fails to satisfy the constraints specified by the service.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequestException'
+        '500':
+          description: |-
+            There was an internal failure in the service.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerException'
+        '404':
+          description: |-
+            The requested resource could not be found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+        '429':
+          description: |-
+            The request was denied due to request throttling.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThrottlingException'
+  /configurationsessions:
+    post:
+      operationId: StartConfigurationSession
+      description: |-
+        Starts a configuration session used to retrieve a deployed configuration. For more information about this API action and to view example CLI commands that show how to use it with the GetLatestConfiguration API action, see [Retrieving the configuration](http://docs.aws.amazon.com/appconfig/latest/userguide/appconfig-retrieving-the-configuration) in the _AppConfig User Guide_.
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                ApplicationIdentifier:
+                  $ref: '#/components/schemas/Identifier'
+                EnvironmentIdentifier:
+                  $ref: '#/components/schemas/Identifier'
+                ConfigurationProfileIdentifier:
+                  $ref: '#/components/schemas/Identifier'
+                RequiredMinimumPollIntervalInSeconds:
+                  $ref: '#/components/schemas/OptionalPollSeconds'
+      responses:
+        '201': {}
+        '400':
+          description: |-
+            The input fails to satisfy the constraints specified by the service.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequestException'
+        '500':
+          description: |-
+            There was an internal failure in the service.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerException'
+        '404':
+          description: |-
+            The requested resource could not be found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+        '429':
+          description: |-
+            The request was denied due to request throttling.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThrottlingException'
 components:
   schemas:
     BadRequestDetails:
@@ -78,10 +179,78 @@ components:
           One or more specified parameters are not valid for the call.
       description: |-
         Detailed information about the input that failed to satisfy the constraints specified by a call.
+    BadRequestException:
+      type: object
+      properties:
+        Message:
+          $ref: '#/components/schemas/String'
+        Reason:
+          allOf:
+          - $ref: '#/components/schemas/BadRequestReason'
+          description: Code indicating the reason the request was invalid.
+        Details:
+          allOf:
+          - $ref: '#/components/schemas/BadRequestDetails'
+          description: Details describing why the request was invalid.
+      description: The input fails to satisfy the constraints specified by the service.
     BadRequestReason:
       type: string
       enum:
       - InvalidParameters
+    GetLatestConfigurationRequest:
+      type: object
+      properties:
+        ConfigurationToken:
+          allOf:
+          - $ref: '#/components/schemas/Token'
+          description: 'Token describing the current state of the configuration session.
+            To obtain a token, first call the StartConfigurationSession API. Note
+            that every call to `GetLatestConfiguration` will return a new `ConfigurationToken`
+            (`NextPollConfigurationToken` in the response) and _must_ be provided
+            to subsequent `GetLatestConfiguration` API calls.
+
+
+            This token should only be used once. To support long poll use cases, the
+            token is valid for up to 24 hours. If a `GetLatestConfiguration` call
+            uses an expired token, the system returns `BadRequestException`.'
+      required:
+      - ConfigurationToken
+    GetLatestConfigurationResponse:
+      type: object
+      properties:
+        NextPollConfigurationToken:
+          allOf:
+          - $ref: '#/components/schemas/Token'
+          description: 'The latest token describing the current state of the configuration
+            session. This _must_ be provided to the next call to `GetLatestConfiguration.`
+
+
+            This token should only be used once. To support long poll use cases, the
+            token is valid for up to 24 hours. If a `GetLatestConfiguration` call
+            uses an expired token, the system returns `BadRequestException`.'
+        NextPollIntervalInSeconds:
+          allOf:
+          - $ref: '#/components/schemas/Integer'
+          description: The amount of time the client should wait before polling for
+            configuration updates again. Use `RequiredMinimumPollIntervalInSeconds`
+            to set the desired poll interval.
+        ContentType:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: A standard MIME type describing the format of the configuration
+            content.
+        Configuration:
+          allOf:
+          - $ref: '#/components/schemas/SensitiveBlob'
+          description: The data of the configuration. This may be empty if the client
+            already has the latest version of configuration.
+        VersionLabel:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The user-defined label for the AppConfig hosted configuration
+            version. This attribute doesn't apply if the configuration is not from
+            an AppConfig hosted configuration version. If the client already has the
+            latest version of the configuration data, this value is empty.
     Id:
       type: string
       pattern: ^[a-z0-9]{7}$
@@ -92,6 +261,20 @@ components:
     Integer:
       type: integer
       default: 0
+    InternalServerException:
+      type: object
+      properties:
+        Message:
+          $ref: '#/components/schemas/String'
+      description: There was an internal failure in the service.
+    InvalidParameterDetail:
+      type: object
+      properties:
+        Problem:
+          allOf:
+          - $ref: '#/components/schemas/InvalidParameterProblem'
+          description: The reason the parameter is invalid.
+      description: Information about an invalid parameter.
     InvalidParameterMap:
       type: object
       additionalProperties:
@@ -106,6 +289,21 @@ components:
       type: integer
       minimum: 15
       maximum: 86400
+    ResourceNotFoundException:
+      type: object
+      properties:
+        Message:
+          $ref: '#/components/schemas/String'
+        ResourceType:
+          allOf:
+          - $ref: '#/components/schemas/ResourceType'
+          description: The type of resource that was not found.
+        ReferencedBy:
+          allOf:
+          - $ref: '#/components/schemas/StringMap'
+          description: A map indicating which parameters in the request reference
+            the resource that was not found.
+      description: The requested resource could not be found.
     ResourceType:
       type: string
       enum:
@@ -118,12 +316,63 @@ components:
       type: string
       format: byte
       x-sensitive: true
+    StartConfigurationSessionRequest:
+      type: object
+      properties:
+        ApplicationIdentifier:
+          allOf:
+          - $ref: '#/components/schemas/Identifier'
+          description: The application ID or the application name.
+        EnvironmentIdentifier:
+          allOf:
+          - $ref: '#/components/schemas/Identifier'
+          description: The environment ID or the environment name.
+        ConfigurationProfileIdentifier:
+          allOf:
+          - $ref: '#/components/schemas/Identifier'
+          description: The configuration profile ID or the configuration profile name.
+        RequiredMinimumPollIntervalInSeconds:
+          allOf:
+          - $ref: '#/components/schemas/OptionalPollSeconds'
+          description: Sets a constraint on a session. If you specify a value of,
+            for example, 60 seconds, then the client that established the session
+            can't call GetLatestConfiguration more frequently than every 60 seconds.
+      required:
+      - ApplicationIdentifier
+      - EnvironmentIdentifier
+      - ConfigurationProfileIdentifier
+    StartConfigurationSessionResponse:
+      type: object
+      properties:
+        InitialConfigurationToken:
+          allOf:
+          - $ref: '#/components/schemas/Token'
+          description: 'Token encapsulating state about the configuration session.
+            Provide this token to the `GetLatestConfiguration` API to retrieve configuration
+            data.
+
+
+            This token should only be used once in your first call to `GetLatestConfiguration`.
+            You _must_ use the new token in the `GetLatestConfiguration` response
+            (`NextPollConfigurationToken`) in each subsequent call to `GetLatestConfiguration`.
+
+
+            The `InitialConfigurationToken` and `NextPollConfigurationToken` should
+            only be used once. To support long poll use cases, the tokens are valid
+            for up to 24 hours. If a `GetLatestConfiguration` call uses an expired
+            token, the system returns `BadRequestException`.'
     String:
       type: string
     StringMap:
       type: object
       additionalProperties:
         $ref: '#/components/schemas/String'
+    ThrottlingException:
+      type: object
+      properties:
+        Message:
+          $ref: '#/components/schemas/String'
+      description: The request was denied due to request throttling.
     Token:
       type: string
       pattern: ^\S{1,8192}$

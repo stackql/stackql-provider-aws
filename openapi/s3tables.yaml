@@ -7,7 +7,7 @@ info:
   x-stackql-serviceName: s3tables
   x-aws-serviceName: s3tables
   x-aws-protocol: aws.protocols#restJson1
-  x-dateGenerated: '2025-05-05'
+  x-dateGenerated: '2025-05-07'
   version: '2018-05-10'
   title: Amazon S3 Tables
   description: |-
@@ -43,16 +43,2732 @@ servers:
       - sa-east-1
       - me-south-1
       default: us-east-1
-paths: {}
+paths:
+  /namespaces/{tableBucketARN}:
+    put:
+      operationId: CreateNamespace
+      description: "Creates a namespace. A namespace is a logical grouping of tables\
+        \ within your table bucket, which you can use to organize tables. For more\
+        \ information, see [Create a namespace](https://docs.aws.amazon.com/AmazonS3/latest/userguide/s3-tables-namespace-create.html)\
+        \ in the _Amazon Simple Storage Service User Guide_.\n\nPermissions\n\n  \
+        \  \n\nYou must have the `s3tables:CreateNamespace` permission to use this\
+        \ operation."
+      parameters:
+      - name: tableBucketARN
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/TableBucketARN'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                namespace:
+                  $ref: '#/components/schemas/NamespaceList'
+      responses:
+        '200': {}
+        '400':
+          description: |-
+            The request is invalid or malformed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequestException'
+        '409':
+          description: |-
+            The request failed because there is a conflict with a previous write. You can retry the request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConflictException'
+        '403':
+          description: |-
+            The caller isn't authorized to make the request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ForbiddenException'
+        '500':
+          description: |-
+            The request failed due to an internal server error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerErrorException'
+        '404':
+          description: |-
+            The request was rejected because the specified resource could not be found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFoundException'
+        '429':
+          description: |-
+            The limit on the number of requests per second was exceeded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TooManyRequestsException'
+    get:
+      operationId: ListNamespaces
+      description: "Lists the namespaces within a table bucket. For more information,\
+        \ see [Table namespaces](https://docs.aws.amazon.com/AmazonS3/latest/userguide/s3-tables-namespace.html)\
+        \ in the _Amazon Simple Storage Service User Guide_.\n\nPermissions\n\n  \
+        \  \n\nYou must have the `s3tables:ListNamespaces` permission to use this\
+        \ operation."
+      parameters:
+      - name: tableBucketARN
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/TableBucketARN'
+      - name: prefix
+        in: query
+        required: false
+        schema:
+          $ref: '#/components/schemas/String'
+      - name: continuationToken
+        in: query
+        required: false
+        schema:
+          $ref: '#/components/schemas/NextToken'
+      - name: maxNamespaces
+        in: query
+        required: false
+        schema:
+          $ref: '#/components/schemas/ListNamespacesLimit'
+      responses:
+        '200': {}
+        '403':
+          description: |-
+            The caller isn't authorized to make the request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ForbiddenException'
+        '400':
+          description: |-
+            The request is invalid or malformed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequestException'
+        '409':
+          description: |-
+            The request failed because there is a conflict with a previous write. You can retry the request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConflictException'
+        '500':
+          description: |-
+            The request failed due to an internal server error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerErrorException'
+        '404':
+          description: |-
+            The request was rejected because the specified resource could not be found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFoundException'
+        '429':
+          description: |-
+            The limit on the number of requests per second was exceeded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TooManyRequestsException'
+  /tables/{tableBucketARN}/{namespace}:
+    put:
+      operationId: CreateTable
+      description: "Creates a new table associated with the given namespace in a table\
+        \ bucket. For more information, see [Creating an Amazon S3 table](https://docs.aws.amazon.com/AmazonS3/latest/userguide/s3-tables-create.html)\
+        \ in the _Amazon Simple Storage Service User Guide_.\n\nPermissions\n\n  \
+        \  \n\n  * You must have the `s3tables:CreateTable` permission to use this\
+        \ operation. \n\n  * If you use this operation with the optional `metadata`\
+        \ request parameter you must have the `s3tables:PutTableData` permission.\
+        \ \n\n  * If you use this operation with the optional `encryptionConfiguration`\
+        \ request parameter you must have the `s3tables:PutTableEncryption` permission.\
+        \ \n\nAdditionally,"
+      parameters:
+      - name: tableBucketARN
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/TableBucketARN'
+      - name: namespace
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/NamespaceName'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  $ref: '#/components/schemas/TableName'
+                format:
+                  $ref: '#/components/schemas/OpenTableFormat'
+                metadata:
+                  $ref: '#/components/schemas/TableMetadata'
+                encryptionConfiguration:
+                  $ref: '#/components/schemas/EncryptionConfiguration'
+      responses:
+        '200': {}
+        '400':
+          description: |-
+            The request is invalid or malformed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequestException'
+        '409':
+          description: |-
+            The request failed because there is a conflict with a previous write. You can retry the request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConflictException'
+        '403':
+          description: |-
+            The caller isn't authorized to make the request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ForbiddenException'
+        '500':
+          description: |-
+            The request failed due to an internal server error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerErrorException'
+        '404':
+          description: |-
+            The request was rejected because the specified resource could not be found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFoundException'
+        '429':
+          description: |-
+            The limit on the number of requests per second was exceeded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TooManyRequestsException'
+  /buckets:
+    put:
+      operationId: CreateTableBucket
+      description: "Creates a table bucket. For more information, see [Creating a\
+        \ table bucket](https://docs.aws.amazon.com/AmazonS3/latest/userguide/s3-tables-buckets-create.html)\
+        \ in the _Amazon Simple Storage Service User Guide_.\n\nPermissions\n\n  \
+        \  \n\n  * You must have the `s3tables:CreateTableBucket` permission to use\
+        \ this operation. \n\n  * If you use this operation with the optional `encryptionConfiguration`\
+        \ parameter you must have the `s3tables:PutTableBucketEncryption` permission."
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  $ref: '#/components/schemas/TableBucketName'
+                encryptionConfiguration:
+                  $ref: '#/components/schemas/EncryptionConfiguration'
+      responses:
+        '200': {}
+        '400':
+          description: |-
+            The request is invalid or malformed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequestException'
+        '409':
+          description: |-
+            The request failed because there is a conflict with a previous write. You can retry the request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConflictException'
+        '403':
+          description: |-
+            The caller isn't authorized to make the request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ForbiddenException'
+        '500':
+          description: |-
+            The request failed due to an internal server error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerErrorException'
+        '404':
+          description: |-
+            The request was rejected because the specified resource could not be found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFoundException'
+        '429':
+          description: |-
+            The limit on the number of requests per second was exceeded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TooManyRequestsException'
+    get:
+      operationId: ListTableBuckets
+      description: "Lists table buckets for your account. For more information, see\
+        \ [S3 Table buckets](https://docs.aws.amazon.com/AmazonS3/latest/userguide/s3-tables-buckets.html)\
+        \ in the _Amazon Simple Storage Service User Guide_.\n\nPermissions\n\n  \
+        \  \n\nYou must have the `s3tables:ListTableBuckets` permission to use this\
+        \ operation."
+      parameters:
+      - name: prefix
+        in: query
+        required: false
+        schema:
+          $ref: '#/components/schemas/String'
+      - name: continuationToken
+        in: query
+        required: false
+        schema:
+          $ref: '#/components/schemas/NextToken'
+      - name: maxBuckets
+        in: query
+        required: false
+        schema:
+          $ref: '#/components/schemas/ListTableBucketsLimit'
+      responses:
+        '200': {}
+        '403':
+          description: |-
+            The caller isn't authorized to make the request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ForbiddenException'
+        '400':
+          description: |-
+            The request is invalid or malformed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequestException'
+        '409':
+          description: |-
+            The request failed because there is a conflict with a previous write. You can retry the request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConflictException'
+        '500':
+          description: |-
+            The request failed due to an internal server error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerErrorException'
+        '404':
+          description: |-
+            The request was rejected because the specified resource could not be found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFoundException'
+        '429':
+          description: |-
+            The limit on the number of requests per second was exceeded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TooManyRequestsException'
+  /namespaces/{tableBucketARN}/{namespace}:
+    delete:
+      operationId: DeleteNamespace
+      description: "Deletes a namespace. For more information, see [Delete a namespace](https://docs.aws.amazon.com/AmazonS3/latest/userguide/s3-tables-namespace-delete.html)\
+        \ in the _Amazon Simple Storage Service User Guide_.\n\nPermissions\n\n  \
+        \  \n\nYou must have the `s3tables:DeleteNamespace` permission to use this\
+        \ operation."
+      parameters:
+      - name: tableBucketARN
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/TableBucketARN'
+      - name: namespace
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/NamespaceName'
+      responses:
+        '204': {}
+        '400':
+          description: |-
+            The request is invalid or malformed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequestException'
+        '409':
+          description: |-
+            The request failed because there is a conflict with a previous write. You can retry the request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConflictException'
+        '403':
+          description: |-
+            The caller isn't authorized to make the request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ForbiddenException'
+        '500':
+          description: |-
+            The request failed due to an internal server error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerErrorException'
+        '404':
+          description: |-
+            The request was rejected because the specified resource could not be found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFoundException'
+        '429':
+          description: |-
+            The limit on the number of requests per second was exceeded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TooManyRequestsException'
+    get:
+      operationId: GetNamespace
+      description: "Gets details about a namespace. For more information, see [Table\
+        \ namespaces](https://docs.aws.amazon.com/AmazonS3/latest/userguide/s3-tables-namespace.html)\
+        \ in the _Amazon Simple Storage Service User Guide_.\n\nPermissions\n\n  \
+        \  \n\nYou must have the `s3tables:GetNamespace` permission to use this operation."
+      parameters:
+      - name: tableBucketARN
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/TableBucketARN'
+      - name: namespace
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/NamespaceName'
+      responses:
+        '200': {}
+        '403':
+          description: |-
+            The caller isn't authorized to make the request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ForbiddenException'
+        '400':
+          description: |-
+            The request is invalid or malformed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequestException'
+        '409':
+          description: |-
+            The request failed because there is a conflict with a previous write. You can retry the request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConflictException'
+        '500':
+          description: |-
+            The request failed due to an internal server error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerErrorException'
+        '404':
+          description: |-
+            The request was rejected because the specified resource could not be found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFoundException'
+        '429':
+          description: |-
+            The limit on the number of requests per second was exceeded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TooManyRequestsException'
+  /tables/{tableBucketARN}/{namespace}/{name}:
+    delete:
+      operationId: DeleteTable
+      description: "Deletes a table. For more information, see [Deleting an Amazon\
+        \ S3 table](https://docs.aws.amazon.com/AmazonS3/latest/userguide/s3-tables-delete.html)\
+        \ in the _Amazon Simple Storage Service User Guide_.\n\nPermissions\n\n  \
+        \  \n\nYou must have the `s3tables:DeleteTable` permission to use this operation."
+      parameters:
+      - name: tableBucketARN
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/TableBucketARN'
+      - name: namespace
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/NamespaceName'
+      - name: name
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/TableName'
+      - name: versionToken
+        in: query
+        required: false
+        schema:
+          $ref: '#/components/schemas/VersionToken'
+      responses:
+        '204': {}
+        '400':
+          description: |-
+            The request is invalid or malformed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequestException'
+        '409':
+          description: |-
+            The request failed because there is a conflict with a previous write. You can retry the request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConflictException'
+        '403':
+          description: |-
+            The caller isn't authorized to make the request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ForbiddenException'
+        '500':
+          description: |-
+            The request failed due to an internal server error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerErrorException'
+        '404':
+          description: |-
+            The request was rejected because the specified resource could not be found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFoundException'
+        '429':
+          description: |-
+            The limit on the number of requests per second was exceeded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TooManyRequestsException'
+    get:
+      operationId: GetTable
+      description: "Gets details about a table. For more information, see [S3 Tables](https://docs.aws.amazon.com/AmazonS3/latest/userguide/s3-tables-tables.html)\
+        \ in the _Amazon Simple Storage Service User Guide_.\n\nPermissions\n\n  \
+        \  \n\nYou must have the `s3tables:GetTable` permission to use this operation."
+      parameters:
+      - name: tableBucketARN
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/TableBucketARN'
+      - name: namespace
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/NamespaceName'
+      - name: name
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/TableName'
+      responses:
+        '200': {}
+        '403':
+          description: |-
+            The caller isn't authorized to make the request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ForbiddenException'
+        '400':
+          description: |-
+            The request is invalid or malformed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequestException'
+        '409':
+          description: |-
+            The request failed because there is a conflict with a previous write. You can retry the request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConflictException'
+        '500':
+          description: |-
+            The request failed due to an internal server error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerErrorException'
+        '404':
+          description: |-
+            The request was rejected because the specified resource could not be found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFoundException'
+        '429':
+          description: |-
+            The limit on the number of requests per second was exceeded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TooManyRequestsException'
+  /buckets/{tableBucketARN}:
+    delete:
+      operationId: DeleteTableBucket
+      description: "Deletes a table bucket. For more information, see [Deleting a\
+        \ table bucket](https://docs.aws.amazon.com/AmazonS3/latest/userguide/s3-tables-buckets-delete.html)\
+        \ in the _Amazon Simple Storage Service User Guide_.\n\nPermissions\n\n  \
+        \  \n\nYou must have the `s3tables:DeleteTableBucket` permission to use this\
+        \ operation."
+      parameters:
+      - name: tableBucketARN
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/TableBucketARN'
+      responses:
+        '204': {}
+        '400':
+          description: |-
+            The request is invalid or malformed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequestException'
+        '409':
+          description: |-
+            The request failed because there is a conflict with a previous write. You can retry the request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConflictException'
+        '403':
+          description: |-
+            The caller isn't authorized to make the request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ForbiddenException'
+        '500':
+          description: |-
+            The request failed due to an internal server error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerErrorException'
+        '404':
+          description: |-
+            The request was rejected because the specified resource could not be found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFoundException'
+        '429':
+          description: |-
+            The limit on the number of requests per second was exceeded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TooManyRequestsException'
+    get:
+      operationId: GetTableBucket
+      description: "Gets details on a table bucket. For more information, see [Viewing\
+        \ details about an Amazon S3 table bucket](https://docs.aws.amazon.com/AmazonS3/latest/userguide/s3-tables-buckets-details.html)\
+        \ in the _Amazon Simple Storage Service User Guide_.\n\nPermissions\n\n  \
+        \  \n\nYou must have the `s3tables:GetTableBucket` permission to use this\
+        \ operation."
+      parameters:
+      - name: tableBucketARN
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/TableBucketARN'
+      responses:
+        '200': {}
+        '403':
+          description: |-
+            The caller isn't authorized to make the request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ForbiddenException'
+        '400':
+          description: |-
+            The request is invalid or malformed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequestException'
+        '409':
+          description: |-
+            The request failed because there is a conflict with a previous write. You can retry the request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConflictException'
+        '500':
+          description: |-
+            The request failed due to an internal server error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerErrorException'
+        '404':
+          description: |-
+            The request was rejected because the specified resource could not be found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFoundException'
+        '429':
+          description: |-
+            The limit on the number of requests per second was exceeded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TooManyRequestsException'
+  /buckets/{tableBucketARN}/encryption:
+    delete:
+      operationId: DeleteTableBucketEncryption
+      description: "Deletes the encryption configuration for a table bucket.\n\nPermissions\n\
+        \n    \n\nYou must have the `s3tables:DeleteTableBucketEncryption` permission\
+        \ to use this operation."
+      parameters:
+      - name: tableBucketARN
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/TableBucketARN'
+      responses:
+        '204': {}
+        '400':
+          description: |-
+            The request is invalid or malformed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequestException'
+        '409':
+          description: |-
+            The request failed because there is a conflict with a previous write. You can retry the request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConflictException'
+        '403':
+          description: |-
+            The caller isn't authorized to make the request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ForbiddenException'
+        '500':
+          description: |-
+            The request failed due to an internal server error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerErrorException'
+        '404':
+          description: |-
+            The request was rejected because the specified resource could not be found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFoundException'
+        '429':
+          description: |-
+            The limit on the number of requests per second was exceeded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TooManyRequestsException'
+    get:
+      operationId: GetTableBucketEncryption
+      description: "Gets the encryption configuration for a table bucket.\n\nPermissions\n\
+        \n    \n\nYou must have the `s3tables:GetTableBucketEncryption` permission\
+        \ to use this operation."
+      parameters:
+      - name: tableBucketARN
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/TableBucketARN'
+      responses:
+        '200': {}
+        '403':
+          description: |-
+            The caller isn't authorized to make the request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ForbiddenException'
+        '400':
+          description: |-
+            The request is invalid or malformed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequestException'
+        '500':
+          description: |-
+            The request failed due to an internal server error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerErrorException'
+        '404':
+          description: |-
+            The request was rejected because the specified resource could not be found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFoundException'
+        '429':
+          description: |-
+            The limit on the number of requests per second was exceeded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TooManyRequestsException'
+    put:
+      operationId: PutTableBucketEncryption
+      description: "Sets the encryption configuration for a table bucket.\n\nPermissions\n\
+        \n    \n\nYou must have the `s3tables:PutTableBucketEncryption` permission\
+        \ to use this operation.\n\nIf you choose SSE-KMS encryption you must grant\
+        \ the S3 Tables maintenance principal access to your KMS key. For more information,\
+        \ see [Permissions requirements for S3 Tables SSE-KMS encryption](AmazonS3/latest/userguide/s3-tables-kms-permissions.html)"
+      parameters:
+      - name: tableBucketARN
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/TableBucketARN'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                encryptionConfiguration:
+                  $ref: '#/components/schemas/EncryptionConfiguration'
+      responses:
+        '200': {}
+        '400':
+          description: |-
+            The request is invalid or malformed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequestException'
+        '409':
+          description: |-
+            The request failed because there is a conflict with a previous write. You can retry the request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConflictException'
+        '403':
+          description: |-
+            The caller isn't authorized to make the request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ForbiddenException'
+        '500':
+          description: |-
+            The request failed due to an internal server error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerErrorException'
+        '404':
+          description: |-
+            The request was rejected because the specified resource could not be found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFoundException'
+        '429':
+          description: |-
+            The limit on the number of requests per second was exceeded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TooManyRequestsException'
+  /buckets/{tableBucketARN}/policy:
+    delete:
+      operationId: DeleteTableBucketPolicy
+      description: "Deletes a table bucket policy. For more information, see [Deleting\
+        \ a table bucket policy](https://docs.aws.amazon.com/AmazonS3/latest/userguide/s3-tables-bucket-policy.html#table-bucket-policy-delete)\
+        \ in the _Amazon Simple Storage Service User Guide_.\n\nPermissions\n\n  \
+        \  \n\nYou must have the `s3tables:DeleteTableBucketPolicy` permission to\
+        \ use this operation."
+      parameters:
+      - name: tableBucketARN
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/TableBucketARN'
+      responses:
+        '204': {}
+        '400':
+          description: |-
+            The request is invalid or malformed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequestException'
+        '409':
+          description: |-
+            The request failed because there is a conflict with a previous write. You can retry the request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConflictException'
+        '403':
+          description: |-
+            The caller isn't authorized to make the request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ForbiddenException'
+        '500':
+          description: |-
+            The request failed due to an internal server error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerErrorException'
+        '404':
+          description: |-
+            The request was rejected because the specified resource could not be found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFoundException'
+        '429':
+          description: |-
+            The limit on the number of requests per second was exceeded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TooManyRequestsException'
+    get:
+      operationId: GetTableBucketPolicy
+      description: "Gets details about a table bucket policy. For more information,\
+        \ see [Viewing a table bucket policy](https://docs.aws.amazon.com/AmazonS3/latest/userguide/s3-tables-bucket-policy.html#table-bucket-policy-get)\
+        \ in the _Amazon Simple Storage Service User Guide_.\n\nPermissions\n\n  \
+        \  \n\nYou must have the `s3tables:GetTableBucketPolicy` permission to use\
+        \ this operation."
+      parameters:
+      - name: tableBucketARN
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/TableBucketARN'
+      responses:
+        '200': {}
+        '400':
+          description: |-
+            The request is invalid or malformed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequestException'
+        '409':
+          description: |-
+            The request failed because there is a conflict with a previous write. You can retry the request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConflictException'
+        '403':
+          description: |-
+            The caller isn't authorized to make the request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ForbiddenException'
+        '500':
+          description: |-
+            The request failed due to an internal server error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerErrorException'
+        '404':
+          description: |-
+            The request was rejected because the specified resource could not be found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFoundException'
+        '429':
+          description: |-
+            The limit on the number of requests per second was exceeded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TooManyRequestsException'
+    put:
+      operationId: PutTableBucketPolicy
+      description: "Creates a new maintenance configuration or replaces an existing\
+        \ table bucket policy for a table bucket. For more information, see [Adding\
+        \ a table bucket policy](https://docs.aws.amazon.com/AmazonS3/latest/userguide/s3-tables-bucket-policy.html#table-bucket-policy-add)\
+        \ in the _Amazon Simple Storage Service User Guide_.\n\nPermissions\n\n  \
+        \  \n\nYou must have the `s3tables:PutTableBucketPolicy` permission to use\
+        \ this operation."
+      parameters:
+      - name: tableBucketARN
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/TableBucketARN'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                resourcePolicy:
+                  $ref: '#/components/schemas/ResourcePolicy'
+      responses:
+        '200': {}
+        '400':
+          description: |-
+            The request is invalid or malformed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequestException'
+        '409':
+          description: |-
+            The request failed because there is a conflict with a previous write. You can retry the request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConflictException'
+        '403':
+          description: |-
+            The caller isn't authorized to make the request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ForbiddenException'
+        '500':
+          description: |-
+            The request failed due to an internal server error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerErrorException'
+        '404':
+          description: |-
+            The request was rejected because the specified resource could not be found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFoundException'
+        '429':
+          description: |-
+            The limit on the number of requests per second was exceeded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TooManyRequestsException'
+  /tables/{tableBucketARN}/{namespace}/{name}/policy:
+    delete:
+      operationId: DeleteTablePolicy
+      description: "Deletes a table policy. For more information, see [Deleting a\
+        \ table policy](https://docs.aws.amazon.com/AmazonS3/latest/userguide/s3-tables-table-policy.html#table-policy-delete)\
+        \ in the _Amazon Simple Storage Service User Guide_.\n\nPermissions\n\n  \
+        \  \n\nYou must have the `s3tables:DeleteTablePolicy` permission to use this\
+        \ operation."
+      parameters:
+      - name: tableBucketARN
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/TableBucketARN'
+      - name: namespace
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/NamespaceName'
+      - name: name
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/TableName'
+      responses:
+        '204': {}
+        '400':
+          description: |-
+            The request is invalid or malformed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequestException'
+        '409':
+          description: |-
+            The request failed because there is a conflict with a previous write. You can retry the request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConflictException'
+        '403':
+          description: |-
+            The caller isn't authorized to make the request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ForbiddenException'
+        '500':
+          description: |-
+            The request failed due to an internal server error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerErrorException'
+        '404':
+          description: |-
+            The request was rejected because the specified resource could not be found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFoundException'
+        '429':
+          description: |-
+            The limit on the number of requests per second was exceeded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TooManyRequestsException'
+    get:
+      operationId: GetTablePolicy
+      description: "Gets details about a table policy. For more information, see [Viewing\
+        \ a table policy](https://docs.aws.amazon.com/AmazonS3/latest/userguide/s3-tables-table-policy.html#table-policy-get)\
+        \ in the _Amazon Simple Storage Service User Guide_.\n\nPermissions\n\n  \
+        \  \n\nYou must have the `s3tables:GetTablePolicy` permission to use this\
+        \ operation."
+      parameters:
+      - name: tableBucketARN
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/TableBucketARN'
+      - name: namespace
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/NamespaceName'
+      - name: name
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/TableName'
+      responses:
+        '200': {}
+        '400':
+          description: |-
+            The request is invalid or malformed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequestException'
+        '409':
+          description: |-
+            The request failed because there is a conflict with a previous write. You can retry the request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConflictException'
+        '403':
+          description: |-
+            The caller isn't authorized to make the request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ForbiddenException'
+        '500':
+          description: |-
+            The request failed due to an internal server error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerErrorException'
+        '404':
+          description: |-
+            The request was rejected because the specified resource could not be found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFoundException'
+        '429':
+          description: |-
+            The limit on the number of requests per second was exceeded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TooManyRequestsException'
+    put:
+      operationId: PutTablePolicy
+      description: "Creates a new maintenance configuration or replaces an existing\
+        \ table policy for a table. For more information, see [Adding a table policy](https://docs.aws.amazon.com/AmazonS3/latest/userguide/s3-tables-table-policy.html#table-policy-add)\
+        \ in the _Amazon Simple Storage Service User Guide_.\n\nPermissions\n\n  \
+        \  \n\nYou must have the `s3tables:PutTablePolicy` permission to use this\
+        \ operation."
+      parameters:
+      - name: tableBucketARN
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/TableBucketARN'
+      - name: namespace
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/NamespaceName'
+      - name: name
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/TableName'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                resourcePolicy:
+                  $ref: '#/components/schemas/ResourcePolicy'
+      responses:
+        '200': {}
+        '400':
+          description: |-
+            The request is invalid or malformed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequestException'
+        '409':
+          description: |-
+            The request failed because there is a conflict with a previous write. You can retry the request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConflictException'
+        '403':
+          description: |-
+            The caller isn't authorized to make the request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ForbiddenException'
+        '500':
+          description: |-
+            The request failed due to an internal server error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerErrorException'
+        '404':
+          description: |-
+            The request was rejected because the specified resource could not be found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFoundException'
+        '429':
+          description: |-
+            The limit on the number of requests per second was exceeded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TooManyRequestsException'
+  /buckets/{tableBucketARN}/maintenance:
+    get:
+      operationId: GetTableBucketMaintenanceConfiguration
+      description: "Gets details about a maintenance configuration for a given table\
+        \ bucket. For more information, see [Amazon S3 table bucket maintenance](https://docs.aws.amazon.com/AmazonS3/latest/userguide/s3-table-buckets-maintenance.html)\
+        \ in the _Amazon Simple Storage Service User Guide_.\n\nPermissions\n\n  \
+        \  \n\nYou must have the `s3tables:GetTableBucketMaintenanceConfiguration`\
+        \ permission to use this operation."
+      parameters:
+      - name: tableBucketARN
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/TableBucketARN'
+      responses:
+        '200': {}
+        '400':
+          description: |-
+            The request is invalid or malformed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequestException'
+        '409':
+          description: |-
+            The request failed because there is a conflict with a previous write. You can retry the request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConflictException'
+        '403':
+          description: |-
+            The caller isn't authorized to make the request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ForbiddenException'
+        '500':
+          description: |-
+            The request failed due to an internal server error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerErrorException'
+        '404':
+          description: |-
+            The request was rejected because the specified resource could not be found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFoundException'
+        '429':
+          description: |-
+            The limit on the number of requests per second was exceeded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TooManyRequestsException'
+  /tables/{tableBucketARN}/{namespace}/{name}/encryption:
+    get:
+      operationId: GetTableEncryption
+      description: "Gets the encryption configuration for a table.\n\nPermissions\n\
+        \n    \n\nYou must have the `s3tables:GetTableEncryption` permission to use\
+        \ this operation."
+      parameters:
+      - name: tableBucketARN
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/TableBucketARN'
+      - name: namespace
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/NamespaceName'
+      - name: name
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/TableName'
+      responses:
+        '200': {}
+        '403':
+          description: |-
+            The caller isn't authorized to make the request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ForbiddenException'
+        '400':
+          description: |-
+            The request is invalid or malformed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequestException'
+        '500':
+          description: |-
+            The request failed due to an internal server error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerErrorException'
+        '404':
+          description: |-
+            The request was rejected because the specified resource could not be found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFoundException'
+        '429':
+          description: |-
+            The limit on the number of requests per second was exceeded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TooManyRequestsException'
+  /tables/{tableBucketARN}/{namespace}/{name}/maintenance:
+    get:
+      operationId: GetTableMaintenanceConfiguration
+      description: "Gets details about the maintenance configuration of a table. For\
+        \ more information, see [S3 Tables maintenance](https://docs.aws.amazon.com/AmazonS3/latest/userguide/s3-tables-maintenance.html)\
+        \ in the _Amazon Simple Storage Service User Guide_.\n\nPermissions\n\n  \
+        \  \n\nYou must have the `s3tables:GetTableMaintenanceConfiguration` permission\
+        \ to use this operation."
+      parameters:
+      - name: tableBucketARN
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/TableBucketARN'
+      - name: namespace
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/NamespaceName'
+      - name: name
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/TableName'
+      responses:
+        '200': {}
+        '400':
+          description: |-
+            The request is invalid or malformed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequestException'
+        '409':
+          description: |-
+            The request failed because there is a conflict with a previous write. You can retry the request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConflictException'
+        '403':
+          description: |-
+            The caller isn't authorized to make the request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ForbiddenException'
+        '500':
+          description: |-
+            The request failed due to an internal server error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerErrorException'
+        '404':
+          description: |-
+            The request was rejected because the specified resource could not be found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFoundException'
+        '429':
+          description: |-
+            The limit on the number of requests per second was exceeded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TooManyRequestsException'
+  /tables/{tableBucketARN}/{namespace}/{name}/maintenance-job-status:
+    get:
+      operationId: GetTableMaintenanceJobStatus
+      description: "Gets the status of a maintenance job for a table. For more information,\
+        \ see [S3 Tables maintenance](https://docs.aws.amazon.com/AmazonS3/latest/userguide/s3-tables-maintenance.html)\
+        \ in the _Amazon Simple Storage Service User Guide_.\n\nPermissions\n\n  \
+        \  \n\nYou must have the `s3tables:GetTableMaintenanceJobStatus` permission\
+        \ to use this operation."
+      parameters:
+      - name: tableBucketARN
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/TableBucketARN'
+      - name: namespace
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/NamespaceName'
+      - name: name
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/TableName'
+      responses:
+        '200': {}
+        '400':
+          description: |-
+            The request is invalid or malformed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequestException'
+        '409':
+          description: |-
+            The request failed because there is a conflict with a previous write. You can retry the request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConflictException'
+        '403':
+          description: |-
+            The caller isn't authorized to make the request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ForbiddenException'
+        '500':
+          description: |-
+            The request failed due to an internal server error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerErrorException'
+        '404':
+          description: |-
+            The request was rejected because the specified resource could not be found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFoundException'
+        '429':
+          description: |-
+            The limit on the number of requests per second was exceeded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TooManyRequestsException'
+  /tables/{tableBucketARN}/{namespace}/{name}/metadata-location:
+    get:
+      operationId: GetTableMetadataLocation
+      description: "Gets the location of the table metadata.\n\nPermissions\n\n  \
+        \  \n\nYou must have the `s3tables:GetTableMetadataLocation` permission to\
+        \ use this operation."
+      parameters:
+      - name: tableBucketARN
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/TableBucketARN'
+      - name: namespace
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/NamespaceName'
+      - name: name
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/TableName'
+      responses:
+        '200': {}
+        '400':
+          description: |-
+            The request is invalid or malformed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequestException'
+        '409':
+          description: |-
+            The request failed because there is a conflict with a previous write. You can retry the request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConflictException'
+        '403':
+          description: |-
+            The caller isn't authorized to make the request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ForbiddenException'
+        '500':
+          description: |-
+            The request failed due to an internal server error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerErrorException'
+        '404':
+          description: |-
+            The request was rejected because the specified resource could not be found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFoundException'
+        '429':
+          description: |-
+            The limit on the number of requests per second was exceeded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TooManyRequestsException'
+    put:
+      operationId: UpdateTableMetadataLocation
+      description: "Updates the metadata location for a table. The metadata location\
+        \ of a table must be an S3 URI that begins with the table's warehouse location.\
+        \ The metadata location for an Apache Iceberg table must end with `.metadata.json`,\
+        \ or if the metadata file is Gzip-compressed, `.metadata.json.gz`.\n\nPermissions\n\
+        \n    \n\nYou must have the `s3tables:UpdateTableMetadataLocation` permission\
+        \ to use this operation."
+      parameters:
+      - name: tableBucketARN
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/TableBucketARN'
+      - name: namespace
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/NamespaceName'
+      - name: name
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/TableName'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                versionToken:
+                  $ref: '#/components/schemas/VersionToken'
+                metadataLocation:
+                  $ref: '#/components/schemas/MetadataLocation'
+      responses:
+        '200': {}
+        '400':
+          description: |-
+            The request is invalid or malformed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequestException'
+        '409':
+          description: |-
+            The request failed because there is a conflict with a previous write. You can retry the request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConflictException'
+        '403':
+          description: |-
+            The caller isn't authorized to make the request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ForbiddenException'
+        '500':
+          description: |-
+            The request failed due to an internal server error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerErrorException'
+        '404':
+          description: |-
+            The request was rejected because the specified resource could not be found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFoundException'
+        '429':
+          description: |-
+            The limit on the number of requests per second was exceeded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TooManyRequestsException'
+  /tables/{tableBucketARN}:
+    get:
+      operationId: ListTables
+      description: "List tables in the given table bucket. For more information, see\
+        \ [S3 Tables](https://docs.aws.amazon.com/AmazonS3/latest/userguide/s3-tables-tables.html)\
+        \ in the _Amazon Simple Storage Service User Guide_.\n\nPermissions\n\n  \
+        \  \n\nYou must have the `s3tables:ListTables` permission to use this operation."
+      parameters:
+      - name: tableBucketARN
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/TableBucketARN'
+      - name: namespace
+        in: query
+        required: false
+        schema:
+          $ref: '#/components/schemas/NamespaceName'
+      - name: prefix
+        in: query
+        required: false
+        schema:
+          $ref: '#/components/schemas/String'
+      - name: continuationToken
+        in: query
+        required: false
+        schema:
+          $ref: '#/components/schemas/NextToken'
+      - name: maxTables
+        in: query
+        required: false
+        schema:
+          $ref: '#/components/schemas/ListTablesLimit'
+      responses:
+        '200': {}
+        '400':
+          description: |-
+            The request is invalid or malformed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequestException'
+        '409':
+          description: |-
+            The request failed because there is a conflict with a previous write. You can retry the request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConflictException'
+        '403':
+          description: |-
+            The caller isn't authorized to make the request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ForbiddenException'
+        '500':
+          description: |-
+            The request failed due to an internal server error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerErrorException'
+        '404':
+          description: |-
+            The request was rejected because the specified resource could not be found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFoundException'
+        '429':
+          description: |-
+            The limit on the number of requests per second was exceeded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TooManyRequestsException'
+  /buckets/{tableBucketARN}/maintenance/{type}:
+    put:
+      operationId: PutTableBucketMaintenanceConfiguration
+      description: "Creates a new maintenance configuration or replaces an existing\
+        \ maintenance configuration for a table bucket. For more information, see\
+        \ [Amazon S3 table bucket maintenance](https://docs.aws.amazon.com/AmazonS3/latest/userguide/s3-table-buckets-maintenance.html)\
+        \ in the _Amazon Simple Storage Service User Guide_.\n\nPermissions\n\n  \
+        \  \n\nYou must have the `s3tables:PutTableBucketMaintenanceConfiguration`\
+        \ permission to use this operation."
+      parameters:
+      - name: tableBucketARN
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/TableBucketARN'
+      - name: type
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/TableBucketMaintenanceType'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                value:
+                  $ref: '#/components/schemas/TableBucketMaintenanceConfigurationValue'
+      responses:
+        '204': {}
+        '400':
+          description: |-
+            The request is invalid or malformed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequestException'
+        '409':
+          description: |-
+            The request failed because there is a conflict with a previous write. You can retry the request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConflictException'
+        '403':
+          description: |-
+            The caller isn't authorized to make the request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ForbiddenException'
+        '500':
+          description: |-
+            The request failed due to an internal server error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerErrorException'
+        '404':
+          description: |-
+            The request was rejected because the specified resource could not be found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFoundException'
+        '429':
+          description: |-
+            The limit on the number of requests per second was exceeded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TooManyRequestsException'
+  /tables/{tableBucketARN}/{namespace}/{name}/maintenance/{type}:
+    put:
+      operationId: PutTableMaintenanceConfiguration
+      description: "Creates a new maintenance configuration or replaces an existing\
+        \ maintenance configuration for a table. For more information, see [S3 Tables\
+        \ maintenance](https://docs.aws.amazon.com/AmazonS3/latest/userguide/s3-tables-maintenance.html)\
+        \ in the _Amazon Simple Storage Service User Guide_.\n\nPermissions\n\n  \
+        \  \n\nYou must have the `s3tables:PutTableMaintenanceConfiguration` permission\
+        \ to use this operation."
+      parameters:
+      - name: tableBucketARN
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/TableBucketARN'
+      - name: namespace
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/NamespaceName'
+      - name: name
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/TableName'
+      - name: type
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/TableMaintenanceType'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                value:
+                  $ref: '#/components/schemas/TableMaintenanceConfigurationValue'
+      responses:
+        '204': {}
+        '400':
+          description: |-
+            The request is invalid or malformed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequestException'
+        '409':
+          description: |-
+            The request failed because there is a conflict with a previous write. You can retry the request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConflictException'
+        '403':
+          description: |-
+            The caller isn't authorized to make the request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ForbiddenException'
+        '500':
+          description: |-
+            The request failed due to an internal server error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerErrorException'
+        '404':
+          description: |-
+            The request was rejected because the specified resource could not be found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFoundException'
+        '429':
+          description: |-
+            The limit on the number of requests per second was exceeded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TooManyRequestsException'
+  /tables/{tableBucketARN}/{namespace}/{name}/rename:
+    put:
+      operationId: RenameTable
+      description: "Renames a table or a namespace. For more information, see [S3\
+        \ Tables](https://docs.aws.amazon.com/AmazonS3/latest/userguide/s3-tables-tables.html)\
+        \ in the _Amazon Simple Storage Service User Guide_.\n\nPermissions\n\n  \
+        \  \n\nYou must have the `s3tables:RenameTable` permission to use this operation."
+      parameters:
+      - name: tableBucketARN
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/TableBucketARN'
+      - name: namespace
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/NamespaceName'
+      - name: name
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/TableName'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                newNamespaceName:
+                  $ref: '#/components/schemas/NamespaceName'
+                newName:
+                  $ref: '#/components/schemas/TableName'
+                versionToken:
+                  $ref: '#/components/schemas/VersionToken'
+      responses:
+        '204': {}
+        '400':
+          description: |-
+            The request is invalid or malformed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequestException'
+        '409':
+          description: |-
+            The request failed because there is a conflict with a previous write. You can retry the request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConflictException'
+        '403':
+          description: |-
+            The caller isn't authorized to make the request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ForbiddenException'
+        '500':
+          description: |-
+            The request failed due to an internal server error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerErrorException'
+        '404':
+          description: |-
+            The request was rejected because the specified resource could not be found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFoundException'
+        '429':
+          description: |-
+            The limit on the number of requests per second was exceeded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TooManyRequestsException'
 components:
   schemas:
+    AccessDeniedException:
+      type: object
+      properties:
+        message:
+          $ref: '#/components/schemas/ErrorMessage'
+      description: The action cannot be performed because you do not have the required
+        permission.
     AccountId:
       type: string
       pattern: ^[0-9].*$
       minLength: 12
       maxLength: 12
+    BadRequestException:
+      type: object
+      properties:
+        message:
+          $ref: '#/components/schemas/ErrorMessage'
+      description: The request is invalid or malformed.
+    ConflictException:
+      type: object
+      properties:
+        message:
+          $ref: '#/components/schemas/ErrorMessage'
+      description: The request failed because there is a conflict with a previous
+        write. You can retry the request.
+    CreateNamespaceRequest:
+      type: object
+      properties:
+        tableBucketARN:
+          allOf:
+          - $ref: '#/components/schemas/TableBucketARN'
+          description: The Amazon Resource Name (ARN) of the table bucket to create
+            the namespace in.
+        namespace:
+          allOf:
+          - $ref: '#/components/schemas/NamespaceList'
+          description: A name for the namespace.
+      required:
+      - tableBucketARN
+      - namespace
+    CreateNamespaceResponse:
+      type: object
+      properties:
+        tableBucketARN:
+          allOf:
+          - $ref: '#/components/schemas/TableBucketARN'
+          description: The Amazon Resource Name (ARN) of the table bucket the namespace
+            was created in.
+        namespace:
+          allOf:
+          - $ref: '#/components/schemas/NamespaceList'
+          description: The name of the namespace.
+      required:
+      - tableBucketARN
+      - namespace
+    CreateTableBucketRequest:
+      type: object
+      properties:
+        name:
+          allOf:
+          - $ref: '#/components/schemas/TableBucketName'
+          description: The name for the table bucket.
+        encryptionConfiguration:
+          allOf:
+          - $ref: '#/components/schemas/EncryptionConfiguration'
+          description: The encryption configuration to use for the table bucket. This
+            configuration specifies the default encryption settings that will be applied
+            to all tables created in this bucket unless overridden at the table level.
+            The configuration includes the encryption algorithm and, if using SSE-KMS,
+            the KMS key to use.
+      required:
+      - name
+    CreateTableBucketResponse:
+      type: object
+      properties:
+        arn:
+          allOf:
+          - $ref: '#/components/schemas/TableBucketARN'
+          description: The Amazon Resource Name (ARN) of the table bucket.
+      required:
+      - arn
+    CreateTableRequest:
+      type: object
+      properties:
+        tableBucketARN:
+          allOf:
+          - $ref: '#/components/schemas/TableBucketARN'
+          description: The Amazon Resource Name (ARN) of the table bucket to create
+            the table in.
+        namespace:
+          allOf:
+          - $ref: '#/components/schemas/NamespaceName'
+          description: The namespace to associated with the table.
+        name:
+          allOf:
+          - $ref: '#/components/schemas/TableName'
+          description: The name for the table.
+        format:
+          allOf:
+          - $ref: '#/components/schemas/OpenTableFormat'
+          description: The format for the table.
+        metadata:
+          allOf:
+          - $ref: '#/components/schemas/TableMetadata'
+          description: The metadata for the table.
+        encryptionConfiguration:
+          allOf:
+          - $ref: '#/components/schemas/EncryptionConfiguration'
+          description: 'The encryption configuration to use for the table. This configuration
+            specifies the encryption algorithm and, if using SSE-KMS, the KMS key
+            to use for encrypting the table.
+
+
+            If you choose SSE-KMS encryption you must grant the S3 Tables maintenance
+            principal access to your KMS key. For more information, see [Permissions
+            requirements for S3 Tables SSE-KMS encryption](https://docs.aws.amazon.com/AmazonS3/latest/userguide/s3-tables-kms-permissions.html).'
+      required:
+      - tableBucketARN
+      - namespace
+      - name
+      - format
+    CreateTableResponse:
+      type: object
+      properties:
+        tableARN:
+          allOf:
+          - $ref: '#/components/schemas/TableARN'
+          description: The Amazon Resource Name (ARN) of the table.
+        versionToken:
+          allOf:
+          - $ref: '#/components/schemas/VersionToken'
+          description: The version token of the table.
+      required:
+      - tableARN
+      - versionToken
+    DeleteNamespaceRequest:
+      type: object
+      properties:
+        tableBucketARN:
+          allOf:
+          - $ref: '#/components/schemas/TableBucketARN'
+          description: The Amazon Resource Name (ARN) of the table bucket associated
+            with the namespace.
+        namespace:
+          allOf:
+          - $ref: '#/components/schemas/NamespaceName'
+          description: The name of the namespace.
+      required:
+      - tableBucketARN
+      - namespace
+    DeleteTableBucketEncryptionRequest:
+      type: object
+      properties:
+        tableBucketARN:
+          allOf:
+          - $ref: '#/components/schemas/TableBucketARN'
+          description: The Amazon Resource Name (ARN) of the table bucket.
+      required:
+      - tableBucketARN
+    DeleteTableBucketPolicyRequest:
+      type: object
+      properties:
+        tableBucketARN:
+          allOf:
+          - $ref: '#/components/schemas/TableBucketARN'
+          description: The Amazon Resource Name (ARN) of the table bucket.
+      required:
+      - tableBucketARN
+    DeleteTableBucketRequest:
+      type: object
+      properties:
+        tableBucketARN:
+          allOf:
+          - $ref: '#/components/schemas/TableBucketARN'
+          description: The Amazon Resource Name (ARN) of the table bucket.
+      required:
+      - tableBucketARN
+    DeleteTablePolicyRequest:
+      type: object
+      properties:
+        tableBucketARN:
+          allOf:
+          - $ref: '#/components/schemas/TableBucketARN'
+          description: The Amazon Resource Name (ARN) of the table bucket that contains
+            the table.
+        namespace:
+          allOf:
+          - $ref: '#/components/schemas/NamespaceName'
+          description: The namespace associated with the table.
+        name:
+          allOf:
+          - $ref: '#/components/schemas/TableName'
+          description: The table name.
+      required:
+      - tableBucketARN
+      - namespace
+      - name
+    DeleteTableRequest:
+      type: object
+      properties:
+        tableBucketARN:
+          allOf:
+          - $ref: '#/components/schemas/TableBucketARN'
+          description: The Amazon Resource Name (ARN) of the table bucket that contains
+            the table.
+        namespace:
+          allOf:
+          - $ref: '#/components/schemas/NamespaceName'
+          description: The namespace associated with the table.
+        name:
+          allOf:
+          - $ref: '#/components/schemas/TableName'
+          description: The name of the table.
+        versionToken:
+          allOf:
+          - $ref: '#/components/schemas/VersionToken'
+          description: The version token of the table.
+      required:
+      - tableBucketARN
+      - namespace
+      - name
+    EncryptionConfiguration:
+      type: object
+      properties:
+        sseAlgorithm:
+          allOf:
+          - $ref: '#/components/schemas/SSEAlgorithm'
+          description: The server-side encryption algorithm to use. Valid values are
+            `AES256` for S3-managed encryption keys, or `aws:kms` for Amazon Web Services
+            KMS-managed encryption keys. If you choose SSE-KMS encryption you must
+            grant the S3 Tables maintenance principal access to your KMS key. For
+            more information, see [Permissions requirements for S3 Tables SSE-KMS
+            encryption](https://docs.aws.amazon.com/AmazonS3/latest/userguide/s3-tables-kms-permissions.html).
+        kmsKeyArn:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The Amazon Resource Name (ARN) of the KMS key to use for encryption.
+            This field is required only when `sseAlgorithm` is set to `aws:kms`.
+      required:
+      - sseAlgorithm
+      description: Configuration specifying how data should be encrypted. This structure
+        defines the encryption algorithm and optional KMS key to be used for server-side
+        encryption.
     ErrorMessage:
       type: string
+    ForbiddenException:
+      type: object
+      properties:
+        message:
+          $ref: '#/components/schemas/ErrorMessage'
+      description: The caller isn't authorized to make the request.
+    GetNamespaceRequest:
+      type: object
+      properties:
+        tableBucketARN:
+          allOf:
+          - $ref: '#/components/schemas/TableBucketARN'
+          description: The Amazon Resource Name (ARN) of the table bucket.
+        namespace:
+          allOf:
+          - $ref: '#/components/schemas/NamespaceName'
+          description: The name of the namespace.
+      required:
+      - tableBucketARN
+      - namespace
+    GetNamespaceResponse:
+      type: object
+      properties:
+        namespace:
+          allOf:
+          - $ref: '#/components/schemas/NamespaceList'
+          description: The name of the namespace.
+        createdAt:
+          allOf:
+          - $ref: '#/components/schemas/Timestamp'
+          description: The date and time the namespace was created at.
+        createdBy:
+          allOf:
+          - $ref: '#/components/schemas/AccountId'
+          description: The ID of the account that created the namespace.
+        ownerAccountId:
+          allOf:
+          - $ref: '#/components/schemas/AccountId'
+          description: The ID of the account that owns the namespcace.
+        namespaceId:
+          allOf:
+          - $ref: '#/components/schemas/NamespaceId'
+          description: The unique identifier of the namespace.
+        tableBucketId:
+          allOf:
+          - $ref: '#/components/schemas/TableBucketId'
+          description: The unique identifier of the table bucket containing this namespace.
+      required:
+      - namespace
+      - createdAt
+      - createdBy
+      - ownerAccountId
+    GetTableBucketEncryptionRequest:
+      type: object
+      properties:
+        tableBucketARN:
+          allOf:
+          - $ref: '#/components/schemas/TableBucketARN'
+          description: The Amazon Resource Name (ARN) of the table bucket.
+      required:
+      - tableBucketARN
+    GetTableBucketEncryptionResponse:
+      type: object
+      properties:
+        encryptionConfiguration:
+          allOf:
+          - $ref: '#/components/schemas/EncryptionConfiguration'
+          description: The encryption configuration for the table bucket.
+      required:
+      - encryptionConfiguration
+    GetTableBucketMaintenanceConfigurationRequest:
+      type: object
+      properties:
+        tableBucketARN:
+          allOf:
+          - $ref: '#/components/schemas/TableBucketARN'
+          description: The Amazon Resource Name (ARN) of the table bucket associated
+            with the maintenance configuration.
+      required:
+      - tableBucketARN
+    GetTableBucketMaintenanceConfigurationResponse:
+      type: object
+      properties:
+        tableBucketARN:
+          allOf:
+          - $ref: '#/components/schemas/TableBucketARN'
+          description: The Amazon Resource Name (ARN) of the table bucket associated
+            with the maintenance configuration.
+        configuration:
+          allOf:
+          - $ref: '#/components/schemas/TableBucketMaintenanceConfiguration'
+          description: Details about the maintenance configuration for the table bucket.
+      required:
+      - tableBucketARN
+      - configuration
+    GetTableBucketPolicyRequest:
+      type: object
+      properties:
+        tableBucketARN:
+          allOf:
+          - $ref: '#/components/schemas/TableBucketARN'
+          description: The Amazon Resource Name (ARN) of the table bucket.
+      required:
+      - tableBucketARN
+    GetTableBucketPolicyResponse:
+      type: object
+      properties:
+        resourcePolicy:
+          allOf:
+          - $ref: '#/components/schemas/ResourcePolicy'
+          description: The `JSON` that defines the policy.
+      required:
+      - resourcePolicy
+    GetTableBucketRequest:
+      type: object
+      properties:
+        tableBucketARN:
+          allOf:
+          - $ref: '#/components/schemas/TableBucketARN'
+          description: The Amazon Resource Name (ARN) of the table bucket.
+      required:
+      - tableBucketARN
+    GetTableBucketResponse:
+      type: object
+      properties:
+        arn:
+          allOf:
+          - $ref: '#/components/schemas/TableBucketARN'
+          description: The Amazon Resource Name (ARN) of the table bucket.
+        name:
+          allOf:
+          - $ref: '#/components/schemas/TableBucketName'
+          description: The name of the table bucket
+        ownerAccountId:
+          allOf:
+          - $ref: '#/components/schemas/AccountId'
+          description: The ID of the account that owns the table bucket.
+        createdAt:
+          allOf:
+          - $ref: '#/components/schemas/Timestamp'
+          description: The date and time the table bucket was created.
+        tableBucketId:
+          allOf:
+          - $ref: '#/components/schemas/TableBucketId'
+          description: The unique identifier of the table bucket.
+      required:
+      - arn
+      - name
+      - ownerAccountId
+      - createdAt
+    GetTableEncryptionRequest:
+      type: object
+      properties:
+        tableBucketARN:
+          allOf:
+          - $ref: '#/components/schemas/TableBucketARN'
+          description: The Amazon Resource Name (ARN) of the table bucket containing
+            the table.
+        namespace:
+          allOf:
+          - $ref: '#/components/schemas/NamespaceName'
+          description: The namespace associated with the table.
+        name:
+          allOf:
+          - $ref: '#/components/schemas/TableName'
+          description: The name of the table.
+      required:
+      - tableBucketARN
+      - namespace
+      - name
+    GetTableEncryptionResponse:
+      type: object
+      properties:
+        encryptionConfiguration:
+          allOf:
+          - $ref: '#/components/schemas/EncryptionConfiguration'
+          description: The encryption configuration for the table.
+      required:
+      - encryptionConfiguration
+    GetTableMaintenanceConfigurationRequest:
+      type: object
+      properties:
+        tableBucketARN:
+          allOf:
+          - $ref: '#/components/schemas/TableBucketARN'
+          description: The Amazon Resource Name (ARN) of the table bucket.
+        namespace:
+          allOf:
+          - $ref: '#/components/schemas/NamespaceName'
+          description: The namespace associated with the table.
+        name:
+          allOf:
+          - $ref: '#/components/schemas/TableName'
+          description: The name of the table.
+      required:
+      - tableBucketARN
+      - namespace
+      - name
+    GetTableMaintenanceConfigurationResponse:
+      type: object
+      properties:
+        tableARN:
+          allOf:
+          - $ref: '#/components/schemas/TableARN'
+          description: The Amazon Resource Name (ARN) of the table.
+        configuration:
+          allOf:
+          - $ref: '#/components/schemas/TableMaintenanceConfiguration'
+          description: Details about the maintenance configuration for the table bucket.
+      required:
+      - tableARN
+      - configuration
+    GetTableMaintenanceJobStatusRequest:
+      type: object
+      properties:
+        tableBucketARN:
+          allOf:
+          - $ref: '#/components/schemas/TableBucketARN'
+          description: The Amazon Resource Name (ARN) of the table bucket.
+        namespace:
+          allOf:
+          - $ref: '#/components/schemas/NamespaceName'
+          description: The name of the namespace the table is associated with.
+        name:
+          allOf:
+          - $ref: '#/components/schemas/TableName'
+          description: The name of the maintenance job.
+      required:
+      - tableBucketARN
+      - namespace
+      - name
+    GetTableMaintenanceJobStatusResponse:
+      type: object
+      properties:
+        tableARN:
+          allOf:
+          - $ref: '#/components/schemas/TableARN'
+          description: The Amazon Resource Name (ARN) of the table.
+        status:
+          allOf:
+          - $ref: '#/components/schemas/TableMaintenanceJobStatus'
+          description: The status of the maintenance job.
+      required:
+      - tableARN
+      - status
+    GetTableMetadataLocationRequest:
+      type: object
+      properties:
+        tableBucketARN:
+          allOf:
+          - $ref: '#/components/schemas/TableBucketARN'
+          description: The Amazon Resource Name (ARN) of the table bucket.
+        namespace:
+          allOf:
+          - $ref: '#/components/schemas/NamespaceName'
+          description: The namespace of the table.
+        name:
+          allOf:
+          - $ref: '#/components/schemas/TableName'
+          description: The name of the table.
+      required:
+      - tableBucketARN
+      - namespace
+      - name
+    GetTableMetadataLocationResponse:
+      type: object
+      properties:
+        versionToken:
+          allOf:
+          - $ref: '#/components/schemas/VersionToken'
+          description: The version token.
+        metadataLocation:
+          allOf:
+          - $ref: '#/components/schemas/MetadataLocation'
+          description: The metadata location.
+        warehouseLocation:
+          allOf:
+          - $ref: '#/components/schemas/WarehouseLocation'
+          description: The warehouse location.
+      required:
+      - versionToken
+      - warehouseLocation
+    GetTablePolicyRequest:
+      type: object
+      properties:
+        tableBucketARN:
+          allOf:
+          - $ref: '#/components/schemas/TableBucketARN'
+          description: The Amazon Resource Name (ARN) of the table bucket that contains
+            the table.
+        namespace:
+          allOf:
+          - $ref: '#/components/schemas/NamespaceName'
+          description: The namespace associated with the table.
+        name:
+          allOf:
+          - $ref: '#/components/schemas/TableName'
+          description: The name of the table.
+      required:
+      - tableBucketARN
+      - namespace
+      - name
+    GetTablePolicyResponse:
+      type: object
+      properties:
+        resourcePolicy:
+          allOf:
+          - $ref: '#/components/schemas/ResourcePolicy'
+          description: The `JSON` that defines the policy.
+      required:
+      - resourcePolicy
+    GetTableRequest:
+      type: object
+      properties:
+        tableBucketARN:
+          allOf:
+          - $ref: '#/components/schemas/TableBucketARN'
+          description: The Amazon Resource Name (ARN) of the table bucket associated
+            with the table.
+        namespace:
+          allOf:
+          - $ref: '#/components/schemas/NamespaceName'
+          description: The name of the namespace the table is associated with.
+        name:
+          allOf:
+          - $ref: '#/components/schemas/TableName'
+          description: The name of the table.
+      required:
+      - tableBucketARN
+      - namespace
+      - name
+    GetTableResponse:
+      type: object
+      properties:
+        name:
+          allOf:
+          - $ref: '#/components/schemas/TableName'
+          description: The name of the table.
+        type:
+          allOf:
+          - $ref: '#/components/schemas/TableType'
+          description: The type of the table.
+        tableARN:
+          allOf:
+          - $ref: '#/components/schemas/TableARN'
+          description: The Amazon Resource Name (ARN) of the table.
+        namespace:
+          allOf:
+          - $ref: '#/components/schemas/NamespaceList'
+          description: The namespace associated with the table.
+        namespaceId:
+          allOf:
+          - $ref: '#/components/schemas/NamespaceId'
+          description: The unique identifier of the namespace containing this table.
+        versionToken:
+          allOf:
+          - $ref: '#/components/schemas/VersionToken'
+          description: The version token of the table.
+        metadataLocation:
+          allOf:
+          - $ref: '#/components/schemas/MetadataLocation'
+          description: The metadata location of the table.
+        warehouseLocation:
+          allOf:
+          - $ref: '#/components/schemas/WarehouseLocation'
+          description: The warehouse location of the table.
+        createdAt:
+          allOf:
+          - $ref: '#/components/schemas/Timestamp'
+          description: The date and time the table bucket was created at.
+        createdBy:
+          allOf:
+          - $ref: '#/components/schemas/AccountId'
+          description: The ID of the account that created the table.
+        managedByService:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The service that manages the table.
+        modifiedAt:
+          allOf:
+          - $ref: '#/components/schemas/Timestamp'
+          description: The date and time the table was last modified on.
+        modifiedBy:
+          allOf:
+          - $ref: '#/components/schemas/AccountId'
+          description: The ID of the account that last modified the table.
+        ownerAccountId:
+          allOf:
+          - $ref: '#/components/schemas/AccountId'
+          description: The ID of the account that owns the table.
+        format:
+          allOf:
+          - $ref: '#/components/schemas/OpenTableFormat'
+          description: The format of the table.
+        tableBucketId:
+          allOf:
+          - $ref: '#/components/schemas/TableBucketId'
+          description: The unique identifier of the table bucket containing this table.
+      required:
+      - name
+      - type
+      - tableARN
+      - namespace
+      - versionToken
+      - warehouseLocation
+      - createdAt
+      - createdBy
+      - modifiedAt
+      - modifiedBy
+      - ownerAccountId
+      - format
+    IcebergCompactionSettings:
+      type: object
+      properties:
+        targetFileSizeMB:
+          allOf:
+          - $ref: '#/components/schemas/PositiveInteger'
+          description: The target file size for the table in MB.
+      description: Contains details about the compaction settings for an Iceberg table.
+    IcebergMetadata:
+      type: object
+      properties:
+        schema:
+          allOf:
+          - $ref: '#/components/schemas/IcebergSchema'
+          description: The schema for an Iceberg table.
+      required:
+      - schema
+      description: Contains details about the metadata for an Iceberg table.
+    IcebergSchema:
+      type: object
+      properties:
+        fields:
+          allOf:
+          - $ref: '#/components/schemas/SchemaFieldList'
+          description: The schema fields for the table
+      required:
+      - fields
+      description: Contains details about the schema for an Iceberg table.
+    IcebergSnapshotManagementSettings:
+      type: object
+      properties:
+        minSnapshotsToKeep:
+          allOf:
+          - $ref: '#/components/schemas/PositiveInteger'
+          description: The minimum number of snapshots to keep.
+        maxSnapshotAgeHours:
+          allOf:
+          - $ref: '#/components/schemas/PositiveInteger'
+          description: The maximum age of a snapshot before it can be expired.
+      description: Contains details about the snapshot management settings for an
+        Iceberg table. The oldest snapshot expires when its age exceeds the `maxSnapshotAgeHours`
+        and the total number of snapshots exceeds the value for the minimum number
+        of snapshots to keep `minSnapshotsToKeep`.
+    IcebergUnreferencedFileRemovalSettings:
+      type: object
+      properties:
+        unreferencedDays:
+          allOf:
+          - $ref: '#/components/schemas/PositiveInteger'
+          description: The number of days an object has to be unreferenced before
+            it is marked as non-current.
+        nonCurrentDays:
+          allOf:
+          - $ref: '#/components/schemas/PositiveInteger'
+          description: The number of days an object has to be non-current before it
+            is deleted.
+      description: Contains details about the unreferenced file removal settings for
+        an Iceberg table bucket.
+    InternalServerErrorException:
+      type: object
+      properties:
+        message:
+          $ref: '#/components/schemas/ErrorMessage'
+      description: The request failed due to an internal server error.
     JobStatus:
       type: string
       enum:
@@ -64,14 +2780,125 @@ components:
       type: integer
       minimum: 1
       maximum: 1000
+    ListNamespacesRequest:
+      type: object
+      properties:
+        tableBucketARN:
+          allOf:
+          - $ref: '#/components/schemas/TableBucketARN'
+          description: The Amazon Resource Name (ARN) of the table bucket.
+        prefix:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The prefix of the namespaces.
+        continuationToken:
+          allOf:
+          - $ref: '#/components/schemas/NextToken'
+          description: '`ContinuationToken` indicates to Amazon S3 that the list is
+            being continued on this bucket with a token. `ContinuationToken` is obfuscated
+            and is not a real key. You can use this `ContinuationToken` for pagination
+            of the list results.'
+        maxNamespaces:
+          allOf:
+          - $ref: '#/components/schemas/ListNamespacesLimit'
+          description: The maximum number of namespaces to return in the list.
+      required:
+      - tableBucketARN
+    ListNamespacesResponse:
+      type: object
+      properties:
+        namespaces:
+          allOf:
+          - $ref: '#/components/schemas/NamespaceSummaryList'
+          description: A list of namespaces.
+        continuationToken:
+          allOf:
+          - $ref: '#/components/schemas/NextToken'
+          description: The `ContinuationToken` for pagination of the list results.
+      required:
+      - namespaces
     ListTableBucketsLimit:
       type: integer
       minimum: 1
       maximum: 1000
+    ListTableBucketsRequest:
+      type: object
+      properties:
+        prefix:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The prefix of the table buckets.
+        continuationToken:
+          allOf:
+          - $ref: '#/components/schemas/NextToken'
+          description: '`ContinuationToken` indicates to Amazon S3 that the list is
+            being continued on this bucket with a token. `ContinuationToken` is obfuscated
+            and is not a real key. You can use this `ContinuationToken` for pagination
+            of the list results.'
+        maxBuckets:
+          allOf:
+          - $ref: '#/components/schemas/ListTableBucketsLimit'
+          description: The maximum number of table buckets to return in the list.
+    ListTableBucketsResponse:
+      type: object
+      properties:
+        tableBuckets:
+          allOf:
+          - $ref: '#/components/schemas/TableBucketSummaryList'
+          description: A list of table buckets.
+        continuationToken:
+          allOf:
+          - $ref: '#/components/schemas/NextToken'
+          description: You can use this `ContinuationToken` for pagination of the
+            list results.
+      required:
+      - tableBuckets
     ListTablesLimit:
       type: integer
       minimum: 1
       maximum: 1000
+    ListTablesRequest:
+      type: object
+      properties:
+        tableBucketARN:
+          allOf:
+          - $ref: '#/components/schemas/TableBucketARN'
+          description: The Amazon resource Name (ARN) of the table bucket.
+        namespace:
+          allOf:
+          - $ref: '#/components/schemas/NamespaceName'
+          description: The namespace of the tables.
+        prefix:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The prefix of the tables.
+        continuationToken:
+          allOf:
+          - $ref: '#/components/schemas/NextToken'
+          description: '`ContinuationToken` indicates to Amazon S3 that the list is
+            being continued on this bucket with a token. `ContinuationToken` is obfuscated
+            and is not a real key. You can use this `ContinuationToken` for pagination
+            of the list results.'
+        maxTables:
+          allOf:
+          - $ref: '#/components/schemas/ListTablesLimit'
+          description: The maximum number of tables to return.
+      required:
+      - tableBucketARN
+    ListTablesResponse:
+      type: object
+      properties:
+        tables:
+          allOf:
+          - $ref: '#/components/schemas/TableSummaryList'
+          description: A list of tables.
+        continuationToken:
+          allOf:
+          - $ref: '#/components/schemas/NextToken'
+          description: You can use this `ContinuationToken` for pagination of the
+            list results.
+      required:
+      - tables
     MaintenanceStatus:
       type: string
       enum:
@@ -92,6 +2919,40 @@ components:
       pattern: ^[0-9a-z_]*$
       minLength: 1
       maxLength: 255
+    NamespaceSummary:
+      type: object
+      properties:
+        namespace:
+          allOf:
+          - $ref: '#/components/schemas/NamespaceList'
+          description: The name of the namespace.
+        createdAt:
+          allOf:
+          - $ref: '#/components/schemas/Timestamp'
+          description: The date and time the namespace was created at.
+        createdBy:
+          allOf:
+          - $ref: '#/components/schemas/AccountId'
+          description: The ID of the account that created the namespace.
+        ownerAccountId:
+          allOf:
+          - $ref: '#/components/schemas/AccountId'
+          description: The ID of the account that owns the namespace.
+        namespaceId:
+          allOf:
+          - $ref: '#/components/schemas/NamespaceId'
+          description: The system-assigned unique identifier for the namespace.
+        tableBucketId:
+          allOf:
+          - $ref: '#/components/schemas/TableBucketId'
+          description: The system-assigned unique identifier for the table bucket
+            that contains this namespace.
+      required:
+      - namespace
+      - createdAt
+      - createdBy
+      - ownerAccountId
+      description: Contains details about a namespace.
     NamespaceSummaryList:
       type: array
       items:
@@ -100,6 +2961,13 @@ components:
       type: string
       minLength: 1
       maxLength: 2048
+    NotFoundException:
+      type: object
+      properties:
+        message:
+          $ref: '#/components/schemas/ErrorMessage'
+      description: The request was rejected because the specified resource could not
+        be found.
     OpenTableFormat:
       type: string
       enum:
@@ -108,6 +2976,142 @@ components:
       type: integer
       minimum: 1
       maximum: 2147483647
+    PutTableBucketEncryptionRequest:
+      type: object
+      properties:
+        tableBucketARN:
+          allOf:
+          - $ref: '#/components/schemas/TableBucketARN'
+          description: The Amazon Resource Name (ARN) of the table bucket.
+        encryptionConfiguration:
+          allOf:
+          - $ref: '#/components/schemas/EncryptionConfiguration'
+          description: The encryption configuration to apply to the table bucket.
+      required:
+      - tableBucketARN
+      - encryptionConfiguration
+    PutTableBucketMaintenanceConfigurationRequest:
+      type: object
+      properties:
+        tableBucketARN:
+          allOf:
+          - $ref: '#/components/schemas/TableBucketARN'
+          description: The Amazon Resource Name (ARN) of the table bucket associated
+            with the maintenance configuration.
+        type:
+          allOf:
+          - $ref: '#/components/schemas/TableBucketMaintenanceType'
+          description: The type of the maintenance configuration.
+        value:
+          allOf:
+          - $ref: '#/components/schemas/TableBucketMaintenanceConfigurationValue'
+          description: Defines the values of the maintenance configuration for the
+            table bucket.
+      required:
+      - tableBucketARN
+      - type
+      - value
+    PutTableBucketPolicyRequest:
+      type: object
+      properties:
+        tableBucketARN:
+          allOf:
+          - $ref: '#/components/schemas/TableBucketARN'
+          description: The Amazon Resource Name (ARN) of the table bucket.
+        resourcePolicy:
+          allOf:
+          - $ref: '#/components/schemas/ResourcePolicy'
+          description: The `JSON` that defines the policy.
+      required:
+      - tableBucketARN
+      - resourcePolicy
+    PutTableMaintenanceConfigurationRequest:
+      type: object
+      properties:
+        tableBucketARN:
+          allOf:
+          - $ref: '#/components/schemas/TableBucketARN'
+          description: The Amazon Resource Name (ARN) of the table associated with
+            the maintenance configuration.
+        namespace:
+          allOf:
+          - $ref: '#/components/schemas/NamespaceName'
+          description: The namespace of the table.
+        name:
+          allOf:
+          - $ref: '#/components/schemas/TableName'
+          description: The name of the maintenance configuration.
+        type:
+          allOf:
+          - $ref: '#/components/schemas/TableMaintenanceType'
+          description: The type of the maintenance configuration.
+        value:
+          allOf:
+          - $ref: '#/components/schemas/TableMaintenanceConfigurationValue'
+          description: Defines the values of the maintenance configuration for the
+            table.
+      required:
+      - tableBucketARN
+      - namespace
+      - name
+      - type
+      - value
+    PutTablePolicyRequest:
+      type: object
+      properties:
+        tableBucketARN:
+          allOf:
+          - $ref: '#/components/schemas/TableBucketARN'
+          description: The Amazon Resource Name (ARN) of the table bucket that contains
+            the table.
+        namespace:
+          allOf:
+          - $ref: '#/components/schemas/NamespaceName'
+          description: The namespace associated with the table.
+        name:
+          allOf:
+          - $ref: '#/components/schemas/TableName'
+          description: The name of the table.
+        resourcePolicy:
+          allOf:
+          - $ref: '#/components/schemas/ResourcePolicy'
+          description: The `JSON` that defines the policy.
+      required:
+      - tableBucketARN
+      - namespace
+      - name
+      - resourcePolicy
+    RenameTableRequest:
+      type: object
+      properties:
+        tableBucketARN:
+          allOf:
+          - $ref: '#/components/schemas/TableBucketARN'
+          description: The Amazon Resource Name (ARN) of the table bucket.
+        namespace:
+          allOf:
+          - $ref: '#/components/schemas/NamespaceName'
+          description: The namespace associated with the table.
+        name:
+          allOf:
+          - $ref: '#/components/schemas/TableName'
+          description: The current name of the table.
+        newNamespaceName:
+          allOf:
+          - $ref: '#/components/schemas/NamespaceName'
+          description: The new name for the namespace.
+        newName:
+          allOf:
+          - $ref: '#/components/schemas/TableName'
+          description: The new name for the table.
+        versionToken:
+          allOf:
+          - $ref: '#/components/schemas/VersionToken'
+          description: The version token of the table.
+      required:
+      - tableBucketARN
+      - namespace
+      - name
     ResourcePolicy:
       type: string
       minLength: 1
@@ -117,6 +3121,29 @@ components:
       enum:
       - AES256
       - aws:kms
+    SchemaField:
+      type: object
+      properties:
+        name:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The name of the field.
+        type:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The field type. S3 Tables supports all Apache Iceberg primitive
+            types. For more information, see the [Apache Iceberg documentation](https://iceberg.apache.org/spec/#primitive-types).
+        required:
+          allOf:
+          - $ref: '#/components/schemas/Boolean'
+          description: A Boolean value that specifies whether values are required
+            for each row in this field. By default, this is `false` and null values
+            are allowed in the field. If this is `true` the field does not allow null
+            values.
+      required:
+      - name
+      - type
+      description: Contains details about a schema field.
     SchemaFieldList:
       type: array
       items:
@@ -135,6 +3162,19 @@ components:
       type: object
       additionalProperties:
         $ref: '#/components/schemas/TableBucketMaintenanceConfigurationValue'
+    TableBucketMaintenanceConfigurationValue:
+      type: object
+      properties:
+        status:
+          allOf:
+          - $ref: '#/components/schemas/MaintenanceStatus'
+          description: The status of the maintenance configuration.
+        settings:
+          allOf:
+          - $ref: '#/components/schemas/TableBucketMaintenanceSettings'
+          description: Contains details about the settings of the maintenance configuration.
+      description: Details about the values that define the maintenance configuration
+        for a table bucket.
     TableBucketMaintenanceSettings:
       allOf:
       - allOf:
@@ -152,6 +3192,35 @@ components:
       pattern: ^[0-9a-z-]*$
       minLength: 3
       maxLength: 63
+    TableBucketSummary:
+      type: object
+      properties:
+        arn:
+          allOf:
+          - $ref: '#/components/schemas/TableBucketARN'
+          description: The Amazon Resource Name (ARN) of the table bucket.
+        name:
+          allOf:
+          - $ref: '#/components/schemas/TableBucketName'
+          description: The name of the table bucket.
+        ownerAccountId:
+          allOf:
+          - $ref: '#/components/schemas/AccountId'
+          description: The ID of the account that owns the table bucket.
+        createdAt:
+          allOf:
+          - $ref: '#/components/schemas/Timestamp'
+          description: The date and time the table bucket was created at.
+        tableBucketId:
+          allOf:
+          - $ref: '#/components/schemas/TableBucketId'
+          description: The system-assigned unique identifier for the table bucket.
+      required:
+      - arn
+      - name
+      - ownerAccountId
+      - createdAt
+      description: Contains details about a table bucket.
     TableBucketSummaryList:
       type: array
       items:
@@ -160,10 +3229,41 @@ components:
       type: object
       additionalProperties:
         $ref: '#/components/schemas/TableMaintenanceConfigurationValue'
+    TableMaintenanceConfigurationValue:
+      type: object
+      properties:
+        status:
+          allOf:
+          - $ref: '#/components/schemas/MaintenanceStatus'
+          description: The status of the maintenance configuration.
+        settings:
+          allOf:
+          - $ref: '#/components/schemas/TableMaintenanceSettings'
+          description: Contains details about the settings for the maintenance configuration.
+      description: Contains the values that define a maintenance configuration for
+        a table.
     TableMaintenanceJobStatus:
       type: object
       additionalProperties:
         $ref: '#/components/schemas/TableMaintenanceJobStatusValue'
+    TableMaintenanceJobStatusValue:
+      type: object
+      properties:
+        status:
+          allOf:
+          - $ref: '#/components/schemas/JobStatus'
+          description: The status of the job.
+        lastRunTimestamp:
+          allOf:
+          - $ref: '#/components/schemas/Timestamp'
+          description: The date and time that the maintenance job was last run.
+        failureMessage:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The failure message of a failed job.
+      required:
+      - status
+      description: Details about the status of a maintenance job.
     TableMaintenanceJobType:
       type: string
       enum:
@@ -200,6 +3300,51 @@ components:
       pattern: ^[0-9a-z_]*$
       minLength: 1
       maxLength: 255
+    TableSummary:
+      type: object
+      properties:
+        namespace:
+          allOf:
+          - $ref: '#/components/schemas/NamespaceList'
+          description: The name of the namespace.
+        name:
+          allOf:
+          - $ref: '#/components/schemas/TableName'
+          description: The name of the table.
+        type:
+          allOf:
+          - $ref: '#/components/schemas/TableType'
+          description: The type of the table.
+        tableARN:
+          allOf:
+          - $ref: '#/components/schemas/TableARN'
+          description: The Amazon Resource Name (ARN) of the table.
+        createdAt:
+          allOf:
+          - $ref: '#/components/schemas/Timestamp'
+          description: The date and time the table was created at.
+        modifiedAt:
+          allOf:
+          - $ref: '#/components/schemas/Timestamp'
+          description: The date and time the table was last modified at.
+        namespaceId:
+          allOf:
+          - $ref: '#/components/schemas/NamespaceId'
+          description: The unique identifier for the namespace that contains this
+            table.
+        tableBucketId:
+          allOf:
+          - $ref: '#/components/schemas/TableBucketId'
+          description: The unique identifier for the table bucket that contains this
+            table.
+      required:
+      - namespace
+      - name
+      - type
+      - tableARN
+      - createdAt
+      - modifiedAt
+      description: Contains details about a table.
     TableSummaryList:
       type: array
       items:
@@ -209,6 +3354,70 @@ components:
       enum:
       - customer
       - aws
+    TooManyRequestsException:
+      type: object
+      properties:
+        message:
+          $ref: '#/components/schemas/ErrorMessage'
+      description: The limit on the number of requests per second was exceeded.
+    UpdateTableMetadataLocationRequest:
+      type: object
+      properties:
+        tableBucketARN:
+          allOf:
+          - $ref: '#/components/schemas/TableBucketARN'
+          description: The Amazon Resource Name (ARN) of the table bucket.
+        namespace:
+          allOf:
+          - $ref: '#/components/schemas/NamespaceName'
+          description: The namespace of the table.
+        name:
+          allOf:
+          - $ref: '#/components/schemas/TableName'
+          description: The name of the table.
+        versionToken:
+          allOf:
+          - $ref: '#/components/schemas/VersionToken'
+          description: The version token of the table.
+        metadataLocation:
+          allOf:
+          - $ref: '#/components/schemas/MetadataLocation'
+          description: The new metadata location for the table.
+      required:
+      - tableBucketARN
+      - namespace
+      - name
+      - versionToken
+      - metadataLocation
+    UpdateTableMetadataLocationResponse:
+      type: object
+      properties:
+        name:
+          allOf:
+          - $ref: '#/components/schemas/TableName'
+          description: The name of the table.
+        tableARN:
+          allOf:
+          - $ref: '#/components/schemas/TableARN'
+          description: The Amazon Resource Name (ARN) of the table.
+        namespace:
+          allOf:
+          - $ref: '#/components/schemas/NamespaceList'
+          description: The namespace the table is associated with.
+        versionToken:
+          allOf:
+          - $ref: '#/components/schemas/VersionToken'
+          description: The version token of the table.
+        metadataLocation:
+          allOf:
+          - $ref: '#/components/schemas/MetadataLocation'
+          description: The metadata location of the table.
+      required:
+      - name
+      - tableARN
+      - namespace
+      - versionToken
+      - metadataLocation
     VersionToken:
       type: string
       minLength: 1

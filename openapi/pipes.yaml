@@ -7,7 +7,7 @@ info:
   x-stackql-serviceName: pipes
   x-aws-serviceName: pipes
   x-aws-protocol: aws.protocols#restJson1
-  x-dateGenerated: '2025-05-05'
+  x-dateGenerated: '2025-05-07'
   version: '2015-10-07'
   title: Amazon EventBridge Pipes
   description: |-
@@ -43,7 +43,536 @@ servers:
       - sa-east-1
       - me-south-1
       default: us-east-1
-paths: {}
+paths:
+  /v1/pipes/{Name}:
+    post:
+      operationId: CreatePipe
+      description: |-
+        Create a pipe. Amazon EventBridge Pipes connect event sources to targets and reduces the need for specialized knowledge and integration code.
+      parameters:
+      - name: Name
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/PipeName'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                Description:
+                  $ref: '#/components/schemas/PipeDescription'
+                DesiredState:
+                  $ref: '#/components/schemas/RequestedPipeState'
+                Source:
+                  $ref: '#/components/schemas/ArnOrUrl'
+                SourceParameters:
+                  $ref: '#/components/schemas/PipeSourceParameters'
+                Enrichment:
+                  $ref: '#/components/schemas/OptionalArn'
+                EnrichmentParameters:
+                  $ref: '#/components/schemas/PipeEnrichmentParameters'
+                Target:
+                  $ref: '#/components/schemas/Arn'
+                TargetParameters:
+                  $ref: '#/components/schemas/PipeTargetParameters'
+                RoleArn:
+                  $ref: '#/components/schemas/RoleArn'
+                Tags:
+                  $ref: '#/components/schemas/TagMap'
+                LogConfiguration:
+                  $ref: '#/components/schemas/PipeLogConfigurationParameters'
+                KmsKeyIdentifier:
+                  $ref: '#/components/schemas/KmsKeyIdentifier'
+      responses:
+        '200': {}
+        '409':
+          description: |-
+            An action you attempted resulted in an exception.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConflictException'
+        '500':
+          description: |-
+            This exception occurs due to unexpected causes.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalException'
+        '404':
+          description: |-
+            An entity that you specified does not exist.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFoundException'
+        '402':
+          description: |-
+            A quota has been exceeded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServiceQuotaExceededException'
+        '429':
+          description: |-
+            An action was throttled.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThrottlingException'
+        '400':
+          description: |-
+            Indicates that an error has occurred while performing a validate operation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+    delete:
+      operationId: DeletePipe
+      description: |-
+        Delete an existing pipe. For more information about pipes, see [Amazon EventBridge Pipes](https://docs.aws.amazon.com/eventbridge/latest/userguide/eb-pipes.html) in the Amazon EventBridge User Guide.
+      parameters:
+      - name: Name
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/PipeName'
+      responses:
+        '200': {}
+        '409':
+          description: |-
+            An action you attempted resulted in an exception.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConflictException'
+        '500':
+          description: |-
+            This exception occurs due to unexpected causes.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalException'
+        '404':
+          description: |-
+            An entity that you specified does not exist.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFoundException'
+        '429':
+          description: |-
+            An action was throttled.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThrottlingException'
+        '400':
+          description: |-
+            Indicates that an error has occurred while performing a validate operation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+    get:
+      operationId: DescribePipe
+      description: |-
+        Get the information about an existing pipe. For more information about pipes, see [Amazon EventBridge Pipes](https://docs.aws.amazon.com/eventbridge/latest/userguide/eb-pipes.html) in the Amazon EventBridge User Guide.
+      parameters:
+      - name: Name
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/PipeName'
+      responses:
+        '200': {}
+        '500':
+          description: |-
+            This exception occurs due to unexpected causes.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalException'
+        '404':
+          description: |-
+            An entity that you specified does not exist.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFoundException'
+        '429':
+          description: |-
+            An action was throttled.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThrottlingException'
+        '400':
+          description: |-
+            Indicates that an error has occurred while performing a validate operation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+    put:
+      operationId: UpdatePipe
+      description: |-
+        Update an existing pipe. When you call `UpdatePipe`, EventBridge only the updates fields you have specified in the request; the rest remain unchanged. The exception to this is if you modify any Amazon Web Services-service specific fields in the `SourceParameters`, `EnrichmentParameters`, or `TargetParameters` objects. For example, `DynamoDBStreamParameters` or `EventBridgeEventBusParameters`. EventBridge updates the fields in these objects atomically as one and overrides existing values. This is by design, and means that if you don't specify an optional field in one of these `Parameters` objects, EventBridge sets that field to its system-default value during the update.
+
+        For more information about pipes, see [ Amazon EventBridge Pipes](https://docs.aws.amazon.com/eventbridge/latest/userguide/eb-pipes.html) in the Amazon EventBridge User Guide.
+      parameters:
+      - name: Name
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/PipeName'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                Description:
+                  $ref: '#/components/schemas/PipeDescription'
+                DesiredState:
+                  $ref: '#/components/schemas/RequestedPipeState'
+                SourceParameters:
+                  $ref: '#/components/schemas/UpdatePipeSourceParameters'
+                Enrichment:
+                  $ref: '#/components/schemas/OptionalArn'
+                EnrichmentParameters:
+                  $ref: '#/components/schemas/PipeEnrichmentParameters'
+                Target:
+                  $ref: '#/components/schemas/Arn'
+                TargetParameters:
+                  $ref: '#/components/schemas/PipeTargetParameters'
+                RoleArn:
+                  $ref: '#/components/schemas/RoleArn'
+                LogConfiguration:
+                  $ref: '#/components/schemas/PipeLogConfigurationParameters'
+                KmsKeyIdentifier:
+                  $ref: '#/components/schemas/KmsKeyIdentifier'
+      responses:
+        '200': {}
+        '409':
+          description: |-
+            An action you attempted resulted in an exception.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConflictException'
+        '500':
+          description: |-
+            This exception occurs due to unexpected causes.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalException'
+        '404':
+          description: |-
+            An entity that you specified does not exist.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFoundException'
+        '429':
+          description: |-
+            An action was throttled.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThrottlingException'
+        '400':
+          description: |-
+            Indicates that an error has occurred while performing a validate operation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+  /v1/pipes:
+    get:
+      operationId: ListPipes
+      description: |-
+        Get the pipes associated with this account. For more information about pipes, see [Amazon EventBridge Pipes](https://docs.aws.amazon.com/eventbridge/latest/userguide/eb-pipes.html) in the Amazon EventBridge User Guide.
+      parameters:
+      - name: NamePrefix
+        in: query
+        required: false
+        schema:
+          $ref: '#/components/schemas/PipeName'
+      - name: DesiredState
+        in: query
+        required: false
+        schema:
+          $ref: '#/components/schemas/RequestedPipeState'
+      - name: CurrentState
+        in: query
+        required: false
+        schema:
+          $ref: '#/components/schemas/PipeState'
+      - name: SourcePrefix
+        in: query
+        required: false
+        schema:
+          $ref: '#/components/schemas/ResourceArn'
+      - name: TargetPrefix
+        in: query
+        required: false
+        schema:
+          $ref: '#/components/schemas/ResourceArn'
+      - name: NextToken
+        in: query
+        required: false
+        schema:
+          $ref: '#/components/schemas/NextToken'
+      - name: Limit
+        in: query
+        required: false
+        schema:
+          $ref: '#/components/schemas/LimitMax100'
+      responses:
+        '200': {}
+        '500':
+          description: |-
+            This exception occurs due to unexpected causes.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalException'
+        '429':
+          description: |-
+            An action was throttled.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThrottlingException'
+        '400':
+          description: |-
+            Indicates that an error has occurred while performing a validate operation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+  /tags/{resourceArn}:
+    get:
+      operationId: ListTagsForResource
+      description: |-
+        Displays the tags associated with a pipe.
+      parameters:
+      - name: resourceArn
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/PipeArn'
+      responses:
+        '200': {}
+        '500':
+          description: |-
+            This exception occurs due to unexpected causes.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalException'
+        '404':
+          description: |-
+            An entity that you specified does not exist.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFoundException'
+        '400':
+          description: |-
+            Indicates that an error has occurred while performing a validate operation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+    post:
+      operationId: TagResource
+      description: |-
+        Assigns one or more tags (key-value pairs) to the specified pipe. Tags can help you organize and categorize your resources. You can also use them to scope user permissions by granting a user permission to access or change only resources with certain tag values.
+
+        Tags don't have any semantic meaning to Amazon Web Services and are interpreted strictly as strings of characters.
+
+        You can use the `TagResource` action with a pipe that already has tags. If you specify a new tag key, this tag is appended to the list of tags associated with the pipe. If you specify a tag key that is already associated with the pipe, the new tag value that you specify replaces the previous value for that tag.
+
+        You can associate as many as 50 tags with a pipe.
+      parameters:
+      - name: resourceArn
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/PipeArn'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                tags:
+                  $ref: '#/components/schemas/TagMap'
+      responses:
+        '200': {}
+        '500':
+          description: |-
+            This exception occurs due to unexpected causes.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalException'
+        '404':
+          description: |-
+            An entity that you specified does not exist.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFoundException'
+        '400':
+          description: |-
+            Indicates that an error has occurred while performing a validate operation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+    delete:
+      operationId: UntagResource
+      description: |-
+        Removes one or more tags from the specified pipes.
+      parameters:
+      - name: resourceArn
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/PipeArn'
+      - name: tagKeys
+        in: query
+        required: true
+        schema:
+          $ref: '#/components/schemas/TagKeyList'
+      responses:
+        '200': {}
+        '500':
+          description: |-
+            This exception occurs due to unexpected causes.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalException'
+        '404':
+          description: |-
+            An entity that you specified does not exist.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFoundException'
+        '400':
+          description: |-
+            Indicates that an error has occurred while performing a validate operation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+  /v1/pipes/{Name}/start:
+    post:
+      operationId: StartPipe
+      description: |-
+        Start an existing pipe.
+      parameters:
+      - name: Name
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/PipeName'
+      responses:
+        '200': {}
+        '409':
+          description: |-
+            An action you attempted resulted in an exception.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConflictException'
+        '500':
+          description: |-
+            This exception occurs due to unexpected causes.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalException'
+        '404':
+          description: |-
+            An entity that you specified does not exist.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFoundException'
+        '429':
+          description: |-
+            An action was throttled.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThrottlingException'
+        '400':
+          description: |-
+            Indicates that an error has occurred while performing a validate operation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
+  /v1/pipes/{Name}/stop:
+    post:
+      operationId: StopPipe
+      description: |-
+        Stop an existing pipe.
+      parameters:
+      - name: Name
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/PipeName'
+      responses:
+        '200': {}
+        '409':
+          description: |-
+            An action you attempted resulted in an exception.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConflictException'
+        '500':
+          description: |-
+            This exception occurs due to unexpected causes.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalException'
+        '404':
+          description: |-
+            An entity that you specified does not exist.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFoundException'
+        '429':
+          description: |-
+            An action was throttled.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThrottlingException'
+        '400':
+          description: |-
+            Indicates that an error has occurred while performing a validate operation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationException'
 components:
   schemas:
     Arn:
@@ -66,18 +595,122 @@ components:
       enum:
       - ENABLED
       - DISABLED
+    AwsVpcConfiguration:
+      type: object
+      properties:
+        Subnets:
+          allOf:
+          - $ref: '#/components/schemas/Subnets'
+          description: Specifies the subnets associated with the task. These subnets
+            must all be in the same VPC. You can specify as many as 16 subnets.
+        SecurityGroups:
+          allOf:
+          - $ref: '#/components/schemas/SecurityGroups'
+          description: Specifies the security groups associated with the task. These
+            security groups must all be in the same VPC. You can specify as many as
+            five security groups. If you do not specify a security group, the default
+            security group for the VPC is used.
+        AssignPublicIp:
+          allOf:
+          - $ref: '#/components/schemas/AssignPublicIp'
+          description: Specifies whether the task's elastic network interface receives
+            a public IP address. You can specify `ENABLED` only when `LaunchType`
+            in `EcsParameters` is set to `FARGATE`.
+      required:
+      - Subnets
+      description: This structure specifies the VPC subnets and security groups for
+        the task, and whether a public IP address is to be used. This structure is
+        relevant only for ECS tasks that use the `awsvpc` network mode.
+    BatchArrayProperties:
+      type: object
+      properties:
+        Size:
+          allOf:
+          - $ref: '#/components/schemas/BatchArraySize'
+          description: The size of the array, if this is an array batch job.
+      description: The array properties for the submitted job, such as the size of
+        the array. The array size can be between 2 and 10,000. If you specify array
+        properties for a job, it becomes an array job. This parameter is used only
+        if the target is an Batch job.
     BatchArraySize:
       type: integer
       minimum: 2
       maximum: 10000
+    BatchContainerOverrides:
+      type: object
+      properties:
+        Command:
+          allOf:
+          - $ref: '#/components/schemas/StringList'
+          description: The command to send to the container that overrides the default
+            command from the Docker image or the task definition.
+        Environment:
+          allOf:
+          - $ref: '#/components/schemas/BatchEnvironmentVariableList'
+          description: 'The environment variables to send to the container. You can
+            add new environment variables, which are added to the container at launch,
+            or you can override the existing environment variables from the Docker
+            image or the task definition.
+
+
+            Environment variables cannot start with "`Batch`". This naming convention
+            is reserved for variables that Batch sets.'
+        InstanceType:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: 'The instance type to use for a multi-node parallel job.
+
+
+            This parameter isn''t applicable to single-node container jobs or jobs
+            that run on Fargate resources, and shouldn''t be provided.'
+        ResourceRequirements:
+          allOf:
+          - $ref: '#/components/schemas/BatchResourceRequirementsList'
+          description: The type and amount of resources to assign to a container.
+            This overrides the settings in the job definition. The supported resources
+            include `GPU`, `MEMORY`, and `VCPU`.
+      description: The overrides that are sent to a container.
     BatchDependsOn:
       type: array
       items:
         $ref: '#/components/schemas/BatchJobDependency'
+    BatchEnvironmentVariable:
+      type: object
+      properties:
+        Name:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The name of the key-value pair. For environment variables,
+            this is the name of the environment variable.
+        Value:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The value of the key-value pair. For environment variables,
+            this is the value of the environment variable.
+      description: 'The environment variables to send to the container. You can add
+        new environment variables, which are added to the container at launch, or
+        you can override the existing environment variables from the Docker image
+        or the task definition.
+
+
+        Environment variables cannot start with "`Batch`". This naming convention
+        is reserved for variables that Batch sets.'
     BatchEnvironmentVariableList:
       type: array
       items:
         $ref: '#/components/schemas/BatchEnvironmentVariable'
+    BatchJobDependency:
+      type: object
+      properties:
+        JobId:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The job ID of the Batch job that's associated with this dependency.
+        Type:
+          allOf:
+          - $ref: '#/components/schemas/BatchJobDependencyType'
+          description: The type of the job dependency.
+      description: An object that represents an Batch job dependency.
     BatchJobDependencyType:
       type: string
       enum:
@@ -87,6 +720,84 @@ components:
       type: object
       additionalProperties:
         $ref: '#/components/schemas/String'
+    BatchResourceRequirement:
+      type: object
+      properties:
+        Type:
+          allOf:
+          - $ref: '#/components/schemas/BatchResourceRequirementType'
+          description: The type of resource to assign to a container. The supported
+            resources include `GPU`, `MEMORY`, and `VCPU`.
+        Value:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: "The quantity of the specified resource to reserve for the\
+            \ container. The values vary based on the `type` specified.\n\ntype=\"\
+            GPU\"\n\n    \n\nThe number of physical GPUs to reserve for the container.\
+            \ Make sure that the number of GPUs reserved for all containers in a job\
+            \ doesn't exceed the number of available GPUs on the compute resource\
+            \ that the job is launched on.\n\nGPUs aren't available for jobs that\
+            \ are running on Fargate resources.\n\ntype=\"MEMORY\"\n\n    \n\nThe\
+            \ memory hard limit (in MiB) present to the container. This parameter\
+            \ is supported for jobs that are running on EC2 resources. If your container\
+            \ attempts to exceed the memory specified, the container is terminated.\
+            \ This parameter maps to `Memory` in the [ Create a container](https://docs.docker.com/engine/api/v1.23/#create-a-container)\
+            \ section of the [Docker Remote API](https://docs.docker.com/engine/api/v1.23/)\
+            \ and the `--memory` option to [docker run](https://docs.docker.com/engine/reference/run/).\
+            \ You must specify at least 4 MiB of memory for a job. This is required\
+            \ but can be specified in several places for multi-node parallel (MNP)\
+            \ jobs. It must be specified for each node at least once. This parameter\
+            \ maps to `Memory` in the [ Create a container](https://docs.docker.com/engine/api/v1.23/#create-a-container)\
+            \ section of the [Docker Remote API](https://docs.docker.com/engine/api/v1.23/)\
+            \ and the `--memory` option to [docker run](https://docs.docker.com/engine/reference/run/).\n\
+            \nIf you're trying to maximize your resource utilization by providing\
+            \ your jobs as much memory as possible for a particular instance type,\
+            \ see [Memory management](https://docs.aws.amazon.com/batch/latest/userguide/memory-management.html)\
+            \ in the _Batch User Guide_.\n\nFor jobs that are running on Fargate resources,\
+            \ then `value` is the hard limit (in MiB), and must match one of the supported\
+            \ values and the `VCPU` values must be one of the values supported for\
+            \ that memory value.\n\nvalue = 512\n\n    \n\n`VCPU` = 0.25\n\nvalue\
+            \ = 1024\n\n    \n\n`VCPU` = 0.25 or 0.5\n\nvalue = 2048\n\n    \n\n`VCPU`\
+            \ = 0.25, 0.5, or 1\n\nvalue = 3072\n\n    \n\n`VCPU` = 0.5, or 1\n\n\
+            value = 4096\n\n    \n\n`VCPU` = 0.5, 1, or 2\n\nvalue = 5120, 6144, or\
+            \ 7168\n\n    \n\n`VCPU` = 1 or 2\n\nvalue = 8192\n\n    \n\n`VCPU` =\
+            \ 1, 2, 4, or 8\n\nvalue = 9216, 10240, 11264, 12288, 13312, 14336, or\
+            \ 15360\n\n    \n\n`VCPU` = 2 or 4\n\nvalue = 16384\n\n    \n\n`VCPU`\
+            \ = 2, 4, or 8\n\nvalue = 17408, 18432, 19456, 21504, 22528, 23552, 25600,\
+            \ 26624, 27648, 29696, or 30720\n\n    \n\n`VCPU` = 4\n\nvalue = 20480,\
+            \ 24576, or 28672\n\n    \n\n`VCPU` = 4 or 8\n\nvalue = 36864, 45056,\
+            \ 53248, or 61440\n\n    \n\n`VCPU` = 8\n\nvalue = 32768, 40960, 49152,\
+            \ or 57344\n\n    \n\n`VCPU` = 8 or 16\n\nvalue = 65536, 73728, 81920,\
+            \ 90112, 98304, 106496, 114688, or 122880\n\n    \n\n`VCPU` = 16\n\ntype=\"\
+            VCPU\"\n\n    \n\nThe number of vCPUs reserved for the container. This\
+            \ parameter maps to `CpuShares` in the [ Create a container](https://docs.docker.com/engine/api/v1.23/#create-a-container)\
+            \ section of the [Docker Remote API](https://docs.docker.com/engine/api/v1.23/)\
+            \ and the `--cpu-shares` option to [docker run](https://docs.docker.com/engine/reference/run/).\
+            \ Each vCPU is equivalent to 1,024 CPU shares. For EC2 resources, you\
+            \ must specify at least one vCPU. This is required but can be specified\
+            \ in several places; it must be specified for each node at least once.\n\
+            \nThe default for the Fargate On-Demand vCPU resource count quota is 6\
+            \ vCPUs. For more information about Fargate quotas, see [Fargate quotas](https://docs.aws.amazon.com/general/latest/gr/ecs-service.html#service-quotas-fargate)\
+            \ in the _Amazon Web Services General Reference_.\n\nFor jobs that are\
+            \ running on Fargate resources, then `value` must match one of the supported\
+            \ values and the `MEMORY` values must be one of the values supported for\
+            \ that `VCPU` value. The supported values are 0.25, 0.5, 1, 2, 4, 8, and\
+            \ 16\n\nvalue = 0.25\n\n    \n\n`MEMORY` = 512, 1024, or 2048\n\nvalue\
+            \ = 0.5\n\n    \n\n`MEMORY` = 1024, 2048, 3072, or 4096\n\nvalue = 1\n\
+            \n    \n\n`MEMORY` = 2048, 3072, 4096, 5120, 6144, 7168, or 8192\n\nvalue\
+            \ = 2\n\n    \n\n`MEMORY` = 4096, 5120, 6144, 7168, 8192, 9216, 10240,\
+            \ 11264, 12288, 13312, 14336, 15360, or 16384\n\nvalue = 4\n\n    \n\n\
+            `MEMORY` = 8192, 9216, 10240, 11264, 12288, 13312, 14336, 15360, 16384,\
+            \ 17408, 18432, 19456, 20480, 21504, 22528, 23552, 24576, 25600, 26624,\
+            \ 27648, 28672, 29696, or 30720\n\nvalue = 8\n\n    \n\n`MEMORY` = 16384,\
+            \ 20480, 24576, 28672, 32768, 36864, 40960, 45056, 49152, 53248, 57344,\
+            \ or 61440\n\nvalue = 16\n\n    \n\n`MEMORY` = 32768, 40960, 49152, 57344,\
+            \ 65536, 73728, 81920, 90112, 98304, 106496, 114688, or 122880"
+      required:
+      - Type
+      - Value
+      description: The type and amount of a resource to assign to a container. The
+        supported resources include `GPU`, `MEMORY`, and `VCPU`.
     BatchResourceRequirementType:
       type: string
       enum:
@@ -101,6 +812,18 @@ components:
       type: integer
       minimum: 1
       maximum: 10
+    BatchRetryStrategy:
+      type: object
+      properties:
+        Attempts:
+          allOf:
+          - $ref: '#/components/schemas/BatchRetryAttempts'
+          description: The number of times to move a job to the `RUNNABLE` status.
+            If the value of `attempts` is greater than one, the job is retried on
+            failure the same number of attempts as the value.
+      description: The retry strategy that's associated with a job. For more information,
+        see [ Automated job retries](https://docs.aws.amazon.com/batch/latest/userguide/job_retries.html)
+        in the _Batch User Guide_.
     Boolean:
       type: boolean
       default: false
@@ -112,6 +835,32 @@ components:
       type: array
       items:
         $ref: '#/components/schemas/CapacityProviderStrategyItem'
+    CapacityProviderStrategyItem:
+      type: object
+      properties:
+        capacityProvider:
+          allOf:
+          - $ref: '#/components/schemas/CapacityProvider'
+          description: The short name of the capacity provider.
+        weight:
+          allOf:
+          - $ref: '#/components/schemas/CapacityProviderStrategyItemWeight'
+          description: The weight value designates the relative percentage of the
+            total number of tasks launched that should use the specified capacity
+            provider. The weight value is taken into consideration after the base
+            value, if defined, is satisfied.
+        base:
+          allOf:
+          - $ref: '#/components/schemas/CapacityProviderStrategyItemBase'
+          description: The base value designates how many tasks, at a minimum, to
+            run on the specified capacity provider. Only one capacity provider in
+            a capacity provider strategy can have a base defined. If no value is specified,
+            the default value of 0 is used.
+      required:
+      - capacityProvider
+      description: The details of a capacity provider strategy. To learn more, see
+        [CapacityProviderStrategyItem](https://docs.aws.amazon.com/AmazonECS/latest/APIReference/API_CapacityProviderStrategyItem.html)
+        in the Amazon ECS API Reference.
     CapacityProviderStrategyItemBase:
       type: integer
       default: 0
@@ -127,6 +876,151 @@ components:
       pattern: ^(^arn:aws([a-z]|\-)*:logs:([a-z]{2,4}((-gov)|(-de)|(-iso([a-z]?)))?-[a-z]+(-\d{1})?):(\d{12}):log-group:[\.\-_/#A-Za-z0-9]{1,512}(:\*)?)$
       minLength: 1
       maxLength: 1600
+    CloudwatchLogsLogDestination:
+      type: object
+      properties:
+        LogGroupArn:
+          allOf:
+          - $ref: '#/components/schemas/CloudwatchLogGroupArn'
+          description: The Amazon Web Services Resource Name (ARN) for the CloudWatch
+            log group to which EventBridge sends the log records.
+      description: The Amazon CloudWatch Logs logging configuration settings for the
+        pipe.
+    CloudwatchLogsLogDestinationParameters:
+      type: object
+      properties:
+        LogGroupArn:
+          allOf:
+          - $ref: '#/components/schemas/CloudwatchLogGroupArn'
+          description: The Amazon Web Services Resource Name (ARN) for the CloudWatch
+            log group to which EventBridge sends the log records.
+      required:
+      - LogGroupArn
+      description: The Amazon CloudWatch Logs logging configuration settings for the
+        pipe.
+    ConflictException:
+      type: object
+      properties:
+        message:
+          $ref: '#/components/schemas/String'
+        resourceId:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The ID of the resource that caused the exception.
+        resourceType:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The type of resource that caused the exception.
+      required:
+      - message
+      - resourceId
+      - resourceType
+      description: An action you attempted resulted in an exception.
+    CreatePipeRequest:
+      type: object
+      properties:
+        Name:
+          allOf:
+          - $ref: '#/components/schemas/PipeName'
+          description: The name of the pipe.
+        Description:
+          allOf:
+          - $ref: '#/components/schemas/PipeDescription'
+          description: A description of the pipe.
+        DesiredState:
+          allOf:
+          - $ref: '#/components/schemas/RequestedPipeState'
+          description: The state the pipe should be in.
+        Source:
+          allOf:
+          - $ref: '#/components/schemas/ArnOrUrl'
+          description: The ARN of the source resource.
+        SourceParameters:
+          allOf:
+          - $ref: '#/components/schemas/PipeSourceParameters'
+          description: The parameters required to set up a source for your pipe.
+        Enrichment:
+          allOf:
+          - $ref: '#/components/schemas/OptionalArn'
+          description: The ARN of the enrichment resource.
+        EnrichmentParameters:
+          allOf:
+          - $ref: '#/components/schemas/PipeEnrichmentParameters'
+          description: The parameters required to set up enrichment on your pipe.
+        Target:
+          allOf:
+          - $ref: '#/components/schemas/Arn'
+          description: The ARN of the target resource.
+        TargetParameters:
+          allOf:
+          - $ref: '#/components/schemas/PipeTargetParameters'
+          description: 'The parameters required to set up a target for your pipe.
+
+
+            For more information about pipe target parameters, including how to use
+            dynamic path parameters, see [Target parameters](https://docs.aws.amazon.com/eventbridge/latest/userguide/eb-pipes-event-target.html)
+            in the _Amazon EventBridge User Guide_.'
+        RoleArn:
+          allOf:
+          - $ref: '#/components/schemas/RoleArn'
+          description: The ARN of the role that allows the pipe to send data to the
+            target.
+        Tags:
+          allOf:
+          - $ref: '#/components/schemas/TagMap'
+          description: The list of key-value pairs to associate with the pipe.
+        LogConfiguration:
+          allOf:
+          - $ref: '#/components/schemas/PipeLogConfigurationParameters'
+          description: The logging configuration settings for the pipe.
+        KmsKeyIdentifier:
+          allOf:
+          - $ref: '#/components/schemas/KmsKeyIdentifier'
+          description: 'The identifier of the KMS customer managed key for EventBridge
+            to use, if you choose to use a customer managed key to encrypt pipe data.
+            The identifier can be the key Amazon Resource Name (ARN), KeyId, key alias,
+            or key alias ARN.
+
+
+            If you do not specify a customer managed key identifier, EventBridge uses
+            an Amazon Web Services owned key to encrypt pipe data.
+
+
+            For more information, see [Managing keys](https://docs.aws.amazon.com/kms/latest/developerguide/getting-started.html)
+            in the _Key Management Service Developer Guide_.'
+      required:
+      - Name
+      - Source
+      - Target
+      - RoleArn
+    CreatePipeResponse:
+      type: object
+      properties:
+        Arn:
+          allOf:
+          - $ref: '#/components/schemas/PipeArn'
+          description: The ARN of the pipe.
+        Name:
+          allOf:
+          - $ref: '#/components/schemas/PipeName'
+          description: The name of the pipe.
+        DesiredState:
+          allOf:
+          - $ref: '#/components/schemas/RequestedPipeState'
+          description: The state the pipe should be in.
+        CurrentState:
+          allOf:
+          - $ref: '#/components/schemas/PipeState'
+          description: The state the pipe is in.
+        CreationTime:
+          allOf:
+          - $ref: '#/components/schemas/Timestamp'
+          description: The time the pipe was created.
+        LastModifiedTime:
+          allOf:
+          - $ref: '#/components/schemas/Timestamp'
+          description: When the pipe was last updated, in [ISO-8601 format](https://www.w3.org/TR/NOTE-datetime)
+            (YYYY-MM-DDThh:mm:ss.sTZD).
     Database:
       type: string
       minLength: 1
@@ -135,6 +1029,178 @@ components:
       type: string
       minLength: 1
       maxLength: 128
+    DeadLetterConfig:
+      type: object
+      properties:
+        Arn:
+          allOf:
+          - $ref: '#/components/schemas/Arn'
+          description: 'The ARN of the specified target for the dead-letter queue.
+
+
+            For Amazon Kinesis stream and Amazon DynamoDB stream sources, specify
+            either an Amazon SNS topic or Amazon SQS queue ARN.'
+      description: A `DeadLetterConfig` object that contains information about a dead-letter
+        queue configuration.
+    DeletePipeRequest:
+      type: object
+      properties:
+        Name:
+          allOf:
+          - $ref: '#/components/schemas/PipeName'
+          description: The name of the pipe.
+      required:
+      - Name
+    DeletePipeResponse:
+      type: object
+      properties:
+        Arn:
+          allOf:
+          - $ref: '#/components/schemas/PipeArn'
+          description: The ARN of the pipe.
+        Name:
+          allOf:
+          - $ref: '#/components/schemas/PipeName'
+          description: The name of the pipe.
+        DesiredState:
+          allOf:
+          - $ref: '#/components/schemas/RequestedPipeStateDescribeResponse'
+          description: The state the pipe should be in.
+        CurrentState:
+          allOf:
+          - $ref: '#/components/schemas/PipeState'
+          description: The state the pipe is in.
+        CreationTime:
+          allOf:
+          - $ref: '#/components/schemas/Timestamp'
+          description: The time the pipe was created.
+        LastModifiedTime:
+          allOf:
+          - $ref: '#/components/schemas/Timestamp'
+          description: When the pipe was last updated, in [ISO-8601 format](https://www.w3.org/TR/NOTE-datetime)
+            (YYYY-MM-DDThh:mm:ss.sTZD).
+    DescribePipeRequest:
+      type: object
+      properties:
+        Name:
+          allOf:
+          - $ref: '#/components/schemas/PipeName'
+          description: The name of the pipe.
+      required:
+      - Name
+    DescribePipeResponse:
+      type: object
+      properties:
+        Arn:
+          allOf:
+          - $ref: '#/components/schemas/PipeArn'
+          description: The ARN of the pipe.
+        Name:
+          allOf:
+          - $ref: '#/components/schemas/PipeName'
+          description: The name of the pipe.
+        Description:
+          allOf:
+          - $ref: '#/components/schemas/PipeDescription'
+          description: A description of the pipe.
+        DesiredState:
+          allOf:
+          - $ref: '#/components/schemas/RequestedPipeStateDescribeResponse'
+          description: The state the pipe should be in.
+        CurrentState:
+          allOf:
+          - $ref: '#/components/schemas/PipeState'
+          description: The state the pipe is in.
+        StateReason:
+          allOf:
+          - $ref: '#/components/schemas/PipeStateReason'
+          description: The reason the pipe is in its current state.
+        Source:
+          allOf:
+          - $ref: '#/components/schemas/ArnOrUrl'
+          description: The ARN of the source resource.
+        SourceParameters:
+          allOf:
+          - $ref: '#/components/schemas/PipeSourceParameters'
+          description: The parameters required to set up a source for your pipe.
+        Enrichment:
+          allOf:
+          - $ref: '#/components/schemas/OptionalArn'
+          description: The ARN of the enrichment resource.
+        EnrichmentParameters:
+          allOf:
+          - $ref: '#/components/schemas/PipeEnrichmentParameters'
+          description: The parameters required to set up enrichment on your pipe.
+        Target:
+          allOf:
+          - $ref: '#/components/schemas/Arn'
+          description: The ARN of the target resource.
+        TargetParameters:
+          allOf:
+          - $ref: '#/components/schemas/PipeTargetParameters'
+          description: 'The parameters required to set up a target for your pipe.
+
+
+            For more information about pipe target parameters, including how to use
+            dynamic path parameters, see [Target parameters](https://docs.aws.amazon.com/eventbridge/latest/userguide/eb-pipes-event-target.html)
+            in the _Amazon EventBridge User Guide_.'
+        RoleArn:
+          allOf:
+          - $ref: '#/components/schemas/RoleArn'
+          description: The ARN of the role that allows the pipe to send data to the
+            target.
+        Tags:
+          allOf:
+          - $ref: '#/components/schemas/TagMap'
+          description: The list of key-value pairs to associate with the pipe.
+        CreationTime:
+          allOf:
+          - $ref: '#/components/schemas/Timestamp'
+          description: The time the pipe was created.
+        LastModifiedTime:
+          allOf:
+          - $ref: '#/components/schemas/Timestamp'
+          description: When the pipe was last updated, in [ISO-8601 format](https://www.w3.org/TR/NOTE-datetime)
+            (YYYY-MM-DDThh:mm:ss.sTZD).
+        LogConfiguration:
+          allOf:
+          - $ref: '#/components/schemas/PipeLogConfiguration'
+          description: The logging configuration settings for the pipe.
+        KmsKeyIdentifier:
+          allOf:
+          - $ref: '#/components/schemas/KmsKeyIdentifier'
+          description: 'The identifier of the KMS customer managed key for EventBridge
+            to use to encrypt pipe data, if one has been specified.
+
+
+            For more information, see [Data encryption in EventBridge](https://docs.aws.amazon.com/eventbridge/latest/userguide/eb-encryption.html)
+            in the _Amazon EventBridge User Guide_.'
+    DimensionMapping:
+      type: object
+      properties:
+        DimensionValue:
+          allOf:
+          - $ref: '#/components/schemas/DimensionValue'
+          description: Dynamic path to the dimension value in the source event.
+        DimensionValueType:
+          allOf:
+          - $ref: '#/components/schemas/DimensionValueType'
+          description: The data type of the dimension for the time-series data.
+        DimensionName:
+          allOf:
+          - $ref: '#/components/schemas/DimensionName'
+          description: The metadata attributes of the time series. For example, the
+            name and Availability Zone of an Amazon EC2 instance or the name of the
+            manufacturer of a wind turbine are dimensions.
+      required:
+      - DimensionValue
+      - DimensionValueType
+      - DimensionName
+      description: 'Maps source data to a dimension in the target Timestream for LiveAnalytics
+        table.
+
+
+        For more information, see [Amazon Timestream for LiveAnalytics concepts](https://docs.aws.amazon.com/timestream/latest/developerguide/concepts.html)'
     DimensionMappings:
       type: array
       items:
@@ -156,10 +1222,97 @@ components:
       enum:
       - TRIM_HORIZON
       - LATEST
+    EcsContainerOverride:
+      type: object
+      properties:
+        Command:
+          allOf:
+          - $ref: '#/components/schemas/StringList'
+          description: The command to send to the container that overrides the default
+            command from the Docker image or the task definition. You must also specify
+            a container name.
+        Cpu:
+          allOf:
+          - $ref: '#/components/schemas/Integer'
+          description: The number of `cpu` units reserved for the container, instead
+            of the default value from the task definition. You must also specify a
+            container name.
+        Environment:
+          allOf:
+          - $ref: '#/components/schemas/EcsEnvironmentVariableList'
+          description: The environment variables to send to the container. You can
+            add new environment variables, which are added to the container at launch,
+            or you can override the existing environment variables from the Docker
+            image or the task definition. You must also specify a container name.
+        EnvironmentFiles:
+          allOf:
+          - $ref: '#/components/schemas/EcsEnvironmentFileList'
+          description: A list of files containing the environment variables to pass
+            to a container, instead of the value from the container definition.
+        Memory:
+          allOf:
+          - $ref: '#/components/schemas/Integer'
+          description: The hard limit (in MiB) of memory to present to the container,
+            instead of the default value from the task definition. If your container
+            attempts to exceed the memory specified here, the container is killed.
+            You must also specify a container name.
+        MemoryReservation:
+          allOf:
+          - $ref: '#/components/schemas/Integer'
+          description: The soft limit (in MiB) of memory to reserve for the container,
+            instead of the default value from the task definition. You must also specify
+            a container name.
+        Name:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The name of the container that receives the override. This
+            parameter is required if any override is specified.
+        ResourceRequirements:
+          allOf:
+          - $ref: '#/components/schemas/EcsResourceRequirementsList'
+          description: The type and amount of a resource to assign to a container,
+            instead of the default value from the task definition. The only supported
+            resource is a GPU.
+      description: 'The overrides that are sent to a container. An empty container
+        override can be passed in. An example of an empty container override is `{"containerOverrides":
+        [ ] }`. If a non-empty container override is specified, the `name` parameter
+        must be included.'
     EcsContainerOverrideList:
       type: array
       items:
         $ref: '#/components/schemas/EcsContainerOverride'
+    EcsEnvironmentFile:
+      type: object
+      properties:
+        type:
+          allOf:
+          - $ref: '#/components/schemas/EcsEnvironmentFileType'
+          description: The file type to use. The only supported value is `s3`.
+        value:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The Amazon Resource Name (ARN) of the Amazon S3 object containing
+            the environment variable file.
+      required:
+      - type
+      - value
+      description: "A list of files containing the environment variables to pass to\
+        \ a container. You can specify up to ten environment files. The file must\
+        \ have a `.env` file extension. Each line in an environment file should contain\
+        \ an environment variable in `VARIABLE=VALUE` format. Lines beginning with\
+        \ `#` are treated as comments and are ignored. For more information about\
+        \ the environment variable file syntax, see [Declare default environment variables\
+        \ in file](https://docs.docker.com/compose/env-file/).\n\nIf there are environment\
+        \ variables specified using the `environment` parameter in a container definition,\
+        \ they take precedence over the variables contained within an environment\
+        \ file. If multiple environment files are specified that contain the same\
+        \ variable, they're processed from the top down. We recommend that you use\
+        \ unique variable names. For more information, see [Specifying environment\
+        \ variables](https://docs.aws.amazon.com/AmazonECS/latest/developerguide/taskdef-envfiles.html)\
+        \ in the _Amazon Elastic Container Service Developer Guide_.\n\nThis parameter\
+        \ is only supported for tasks hosted on Fargate using the following platform\
+        \ versions:\n\n  * Linux platform version `1.4.0` or later.\n\n  * Windows\
+        \ platform version `1.0.0` or later."
     EcsEnvironmentFileList:
       type: array
       items:
@@ -168,14 +1321,101 @@ components:
       type: string
       enum:
       - s3
+    EcsEnvironmentVariable:
+      type: object
+      properties:
+        name:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The name of the key-value pair. For environment variables,
+            this is the name of the environment variable.
+        value:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The value of the key-value pair. For environment variables,
+            this is the value of the environment variable.
+      description: The environment variables to send to the container. You can add
+        new environment variables, which are added to the container at launch, or
+        you can override the existing environment variables from the Docker image
+        or the task definition. You must also specify a container name.
     EcsEnvironmentVariableList:
       type: array
       items:
         $ref: '#/components/schemas/EcsEnvironmentVariable'
+    EcsEphemeralStorage:
+      type: object
+      properties:
+        sizeInGiB:
+          allOf:
+          - $ref: '#/components/schemas/EphemeralStorageSize'
+          description: The total amount, in GiB, of ephemeral storage to set for the
+            task. The minimum supported value is `21` GiB and the maximum supported
+            value is `200` GiB.
+      required:
+      - sizeInGiB
+      description: 'The amount of ephemeral storage to allocate for the task. This
+        parameter is used to expand the total amount of ephemeral storage available,
+        beyond the default amount, for tasks hosted on Fargate. For more information,
+        see [Fargate task storage](https://docs.aws.amazon.com/AmazonECS/latest/userguide/using_data_volumes.html)
+        in the _Amazon ECS User Guide for Fargate_.
+
+
+        This parameter is only supported for tasks hosted on Fargate using Linux platform
+        version `1.4.0` or later. This parameter is not supported for Windows containers
+        on Fargate.'
+    EcsInferenceAcceleratorOverride:
+      type: object
+      properties:
+        deviceName:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The Elastic Inference accelerator device name to override for
+            the task. This parameter must match a `deviceName` specified in the task
+            definition.
+        deviceType:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The Elastic Inference accelerator type to use.
+      description: Details on an Elastic Inference accelerator task override. This
+        parameter is used to override the Elastic Inference accelerator specified
+        in the task definition. For more information, see [Working with Amazon Elastic
+        Inference on Amazon ECS](https://docs.aws.amazon.com/AmazonECS/latest/userguide/ecs-inference.html)
+        in the _Amazon Elastic Container Service Developer Guide_.
     EcsInferenceAcceleratorOverrideList:
       type: array
       items:
         $ref: '#/components/schemas/EcsInferenceAcceleratorOverride'
+    EcsResourceRequirement:
+      type: object
+      properties:
+        type:
+          allOf:
+          - $ref: '#/components/schemas/EcsResourceRequirementType'
+          description: The type of resource to assign to a container. The supported
+            values are `GPU` or `InferenceAccelerator`.
+        value:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: 'The value for the specified resource type.
+
+
+            If the `GPU` type is used, the value is the number of physical `GPUs`
+            the Amazon ECS container agent reserves for the container. The number
+            of GPUs that''s reserved for all containers in a task can''t exceed the
+            number of available GPUs on the container instance that the task is launched
+            on.
+
+
+            If the `InferenceAccelerator` type is used, the `value` matches the `deviceName`
+            for an InferenceAccelerator specified in a task definition.'
+      required:
+      - type
+      - value
+      description: The type and amount of a resource to assign to a container. The
+        supported resource types are GPUs and Elastic Inference accelerators. For
+        more information, see [Working with GPUs on Amazon ECS](https://docs.aws.amazon.com/AmazonECS/latest/developerguide/ecs-gpu.html)
+        or [Working with Amazon Elastic Inference on Amazon ECS](https://docs.aws.amazon.com/AmazonECS/latest/developerguide/ecs-inference.html)
+        in the _Amazon Elastic Container Service Developer Guide_
     EcsResourceRequirementType:
       type: string
       enum:
@@ -185,6 +1425,48 @@ components:
       type: array
       items:
         $ref: '#/components/schemas/EcsResourceRequirement'
+    EcsTaskOverride:
+      type: object
+      properties:
+        ContainerOverrides:
+          allOf:
+          - $ref: '#/components/schemas/EcsContainerOverrideList'
+          description: One or more container overrides that are sent to a task.
+        Cpu:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The cpu override for the task.
+        EphemeralStorage:
+          allOf:
+          - $ref: '#/components/schemas/EcsEphemeralStorage'
+          description: "The ephemeral storage setting override for the task.\n\nThis\
+            \ parameter is only supported for tasks hosted on Fargate that use the\
+            \ following platform versions:\n\n  * Linux platform version `1.4.0` or\
+            \ later.\n\n  * Windows platform version `1.0.0` or later."
+        ExecutionRoleArn:
+          allOf:
+          - $ref: '#/components/schemas/ArnOrJsonPath'
+          description: The Amazon Resource Name (ARN) of the task execution IAM role
+            override for the task. For more information, see [Amazon ECS task execution
+            IAM role](https://docs.aws.amazon.com/AmazonECS/latest/developerguide/task_execution_IAM_role.html)
+            in the _Amazon Elastic Container Service Developer Guide_.
+        InferenceAcceleratorOverrides:
+          allOf:
+          - $ref: '#/components/schemas/EcsInferenceAcceleratorOverrideList'
+          description: The Elastic Inference accelerator override for the task.
+        Memory:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The memory override for the task.
+        TaskRoleArn:
+          allOf:
+          - $ref: '#/components/schemas/ArnOrJsonPath'
+          description: The Amazon Resource Name (ARN) of the IAM role that containers
+            in this task can assume. All containers in this task are granted the permissions
+            that are specified in this role. For more information, see [IAM Role for
+            Tasks](https://docs.aws.amazon.com/AmazonECS/latest/developerguide/task-iam-roles.html)
+            in the _Amazon Elastic Container Service Developer Guide_.
+      description: The overrides that are associated with a task.
     EndpointString:
       type: string
       pattern: ^(([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])\.)*([A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9\-]*[A-Za-z0-9]):[0-9]{1,5}$
@@ -225,6 +1507,32 @@ components:
       type: string
       minLength: 0
       maxLength: 4096
+    Filter:
+      type: object
+      properties:
+        Pattern:
+          allOf:
+          - $ref: '#/components/schemas/EventPattern'
+          description: The event pattern.
+      description: Filter events using an event pattern. For more information, see
+        [Events and Event Patterns](https://docs.aws.amazon.com/eventbridge/latest/userguide/eventbridge-and-event-patterns.html)
+        in the _Amazon EventBridge User Guide_.
+    FilterCriteria:
+      type: object
+      properties:
+        Filters:
+          allOf:
+          - $ref: '#/components/schemas/FilterList'
+          description: The event patterns.
+      description: 'The collection of event patterns used to filter events.
+
+
+        To remove a filter, specify a `FilterCriteria` object with an empty array
+        of `Filter` objects.
+
+
+        For more information, see [Events and Event Patterns](https://docs.aws.amazon.com/eventbridge/latest/userguide/eventbridge-and-event-patterns.html)
+        in the _Amazon EventBridge User Guide_.'
     FilterList:
       type: array
       items:
@@ -234,6 +1542,28 @@ components:
       pattern: ^(^arn:aws([a-z]|\-)*:firehose:([a-z]{2,4}((-gov)|(-de)|(-iso([a-z]?)))?-[a-z]+(-\d{1})?):(\d{12}):deliverystream/[a-zA-Z0-9_.-]{1,64})$
       minLength: 1
       maxLength: 1600
+    FirehoseLogDestination:
+      type: object
+      properties:
+        DeliveryStreamArn:
+          allOf:
+          - $ref: '#/components/schemas/FirehoseArn'
+          description: The Amazon Resource Name (ARN) of the Firehose delivery stream
+            to which EventBridge delivers the pipe log records.
+      description: The Amazon Data Firehose logging configuration settings for the
+        pipe.
+    FirehoseLogDestinationParameters:
+      type: object
+      properties:
+        DeliveryStreamArn:
+          allOf:
+          - $ref: '#/components/schemas/FirehoseArn'
+          description: Specifies the Amazon Resource Name (ARN) of the Firehose delivery
+            stream to which EventBridge delivers the pipe log records.
+      required:
+      - DeliveryStreamArn
+      description: The Amazon Data Firehose logging configuration settings for the
+        pipe.
     HeaderKey:
       type: string
       pattern: ^[!#$%&'*+-.^_`|~0-9a-zA-Z]+|(\$(\.[\w/_-]+(\[(\d+|\*)\])*)*)$
@@ -260,6 +1590,19 @@ components:
       type: string
       minLength: 0
       maxLength: 8192
+    InternalException:
+      type: object
+      properties:
+        message:
+          $ref: '#/components/schemas/String'
+        retryAfterSeconds:
+          allOf:
+          - $ref: '#/components/schemas/Integer'
+          description: The number of seconds to wait before retrying the action that
+            caused the exception.
+      required:
+      - message
+      description: This exception occurs due to unexpected causes.
     JsonPath:
       type: string
       pattern: ^\$(\.[\w/_-]+(\[(\d+|\*)\])*)*$
@@ -310,6 +1653,76 @@ components:
     LimitMin1:
       type: integer
       minimum: 1
+    ListPipesRequest:
+      type: object
+      properties:
+        NamePrefix:
+          allOf:
+          - $ref: '#/components/schemas/PipeName'
+          description: 'A value that will return a subset of the pipes associated
+            with this account. For example, `"NamePrefix": "ABC"` will return all
+            endpoints with "ABC" in the name.'
+        DesiredState:
+          allOf:
+          - $ref: '#/components/schemas/RequestedPipeState'
+          description: The state the pipe should be in.
+        CurrentState:
+          allOf:
+          - $ref: '#/components/schemas/PipeState'
+          description: The state the pipe is in.
+        SourcePrefix:
+          allOf:
+          - $ref: '#/components/schemas/ResourceArn'
+          description: The prefix matching the pipe source.
+        TargetPrefix:
+          allOf:
+          - $ref: '#/components/schemas/ResourceArn'
+          description: The prefix matching the pipe target.
+        NextToken:
+          allOf:
+          - $ref: '#/components/schemas/NextToken'
+          description: If `nextToken` is returned, there are more results available.
+            The value of `nextToken` is a unique pagination token for each page. Make
+            the call again using the returned token to retrieve the next page. Keep
+            all other arguments unchanged. Each pagination token expires after 24
+            hours. Using an expired pagination token will return an HTTP 400 InvalidToken
+            error.
+        Limit:
+          allOf:
+          - $ref: '#/components/schemas/LimitMax100'
+          description: The maximum number of pipes to include in the response.
+    ListPipesResponse:
+      type: object
+      properties:
+        Pipes:
+          allOf:
+          - $ref: '#/components/schemas/PipeList'
+          description: The pipes returned by the call.
+        NextToken:
+          allOf:
+          - $ref: '#/components/schemas/NextToken'
+          description: If `nextToken` is returned, there are more results available.
+            The value of `nextToken` is a unique pagination token for each page. Make
+            the call again using the returned token to retrieve the next page. Keep
+            all other arguments unchanged. Each pagination token expires after 24
+            hours. Using an expired pagination token will return an HTTP 400 InvalidToken
+            error.
+    ListTagsForResourceRequest:
+      type: object
+      properties:
+        resourceArn:
+          allOf:
+          - $ref: '#/components/schemas/PipeArn'
+          description: The ARN of the pipe for which you want to view tags.
+      required:
+      - resourceArn
+    ListTagsForResourceResponse:
+      type: object
+      properties:
+        tags:
+          allOf:
+          - $ref: '#/components/schemas/TagMap'
+          description: The list of key-value pairs to associate with the pipe.
     LogLevel:
       type: string
       enum:
@@ -387,6 +1800,27 @@ components:
       type: string
       minLength: 0
       maxLength: 100
+    MultiMeasureAttributeMapping:
+      type: object
+      properties:
+        MeasureValue:
+          allOf:
+          - $ref: '#/components/schemas/MeasureValue'
+          description: Dynamic path to the measurement attribute in the source event.
+        MeasureValueType:
+          allOf:
+          - $ref: '#/components/schemas/MeasureValueType'
+          description: Data type of the measurement attribute in the source event.
+        MultiMeasureAttributeName:
+          allOf:
+          - $ref: '#/components/schemas/MultiMeasureAttributeName'
+          description: Target measure name to be used.
+      required:
+      - MeasureValue
+      - MeasureValueType
+      - MultiMeasureAttributeName
+      description: A mapping of a source event data field to a measure in a Timestream
+        for LiveAnalytics record.
     MultiMeasureAttributeMappings:
       type: array
       items:
@@ -395,6 +1829,26 @@ components:
       type: string
       minLength: 1
       maxLength: 256
+    MultiMeasureMapping:
+      type: object
+      properties:
+        MultiMeasureName:
+          allOf:
+          - $ref: '#/components/schemas/MultiMeasureName'
+          description: The name of the multiple measurements per record (multi-measure).
+        MultiMeasureAttributeMappings:
+          allOf:
+          - $ref: '#/components/schemas/MultiMeasureAttributeMappings'
+          description: Mappings that represent multiple source event fields mapped
+            to measures in the same Timestream for LiveAnalytics record.
+      required:
+      - MultiMeasureName
+      - MultiMeasureAttributeMappings
+      description: 'Maps multiple measures from the source event to the same Timestream
+        for LiveAnalytics record.
+
+
+        For more information, see [Amazon Timestream for LiveAnalytics concepts](https://docs.aws.amazon.com/timestream/latest/developerguide/concepts.html)'
     MultiMeasureMappings:
       type: array
       items:
@@ -403,10 +1857,28 @@ components:
       type: string
       minLength: 1
       maxLength: 256
+    NetworkConfiguration:
+      type: object
+      properties:
+        awsvpcConfiguration:
+          allOf:
+          - $ref: '#/components/schemas/AwsVpcConfiguration'
+          description: Use this structure to specify the VPC subnets and security
+            groups for the task, and whether a public IP address is to be used. This
+            structure is relevant only for ECS tasks that use the `awsvpc` network
+            mode.
+      description: This structure specifies the network configuration for an Amazon
+        ECS task.
     NextToken:
       type: string
       minLength: 1
       maxLength: 2048
+    NotFoundException:
+      type: object
+      properties:
+        message:
+          $ref: '#/components/schemas/ErrorMessage'
+      description: An entity that you specified does not exist.
     OnPartialBatchItemFailureStreams:
       type: string
       enum:
@@ -423,6 +1895,53 @@ components:
       type: array
       items:
         $ref: '#/components/schemas/PathParameter'
+    Pipe:
+      type: object
+      properties:
+        Name:
+          allOf:
+          - $ref: '#/components/schemas/PipeName'
+          description: The name of the pipe.
+        Arn:
+          allOf:
+          - $ref: '#/components/schemas/PipeArn'
+          description: The ARN of the pipe.
+        DesiredState:
+          allOf:
+          - $ref: '#/components/schemas/RequestedPipeState'
+          description: The state the pipe should be in.
+        CurrentState:
+          allOf:
+          - $ref: '#/components/schemas/PipeState'
+          description: The state the pipe is in.
+        StateReason:
+          allOf:
+          - $ref: '#/components/schemas/PipeStateReason'
+          description: The reason the pipe is in its current state.
+        CreationTime:
+          allOf:
+          - $ref: '#/components/schemas/Timestamp'
+          description: The time the pipe was created.
+        LastModifiedTime:
+          allOf:
+          - $ref: '#/components/schemas/Timestamp'
+          description: When the pipe was last updated, in [ISO-8601 format](https://www.w3.org/TR/NOTE-datetime)
+            (YYYY-MM-DDThh:mm:ss.sTZD).
+        Source:
+          allOf:
+          - $ref: '#/components/schemas/ArnOrUrl'
+          description: The ARN of the source resource.
+        Target:
+          allOf:
+          - $ref: '#/components/schemas/Arn'
+          description: The ARN of the target resource.
+        Enrichment:
+          allOf:
+          - $ref: '#/components/schemas/OptionalArn'
+          description: The ARN of the enrichment resource.
+      description: An object that represents a pipe. Amazon EventBridgePipes connect
+        event sources to targets and reduces the need for specialized knowledge and
+        integration code.
     PipeArn:
       type: string
       pattern: ^arn:aws([a-z]|\-)*:([a-zA-Z0-9\-]+):([a-z]|\d|\-)*:([0-9]{12})?:(.+)$
@@ -433,15 +1952,458 @@ components:
       pattern: ^.*$
       minLength: 0
       maxLength: 512
+    PipeEnrichmentHttpParameters:
+      type: object
+      properties:
+        PathParameterValues:
+          allOf:
+          - $ref: '#/components/schemas/PathParameterList'
+          description: The path parameter values to be used to populate API Gateway
+            REST API or EventBridge ApiDestination path wildcards ("*").
+        HeaderParameters:
+          allOf:
+          - $ref: '#/components/schemas/HeaderParametersMap'
+          description: The headers that need to be sent as part of request invoking
+            the API Gateway REST API or EventBridge ApiDestination.
+        QueryStringParameters:
+          allOf:
+          - $ref: '#/components/schemas/QueryStringParametersMap'
+          description: The query string keys/values that need to be sent as part of
+            request invoking the API Gateway REST API or EventBridge ApiDestination.
+      description: These are custom parameter to be used when the target is an API
+        Gateway REST APIs or EventBridge ApiDestinations. In the latter case, these
+        are merged with any InvocationParameters specified on the Connection, with
+        any values from the Connection taking precedence.
+    PipeEnrichmentParameters:
+      type: object
+      properties:
+        InputTemplate:
+          allOf:
+          - $ref: '#/components/schemas/InputTemplate'
+          description: 'Valid JSON text passed to the enrichment. In this case, nothing
+            from the event itself is passed to the enrichment. For more information,
+            see [The JavaScript Object Notation (JSON) Data Interchange Format](http://www.rfc-editor.org/rfc/rfc7159.txt).
+
+
+            To remove an input template, specify an empty string.'
+        HttpParameters:
+          allOf:
+          - $ref: '#/components/schemas/PipeEnrichmentHttpParameters'
+          description: 'Contains the HTTP parameters to use when the target is a API
+            Gateway REST endpoint or EventBridge ApiDestination.
+
+
+            If you specify an API Gateway REST API or EventBridge ApiDestination as
+            a target, you can use this parameter to specify headers, path parameters,
+            and query string keys/values as part of your target invoking request.
+            If you''re using ApiDestinations, the corresponding Connection can also
+            have these values configured. In case of any conflicting keys, values
+            from the Connection take precedence.'
+      description: The parameters required to set up enrichment on your pipe.
     PipeList:
       type: array
       items:
         $ref: '#/components/schemas/Pipe'
+    PipeLogConfiguration:
+      type: object
+      properties:
+        S3LogDestination:
+          allOf:
+          - $ref: '#/components/schemas/S3LogDestination'
+          description: The Amazon S3 logging configuration settings for the pipe.
+        FirehoseLogDestination:
+          allOf:
+          - $ref: '#/components/schemas/FirehoseLogDestination'
+          description: The Amazon Data Firehose logging configuration settings for
+            the pipe.
+        CloudwatchLogsLogDestination:
+          allOf:
+          - $ref: '#/components/schemas/CloudwatchLogsLogDestination'
+          description: The Amazon CloudWatch Logs logging configuration settings for
+            the pipe.
+        Level:
+          allOf:
+          - $ref: '#/components/schemas/LogLevel'
+          description: The level of logging detail to include. This applies to all
+            log destinations for the pipe.
+        IncludeExecutionData:
+          allOf:
+          - $ref: '#/components/schemas/IncludeExecutionData'
+          description: 'Whether the execution data (specifically, the `payload`, `awsRequest`,
+            and `awsResponse` fields) is included in the log messages for this pipe.
+
+
+            This applies to all log destinations for the pipe.
+
+
+            For more information, see [Including execution data in logs](https://docs.aws.amazon.com/eventbridge/latest/userguide/eb-pipes-logs.html#eb-pipes-logs-execution-data)
+            in the _Amazon EventBridge User Guide_.'
+      description: The logging configuration settings for the pipe.
+    PipeLogConfigurationParameters:
+      type: object
+      properties:
+        S3LogDestination:
+          allOf:
+          - $ref: '#/components/schemas/S3LogDestinationParameters'
+          description: The Amazon S3 logging configuration settings for the pipe.
+        FirehoseLogDestination:
+          allOf:
+          - $ref: '#/components/schemas/FirehoseLogDestinationParameters'
+          description: The Amazon Data Firehose logging configuration settings for
+            the pipe.
+        CloudwatchLogsLogDestination:
+          allOf:
+          - $ref: '#/components/schemas/CloudwatchLogsLogDestinationParameters'
+          description: The Amazon CloudWatch Logs logging configuration settings for
+            the pipe.
+        Level:
+          allOf:
+          - $ref: '#/components/schemas/LogLevel'
+          description: 'The level of logging detail to include. This applies to all
+            log destinations for the pipe.
+
+
+            For more information, see [Specifying EventBridge Pipes log level](https://docs.aws.amazon.com/eventbridge/latest/userguide/eb-pipes-logs.html#eb-pipes-logs-level)
+            in the _Amazon EventBridge User Guide_.'
+        IncludeExecutionData:
+          allOf:
+          - $ref: '#/components/schemas/IncludeExecutionData'
+          description: 'Specify `ALL` to include the execution data (specifically,
+            the `payload`, `awsRequest`, and `awsResponse` fields) in the log messages
+            for this pipe.
+
+
+            This applies to all log destinations for the pipe.
+
+
+            For more information, see [Including execution data in logs](https://docs.aws.amazon.com/eventbridge/latest/userguide/eb-pipes-logs.html#eb-pipes-logs-execution-data)
+            in the _Amazon EventBridge User Guide_.
+
+
+            By default, execution data is not included.'
+      required:
+      - Level
+      description: 'Specifies the logging configuration settings for the pipe.
+
+
+        When you call `UpdatePipe`, EventBridge updates the fields in the `PipeLogConfigurationParameters`
+        object atomically as one and overrides existing values. This is by design.
+        If you don''t specify an optional field in any of the Amazon Web Services
+        service parameters objects (`CloudwatchLogsLogDestinationParameters`, `FirehoseLogDestinationParameters`,
+        or `S3LogDestinationParameters`), EventBridge sets that field to its system-default
+        value during the update.
+
+
+        For example, suppose when you created the pipe you specified a Firehose stream
+        log destination. You then update the pipe to add an Amazon S3 log destination.
+        In addition to specifying the `S3LogDestinationParameters` for the new log
+        destination, you must also specify the fields in the `FirehoseLogDestinationParameters`
+        object in order to retain the Firehose stream log destination.
+
+
+        For more information on generating pipe log records, see [Log EventBridge
+        Pipes](eventbridge/latest/userguide/eb-pipes-logs.html) in the _Amazon EventBridge
+        User Guide_.'
     PipeName:
       type: string
       pattern: ^[\.\-_A-Za-z0-9]+$
       minLength: 1
       maxLength: 64
+    PipeSourceActiveMQBrokerParameters:
+      type: object
+      properties:
+        Credentials:
+          allOf:
+          - $ref: '#/components/schemas/MQBrokerAccessCredentials'
+          description: The credentials needed to access the resource.
+        QueueName:
+          allOf:
+          - $ref: '#/components/schemas/MQBrokerQueueName'
+          description: The name of the destination queue to consume.
+        BatchSize:
+          allOf:
+          - $ref: '#/components/schemas/LimitMax10000'
+          description: The maximum number of records to include in each batch.
+        MaximumBatchingWindowInSeconds:
+          allOf:
+          - $ref: '#/components/schemas/MaximumBatchingWindowInSeconds'
+          description: The maximum length of a time to wait for events.
+      required:
+      - Credentials
+      - QueueName
+      description: The parameters for using an Active MQ broker as a source.
+    PipeSourceDynamoDBStreamParameters:
+      type: object
+      properties:
+        BatchSize:
+          allOf:
+          - $ref: '#/components/schemas/LimitMax10000'
+          description: The maximum number of records to include in each batch.
+        DeadLetterConfig:
+          allOf:
+          - $ref: '#/components/schemas/DeadLetterConfig'
+          description: Define the target queue to send dead-letter queue events to.
+        OnPartialBatchItemFailure:
+          allOf:
+          - $ref: '#/components/schemas/OnPartialBatchItemFailureStreams'
+          description: Define how to handle item process failures. `AUTOMATIC_BISECT`
+            halves each batch and retry each half until all the records are processed
+            or there is one failed message left in the batch.
+        MaximumBatchingWindowInSeconds:
+          allOf:
+          - $ref: '#/components/schemas/MaximumBatchingWindowInSeconds'
+          description: The maximum length of a time to wait for events.
+        MaximumRecordAgeInSeconds:
+          allOf:
+          - $ref: '#/components/schemas/MaximumRecordAgeInSeconds'
+          description: Discard records older than the specified age. The default value
+            is -1, which sets the maximum age to infinite. When the value is set to
+            infinite, EventBridge never discards old records.
+        MaximumRetryAttempts:
+          allOf:
+          - $ref: '#/components/schemas/MaximumRetryAttemptsESM'
+          description: Discard records after the specified number of retries. The
+            default value is -1, which sets the maximum number of retries to infinite.
+            When MaximumRetryAttempts is infinite, EventBridge retries failed records
+            until the record expires in the event source.
+        ParallelizationFactor:
+          allOf:
+          - $ref: '#/components/schemas/LimitMax10'
+          description: The number of batches to process concurrently from each shard.
+            The default value is 1.
+        StartingPosition:
+          allOf:
+          - $ref: '#/components/schemas/DynamoDBStreamStartPosition'
+          description: The position in a stream from which to start reading.
+      required:
+      - StartingPosition
+      description: The parameters for using a DynamoDB stream as a source.
+    PipeSourceKinesisStreamParameters:
+      type: object
+      properties:
+        BatchSize:
+          allOf:
+          - $ref: '#/components/schemas/LimitMax10000'
+          description: The maximum number of records to include in each batch.
+        DeadLetterConfig:
+          allOf:
+          - $ref: '#/components/schemas/DeadLetterConfig'
+          description: Define the target queue to send dead-letter queue events to.
+        OnPartialBatchItemFailure:
+          allOf:
+          - $ref: '#/components/schemas/OnPartialBatchItemFailureStreams'
+          description: Define how to handle item process failures. `AUTOMATIC_BISECT`
+            halves each batch and retry each half until all the records are processed
+            or there is one failed message left in the batch.
+        MaximumBatchingWindowInSeconds:
+          allOf:
+          - $ref: '#/components/schemas/MaximumBatchingWindowInSeconds'
+          description: The maximum length of a time to wait for events.
+        MaximumRecordAgeInSeconds:
+          allOf:
+          - $ref: '#/components/schemas/MaximumRecordAgeInSeconds'
+          description: Discard records older than the specified age. The default value
+            is -1, which sets the maximum age to infinite. When the value is set to
+            infinite, EventBridge never discards old records.
+        MaximumRetryAttempts:
+          allOf:
+          - $ref: '#/components/schemas/MaximumRetryAttemptsESM'
+          description: Discard records after the specified number of retries. The
+            default value is -1, which sets the maximum number of retries to infinite.
+            When MaximumRetryAttempts is infinite, EventBridge retries failed records
+            until the record expires in the event source.
+        ParallelizationFactor:
+          allOf:
+          - $ref: '#/components/schemas/LimitMax10'
+          description: The number of batches to process concurrently from each shard.
+            The default value is 1.
+        StartingPosition:
+          allOf:
+          - $ref: '#/components/schemas/KinesisStreamStartPosition'
+          description: The position in a stream from which to start reading.
+        StartingPositionTimestamp:
+          allOf:
+          - $ref: '#/components/schemas/Timestamp'
+          description: With `StartingPosition` set to `AT_TIMESTAMP`, the time from
+            which to start reading, in Unix time seconds.
+      required:
+      - StartingPosition
+      description: The parameters for using a Kinesis stream as a source.
+    PipeSourceManagedStreamingKafkaParameters:
+      type: object
+      properties:
+        TopicName:
+          allOf:
+          - $ref: '#/components/schemas/KafkaTopicName'
+          description: The name of the topic that the pipe will read from.
+        StartingPosition:
+          allOf:
+          - $ref: '#/components/schemas/MSKStartPosition'
+          description: The position in a stream from which to start reading.
+        BatchSize:
+          allOf:
+          - $ref: '#/components/schemas/LimitMax10000'
+          description: The maximum number of records to include in each batch.
+        MaximumBatchingWindowInSeconds:
+          allOf:
+          - $ref: '#/components/schemas/MaximumBatchingWindowInSeconds'
+          description: The maximum length of a time to wait for events.
+        ConsumerGroupID:
+          allOf:
+          - $ref: '#/components/schemas/URI'
+          description: The name of the destination queue to consume.
+        Credentials:
+          allOf:
+          - $ref: '#/components/schemas/MSKAccessCredentials'
+          description: The credentials needed to access the resource.
+      required:
+      - TopicName
+      description: The parameters for using an MSK stream as a source.
+    PipeSourceParameters:
+      type: object
+      properties:
+        FilterCriteria:
+          allOf:
+          - $ref: '#/components/schemas/FilterCriteria'
+          description: 'The collection of event patterns used to filter events.
+
+
+            To remove a filter, specify a `FilterCriteria` object with an empty array
+            of `Filter` objects.
+
+
+            For more information, see [Events and Event Patterns](https://docs.aws.amazon.com/eventbridge/latest/userguide/eventbridge-and-event-patterns.html)
+            in the _Amazon EventBridge User Guide_.'
+        KinesisStreamParameters:
+          allOf:
+          - $ref: '#/components/schemas/PipeSourceKinesisStreamParameters'
+          description: The parameters for using a Kinesis stream as a source.
+        DynamoDBStreamParameters:
+          allOf:
+          - $ref: '#/components/schemas/PipeSourceDynamoDBStreamParameters'
+          description: The parameters for using a DynamoDB stream as a source.
+        SqsQueueParameters:
+          allOf:
+          - $ref: '#/components/schemas/PipeSourceSqsQueueParameters'
+          description: The parameters for using a Amazon SQS stream as a source.
+        ActiveMQBrokerParameters:
+          allOf:
+          - $ref: '#/components/schemas/PipeSourceActiveMQBrokerParameters'
+          description: The parameters for using an Active MQ broker as a source.
+        RabbitMQBrokerParameters:
+          allOf:
+          - $ref: '#/components/schemas/PipeSourceRabbitMQBrokerParameters'
+          description: The parameters for using a Rabbit MQ broker as a source.
+        ManagedStreamingKafkaParameters:
+          allOf:
+          - $ref: '#/components/schemas/PipeSourceManagedStreamingKafkaParameters'
+          description: The parameters for using an MSK stream as a source.
+        SelfManagedKafkaParameters:
+          allOf:
+          - $ref: '#/components/schemas/PipeSourceSelfManagedKafkaParameters'
+          description: 'The parameters for using a self-managed Apache Kafka stream
+            as a source.
+
+
+            A _self managed_ cluster refers to any Apache Kafka cluster not hosted
+            by Amazon Web Services. This includes both clusters you manage yourself,
+            as well as those hosted by a third-party provider, such as [Confluent
+            Cloud](https://www.confluent.io/), [CloudKarafka](https://www.cloudkarafka.com/),
+            or [Redpanda](https://redpanda.com/). For more information, see [Apache
+            Kafka streams as a source](https://docs.aws.amazon.com/eventbridge/latest/userguide/eb-pipes-kafka.html)
+            in the _Amazon EventBridge User Guide_.'
+      description: The parameters required to set up a source for your pipe.
+    PipeSourceRabbitMQBrokerParameters:
+      type: object
+      properties:
+        Credentials:
+          allOf:
+          - $ref: '#/components/schemas/MQBrokerAccessCredentials'
+          description: The credentials needed to access the resource.
+        QueueName:
+          allOf:
+          - $ref: '#/components/schemas/MQBrokerQueueName'
+          description: The name of the destination queue to consume.
+        VirtualHost:
+          allOf:
+          - $ref: '#/components/schemas/URI'
+          description: The name of the virtual host associated with the source broker.
+        BatchSize:
+          allOf:
+          - $ref: '#/components/schemas/LimitMax10000'
+          description: The maximum number of records to include in each batch.
+        MaximumBatchingWindowInSeconds:
+          allOf:
+          - $ref: '#/components/schemas/MaximumBatchingWindowInSeconds'
+          description: The maximum length of a time to wait for events.
+      required:
+      - Credentials
+      - QueueName
+      description: The parameters for using a Rabbit MQ broker as a source.
+    PipeSourceSelfManagedKafkaParameters:
+      type: object
+      properties:
+        TopicName:
+          allOf:
+          - $ref: '#/components/schemas/KafkaTopicName'
+          description: The name of the topic that the pipe will read from.
+        StartingPosition:
+          allOf:
+          - $ref: '#/components/schemas/SelfManagedKafkaStartPosition'
+          description: The position in a stream from which to start reading.
+        AdditionalBootstrapServers:
+          allOf:
+          - $ref: '#/components/schemas/KafkaBootstrapServers'
+          description: An array of server URLs.
+        BatchSize:
+          allOf:
+          - $ref: '#/components/schemas/LimitMax10000'
+          description: The maximum number of records to include in each batch.
+        MaximumBatchingWindowInSeconds:
+          allOf:
+          - $ref: '#/components/schemas/MaximumBatchingWindowInSeconds'
+          description: The maximum length of a time to wait for events.
+        ConsumerGroupID:
+          allOf:
+          - $ref: '#/components/schemas/URI'
+          description: The name of the destination queue to consume.
+        Credentials:
+          allOf:
+          - $ref: '#/components/schemas/SelfManagedKafkaAccessConfigurationCredentials'
+          description: The credentials needed to access the resource.
+        ServerRootCaCertificate:
+          allOf:
+          - $ref: '#/components/schemas/SecretManagerArn'
+          description: The ARN of the Secrets Manager secret used for certification.
+        Vpc:
+          allOf:
+          - $ref: '#/components/schemas/SelfManagedKafkaAccessConfigurationVpc'
+          description: This structure specifies the VPC subnets and security groups
+            for the stream, and whether a public IP address is to be used.
+      required:
+      - TopicName
+      description: 'The parameters for using a self-managed Apache Kafka stream as
+        a source.
+
+
+        A _self managed_ cluster refers to any Apache Kafka cluster not hosted by
+        Amazon Web Services. This includes both clusters you manage yourself, as well
+        as those hosted by a third-party provider, such as [Confluent Cloud](https://www.confluent.io/),
+        [CloudKarafka](https://www.cloudkarafka.com/), or [Redpanda](https://redpanda.com/).
+        For more information, see [Apache Kafka streams as a source](https://docs.aws.amazon.com/eventbridge/latest/userguide/eb-pipes-kafka.html)
+        in the _Amazon EventBridge User Guide_.'
+    PipeSourceSqsQueueParameters:
+      type: object
+      properties:
+        BatchSize:
+          allOf:
+          - $ref: '#/components/schemas/LimitMax10000'
+          description: The maximum number of records to include in each batch.
+        MaximumBatchingWindowInSeconds:
+          allOf:
+          - $ref: '#/components/schemas/MaximumBatchingWindowInSeconds'
+          description: The maximum length of a time to wait for events.
+      description: The parameters for using a Amazon SQS stream as a source.
     PipeState:
       type: string
       enum:
@@ -465,11 +2427,514 @@ components:
       pattern: ^.*$
       minLength: 0
       maxLength: 512
+    PipeTargetBatchJobParameters:
+      type: object
+      properties:
+        JobDefinition:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The job definition used by this job. This value can be one
+            of `name`, `name:revision`, or the Amazon Resource Name (ARN) for the
+            job definition. If name is specified without a revision then the latest
+            active revision is used.
+        JobName:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The name of the job. It can be up to 128 letters long. The
+            first character must be alphanumeric, can contain uppercase and lowercase
+            letters, numbers, hyphens (-), and underscores (_).
+        ArrayProperties:
+          allOf:
+          - $ref: '#/components/schemas/BatchArrayProperties'
+          description: The array properties for the submitted job, such as the size
+            of the array. The array size can be between 2 and 10,000. If you specify
+            array properties for a job, it becomes an array job. This parameter is
+            used only if the target is an Batch job.
+        RetryStrategy:
+          allOf:
+          - $ref: '#/components/schemas/BatchRetryStrategy'
+          description: The retry strategy to use for failed jobs. When a retry strategy
+            is specified here, it overrides the retry strategy defined in the job
+            definition.
+        ContainerOverrides:
+          allOf:
+          - $ref: '#/components/schemas/BatchContainerOverrides'
+          description: The overrides that are sent to a container.
+        DependsOn:
+          allOf:
+          - $ref: '#/components/schemas/BatchDependsOn'
+          description: A list of dependencies for the job. A job can depend upon a
+            maximum of 20 jobs. You can specify a `SEQUENTIAL` type dependency without
+            specifying a job ID for array jobs so that each child array job completes
+            sequentially, starting at index 0. You can also specify an `N_TO_N` type
+            dependency with a job ID for array jobs. In that case, each index child
+            of this job must wait for the corresponding index child of each dependency
+            to complete before it can begin.
+        Parameters:
+          allOf:
+          - $ref: '#/components/schemas/BatchParametersMap'
+          description: Additional parameters passed to the job that replace parameter
+            substitution placeholders that are set in the job definition. Parameters
+            are specified as a key and value pair mapping. Parameters included here
+            override any corresponding parameter defaults from the job definition.
+      required:
+      - JobDefinition
+      - JobName
+      description: The parameters for using an Batch job as a target.
+    PipeTargetCloudWatchLogsParameters:
+      type: object
+      properties:
+        LogStreamName:
+          allOf:
+          - $ref: '#/components/schemas/LogStreamName'
+          description: The name of the log stream.
+        Timestamp:
+          allOf:
+          - $ref: '#/components/schemas/JsonPath'
+          description: The time the event occurred, expressed as the number of milliseconds
+            after Jan 1, 1970 00:00:00 UTC.
+      description: The parameters for using an CloudWatch Logs log stream as a target.
+    PipeTargetEcsTaskParameters:
+      type: object
+      properties:
+        TaskDefinitionArn:
+          allOf:
+          - $ref: '#/components/schemas/ArnOrJsonPath'
+          description: The ARN of the task definition to use if the event target is
+            an Amazon ECS task.
+        TaskCount:
+          allOf:
+          - $ref: '#/components/schemas/LimitMin1'
+          description: The number of tasks to create based on `TaskDefinition`. The
+            default is 1.
+        LaunchType:
+          allOf:
+          - $ref: '#/components/schemas/LaunchType'
+          description: Specifies the launch type on which your task is running. The
+            launch type that you specify here must match one of the launch type (compatibilities)
+            of the target task. The `FARGATE` value is supported only in the Regions
+            where Fargate with Amazon ECS is supported. For more information, see
+            [Fargate on Amazon ECS](https://docs.aws.amazon.com/AmazonECS/latest/developerguide/AWS-Fargate.html)
+            in the _Amazon Elastic Container Service Developer Guide_.
+        NetworkConfiguration:
+          allOf:
+          - $ref: '#/components/schemas/NetworkConfiguration'
+          description: 'Use this structure if the Amazon ECS task uses the `awsvpc`
+            network mode. This structure specifies the VPC subnets and security groups
+            associated with the task, and whether a public IP address is to be used.
+            This structure is required if `LaunchType` is `FARGATE` because the `awsvpc`
+            mode is required for Fargate tasks.
+
+
+            If you specify `NetworkConfiguration` when the target ECS task does not
+            use the `awsvpc` network mode, the task fails.'
+        PlatformVersion:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: 'Specifies the platform version for the task. Specify only
+            the numeric portion of the platform version, such as `1.1.0`.
+
+
+            This structure is used only if `LaunchType` is `FARGATE`. For more information
+            about valid platform versions, see [Fargate Platform Versions](https://docs.aws.amazon.com/AmazonECS/latest/developerguide/platform_versions.html)
+            in the _Amazon Elastic Container Service Developer Guide_.'
+        Group:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: Specifies an Amazon ECS task group for the task. The maximum
+            length is 255 characters.
+        CapacityProviderStrategy:
+          allOf:
+          - $ref: '#/components/schemas/CapacityProviderStrategy'
+          description: 'The capacity provider strategy to use for the task.
+
+
+            If a `capacityProviderStrategy` is specified, the `launchType` parameter
+            must be omitted. If no `capacityProviderStrategy` or launchType is specified,
+            the `defaultCapacityProviderStrategy` for the cluster is used.'
+        EnableECSManagedTags:
+          allOf:
+          - $ref: '#/components/schemas/Boolean'
+          description: Specifies whether to enable Amazon ECS managed tags for the
+            task. For more information, see [Tagging Your Amazon ECS Resources](https://docs.aws.amazon.com/AmazonECS/latest/developerguide/ecs-using-tags.html)
+            in the Amazon Elastic Container Service Developer Guide.
+        EnableExecuteCommand:
+          allOf:
+          - $ref: '#/components/schemas/Boolean'
+          description: Whether or not to enable the execute command functionality
+            for the containers in this task. If true, this enables execute command
+            functionality on all containers in the task.
+        PlacementConstraints:
+          allOf:
+          - $ref: '#/components/schemas/PlacementConstraints'
+          description: An array of placement constraint objects to use for the task.
+            You can specify up to 10 constraints per task (including constraints in
+            the task definition and those specified at runtime).
+        PlacementStrategy:
+          allOf:
+          - $ref: '#/components/schemas/PlacementStrategies'
+          description: The placement strategy objects to use for the task. You can
+            specify a maximum of five strategy rules per task.
+        PropagateTags:
+          allOf:
+          - $ref: '#/components/schemas/PropagateTags'
+          description: Specifies whether to propagate the tags from the task definition
+            to the task. If no value is specified, the tags are not propagated. Tags
+            can only be propagated to the task during task creation. To add tags to
+            a task after task creation, use the `TagResource` API action.
+        ReferenceId:
+          allOf:
+          - $ref: '#/components/schemas/ReferenceId'
+          description: The reference ID to use for the task.
+        Overrides:
+          allOf:
+          - $ref: '#/components/schemas/EcsTaskOverride'
+          description: The overrides that are associated with a task.
+        Tags:
+          allOf:
+          - $ref: '#/components/schemas/TagList'
+          description: The metadata that you apply to the task to help you categorize
+            and organize them. Each tag consists of a key and an optional value, both
+            of which you define. To learn more, see [RunTask](https://docs.aws.amazon.com/AmazonECS/latest/APIReference/API_RunTask.html#ECS-RunTask-request-tags)
+            in the Amazon ECS API Reference.
+      required:
+      - TaskDefinitionArn
+      description: The parameters for using an Amazon ECS task as a target.
+    PipeTargetEventBridgeEventBusParameters:
+      type: object
+      properties:
+        EndpointId:
+          allOf:
+          - $ref: '#/components/schemas/EventBridgeEndpointId'
+          description: The URL subdomain of the endpoint. For example, if the URL
+            for Endpoint is https://abcde.veo.endpoints.event.amazonaws.com, then
+            the EndpointId is `abcde.veo`.
+        DetailType:
+          allOf:
+          - $ref: '#/components/schemas/EventBridgeDetailType'
+          description: A free-form string, with a maximum of 128 characters, used
+            to decide what fields to expect in the event detail.
+        Source:
+          allOf:
+          - $ref: '#/components/schemas/EventBridgeEventSource'
+          description: The source of the event.
+        Resources:
+          allOf:
+          - $ref: '#/components/schemas/EventBridgeEventResourceList'
+          description: Amazon Web Services resources, identified by Amazon Resource
+            Name (ARN), which the event primarily concerns. Any number, including
+            zero, may be present.
+        Time:
+          allOf:
+          - $ref: '#/components/schemas/JsonPath'
+          description: The time stamp of the event, per [RFC3339](https://www.rfc-editor.org/rfc/rfc3339.txt).
+            If no time stamp is provided, the time stamp of the [PutEvents](https://docs.aws.amazon.com/eventbridge/latest/APIReference/API_PutEvents.html)
+            call is used.
+      description: The parameters for using an EventBridge event bus as a target.
+    PipeTargetHttpParameters:
+      type: object
+      properties:
+        PathParameterValues:
+          allOf:
+          - $ref: '#/components/schemas/PathParameterList'
+          description: The path parameter values to be used to populate API Gateway
+            REST API or EventBridge ApiDestination path wildcards ("*").
+        HeaderParameters:
+          allOf:
+          - $ref: '#/components/schemas/HeaderParametersMap'
+          description: The headers that need to be sent as part of request invoking
+            the API Gateway REST API or EventBridge ApiDestination.
+        QueryStringParameters:
+          allOf:
+          - $ref: '#/components/schemas/QueryStringParametersMap'
+          description: The query string keys/values that need to be sent as part of
+            request invoking the API Gateway REST API or EventBridge ApiDestination.
+      description: These are custom parameter to be used when the target is an API
+        Gateway REST APIs or EventBridge ApiDestinations.
     PipeTargetInvocationType:
       type: string
       enum:
       - REQUEST_RESPONSE
       - FIRE_AND_FORGET
+    PipeTargetKinesisStreamParameters:
+      type: object
+      properties:
+        PartitionKey:
+          allOf:
+          - $ref: '#/components/schemas/KinesisPartitionKey'
+          description: Determines which shard in the stream the data record is assigned
+            to. Partition keys are Unicode strings with a maximum length limit of
+            256 characters for each key. Amazon Kinesis Data Streams uses the partition
+            key as input to a hash function that maps the partition key and associated
+            data to a specific shard. Specifically, an MD5 hash function is used to
+            map partition keys to 128-bit integer values and to map associated data
+            records to shards. As a result of this hashing mechanism, all data records
+            with the same partition key map to the same shard within the stream.
+      required:
+      - PartitionKey
+      description: The parameters for using a Kinesis stream as a target.
+    PipeTargetLambdaFunctionParameters:
+      type: object
+      properties:
+        InvocationType:
+          allOf:
+          - $ref: '#/components/schemas/PipeTargetInvocationType'
+          description: "Specify whether to invoke the function synchronously or asynchronously.\n\
+            \n  * `REQUEST_RESPONSE` (default) - Invoke synchronously. This corresponds\
+            \ to the `RequestResponse` option in the `InvocationType` parameter for\
+            \ the Lambda [Invoke](https://docs.aws.amazon.com/lambda/latest/dg/API_Invoke.html#API_Invoke_RequestSyntax)\
+            \ API.\n\n  * `FIRE_AND_FORGET` \\- Invoke asynchronously. This corresponds\
+            \ to the `Event` option in the `InvocationType` parameter for the Lambda\
+            \ [Invoke](https://docs.aws.amazon.com/lambda/latest/dg/API_Invoke.html#API_Invoke_RequestSyntax)\
+            \ API.\n\nFor more information, see [Invocation types](https://docs.aws.amazon.com/eventbridge/latest/userguide/eb-pipes.html#pipes-invocation)\
+            \ in the _Amazon EventBridge User Guide_."
+      description: The parameters for using a Lambda function as a target.
+    PipeTargetParameters:
+      type: object
+      properties:
+        InputTemplate:
+          allOf:
+          - $ref: '#/components/schemas/InputTemplate'
+          description: 'Valid JSON text passed to the target. In this case, nothing
+            from the event itself is passed to the target. For more information, see
+            [The JavaScript Object Notation (JSON) Data Interchange Format](http://www.rfc-editor.org/rfc/rfc7159.txt).
+
+
+            To remove an input template, specify an empty string.'
+        LambdaFunctionParameters:
+          allOf:
+          - $ref: '#/components/schemas/PipeTargetLambdaFunctionParameters'
+          description: The parameters for using a Lambda function as a target.
+        StepFunctionStateMachineParameters:
+          allOf:
+          - $ref: '#/components/schemas/PipeTargetStateMachineParameters'
+          description: The parameters for using a Step Functions state machine as
+            a target.
+        KinesisStreamParameters:
+          allOf:
+          - $ref: '#/components/schemas/PipeTargetKinesisStreamParameters'
+          description: The parameters for using a Kinesis stream as a target.
+        EcsTaskParameters:
+          allOf:
+          - $ref: '#/components/schemas/PipeTargetEcsTaskParameters'
+          description: The parameters for using an Amazon ECS task as a target.
+        BatchJobParameters:
+          allOf:
+          - $ref: '#/components/schemas/PipeTargetBatchJobParameters'
+          description: The parameters for using an Batch job as a target.
+        SqsQueueParameters:
+          allOf:
+          - $ref: '#/components/schemas/PipeTargetSqsQueueParameters'
+          description: The parameters for using a Amazon SQS stream as a target.
+        HttpParameters:
+          allOf:
+          - $ref: '#/components/schemas/PipeTargetHttpParameters'
+          description: These are custom parameter to be used when the target is an
+            API Gateway REST APIs or EventBridge ApiDestinations.
+        RedshiftDataParameters:
+          allOf:
+          - $ref: '#/components/schemas/PipeTargetRedshiftDataParameters'
+          description: These are custom parameters to be used when the target is a
+            Amazon Redshift cluster to invoke the Amazon Redshift Data API BatchExecuteStatement.
+        SageMakerPipelineParameters:
+          allOf:
+          - $ref: '#/components/schemas/PipeTargetSageMakerPipelineParameters'
+          description: The parameters for using a SageMaker pipeline as a target.
+        EventBridgeEventBusParameters:
+          allOf:
+          - $ref: '#/components/schemas/PipeTargetEventBridgeEventBusParameters'
+          description: The parameters for using an EventBridge event bus as a target.
+        CloudWatchLogsParameters:
+          allOf:
+          - $ref: '#/components/schemas/PipeTargetCloudWatchLogsParameters'
+          description: The parameters for using an CloudWatch Logs log stream as a
+            target.
+        TimestreamParameters:
+          allOf:
+          - $ref: '#/components/schemas/PipeTargetTimestreamParameters'
+          description: The parameters for using a Timestream for LiveAnalytics table
+            as a target.
+      description: 'The parameters required to set up a target for your pipe.
+
+
+        For more information about pipe target parameters, including how to use dynamic
+        path parameters, see [Target parameters](https://docs.aws.amazon.com/eventbridge/latest/userguide/eb-pipes-event-target.html)
+        in the _Amazon EventBridge User Guide_.'
+    PipeTargetRedshiftDataParameters:
+      type: object
+      properties:
+        SecretManagerArn:
+          allOf:
+          - $ref: '#/components/schemas/SecretManagerArnOrJsonPath'
+          description: The name or ARN of the secret that enables access to the database.
+            Required when authenticating using Secrets Manager.
+        Database:
+          allOf:
+          - $ref: '#/components/schemas/Database'
+          description: The name of the database. Required when authenticating using
+            temporary credentials.
+        DbUser:
+          allOf:
+          - $ref: '#/components/schemas/DbUser'
+          description: The database user name. Required when authenticating using
+            temporary credentials.
+        StatementName:
+          allOf:
+          - $ref: '#/components/schemas/StatementName'
+          description: The name of the SQL statement. You can name the SQL statement
+            when you create it to identify the query.
+        WithEvent:
+          allOf:
+          - $ref: '#/components/schemas/Boolean'
+          description: Indicates whether to send an event back to EventBridge after
+            the SQL statement runs.
+        Sqls:
+          allOf:
+          - $ref: '#/components/schemas/Sqls'
+          description: The SQL statement text to run.
+      required:
+      - Database
+      - Sqls
+      description: These are custom parameters to be used when the target is a Amazon
+        Redshift cluster to invoke the Amazon Redshift Data API BatchExecuteStatement.
+    PipeTargetSageMakerPipelineParameters:
+      type: object
+      properties:
+        PipelineParameterList:
+          allOf:
+          - $ref: '#/components/schemas/SageMakerPipelineParameterList'
+          description: List of Parameter names and values for SageMaker Model Building
+            Pipeline execution.
+      description: The parameters for using a SageMaker pipeline as a target.
+    PipeTargetSqsQueueParameters:
+      type: object
+      properties:
+        MessageGroupId:
+          allOf:
+          - $ref: '#/components/schemas/MessageGroupId'
+          description: The FIFO message group ID to use as the target.
+        MessageDeduplicationId:
+          allOf:
+          - $ref: '#/components/schemas/MessageDeduplicationId'
+          description: 'This parameter applies only to FIFO (first-in-first-out) queues.
+
+
+            The token used for deduplication of sent messages.'
+      description: The parameters for using a Amazon SQS stream as a target.
+    PipeTargetStateMachineParameters:
+      type: object
+      properties:
+        InvocationType:
+          allOf:
+          - $ref: '#/components/schemas/PipeTargetInvocationType'
+          description: "Specify whether to invoke the Step Functions state machine\
+            \ synchronously or asynchronously.\n\n  * `REQUEST_RESPONSE` (default)\
+            \ - Invoke synchronously. For more information, see [StartSyncExecution](https://docs.aws.amazon.com/step-functions/latest/apireference/API_StartSyncExecution.html)\
+            \ in the _Step Functions API Reference_.\n\n`REQUEST_RESPONSE` is not\
+            \ supported for `STANDARD` state machine workflows.\n\n  * `FIRE_AND_FORGET`\
+            \ \\- Invoke asynchronously. For more information, see [StartExecution](https://docs.aws.amazon.com/step-functions/latest/apireference/API_StartExecution.html)\
+            \ in the _Step Functions API Reference_.\n\nFor more information, see\
+            \ [Invocation types](https://docs.aws.amazon.com/eventbridge/latest/userguide/eb-pipes.html#pipes-invocation)\
+            \ in the _Amazon EventBridge User Guide_."
+      description: The parameters for using a Step Functions state machine as a target.
+    PipeTargetTimestreamParameters:
+      type: object
+      properties:
+        TimeValue:
+          allOf:
+          - $ref: '#/components/schemas/TimeValue'
+          description: Dynamic path to the source data field that represents the time
+            value for your data.
+        EpochTimeUnit:
+          allOf:
+          - $ref: '#/components/schemas/EpochTimeUnit'
+          description: 'The granularity of the time units used. Default is `MILLISECONDS`.
+
+
+            Required if `TimeFieldType` is specified as `EPOCH`.'
+        TimeFieldType:
+          allOf:
+          - $ref: '#/components/schemas/TimeFieldType'
+          description: 'The type of time value used.
+
+
+            The default is `EPOCH`.'
+        TimestampFormat:
+          allOf:
+          - $ref: '#/components/schemas/TimestampFormat'
+          description: 'How to format the timestamps. For example, `yyyy-MM-dd''T''HH:mm:ss''Z''`.
+
+
+            Required if `TimeFieldType` is specified as `TIMESTAMP_FORMAT`.'
+        VersionValue:
+          allOf:
+          - $ref: '#/components/schemas/VersionValue'
+          description: '64 bit version value or source data field that represents
+            the version value for your data.
+
+
+            Write requests with a higher version number will update the existing measure
+            values of the record and version. In cases where the measure value is
+            the same, the version will still be updated.
+
+
+            Default value is 1.
+
+
+            Timestream for LiveAnalytics does not support updating partial measure
+            values in a record.
+
+
+            Write requests for duplicate data with a higher version number will update
+            the existing measure value and version. In cases where the measure value
+            is the same, `Version` will still be updated. Default value is `1`.
+
+
+            `Version` must be `1` or greater, or you will receive a `ValidationException`
+            error.'
+        DimensionMappings:
+          allOf:
+          - $ref: '#/components/schemas/DimensionMappings'
+          description: 'Map source data to dimensions in the target Timestream for
+            LiveAnalytics table.
+
+
+            For more information, see [Amazon Timestream for LiveAnalytics concepts](https://docs.aws.amazon.com/timestream/latest/developerguide/concepts.html)'
+        SingleMeasureMappings:
+          allOf:
+          - $ref: '#/components/schemas/SingleMeasureMappings'
+          description: Mappings of single source data fields to individual records
+            in the specified Timestream for LiveAnalytics table.
+        MultiMeasureMappings:
+          allOf:
+          - $ref: '#/components/schemas/MultiMeasureMappings'
+          description: Maps multiple measures from the source event to the same record
+            in the specified Timestream for LiveAnalytics table.
+      required:
+      - TimeValue
+      - VersionValue
+      - DimensionMappings
+      description: The parameters for using a Timestream for LiveAnalytics table as
+        a target.
+    PlacementConstraint:
+      type: object
+      properties:
+        type:
+          allOf:
+          - $ref: '#/components/schemas/PlacementConstraintType'
+          description: The type of constraint. Use distinctInstance to ensure that
+            each task in a particular group is running on a different container instance.
+            Use memberOf to restrict the selection to a group of valid candidates.
+        expression:
+          allOf:
+          - $ref: '#/components/schemas/PlacementConstraintExpression'
+          description: A cluster query language expression to apply to the constraint.
+            You cannot specify an expression if the constraint type is `distinctInstance`.
+            To learn more, see [Cluster Query Language](https://docs.aws.amazon.com/AmazonECS/latest/developerguide/cluster-query-language.html)
+            in the Amazon Elastic Container Service Developer Guide.
+      description: An object representing a constraint on task placement. To learn
+        more, see [Task Placement Constraints](https://docs.aws.amazon.com/AmazonECS/latest/developerguide/task-placement-constraints.html)
+        in the Amazon Elastic Container Service Developer Guide.
     PlacementConstraintExpression:
       type: string
       minLength: 0
@@ -487,6 +2952,32 @@ components:
       type: array
       items:
         $ref: '#/components/schemas/PlacementStrategy'
+    PlacementStrategy:
+      type: object
+      properties:
+        type:
+          allOf:
+          - $ref: '#/components/schemas/PlacementStrategyType'
+          description: The type of placement strategy. The random placement strategy
+            randomly places tasks on available candidates. The spread placement strategy
+            spreads placement across available candidates evenly based on the field
+            parameter. The binpack strategy places tasks on available candidates that
+            have the least available amount of the resource that is specified with
+            the field parameter. For example, if you binpack on memory, a task is
+            placed on the instance with the least amount of remaining memory (but
+            still enough to run the task).
+        field:
+          allOf:
+          - $ref: '#/components/schemas/PlacementStrategyField'
+          description: The field to apply the placement strategy against. For the
+            spread placement strategy, valid values are instanceId (or host, which
+            has the same effect), or any platform or custom attribute that is applied
+            to a container instance, such as attribute:ecs.availability-zone. For
+            the binpack placement strategy, valid values are cpu and memory. For the
+            random placement strategy, this field is not used.
+      description: The task placement strategy for a task or service. To learn more,
+        see [Task Placement Strategies](https://docs.aws.amazon.com/AmazonECS/latest/developerguide/task-placement-strategies.html)
+        in the Amazon Elastic Container Service Service Developer Guide.
     PlacementStrategyField:
       type: string
       minLength: 0
@@ -539,12 +3030,96 @@ components:
       pattern: ^arn:(aws[a-zA-Z-]*)?:iam::\d{12}:role/?[a-zA-Z0-9+=,.@\-_/]+$
       minLength: 1
       maxLength: 1600
+    S3LogDestination:
+      type: object
+      properties:
+        BucketName:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The name of the Amazon S3 bucket to which EventBridge delivers
+            the log records for the pipe.
+        Prefix:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: 'The prefix text with which to begin Amazon S3 log object names.
+
+
+            For more information, see [Organizing objects using prefixes](https://docs.aws.amazon.com/AmazonS3/latest/userguide/using-prefixes.html)
+            in the _Amazon Simple Storage Service User Guide_.'
+        BucketOwner:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The Amazon Web Services account that owns the Amazon S3 bucket
+            to which EventBridge delivers the log records for the pipe.
+        OutputFormat:
+          allOf:
+          - $ref: '#/components/schemas/S3OutputFormat'
+          description: 'The format EventBridge uses for the log records.
+
+
+            EventBridge currently only supports `json` formatting.'
+      description: The Amazon S3 logging configuration settings for the pipe.
+    S3LogDestinationParameters:
+      type: object
+      properties:
+        BucketName:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: Specifies the name of the Amazon S3 bucket to which EventBridge
+            delivers the log records for the pipe.
+        BucketOwner:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: Specifies the Amazon Web Services account that owns the Amazon
+            S3 bucket to which EventBridge delivers the log records for the pipe.
+        OutputFormat:
+          allOf:
+          - $ref: '#/components/schemas/S3OutputFormat'
+          description: 'How EventBridge should format the log records.
+
+
+            EventBridge currently only supports `json` formatting.'
+        Prefix:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: 'Specifies any prefix text with which to begin Amazon S3 log
+            object names.
+
+
+            You can use prefixes to organize the data that you store in Amazon S3
+            buckets. A prefix is a string of characters at the beginning of the object
+            key name. A prefix can be any length, subject to the maximum length of
+            the object key name (1,024 bytes). For more information, see [Organizing
+            objects using prefixes](https://docs.aws.amazon.com/AmazonS3/latest/userguide/using-prefixes.html)
+            in the _Amazon Simple Storage Service User Guide_.'
+      required:
+      - BucketName
+      - BucketOwner
+      description: The Amazon S3 logging configuration settings for the pipe.
     S3OutputFormat:
       type: string
       enum:
       - json
       - plain
       - w3c
+    SageMakerPipelineParameter:
+      type: object
+      properties:
+        Name:
+          allOf:
+          - $ref: '#/components/schemas/SageMakerPipelineParameterName'
+          description: Name of parameter to start execution of a SageMaker Model Building
+            Pipeline.
+        Value:
+          allOf:
+          - $ref: '#/components/schemas/SageMakerPipelineParameterValue'
+          description: Value of parameter to start execution of a SageMaker Model
+            Building Pipeline.
+      required:
+      - Name
+      - Value
+      description: Name/Value pair of a parameter to start execution of a SageMaker
+        Model Building Pipeline.
     SageMakerPipelineParameterList:
       type: array
       items:
@@ -607,11 +3182,81 @@ components:
           The ARN of the Secrets Manager secret.
       description: |-
         The Secrets Manager secret that stores your stream credentials.
+    SelfManagedKafkaAccessConfigurationVpc:
+      type: object
+      properties:
+        Subnets:
+          allOf:
+          - $ref: '#/components/schemas/SubnetIds'
+          description: Specifies the subnets associated with the stream. These subnets
+            must all be in the same VPC. You can specify as many as 16 subnets.
+        SecurityGroup:
+          allOf:
+          - $ref: '#/components/schemas/SecurityGroupIds'
+          description: Specifies the security groups associated with the stream. These
+            security groups must all be in the same VPC. You can specify as many as
+            five security groups.
+      description: This structure specifies the VPC subnets and security groups for
+        the stream, and whether a public IP address is to be used.
     SelfManagedKafkaStartPosition:
       type: string
       enum:
       - TRIM_HORIZON
       - LATEST
+    ServiceQuotaExceededException:
+      type: object
+      properties:
+        message:
+          $ref: '#/components/schemas/String'
+        resourceId:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The ID of the resource that caused the exception.
+        resourceType:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The type of resource that caused the exception.
+        serviceCode:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The identifier of the service that caused the exception.
+        quotaCode:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The identifier of the quota that caused the exception.
+      required:
+      - message
+      - resourceId
+      - resourceType
+      - serviceCode
+      - quotaCode
+      description: A quota has been exceeded.
+    SingleMeasureMapping:
+      type: object
+      properties:
+        MeasureValue:
+          allOf:
+          - $ref: '#/components/schemas/MeasureValue'
+          description: Dynamic path of the source field to map to the measure in the
+            record.
+        MeasureValueType:
+          allOf:
+          - $ref: '#/components/schemas/MeasureValueType'
+          description: Data type of the source field.
+        MeasureName:
+          allOf:
+          - $ref: '#/components/schemas/MeasureName'
+          description: Target measure name for the measurement attribute in the Timestream
+            table.
+      required:
+      - MeasureValue
+      - MeasureValueType
+      - MeasureName
+      description: 'Maps a single source data field to a single record in the specified
+        Timestream for LiveAnalytics table.
+
+
+        For more information, see [Amazon Timestream for LiveAnalytics concepts](https://docs.aws.amazon.com/timestream/latest/developerguide/concepts.html)'
     SingleMeasureMappings:
       type: array
       items:
@@ -625,10 +3270,84 @@ components:
       items:
         $ref: '#/components/schemas/Sql'
       description: // A list of SQLs.
+    StartPipeRequest:
+      type: object
+      properties:
+        Name:
+          allOf:
+          - $ref: '#/components/schemas/PipeName'
+          description: The name of the pipe.
+      required:
+      - Name
+    StartPipeResponse:
+      type: object
+      properties:
+        Arn:
+          allOf:
+          - $ref: '#/components/schemas/PipeArn'
+          description: The ARN of the pipe.
+        Name:
+          allOf:
+          - $ref: '#/components/schemas/PipeName'
+          description: The name of the pipe.
+        DesiredState:
+          allOf:
+          - $ref: '#/components/schemas/RequestedPipeState'
+          description: The state the pipe should be in.
+        CurrentState:
+          allOf:
+          - $ref: '#/components/schemas/PipeState'
+          description: The state the pipe is in.
+        CreationTime:
+          allOf:
+          - $ref: '#/components/schemas/Timestamp'
+          description: The time the pipe was created.
+        LastModifiedTime:
+          allOf:
+          - $ref: '#/components/schemas/Timestamp'
+          description: When the pipe was last updated, in [ISO-8601 format](https://www.w3.org/TR/NOTE-datetime)
+            (YYYY-MM-DDThh:mm:ss.sTZD).
     StatementName:
       type: string
       minLength: 1
       maxLength: 500
+    StopPipeRequest:
+      type: object
+      properties:
+        Name:
+          allOf:
+          - $ref: '#/components/schemas/PipeName'
+          description: The name of the pipe.
+      required:
+      - Name
+    StopPipeResponse:
+      type: object
+      properties:
+        Arn:
+          allOf:
+          - $ref: '#/components/schemas/PipeArn'
+          description: The ARN of the pipe.
+        Name:
+          allOf:
+          - $ref: '#/components/schemas/PipeName'
+          description: The name of the pipe.
+        DesiredState:
+          allOf:
+          - $ref: '#/components/schemas/RequestedPipeState'
+          description: The state the pipe should be in.
+        CurrentState:
+          allOf:
+          - $ref: '#/components/schemas/PipeState'
+          description: The state the pipe is in.
+        CreationTime:
+          allOf:
+          - $ref: '#/components/schemas/Timestamp'
+          description: The time the pipe was created.
+        LastModifiedTime:
+          allOf:
+          - $ref: '#/components/schemas/Timestamp'
+          description: When the pipe was last updated, in [ISO-8601 format](https://www.w3.org/TR/NOTE-datetime)
+            (YYYY-MM-DDThh:mm:ss.sTZD).
     String:
       type: string
     StringList:
@@ -654,6 +3373,23 @@ components:
       type: array
       items:
         $ref: '#/components/schemas/Subnet'
+    Tag:
+      type: object
+      properties:
+        Key:
+          allOf:
+          - $ref: '#/components/schemas/TagKey'
+          description: A string you can use to assign a value. The combination of
+            tag keys and values can help you organize and categorize your resources.
+        Value:
+          allOf:
+          - $ref: '#/components/schemas/TagValue'
+          description: The value for the specified tag key.
+      required:
+      - Key
+      - Value
+      description: A key-value pair associated with an Amazon Web Services resource.
+        In EventBridge, rules and event buses support tagging.
     TagKey:
       type: string
       minLength: 1
@@ -670,10 +3406,48 @@ components:
       type: object
       additionalProperties:
         $ref: '#/components/schemas/TagValue'
+    TagResourceRequest:
+      type: object
+      properties:
+        resourceArn:
+          allOf:
+          - $ref: '#/components/schemas/PipeArn'
+          description: The ARN of the pipe.
+        tags:
+          allOf:
+          - $ref: '#/components/schemas/TagMap'
+          description: The list of key-value pairs associated with the pipe.
+      required:
+      - resourceArn
+      - tags
+    TagResourceResponse:
+      type: object
+      properties: {}
     TagValue:
       type: string
       minLength: 0
       maxLength: 256
+    ThrottlingException:
+      type: object
+      properties:
+        message:
+          $ref: '#/components/schemas/String'
+        serviceCode:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The identifier of the service that caused the exception.
+        quotaCode:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The identifier of the quota that caused the exception.
+        retryAfterSeconds:
+          allOf:
+          - $ref: '#/components/schemas/Integer'
+          description: The number of seconds to wait before retrying the action that
+            caused the exception.
+      required:
+      - message
+      description: An action was throttled.
     TimeFieldType:
       type: string
       enum:
@@ -695,6 +3469,384 @@ components:
       pattern: ^[a-zA-Z0-9-\/*:_+=.@-]*$
       minLength: 1
       maxLength: 200
+    UntagResourceRequest:
+      type: object
+      properties:
+        resourceArn:
+          allOf:
+          - $ref: '#/components/schemas/PipeArn'
+          description: The ARN of the pipe.
+        tagKeys:
+          allOf:
+          - $ref: '#/components/schemas/TagKeyList'
+          description: The list of tag keys to remove from the pipe.
+      required:
+      - resourceArn
+      - tagKeys
+    UntagResourceResponse:
+      type: object
+      properties: {}
+    UpdatePipeRequest:
+      type: object
+      properties:
+        Name:
+          allOf:
+          - $ref: '#/components/schemas/PipeName'
+          description: The name of the pipe.
+        Description:
+          allOf:
+          - $ref: '#/components/schemas/PipeDescription'
+          description: A description of the pipe.
+        DesiredState:
+          allOf:
+          - $ref: '#/components/schemas/RequestedPipeState'
+          description: The state the pipe should be in.
+        SourceParameters:
+          allOf:
+          - $ref: '#/components/schemas/UpdatePipeSourceParameters'
+          description: The parameters required to set up a source for your pipe.
+        Enrichment:
+          allOf:
+          - $ref: '#/components/schemas/OptionalArn'
+          description: The ARN of the enrichment resource.
+        EnrichmentParameters:
+          allOf:
+          - $ref: '#/components/schemas/PipeEnrichmentParameters'
+          description: The parameters required to set up enrichment on your pipe.
+        Target:
+          allOf:
+          - $ref: '#/components/schemas/Arn'
+          description: The ARN of the target resource.
+        TargetParameters:
+          allOf:
+          - $ref: '#/components/schemas/PipeTargetParameters'
+          description: 'The parameters required to set up a target for your pipe.
+
+
+            For more information about pipe target parameters, including how to use
+            dynamic path parameters, see [Target parameters](https://docs.aws.amazon.com/eventbridge/latest/userguide/eb-pipes-event-target.html)
+            in the _Amazon EventBridge User Guide_.'
+        RoleArn:
+          allOf:
+          - $ref: '#/components/schemas/RoleArn'
+          description: The ARN of the role that allows the pipe to send data to the
+            target.
+        LogConfiguration:
+          allOf:
+          - $ref: '#/components/schemas/PipeLogConfigurationParameters'
+          description: The logging configuration settings for the pipe.
+        KmsKeyIdentifier:
+          allOf:
+          - $ref: '#/components/schemas/KmsKeyIdentifier'
+          description: 'The identifier of the KMS customer managed key for EventBridge
+            to use, if you choose to use a customer managed key to encrypt pipe data.
+            The identifier can be the key Amazon Resource Name (ARN), KeyId, key alias,
+            or key alias ARN.
+
+
+            To update a pipe that is using the default Amazon Web Services owned key
+            to use a customer managed key instead, or update a pipe that is using
+            a customer managed key to use a different customer managed key, specify
+            a customer managed key identifier.
+
+
+            To update a pipe that is using a customer managed key to use the default
+            Amazon Web Services owned key, specify an empty string.
+
+
+            For more information, see [Managing keys](https://docs.aws.amazon.com/kms/latest/developerguide/getting-started.html)
+            in the _Key Management Service Developer Guide_.'
+      required:
+      - Name
+      - RoleArn
+    UpdatePipeResponse:
+      type: object
+      properties:
+        Arn:
+          allOf:
+          - $ref: '#/components/schemas/PipeArn'
+          description: The ARN of the pipe.
+        Name:
+          allOf:
+          - $ref: '#/components/schemas/PipeName'
+          description: The name of the pipe.
+        DesiredState:
+          allOf:
+          - $ref: '#/components/schemas/RequestedPipeState'
+          description: The state the pipe should be in.
+        CurrentState:
+          allOf:
+          - $ref: '#/components/schemas/PipeState'
+          description: The state the pipe is in.
+        CreationTime:
+          allOf:
+          - $ref: '#/components/schemas/Timestamp'
+          description: The time the pipe was created.
+        LastModifiedTime:
+          allOf:
+          - $ref: '#/components/schemas/Timestamp'
+          description: When the pipe was last updated, in [ISO-8601 format](https://www.w3.org/TR/NOTE-datetime)
+            (YYYY-MM-DDThh:mm:ss.sTZD).
+    UpdatePipeSourceActiveMQBrokerParameters:
+      type: object
+      properties:
+        Credentials:
+          allOf:
+          - $ref: '#/components/schemas/MQBrokerAccessCredentials'
+          description: The credentials needed to access the resource.
+        BatchSize:
+          allOf:
+          - $ref: '#/components/schemas/LimitMax10000'
+          description: The maximum number of records to include in each batch.
+        MaximumBatchingWindowInSeconds:
+          allOf:
+          - $ref: '#/components/schemas/MaximumBatchingWindowInSeconds'
+          description: The maximum length of a time to wait for events.
+      required:
+      - Credentials
+      description: The parameters for using an Active MQ broker as a source.
+    UpdatePipeSourceDynamoDBStreamParameters:
+      type: object
+      properties:
+        BatchSize:
+          allOf:
+          - $ref: '#/components/schemas/LimitMax10000'
+          description: The maximum number of records to include in each batch.
+        DeadLetterConfig:
+          allOf:
+          - $ref: '#/components/schemas/DeadLetterConfig'
+          description: Define the target queue to send dead-letter queue events to.
+        OnPartialBatchItemFailure:
+          allOf:
+          - $ref: '#/components/schemas/OnPartialBatchItemFailureStreams'
+          description: Define how to handle item process failures. `AUTOMATIC_BISECT`
+            halves each batch and retry each half until all the records are processed
+            or there is one failed message left in the batch.
+        MaximumBatchingWindowInSeconds:
+          allOf:
+          - $ref: '#/components/schemas/MaximumBatchingWindowInSeconds'
+          description: The maximum length of a time to wait for events.
+        MaximumRecordAgeInSeconds:
+          allOf:
+          - $ref: '#/components/schemas/MaximumRecordAgeInSeconds'
+          description: Discard records older than the specified age. The default value
+            is -1, which sets the maximum age to infinite. When the value is set to
+            infinite, EventBridge never discards old records.
+        MaximumRetryAttempts:
+          allOf:
+          - $ref: '#/components/schemas/MaximumRetryAttemptsESM'
+          description: Discard records after the specified number of retries. The
+            default value is -1, which sets the maximum number of retries to infinite.
+            When MaximumRetryAttempts is infinite, EventBridge retries failed records
+            until the record expires in the event source.
+        ParallelizationFactor:
+          allOf:
+          - $ref: '#/components/schemas/LimitMax10'
+          description: The number of batches to process concurrently from each shard.
+            The default value is 1.
+      description: The parameters for using a DynamoDB stream as a source.
+    UpdatePipeSourceKinesisStreamParameters:
+      type: object
+      properties:
+        BatchSize:
+          allOf:
+          - $ref: '#/components/schemas/LimitMax10000'
+          description: The maximum number of records to include in each batch.
+        DeadLetterConfig:
+          allOf:
+          - $ref: '#/components/schemas/DeadLetterConfig'
+          description: Define the target queue to send dead-letter queue events to.
+        OnPartialBatchItemFailure:
+          allOf:
+          - $ref: '#/components/schemas/OnPartialBatchItemFailureStreams'
+          description: Define how to handle item process failures. `AUTOMATIC_BISECT`
+            halves each batch and retry each half until all the records are processed
+            or there is one failed message left in the batch.
+        MaximumBatchingWindowInSeconds:
+          allOf:
+          - $ref: '#/components/schemas/MaximumBatchingWindowInSeconds'
+          description: The maximum length of a time to wait for events.
+        MaximumRecordAgeInSeconds:
+          allOf:
+          - $ref: '#/components/schemas/MaximumRecordAgeInSeconds'
+          description: Discard records older than the specified age. The default value
+            is -1, which sets the maximum age to infinite. When the value is set to
+            infinite, EventBridge never discards old records.
+        MaximumRetryAttempts:
+          allOf:
+          - $ref: '#/components/schemas/MaximumRetryAttemptsESM'
+          description: Discard records after the specified number of retries. The
+            default value is -1, which sets the maximum number of retries to infinite.
+            When MaximumRetryAttempts is infinite, EventBridge retries failed records
+            until the record expires in the event source.
+        ParallelizationFactor:
+          allOf:
+          - $ref: '#/components/schemas/LimitMax10'
+          description: The number of batches to process concurrently from each shard.
+            The default value is 1.
+      description: The parameters for using a Kinesis stream as a source.
+    UpdatePipeSourceManagedStreamingKafkaParameters:
+      type: object
+      properties:
+        BatchSize:
+          allOf:
+          - $ref: '#/components/schemas/LimitMax10000'
+          description: The maximum number of records to include in each batch.
+        Credentials:
+          allOf:
+          - $ref: '#/components/schemas/MSKAccessCredentials'
+          description: The credentials needed to access the resource.
+        MaximumBatchingWindowInSeconds:
+          allOf:
+          - $ref: '#/components/schemas/MaximumBatchingWindowInSeconds'
+          description: The maximum length of a time to wait for events.
+      description: The parameters for using an MSK stream as a source.
+    UpdatePipeSourceParameters:
+      type: object
+      properties:
+        FilterCriteria:
+          allOf:
+          - $ref: '#/components/schemas/FilterCriteria'
+          description: 'The collection of event patterns used to filter events.
+
+
+            To remove a filter, specify a `FilterCriteria` object with an empty array
+            of `Filter` objects.
+
+
+            For more information, see [Events and Event Patterns](https://docs.aws.amazon.com/eventbridge/latest/userguide/eventbridge-and-event-patterns.html)
+            in the _Amazon EventBridge User Guide_.'
+        KinesisStreamParameters:
+          allOf:
+          - $ref: '#/components/schemas/UpdatePipeSourceKinesisStreamParameters'
+          description: The parameters for using a Kinesis stream as a source.
+        DynamoDBStreamParameters:
+          allOf:
+          - $ref: '#/components/schemas/UpdatePipeSourceDynamoDBStreamParameters'
+          description: The parameters for using a DynamoDB stream as a source.
+        SqsQueueParameters:
+          allOf:
+          - $ref: '#/components/schemas/UpdatePipeSourceSqsQueueParameters'
+          description: The parameters for using a Amazon SQS stream as a source.
+        ActiveMQBrokerParameters:
+          allOf:
+          - $ref: '#/components/schemas/UpdatePipeSourceActiveMQBrokerParameters'
+          description: The parameters for using an Active MQ broker as a source.
+        RabbitMQBrokerParameters:
+          allOf:
+          - $ref: '#/components/schemas/UpdatePipeSourceRabbitMQBrokerParameters'
+          description: The parameters for using a Rabbit MQ broker as a source.
+        ManagedStreamingKafkaParameters:
+          allOf:
+          - $ref: '#/components/schemas/UpdatePipeSourceManagedStreamingKafkaParameters'
+          description: The parameters for using an MSK stream as a source.
+        SelfManagedKafkaParameters:
+          allOf:
+          - $ref: '#/components/schemas/UpdatePipeSourceSelfManagedKafkaParameters'
+          description: 'The parameters for using a self-managed Apache Kafka stream
+            as a source.
+
+
+            A _self managed_ cluster refers to any Apache Kafka cluster not hosted
+            by Amazon Web Services. This includes both clusters you manage yourself,
+            as well as those hosted by a third-party provider, such as [Confluent
+            Cloud](https://www.confluent.io/), [CloudKarafka](https://www.cloudkarafka.com/),
+            or [Redpanda](https://redpanda.com/). For more information, see [Apache
+            Kafka streams as a source](https://docs.aws.amazon.com/eventbridge/latest/userguide/eb-pipes-kafka.html)
+            in the _Amazon EventBridge User Guide_.'
+      description: The parameters required to set up a source for your pipe.
+    UpdatePipeSourceRabbitMQBrokerParameters:
+      type: object
+      properties:
+        Credentials:
+          allOf:
+          - $ref: '#/components/schemas/MQBrokerAccessCredentials'
+          description: The credentials needed to access the resource.
+        BatchSize:
+          allOf:
+          - $ref: '#/components/schemas/LimitMax10000'
+          description: The maximum number of records to include in each batch.
+        MaximumBatchingWindowInSeconds:
+          allOf:
+          - $ref: '#/components/schemas/MaximumBatchingWindowInSeconds'
+          description: The maximum length of a time to wait for events.
+      required:
+      - Credentials
+      description: The parameters for using a Rabbit MQ broker as a source.
+    UpdatePipeSourceSelfManagedKafkaParameters:
+      type: object
+      properties:
+        BatchSize:
+          allOf:
+          - $ref: '#/components/schemas/LimitMax10000'
+          description: The maximum number of records to include in each batch.
+        MaximumBatchingWindowInSeconds:
+          allOf:
+          - $ref: '#/components/schemas/MaximumBatchingWindowInSeconds'
+          description: The maximum length of a time to wait for events.
+        Credentials:
+          allOf:
+          - $ref: '#/components/schemas/SelfManagedKafkaAccessConfigurationCredentials'
+          description: The credentials needed to access the resource.
+        ServerRootCaCertificate:
+          allOf:
+          - $ref: '#/components/schemas/SecretManagerArn'
+          description: The ARN of the Secrets Manager secret used for certification.
+        Vpc:
+          allOf:
+          - $ref: '#/components/schemas/SelfManagedKafkaAccessConfigurationVpc'
+          description: This structure specifies the VPC subnets and security groups
+            for the stream, and whether a public IP address is to be used.
+      description: 'The parameters for using a self-managed Apache Kafka stream as
+        a source.
+
+
+        A _self managed_ cluster refers to any Apache Kafka cluster not hosted by
+        Amazon Web Services. This includes both clusters you manage yourself, as well
+        as those hosted by a third-party provider, such as [Confluent Cloud](https://www.confluent.io/),
+        [CloudKarafka](https://www.cloudkarafka.com/), or [Redpanda](https://redpanda.com/).
+        For more information, see [Apache Kafka streams as a source](https://docs.aws.amazon.com/eventbridge/latest/userguide/eb-pipes-kafka.html)
+        in the _Amazon EventBridge User Guide_.'
+    UpdatePipeSourceSqsQueueParameters:
+      type: object
+      properties:
+        BatchSize:
+          allOf:
+          - $ref: '#/components/schemas/LimitMax10000'
+          description: The maximum number of records to include in each batch.
+        MaximumBatchingWindowInSeconds:
+          allOf:
+          - $ref: '#/components/schemas/MaximumBatchingWindowInSeconds'
+          description: The maximum length of a time to wait for events.
+      description: The parameters for using a Amazon SQS stream as a source.
+    ValidationException:
+      type: object
+      properties:
+        message:
+          $ref: '#/components/schemas/ErrorMessage'
+        fieldList:
+          allOf:
+          - $ref: '#/components/schemas/ValidationExceptionFieldList'
+          description: The list of fields for which validation failed and the corresponding
+            failure messages.
+      description: Indicates that an error has occurred while performing a validate
+        operation.
+    ValidationExceptionField:
+      type: object
+      properties:
+        name:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The name of the exception.
+        message:
+          allOf:
+          - $ref: '#/components/schemas/ErrorMessage'
+          description: The message of the exception.
+      required:
+      - name
+      - message
+      description: Indicates that an error has occurred while performing a validate
+        operation.
     ValidationExceptionFieldList:
       type: array
       items:

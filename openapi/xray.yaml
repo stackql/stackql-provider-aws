@@ -7,7 +7,7 @@ info:
   x-stackql-serviceName: xray
   x-aws-serviceName: xray
   x-aws-protocol: aws.protocols#restJson1
-  x-dateGenerated: '2025-05-05'
+  x-dateGenerated: '2025-05-07'
   version: '2016-04-12'
   title: AWS X-Ray
   description: |-
@@ -43,9 +43,1421 @@ servers:
       - sa-east-1
       - me-south-1
       default: us-east-1
-paths: {}
+paths:
+  /Traces:
+    post:
+      operationId: BatchGetTraces
+      description: |-
+        You cannot find traces through this API if Transaction Search is enabled since trace is not indexed in X-Ray.
+
+        Retrieves a list of traces specified by ID. Each trace is a collection of segment documents that originates from a single request. Use `GetTraceSummaries` to get a list of trace IDs.
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                TraceIds:
+                  $ref: '#/components/schemas/TraceIdList'
+                NextToken:
+                  $ref: '#/components/schemas/String'
+      responses:
+        '200': {}
+        '400':
+          description: |-
+            The request is missing required parameters or has invalid parameters.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InvalidRequestException'
+        '429':
+          description: |-
+            The request exceeds the maximum number of requests per second.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThrottledException'
+  /CancelTraceRetrieval:
+    post:
+      operationId: CancelTraceRetrieval
+      description: |-
+        Cancels an ongoing trace retrieval job initiated by `StartTraceRetrieval` using the provided `RetrievalToken`. A successful cancellation will return an HTTP 200 response.
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                RetrievalToken:
+                  $ref: '#/components/schemas/RetrievalToken'
+      responses:
+        '200': {}
+        '400':
+          description: |-
+            The request is missing required parameters or has invalid parameters.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InvalidRequestException'
+        '404':
+          description: |-
+            The resource was not found. Verify that the name or Amazon Resource Name (ARN) of the resource is correct.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+        '429':
+          description: |-
+            The request exceeds the maximum number of requests per second.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThrottledException'
+  /CreateGroup:
+    post:
+      operationId: CreateGroup
+      description: |-
+        Creates a group resource with a name and a filter expression.
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                GroupName:
+                  $ref: '#/components/schemas/GroupName'
+                FilterExpression:
+                  $ref: '#/components/schemas/FilterExpression'
+                InsightsConfiguration:
+                  $ref: '#/components/schemas/InsightsConfiguration'
+                Tags:
+                  $ref: '#/components/schemas/TagList'
+      responses:
+        '200': {}
+        '400':
+          description: |-
+            The request is missing required parameters or has invalid parameters.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InvalidRequestException'
+        '429':
+          description: |-
+            The request exceeds the maximum number of requests per second.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThrottledException'
+  /CreateSamplingRule:
+    post:
+      operationId: CreateSamplingRule
+      description: |-
+        Creates a rule to control sampling behavior for instrumented applications. Services retrieve rules with [GetSamplingRules](https://docs.aws.amazon.com/xray/latest/api/API_GetSamplingRules.html), and evaluate each rule in ascending order of _priority_ for each request. If a rule matches, the service records a trace, borrowing it from the reservoir size. After 10 seconds, the service reports back to X-Ray with [GetSamplingTargets](https://docs.aws.amazon.com/xray/latest/api/API_GetSamplingTargets.html) to get updated versions of each in-use rule. The updated rule contains a trace quota that the service can use instead of borrowing from the reservoir.
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                SamplingRule:
+                  $ref: '#/components/schemas/SamplingRule'
+                Tags:
+                  $ref: '#/components/schemas/TagList'
+      responses:
+        '200': {}
+        '400':
+          description: |-
+            You have reached the maximum number of sampling rules.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RuleLimitExceededException'
+        '429':
+          description: |-
+            The request exceeds the maximum number of requests per second.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThrottledException'
+  /DeleteGroup:
+    post:
+      operationId: DeleteGroup
+      description: |-
+        Deletes a group resource.
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                GroupName:
+                  $ref: '#/components/schemas/GroupName'
+                GroupARN:
+                  $ref: '#/components/schemas/GroupARN'
+      responses:
+        '200': {}
+        '400':
+          description: |-
+            The request is missing required parameters or has invalid parameters.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InvalidRequestException'
+        '429':
+          description: |-
+            The request exceeds the maximum number of requests per second.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThrottledException'
+  /DeleteResourcePolicy:
+    post:
+      operationId: DeleteResourcePolicy
+      description: |-
+        Deletes a resource policy from the target Amazon Web Services account.
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                PolicyName:
+                  $ref: '#/components/schemas/PolicyName'
+                PolicyRevisionId:
+                  $ref: '#/components/schemas/PolicyRevisionId'
+      responses:
+        '200': {}
+        '400':
+          description: |-
+            The request is missing required parameters or has invalid parameters.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InvalidRequestException'
+        '429':
+          description: |-
+            The request exceeds the maximum number of requests per second.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThrottledException'
+  /DeleteSamplingRule:
+    post:
+      operationId: DeleteSamplingRule
+      description: |-
+        Deletes a sampling rule.
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                RuleName:
+                  $ref: '#/components/schemas/String'
+                RuleARN:
+                  $ref: '#/components/schemas/String'
+      responses:
+        '200': {}
+        '400':
+          description: |-
+            The request is missing required parameters or has invalid parameters.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InvalidRequestException'
+        '429':
+          description: |-
+            The request exceeds the maximum number of requests per second.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThrottledException'
+  /EncryptionConfig:
+    post:
+      operationId: GetEncryptionConfig
+      description: |-
+        Retrieves the current encryption configuration for X-Ray data.
+      parameters: []
+      responses:
+        '200': {}
+        '400':
+          description: |-
+            The request is missing required parameters or has invalid parameters.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InvalidRequestException'
+        '429':
+          description: |-
+            The request exceeds the maximum number of requests per second.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThrottledException'
+  /GetGroup:
+    post:
+      operationId: GetGroup
+      description: |-
+        Retrieves group resource details.
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                GroupName:
+                  $ref: '#/components/schemas/GroupName'
+                GroupARN:
+                  $ref: '#/components/schemas/GroupARN'
+      responses:
+        '200': {}
+        '400':
+          description: |-
+            The request is missing required parameters or has invalid parameters.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InvalidRequestException'
+        '429':
+          description: |-
+            The request exceeds the maximum number of requests per second.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThrottledException'
+  /Groups:
+    post:
+      operationId: GetGroups
+      description: |-
+        Retrieves all active group details.
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                NextToken:
+                  $ref: '#/components/schemas/GetGroupsNextToken'
+      responses:
+        '200': {}
+        '400':
+          description: |-
+            The request is missing required parameters or has invalid parameters.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InvalidRequestException'
+        '429':
+          description: |-
+            The request exceeds the maximum number of requests per second.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThrottledException'
+  /GetIndexingRules:
+    post:
+      operationId: GetIndexingRules
+      description: |-
+        Retrieves all indexing rules.
+
+        Indexing rules are used to determine the server-side sampling rate for spans ingested through the CloudWatchLogs destination and indexed by X-Ray. For more information, see [Transaction Search](https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/CloudWatch-Transaction-Search.html).
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                NextToken:
+                  $ref: '#/components/schemas/String'
+      responses:
+        '200': {}
+        '400':
+          description: |-
+            The request is missing required parameters or has invalid parameters.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InvalidRequestException'
+        '429':
+          description: |-
+            The request exceeds the maximum number of requests per second.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThrottledException'
+  /Insight:
+    post:
+      operationId: GetInsight
+      description: |-
+        Retrieves the summary information of an insight. This includes impact to clients and root cause services, the top anomalous services, the category, the state of the insight, and the start and end time of the insight.
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                InsightId:
+                  $ref: '#/components/schemas/InsightId'
+      responses:
+        '200': {}
+        '400':
+          description: |-
+            The request is missing required parameters or has invalid parameters.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InvalidRequestException'
+        '429':
+          description: |-
+            The request exceeds the maximum number of requests per second.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThrottledException'
+  /InsightEvents:
+    post:
+      operationId: GetInsightEvents
+      description: |-
+        X-Ray reevaluates insights periodically until they're resolved, and records each intermediate state as an event. You can review an insight's events in the Impact Timeline on the Inspect page in the X-Ray console.
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                InsightId:
+                  $ref: '#/components/schemas/InsightId'
+                MaxResults:
+                  $ref: '#/components/schemas/GetInsightEventsMaxResults'
+                NextToken:
+                  $ref: '#/components/schemas/Token'
+      responses:
+        '200': {}
+        '400':
+          description: |-
+            The request is missing required parameters or has invalid parameters.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InvalidRequestException'
+        '429':
+          description: |-
+            The request exceeds the maximum number of requests per second.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThrottledException'
+  /InsightImpactGraph:
+    post:
+      operationId: GetInsightImpactGraph
+      description: |-
+        Retrieves a service graph structure filtered by the specified insight. The service graph is limited to only structural information. For a complete service graph, use this API with the GetServiceGraph API.
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                InsightId:
+                  $ref: '#/components/schemas/InsightId'
+                StartTime:
+                  $ref: '#/components/schemas/Timestamp'
+                EndTime:
+                  $ref: '#/components/schemas/Timestamp'
+                NextToken:
+                  $ref: '#/components/schemas/Token'
+      responses:
+        '200': {}
+        '400':
+          description: |-
+            The request is missing required parameters or has invalid parameters.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InvalidRequestException'
+        '429':
+          description: |-
+            The request exceeds the maximum number of requests per second.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThrottledException'
+  /InsightSummaries:
+    post:
+      operationId: GetInsightSummaries
+      description: |-
+        Retrieves the summaries of all insights in the specified group matching the provided filter values.
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                States:
+                  $ref: '#/components/schemas/InsightStateList'
+                GroupARN:
+                  $ref: '#/components/schemas/GroupARN'
+                GroupName:
+                  $ref: '#/components/schemas/GroupName'
+                StartTime:
+                  $ref: '#/components/schemas/Timestamp'
+                EndTime:
+                  $ref: '#/components/schemas/Timestamp'
+                MaxResults:
+                  $ref: '#/components/schemas/GetInsightSummariesMaxResults'
+                NextToken:
+                  $ref: '#/components/schemas/Token'
+      responses:
+        '200': {}
+        '400':
+          description: |-
+            The request is missing required parameters or has invalid parameters.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InvalidRequestException'
+        '429':
+          description: |-
+            The request exceeds the maximum number of requests per second.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThrottledException'
+  /GetRetrievedTracesGraph:
+    post:
+      operationId: GetRetrievedTracesGraph
+      description: |-
+        Retrieves a service graph for traces based on the specified `RetrievalToken` from the CloudWatch log group generated by Transaction Search. This API does not initiate a retrieval job. You must first execute `StartTraceRetrieval` to obtain the required `RetrievalToken`.
+
+        The trace graph describes services that process incoming requests and any downstream services they call, which may include Amazon Web Services resources, external APIs, or databases.
+
+        The response is empty until the `RetrievalStatus` is _COMPLETE_. Retry the request after the status changes from _RUNNING_ or _SCHEDULED_ to _COMPLETE_ to access the full service graph.
+
+        When CloudWatch log is the destination, this API can support cross-account observability and service graph retrieval across linked accounts.
+
+        For retrieving graphs from X-Ray directly as opposed to the Transaction-Search Log group, see [GetTraceGraph](https://docs.aws.amazon.com/xray/latest/api/API_GetTraceGraph.html).
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                RetrievalToken:
+                  $ref: '#/components/schemas/RetrievalToken'
+                NextToken:
+                  $ref: '#/components/schemas/String'
+      responses:
+        '200': {}
+        '400':
+          description: |-
+            The request is missing required parameters or has invalid parameters.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InvalidRequestException'
+        '404':
+          description: |-
+            The resource was not found. Verify that the name or Amazon Resource Name (ARN) of the resource is correct.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+        '429':
+          description: |-
+            The request exceeds the maximum number of requests per second.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThrottledException'
+  /GetSamplingRules:
+    post:
+      operationId: GetSamplingRules
+      description: |-
+        Retrieves all sampling rules.
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                NextToken:
+                  $ref: '#/components/schemas/String'
+      responses:
+        '200': {}
+        '400':
+          description: |-
+            The request is missing required parameters or has invalid parameters.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InvalidRequestException'
+        '429':
+          description: |-
+            The request exceeds the maximum number of requests per second.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThrottledException'
+  /SamplingStatisticSummaries:
+    post:
+      operationId: GetSamplingStatisticSummaries
+      description: |-
+        Retrieves information about recent sampling results for all sampling rules.
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                NextToken:
+                  $ref: '#/components/schemas/String'
+      responses:
+        '200': {}
+        '400':
+          description: |-
+            The request is missing required parameters or has invalid parameters.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InvalidRequestException'
+        '429':
+          description: |-
+            The request exceeds the maximum number of requests per second.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThrottledException'
+  /SamplingTargets:
+    post:
+      operationId: GetSamplingTargets
+      description: |-
+        Requests a sampling quota for rules that the service is using to sample requests.
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                SamplingStatisticsDocuments:
+                  $ref: '#/components/schemas/SamplingStatisticsDocumentList'
+      responses:
+        '200': {}
+        '400':
+          description: |-
+            The request is missing required parameters or has invalid parameters.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InvalidRequestException'
+        '429':
+          description: |-
+            The request exceeds the maximum number of requests per second.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThrottledException'
+  /ServiceGraph:
+    post:
+      operationId: GetServiceGraph
+      description: |-
+        Retrieves a document that describes services that process incoming requests, and downstream services that they call as a result. Root services process incoming requests and make calls to downstream services. Root services are applications that use the [Amazon Web Services X-Ray SDK](https://docs.aws.amazon.com/xray/index.html). Downstream services can be other applications, Amazon Web Services resources, HTTP web APIs, or SQL databases.
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                StartTime:
+                  $ref: '#/components/schemas/Timestamp'
+                EndTime:
+                  $ref: '#/components/schemas/Timestamp'
+                GroupName:
+                  $ref: '#/components/schemas/GroupName'
+                GroupARN:
+                  $ref: '#/components/schemas/GroupARN'
+                NextToken:
+                  $ref: '#/components/schemas/String'
+      responses:
+        '200': {}
+        '400':
+          description: |-
+            The request is missing required parameters or has invalid parameters.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InvalidRequestException'
+        '429':
+          description: |-
+            The request exceeds the maximum number of requests per second.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThrottledException'
+  /TimeSeriesServiceStatistics:
+    post:
+      operationId: GetTimeSeriesServiceStatistics
+      description: |-
+        Get an aggregation of service statistics defined by a specific time range.
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                StartTime:
+                  $ref: '#/components/schemas/Timestamp'
+                EndTime:
+                  $ref: '#/components/schemas/Timestamp'
+                GroupName:
+                  $ref: '#/components/schemas/GroupName'
+                GroupARN:
+                  $ref: '#/components/schemas/GroupARN'
+                EntitySelectorExpression:
+                  $ref: '#/components/schemas/EntitySelectorExpression'
+                Period:
+                  $ref: '#/components/schemas/NullableInteger'
+                ForecastStatistics:
+                  $ref: '#/components/schemas/NullableBoolean'
+                NextToken:
+                  $ref: '#/components/schemas/String'
+      responses:
+        '200': {}
+        '400':
+          description: |-
+            The request is missing required parameters or has invalid parameters.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InvalidRequestException'
+        '429':
+          description: |-
+            The request exceeds the maximum number of requests per second.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThrottledException'
+  /TraceGraph:
+    post:
+      operationId: GetTraceGraph
+      description: |-
+        Retrieves a service graph for one or more specific trace IDs.
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                TraceIds:
+                  $ref: '#/components/schemas/TraceIdList'
+                NextToken:
+                  $ref: '#/components/schemas/String'
+      responses:
+        '200': {}
+        '400':
+          description: |-
+            The request is missing required parameters or has invalid parameters.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InvalidRequestException'
+        '429':
+          description: |-
+            The request exceeds the maximum number of requests per second.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThrottledException'
+  /GetTraceSegmentDestination:
+    post:
+      operationId: GetTraceSegmentDestination
+      description: |-
+        Retrieves the current destination of data sent to `PutTraceSegments` and _OpenTelemetry_ API. The Transaction Search feature requires a CloudWatchLogs destination. For more information, see [Transaction Search](https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/CloudWatch-Transaction-Search.html) and [OpenTelemetry](https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/CloudWatch-OpenTelemetry-Sections.html).
+      parameters: []
+      responses:
+        '200': {}
+        '400':
+          description: |-
+            The request is missing required parameters or has invalid parameters.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InvalidRequestException'
+        '429':
+          description: |-
+            The request exceeds the maximum number of requests per second.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThrottledException'
+  /TraceSummaries:
+    post:
+      operationId: GetTraceSummaries
+      description: |-
+        Retrieves IDs and annotations for traces available for a specified time frame using an optional filter. To get the full traces, pass the trace IDs to `BatchGetTraces`.
+
+        A filter expression can target traced requests that hit specific service nodes or edges, have errors, or come from a known user. For example, the following filter expression targets traces that pass through `api.example.com`:
+
+        `service("api.example.com")`
+
+        This filter expression finds traces that have an annotation named `account` with the value `12345`:
+
+        `annotation.account = "12345"`
+
+        For a full list of indexed fields and keywords that you can use in filter expressions, see [Use filter expressions](https://docs.aws.amazon.com/xray/latest/devguide/aws-xray-interface-console.html#xray-console-filters) in the _Amazon Web Services X-Ray Developer Guide_.
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                StartTime:
+                  $ref: '#/components/schemas/Timestamp'
+                EndTime:
+                  $ref: '#/components/schemas/Timestamp'
+                TimeRangeType:
+                  $ref: '#/components/schemas/TimeRangeType'
+                Sampling:
+                  $ref: '#/components/schemas/NullableBoolean'
+                SamplingStrategy:
+                  $ref: '#/components/schemas/SamplingStrategy'
+                FilterExpression:
+                  $ref: '#/components/schemas/FilterExpression'
+                NextToken:
+                  $ref: '#/components/schemas/String'
+      responses:
+        '200': {}
+        '400':
+          description: |-
+            The request is missing required parameters or has invalid parameters.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InvalidRequestException'
+        '429':
+          description: |-
+            The request exceeds the maximum number of requests per second.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThrottledException'
+  /ListResourcePolicies:
+    post:
+      operationId: ListResourcePolicies
+      description: |-
+        Returns the list of resource policies in the target Amazon Web Services account.
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                NextToken:
+                  $ref: '#/components/schemas/ResourcePolicyNextToken'
+      responses:
+        '200': {}
+        '400':
+          description: |-
+            The request is missing required parameters or has invalid parameters.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InvalidRequestException'
+        '429':
+          description: |-
+            The request exceeds the maximum number of requests per second.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThrottledException'
+  /ListRetrievedTraces:
+    post:
+      operationId: ListRetrievedTraces
+      description: |-
+        Retrieves a list of traces for a given `RetrievalToken` from the CloudWatch log group generated by Transaction Search. For information on what each trace returns, see [BatchGetTraces](https://docs.aws.amazon.com/xray/latest/api/API_BatchGetTraces.html).
+
+        This API does not initiate a retrieval job. To start a trace retrieval, use `StartTraceRetrieval`, which generates the required `RetrievalToken`.
+
+        When the `RetrievalStatus` is not _COMPLETE_ , the API will return an empty response. Retry the request once the retrieval has completed to access the full list of traces.
+
+        For cross-account observability, this API can retrieve traces from linked accounts when CloudWatch log is the destination across relevant accounts. For more details, see [CloudWatch cross-account observability](https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/CloudWatch-Unified-Cross-Account.html).
+
+        For retrieving data from X-Ray directly as opposed to the Transaction-Search Log group, see [BatchGetTraces](https://docs.aws.amazon.com/xray/latest/api/API_BatchGetTraces.html).
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                RetrievalToken:
+                  $ref: '#/components/schemas/RetrievalToken'
+                TraceFormat:
+                  $ref: '#/components/schemas/TraceFormatType'
+                NextToken:
+                  $ref: '#/components/schemas/String'
+      responses:
+        '200': {}
+        '400':
+          description: |-
+            The request is missing required parameters or has invalid parameters.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InvalidRequestException'
+        '404':
+          description: |-
+            The resource was not found. Verify that the name or Amazon Resource Name (ARN) of the resource is correct.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+        '429':
+          description: |-
+            The request exceeds the maximum number of requests per second.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThrottledException'
+  /ListTagsForResource:
+    post:
+      operationId: ListTagsForResource
+      description: |-
+        Returns a list of tags that are applied to the specified Amazon Web Services X-Ray group or sampling rule.
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                ResourceARN:
+                  $ref: '#/components/schemas/AmazonResourceName'
+                NextToken:
+                  $ref: '#/components/schemas/String'
+      responses:
+        '200': {}
+        '400':
+          description: |-
+            The request is missing required parameters or has invalid parameters.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InvalidRequestException'
+        '404':
+          description: |-
+            The resource was not found. Verify that the name or Amazon Resource Name (ARN) of the resource is correct.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+        '429':
+          description: |-
+            The request exceeds the maximum number of requests per second.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThrottledException'
+  /PutEncryptionConfig:
+    post:
+      operationId: PutEncryptionConfig
+      description: |-
+        Updates the encryption configuration for X-Ray data.
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                KeyId:
+                  $ref: '#/components/schemas/EncryptionKeyId'
+                Type:
+                  $ref: '#/components/schemas/EncryptionType'
+      responses:
+        '200': {}
+        '400':
+          description: |-
+            The request is missing required parameters or has invalid parameters.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InvalidRequestException'
+        '429':
+          description: |-
+            The request exceeds the maximum number of requests per second.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThrottledException'
+  /PutResourcePolicy:
+    post:
+      operationId: PutResourcePolicy
+      description: |-
+        Sets the resource policy to grant one or more Amazon Web Services services and accounts permissions to access X-Ray. Each resource policy will be associated with a specific Amazon Web Services account. Each Amazon Web Services account can have a maximum of 5 resource policies, and each policy name must be unique within that account. The maximum size of each resource policy is 5KB.
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                PolicyName:
+                  $ref: '#/components/schemas/PolicyName'
+                PolicyDocument:
+                  $ref: '#/components/schemas/PolicyDocument'
+                PolicyRevisionId:
+                  $ref: '#/components/schemas/PolicyRevisionId'
+                BypassPolicyLockoutCheck:
+                  $ref: '#/components/schemas/Boolean'
+      responses:
+        '200': {}
+        '400':
+          description: |-
+            Exceeded the maximum size for a resource policy.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PolicySizeLimitExceededException'
+        '429':
+          description: |-
+            The request exceeds the maximum number of requests per second.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThrottledException'
+  /TelemetryRecords:
+    post:
+      operationId: PutTelemetryRecords
+      description: |-
+        Used by the Amazon Web Services X-Ray daemon to upload telemetry.
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                TelemetryRecords:
+                  $ref: '#/components/schemas/TelemetryRecordList'
+                EC2InstanceId:
+                  $ref: '#/components/schemas/EC2InstanceId'
+                Hostname:
+                  $ref: '#/components/schemas/Hostname'
+                ResourceARN:
+                  $ref: '#/components/schemas/ResourceARN'
+      responses:
+        '200': {}
+        '400':
+          description: |-
+            The request is missing required parameters or has invalid parameters.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InvalidRequestException'
+        '429':
+          description: |-
+            The request exceeds the maximum number of requests per second.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThrottledException'
+  /TraceSegments:
+    post:
+      operationId: PutTraceSegments
+      description: |-
+        Uploads segment documents to Amazon Web Services X-Ray. A segment document can be a completed segment, an in-progress segment, or an array of subsegments.
+
+        Segments must include the following fields. For the full segment document schema, see [Amazon Web Services X-Ray Segment Documents](https://docs.aws.amazon.com/xray/latest/devguide/aws-xray-interface-api.html#xray-api-segmentdocuments.html) in the _Amazon Web Services X-Ray Developer Guide_.
+
+        **Required segment document fields**
+
+          * `name` \- The name of the service that handled the request.
+
+          * `id` \- A 64-bit identifier for the segment, unique among segments in the same trace, in 16 hexadecimal digits.
+
+          * `trace_id` \- A unique identifier that connects all segments and subsegments originating from a single client request.
+
+          * `start_time` \- Time the segment or subsegment was created, in floating point seconds in epoch time, accurate to milliseconds. For example, `1480615200.010` or `1.480615200010E9`.
+
+          * `end_time` \- Time the segment or subsegment was closed. For example, `1480615200.090` or `1.480615200090E9`. Specify either an `end_time` or `in_progress`.
+
+          * `in_progress` \- Set to `true` instead of specifying an `end_time` to record that a segment has been started, but is not complete. Send an in-progress segment when your application receives a request that will take a long time to serve, to trace that the request was received. When the response is sent, send the complete segment to overwrite the in-progress segment.
+
+        A `trace_id` consists of three numbers separated by hyphens. For example, 1-58406520-a006649127e371903a2de979. For trace IDs created by an X-Ray SDK, or by Amazon Web Services services integrated with X-Ray, a trace ID includes:
+
+        **Trace ID Format**
+
+          * The version number, for instance, `1`.
+
+          * The time of the original request, in Unix epoch time, in 8 hexadecimal digits. For example, 10:00AM December 2nd, 2016 PST in epoch time is `1480615200` seconds, or `58406520` in hexadecimal.
+
+          * A 96-bit identifier for the trace, globally unique, in 24 hexadecimal digits.
+
+        Trace IDs created via OpenTelemetry have a different format based on the [W3C Trace Context specification](https://www.w3.org/TR/trace-context/). A W3C trace ID must be formatted in the X-Ray trace ID format when sending to X-Ray. For example, a W3C trace ID `4efaaf4d1e8720b39541901950019ee5` should be formatted as `1-4efaaf4d-1e8720b39541901950019ee5` when sending to X-Ray. While X-Ray trace IDs include the original request timestamp in Unix epoch time, this is not required or validated.
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                TraceSegmentDocuments:
+                  $ref: '#/components/schemas/TraceSegmentDocumentList'
+      responses:
+        '200': {}
+        '400':
+          description: |-
+            The request is missing required parameters or has invalid parameters.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InvalidRequestException'
+        '429':
+          description: |-
+            The request exceeds the maximum number of requests per second.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThrottledException'
+  /StartTraceRetrieval:
+    post:
+      operationId: StartTraceRetrieval
+      description: |-
+        Initiates a trace retrieval process using the specified time range and for the give trace IDs on Transaction Search generated by the CloudWatch log group. For more information, see [Transaction Search](https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/CloudWatch-Transaction-Search.html).
+
+        API returns a `RetrievalToken`, which can be used with `ListRetrievedTraces` or `GetRetrievedTracesGraph` to fetch results. Retrievals will time out after 60 minutes. To execute long time ranges, consider segmenting into multiple retrievals.
+
+        If you are using [CloudWatch cross-account observability](https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/CloudWatch-Unified-Cross-Account.html), you can use this operation in a monitoring account to retrieve data from a linked source account, as long as both accounts have transaction search enabled.
+
+        For retrieving data from X-Ray directly as opposed to the Transaction-Search Log group, see [BatchGetTraces](https://docs.aws.amazon.com/xray/latest/api/API_BatchGetTraces.html).
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                TraceIds:
+                  $ref: '#/components/schemas/TraceIdListForRetrieval'
+                StartTime:
+                  $ref: '#/components/schemas/Timestamp'
+                EndTime:
+                  $ref: '#/components/schemas/Timestamp'
+      responses:
+        '200': {}
+        '400':
+          description: |-
+            The request is missing required parameters or has invalid parameters.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InvalidRequestException'
+        '404':
+          description: |-
+            The resource was not found. Verify that the name or Amazon Resource Name (ARN) of the resource is correct.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+        '429':
+          description: |-
+            The request exceeds the maximum number of requests per second.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThrottledException'
+  /TagResource:
+    post:
+      operationId: TagResource
+      description: |-
+        Applies tags to an existing Amazon Web Services X-Ray group or sampling rule.
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                ResourceARN:
+                  $ref: '#/components/schemas/AmazonResourceName'
+                Tags:
+                  $ref: '#/components/schemas/TagList'
+      responses:
+        '200': {}
+        '400':
+          description: |-
+            You have exceeded the maximum number of tags you can apply to this resource.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TooManyTagsException'
+        '404':
+          description: |-
+            The resource was not found. Verify that the name or Amazon Resource Name (ARN) of the resource is correct.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+        '429':
+          description: |-
+            The request exceeds the maximum number of requests per second.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThrottledException'
+  /UntagResource:
+    post:
+      operationId: UntagResource
+      description: |-
+        Removes tags from an Amazon Web Services X-Ray group or sampling rule. You cannot edit or delete system tags (those with an `aws:` prefix).
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                ResourceARN:
+                  $ref: '#/components/schemas/AmazonResourceName'
+                TagKeys:
+                  $ref: '#/components/schemas/TagKeyList'
+      responses:
+        '200': {}
+        '400':
+          description: |-
+            The request is missing required parameters or has invalid parameters.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InvalidRequestException'
+        '404':
+          description: |-
+            The resource was not found. Verify that the name or Amazon Resource Name (ARN) of the resource is correct.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+        '429':
+          description: |-
+            The request exceeds the maximum number of requests per second.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThrottledException'
+  /UpdateGroup:
+    post:
+      operationId: UpdateGroup
+      description: |-
+        Updates a group resource.
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                GroupName:
+                  $ref: '#/components/schemas/GroupName'
+                GroupARN:
+                  $ref: '#/components/schemas/GroupARN'
+                FilterExpression:
+                  $ref: '#/components/schemas/FilterExpression'
+                InsightsConfiguration:
+                  $ref: '#/components/schemas/InsightsConfiguration'
+      responses:
+        '200': {}
+        '400':
+          description: |-
+            The request is missing required parameters or has invalid parameters.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InvalidRequestException'
+        '429':
+          description: |-
+            The request exceeds the maximum number of requests per second.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThrottledException'
+  /UpdateIndexingRule:
+    post:
+      operationId: UpdateIndexingRule
+      description: |-
+        Modifies an indexing rule’s configuration.
+
+        Indexing rules are used for determining the sampling rate for spans indexed from CloudWatch Logs. For more information, see [Transaction Search](https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/CloudWatch-Transaction-Search.html).
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                Name:
+                  $ref: '#/components/schemas/String'
+                Rule:
+                  $ref: '#/components/schemas/IndexingRuleValueUpdate'
+      responses:
+        '200': {}
+        '400':
+          description: |-
+            The request is missing required parameters or has invalid parameters.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InvalidRequestException'
+        '404':
+          description: |-
+            The resource was not found. Verify that the name or Amazon Resource Name (ARN) of the resource is correct.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+        '429':
+          description: |-
+            The request exceeds the maximum number of requests per second.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThrottledException'
+  /UpdateSamplingRule:
+    post:
+      operationId: UpdateSamplingRule
+      description: |-
+        Modifies a sampling rule's configuration.
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                SamplingRuleUpdate:
+                  $ref: '#/components/schemas/SamplingRuleUpdate'
+      responses:
+        '200': {}
+        '400':
+          description: |-
+            The request is missing required parameters or has invalid parameters.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InvalidRequestException'
+        '429':
+          description: |-
+            The request exceeds the maximum number of requests per second.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThrottledException'
+  /UpdateTraceSegmentDestination:
+    post:
+      operationId: UpdateTraceSegmentDestination
+      description: |-
+        Modifies the destination of data sent to `PutTraceSegments`. The Transaction Search feature requires the CloudWatchLogs destination. For more information, see [Transaction Search](https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/CloudWatch-Transaction-Search.html).
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                Destination:
+                  $ref: '#/components/schemas/TraceSegmentDestination'
+      responses:
+        '200': {}
+        '400':
+          description: |-
+            The request is missing required parameters or has invalid parameters.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InvalidRequestException'
+        '429':
+          description: |-
+            The request exceeds the maximum number of requests per second.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThrottledException'
 components:
   schemas:
+    Alias:
+      type: object
+      properties:
+        Name:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The canonical name of the alias.
+        Names:
+          allOf:
+          - $ref: '#/components/schemas/AliasNames'
+          description: A list of names for the alias, including the canonical name.
+        Type:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The type of the alias.
+      description: An alias for an edge.
     AliasList:
       type: array
       items:
@@ -80,6 +1492,13 @@ components:
       type: object
       additionalProperties:
         $ref: '#/components/schemas/ValuesWithServiceIds'
+    AnomalousService:
+      type: object
+      properties:
+        ServiceId:
+          $ref: '#/components/schemas/ServiceId'
+      description: The service within the service graph that has anomalously high
+        fault rates.
     AnomalousServiceList:
       type: array
       items:
@@ -96,6 +1515,71 @@ components:
       type: string
       minLength: 1
       maxLength: 32
+    AvailabilityZoneDetail:
+      type: object
+      properties:
+        Name:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The name of a corresponding Availability Zone.
+      description: A list of Availability Zones corresponding to the segments in a
+        trace.
+    BackendConnectionErrors:
+      type: object
+      properties:
+        TimeoutCount:
+          allOf:
+          - $ref: '#/components/schemas/NullableInteger'
+          description: ''
+        ConnectionRefusedCount:
+          allOf:
+          - $ref: '#/components/schemas/NullableInteger'
+          description: ''
+        HTTPCode4XXCount:
+          allOf:
+          - $ref: '#/components/schemas/NullableInteger'
+          description: ''
+        HTTPCode5XXCount:
+          allOf:
+          - $ref: '#/components/schemas/NullableInteger'
+          description: ''
+        UnknownHostCount:
+          allOf:
+          - $ref: '#/components/schemas/NullableInteger'
+          description: ''
+        OtherCount:
+          allOf:
+          - $ref: '#/components/schemas/NullableInteger'
+          description: ''
+      description: ''
+    BatchGetTracesRequest:
+      type: object
+      properties:
+        TraceIds:
+          allOf:
+          - $ref: '#/components/schemas/TraceIdList'
+          description: Specify the trace IDs of requests for which to retrieve segments.
+        NextToken:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: Pagination token.
+      required:
+      - TraceIds
+    BatchGetTracesResult:
+      type: object
+      properties:
+        Traces:
+          allOf:
+          - $ref: '#/components/schemas/TraceList'
+          description: Full traces for the specified requests.
+        UnprocessedTraceIds:
+          allOf:
+          - $ref: '#/components/schemas/UnprocessedTraceIdList'
+          description: Trace IDs of requests that haven't been processed.
+        NextToken:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: Pagination token.
     Boolean:
       type: boolean
       default: false
@@ -103,10 +1587,152 @@ components:
       type: integer
       default: 0
       minimum: 0
+    CancelTraceRetrievalRequest:
+      type: object
+      properties:
+        RetrievalToken:
+          allOf:
+          - $ref: '#/components/schemas/RetrievalToken'
+          description: Retrieval token.
+      required:
+      - RetrievalToken
+    CancelTraceRetrievalResult:
+      type: object
+      properties: {}
     ClientID:
       type: string
       minLength: 24
       maxLength: 24
+    CreateGroupRequest:
+      type: object
+      properties:
+        GroupName:
+          allOf:
+          - $ref: '#/components/schemas/GroupName'
+          description: The case-sensitive name of the new group. Default is a reserved
+            name and names must be unique.
+        FilterExpression:
+          allOf:
+          - $ref: '#/components/schemas/FilterExpression'
+          description: The filter expression defining criteria by which to group traces.
+        InsightsConfiguration:
+          allOf:
+          - $ref: '#/components/schemas/InsightsConfiguration'
+          description: "The structure containing configurations related to insights.\n\
+            \n  * The InsightsEnabled boolean can be set to true to enable insights\
+            \ for the new group or false to disable insights for the new group.\n\n\
+            \  * The NotificationsEnabled boolean can be set to true to enable insights\
+            \ notifications for the new group. Notifications may only be enabled on\
+            \ a group with InsightsEnabled set to true."
+        Tags:
+          allOf:
+          - $ref: '#/components/schemas/TagList'
+          description: "A map that contains one or more tag keys and tag values to\
+            \ attach to an X-Ray group. For more information about ways to use tags,\
+            \ see [Tagging Amazon Web Services resources](https://docs.aws.amazon.com/general/latest/gr/aws_tagging.html)\
+            \ in the _Amazon Web Services General Reference_.\n\nThe following restrictions\
+            \ apply to tags:\n\n  * Maximum number of user-applied tags per resource:\
+            \ 50\n\n  * Maximum tag key length: 128 Unicode characters\n\n  * Maximum\
+            \ tag value length: 256 Unicode characters\n\n  * Valid values for key\
+            \ and value: a-z, A-Z, 0-9, space, and the following characters: _ . :\
+            \ / = + - and @\n\n  * Tag keys and values are case sensitive.\n\n  *\
+            \ Don't use `aws:` as a prefix for keys; it's reserved for Amazon Web\
+            \ Services use."
+      required:
+      - GroupName
+    CreateGroupResult:
+      type: object
+      properties:
+        Group:
+          allOf:
+          - $ref: '#/components/schemas/Group'
+          description: The group that was created. Contains the name of the group
+            that was created, the Amazon Resource Name (ARN) of the group that was
+            generated based on the group name, the filter expression, and the insight
+            configuration that was assigned to the group.
+    CreateSamplingRuleRequest:
+      type: object
+      properties:
+        SamplingRule:
+          allOf:
+          - $ref: '#/components/schemas/SamplingRule'
+          description: The rule definition.
+        Tags:
+          allOf:
+          - $ref: '#/components/schemas/TagList'
+          description: "A map that contains one or more tag keys and tag values to\
+            \ attach to an X-Ray sampling rule. For more information about ways to\
+            \ use tags, see [Tagging Amazon Web Services resources](https://docs.aws.amazon.com/general/latest/gr/aws_tagging.html)\
+            \ in the _Amazon Web Services General Reference_.\n\nThe following restrictions\
+            \ apply to tags:\n\n  * Maximum number of user-applied tags per resource:\
+            \ 50\n\n  * Maximum tag key length: 128 Unicode characters\n\n  * Maximum\
+            \ tag value length: 256 Unicode characters\n\n  * Valid values for key\
+            \ and value: a-z, A-Z, 0-9, space, and the following characters: _ . :\
+            \ / = + - and @\n\n  * Tag keys and values are case sensitive.\n\n  *\
+            \ Don't use `aws:` as a prefix for keys; it's reserved for Amazon Web\
+            \ Services use."
+      required:
+      - SamplingRule
+    CreateSamplingRuleResult:
+      type: object
+      properties:
+        SamplingRuleRecord:
+          allOf:
+          - $ref: '#/components/schemas/SamplingRuleRecord'
+          description: The saved rule definition and metadata.
+    DeleteGroupRequest:
+      type: object
+      properties:
+        GroupName:
+          allOf:
+          - $ref: '#/components/schemas/GroupName'
+          description: The case-sensitive name of the group.
+        GroupARN:
+          allOf:
+          - $ref: '#/components/schemas/GroupARN'
+          description: The ARN of the group that was generated on creation.
+    DeleteGroupResult:
+      type: object
+      properties: {}
+    DeleteResourcePolicyRequest:
+      type: object
+      properties:
+        PolicyName:
+          allOf:
+          - $ref: '#/components/schemas/PolicyName'
+          description: The name of the resource policy to delete.
+        PolicyRevisionId:
+          allOf:
+          - $ref: '#/components/schemas/PolicyRevisionId'
+          description: Specifies a specific policy revision to delete. Provide a `PolicyRevisionId`
+            to ensure an atomic delete operation. If the provided revision id does
+            not match the latest policy revision id, an `InvalidPolicyRevisionIdException`
+            exception is returned.
+      required:
+      - PolicyName
+    DeleteResourcePolicyResult:
+      type: object
+      properties: {}
+    DeleteSamplingRuleRequest:
+      type: object
+      properties:
+        RuleName:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The name of the sampling rule. Specify a rule by either name
+            or ARN, but not both.
+        RuleARN:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The ARN of the sampling rule. Specify a rule by either name
+            or ARN, but not both.
+    DeleteSamplingRuleResult:
+      type: object
+      properties:
+        SamplingRuleRecord:
+          allOf:
+          - $ref: '#/components/schemas/SamplingRuleRecord'
+          description: The deleted rule definition and metadata.
     Double:
       type: number
       format: double
@@ -115,10 +1741,98 @@ components:
       type: string
       minLength: 0
       maxLength: 20
+    Edge:
+      type: object
+      properties:
+        ReferenceId:
+          allOf:
+          - $ref: '#/components/schemas/NullableInteger'
+          description: Identifier of the edge. Unique within a service map.
+        StartTime:
+          allOf:
+          - $ref: '#/components/schemas/Timestamp'
+          description: The start time of the first segment on the edge.
+        EndTime:
+          allOf:
+          - $ref: '#/components/schemas/Timestamp'
+          description: The end time of the last segment on the edge.
+        SummaryStatistics:
+          allOf:
+          - $ref: '#/components/schemas/EdgeStatistics'
+          description: Response statistics for segments on the edge.
+        ResponseTimeHistogram:
+          allOf:
+          - $ref: '#/components/schemas/Histogram'
+          description: A histogram that maps the spread of client response times on
+            an edge. Only populated for synchronous edges.
+        Aliases:
+          allOf:
+          - $ref: '#/components/schemas/AliasList'
+          description: Aliases for the edge.
+        EdgeType:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: Describes an asynchronous connection, with a value of `link`.
+        ReceivedEventAgeHistogram:
+          allOf:
+          - $ref: '#/components/schemas/Histogram'
+          description: A histogram that maps the spread of event age when received
+            by consumers. Age is calculated each time an event is received. Only populated
+            when _EdgeType_ is `link`.
+      description: Information about a connection between two services. An edge can
+        be a synchronous connection, such as typical call between client and service,
+        or an asynchronous link, such as a Lambda function which retrieves an event
+        from an SNS queue.
     EdgeList:
       type: array
       items:
         $ref: '#/components/schemas/Edge'
+    EdgeStatistics:
+      type: object
+      properties:
+        OkCount:
+          allOf:
+          - $ref: '#/components/schemas/NullableLong'
+          description: The number of requests that completed with a 2xx Success status
+            code.
+        ErrorStatistics:
+          allOf:
+          - $ref: '#/components/schemas/ErrorStatistics'
+          description: Information about requests that failed with a 4xx Client Error
+            status code.
+        FaultStatistics:
+          allOf:
+          - $ref: '#/components/schemas/FaultStatistics'
+          description: Information about requests that failed with a 5xx Server Error
+            status code.
+        TotalCount:
+          allOf:
+          - $ref: '#/components/schemas/NullableLong'
+          description: The total number of completed requests.
+        TotalResponseTime:
+          allOf:
+          - $ref: '#/components/schemas/NullableDouble'
+          description: The aggregate response time of completed requests.
+      description: Response statistics for an edge.
+    EncryptionConfig:
+      type: object
+      properties:
+        KeyId:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The ID of the KMS key used for encryption, if applicable.
+        Status:
+          allOf:
+          - $ref: '#/components/schemas/EncryptionStatus'
+          description: The encryption status. While the status is `UPDATING`, X-Ray
+            may encrypt data with a combination of the new and old settings.
+        Type:
+          allOf:
+          - $ref: '#/components/schemas/EncryptionType'
+          description: The type of encryption. Set to `KMS` for encryption with KMS
+            keys. Set to `NONE` for default encryption.
+      description: A configuration document that specifies encryption configuration
+        settings.
     EncryptionKeyId:
       type: string
       minLength: 1
@@ -139,10 +1853,70 @@ components:
       maxLength: 500
     ErrorMessage:
       type: string
+    ErrorRootCause:
+      type: object
+      properties:
+        Services:
+          allOf:
+          - $ref: '#/components/schemas/ErrorRootCauseServices'
+          description: A list of services corresponding to an error. A service identifies
+            a segment and it contains a name, account ID, type, and inferred flag.
+        ClientImpacting:
+          allOf:
+          - $ref: '#/components/schemas/NullableBoolean'
+          description: A flag that denotes that the root cause impacts the trace client.
+      description: The root cause of a trace summary error.
+    ErrorRootCauseEntity:
+      type: object
+      properties:
+        Name:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The name of the entity.
+        Exceptions:
+          allOf:
+          - $ref: '#/components/schemas/RootCauseExceptions'
+          description: The types and messages of the exceptions.
+        Remote:
+          allOf:
+          - $ref: '#/components/schemas/NullableBoolean'
+          description: A flag that denotes a remote subsegment.
+      description: A collection of segments and corresponding subsegments associated
+        to a trace summary error.
     ErrorRootCauseEntityPath:
       type: array
       items:
         $ref: '#/components/schemas/ErrorRootCauseEntity'
+    ErrorRootCauseService:
+      type: object
+      properties:
+        Name:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The service name.
+        Names:
+          allOf:
+          - $ref: '#/components/schemas/ServiceNames'
+          description: A collection of associated service names.
+        Type:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The type associated to the service.
+        AccountId:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The account ID associated to the service.
+        EntityPath:
+          allOf:
+          - $ref: '#/components/schemas/ErrorRootCauseEntityPath'
+          description: The path of root cause entities found on the service.
+        Inferred:
+          allOf:
+          - $ref: '#/components/schemas/NullableBoolean'
+          description: A Boolean value indicating if the service is inferred from
+            the trace.
+      description: A collection of fields identifying the services in a trace summary
+        error.
     ErrorRootCauseServices:
       type: array
       items:
@@ -151,12 +1925,92 @@ components:
       type: array
       items:
         $ref: '#/components/schemas/ErrorRootCause'
+    ErrorStatistics:
+      type: object
+      properties:
+        ThrottleCount:
+          allOf:
+          - $ref: '#/components/schemas/NullableLong'
+          description: The number of requests that failed with a 429 throttling status
+            code.
+        OtherCount:
+          allOf:
+          - $ref: '#/components/schemas/NullableLong'
+          description: The number of requests that failed with untracked 4xx Client
+            Error status codes.
+        TotalCount:
+          allOf:
+          - $ref: '#/components/schemas/NullableLong'
+          description: The total number of requests that failed with a 4xx Client
+            Error status code.
+      description: Information about requests that failed with a 4xx Client Error
+        status code.
     EventSummaryText:
       type: string
+    FaultRootCause:
+      type: object
+      properties:
+        Services:
+          allOf:
+          - $ref: '#/components/schemas/FaultRootCauseServices'
+          description: A list of corresponding services. A service identifies a segment
+            and it contains a name, account ID, type, and inferred flag.
+        ClientImpacting:
+          allOf:
+          - $ref: '#/components/schemas/NullableBoolean'
+          description: A flag that denotes that the root cause impacts the trace client.
+      description: The root cause information for a trace summary fault.
+    FaultRootCauseEntity:
+      type: object
+      properties:
+        Name:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The name of the entity.
+        Exceptions:
+          allOf:
+          - $ref: '#/components/schemas/RootCauseExceptions'
+          description: The types and messages of the exceptions.
+        Remote:
+          allOf:
+          - $ref: '#/components/schemas/NullableBoolean'
+          description: A flag that denotes a remote subsegment.
+      description: A collection of segments and corresponding subsegments associated
+        to a trace summary fault error.
     FaultRootCauseEntityPath:
       type: array
       items:
         $ref: '#/components/schemas/FaultRootCauseEntity'
+    FaultRootCauseService:
+      type: object
+      properties:
+        Name:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The service name.
+        Names:
+          allOf:
+          - $ref: '#/components/schemas/ServiceNames'
+          description: A collection of associated service names.
+        Type:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The type associated to the service.
+        AccountId:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The account ID associated to the service.
+        EntityPath:
+          allOf:
+          - $ref: '#/components/schemas/FaultRootCauseEntityPath'
+          description: The path of root cause entities found on the service.
+        Inferred:
+          allOf:
+          - $ref: '#/components/schemas/NullableBoolean'
+          description: A Boolean value indicating if the service is inferred from
+            the trace.
+      description: A collection of fields identifying the services in a trace summary
+        fault.
     FaultRootCauseServices:
       type: array
       items:
@@ -165,6 +2019,21 @@ components:
       type: array
       items:
         $ref: '#/components/schemas/FaultRootCause'
+    FaultStatistics:
+      type: object
+      properties:
+        OtherCount:
+          allOf:
+          - $ref: '#/components/schemas/NullableLong'
+          description: The number of requests that failed with untracked 5xx Server
+            Error status codes.
+        TotalCount:
+          allOf:
+          - $ref: '#/components/schemas/NullableLong'
+          description: The total number of requests that failed with a 5xx Server
+            Error status code.
+      description: Information about requests that failed with a 5xx Server Error
+        status code.
     FilterExpression:
       type: string
     FixedRate:
@@ -173,18 +2042,610 @@ components:
       default: 0
       minimum: 0
       maximum: 1
+    ForecastStatistics:
+      type: object
+      properties:
+        FaultCountHigh:
+          allOf:
+          - $ref: '#/components/schemas/NullableLong'
+          description: The upper limit of fault counts for a service.
+        FaultCountLow:
+          allOf:
+          - $ref: '#/components/schemas/NullableLong'
+          description: The lower limit of fault counts for a service.
+      description: The predicted high and low fault count. This is used to determine
+        if a service has become anomalous and if an insight should be created.
+    GetEncryptionConfigRequest:
+      type: object
+      properties: {}
+    GetEncryptionConfigResult:
+      type: object
+      properties:
+        EncryptionConfig:
+          allOf:
+          - $ref: '#/components/schemas/EncryptionConfig'
+          description: The encryption configuration document.
+    GetGroupRequest:
+      type: object
+      properties:
+        GroupName:
+          allOf:
+          - $ref: '#/components/schemas/GroupName'
+          description: The case-sensitive name of the group.
+        GroupARN:
+          allOf:
+          - $ref: '#/components/schemas/GroupARN'
+          description: The ARN of the group that was generated on creation.
+    GetGroupResult:
+      type: object
+      properties:
+        Group:
+          allOf:
+          - $ref: '#/components/schemas/Group'
+          description: The group that was requested. Contains the name of the group,
+            the ARN of the group, the filter expression, and the insight configuration
+            assigned to the group.
     GetGroupsNextToken:
       type: string
       minLength: 1
       maxLength: 100
+    GetGroupsRequest:
+      type: object
+      properties:
+        NextToken:
+          allOf:
+          - $ref: '#/components/schemas/GetGroupsNextToken'
+          description: Pagination token.
+    GetGroupsResult:
+      type: object
+      properties:
+        Groups:
+          allOf:
+          - $ref: '#/components/schemas/GroupSummaryList'
+          description: The collection of all active groups.
+        NextToken:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: Pagination token.
+    GetIndexingRulesRequest:
+      type: object
+      properties:
+        NextToken:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: Specify the pagination token returned by a previous request
+            to retrieve the next page of indexes.
+    GetIndexingRulesResult:
+      type: object
+      properties:
+        IndexingRules:
+          allOf:
+          - $ref: '#/components/schemas/IndexingRuleList'
+          description: Retrieves all indexing rules.
+        NextToken:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: Specify the pagination token returned by a previous request
+            to retrieve the next page of indexes.
     GetInsightEventsMaxResults:
       type: integer
       minimum: 1
       maximum: 50
+    GetInsightEventsRequest:
+      type: object
+      properties:
+        InsightId:
+          allOf:
+          - $ref: '#/components/schemas/InsightId'
+          description: The insight's unique identifier. Use the GetInsightSummaries
+            action to retrieve an InsightId.
+        MaxResults:
+          allOf:
+          - $ref: '#/components/schemas/GetInsightEventsMaxResults'
+          description: Used to retrieve at most the specified value of events.
+        NextToken:
+          allOf:
+          - $ref: '#/components/schemas/Token'
+          description: Specify the pagination token returned by a previous request
+            to retrieve the next page of events.
+      required:
+      - InsightId
+    GetInsightEventsResult:
+      type: object
+      properties:
+        InsightEvents:
+          allOf:
+          - $ref: '#/components/schemas/InsightEventList'
+          description: A detailed description of the event. This includes the time
+            of the event, client and root cause impact statistics, and the top anomalous
+            service at the time of the event.
+        NextToken:
+          allOf:
+          - $ref: '#/components/schemas/Token'
+          description: Use this token to retrieve the next page of insight events.
+    GetInsightImpactGraphRequest:
+      type: object
+      properties:
+        InsightId:
+          allOf:
+          - $ref: '#/components/schemas/InsightId'
+          description: The insight's unique identifier. Use the GetInsightSummaries
+            action to retrieve an InsightId.
+        StartTime:
+          allOf:
+          - $ref: '#/components/schemas/Timestamp'
+          description: The estimated start time of the insight, in Unix time seconds.
+            The StartTime is inclusive of the value provided and can't be more than
+            30 days old.
+        EndTime:
+          allOf:
+          - $ref: '#/components/schemas/Timestamp'
+          description: The estimated end time of the insight, in Unix time seconds.
+            The EndTime is exclusive of the value provided. The time range between
+            the start time and end time can't be more than six hours.
+        NextToken:
+          allOf:
+          - $ref: '#/components/schemas/Token'
+          description: Specify the pagination token returned by a previous request
+            to retrieve the next page of results.
+      required:
+      - InsightId
+      - StartTime
+      - EndTime
+    GetInsightImpactGraphResult:
+      type: object
+      properties:
+        InsightId:
+          allOf:
+          - $ref: '#/components/schemas/InsightId'
+          description: The insight's unique identifier.
+        StartTime:
+          allOf:
+          - $ref: '#/components/schemas/Timestamp'
+          description: The provided start time.
+        EndTime:
+          allOf:
+          - $ref: '#/components/schemas/Timestamp'
+          description: The provided end time.
+        ServiceGraphStartTime:
+          allOf:
+          - $ref: '#/components/schemas/Timestamp'
+          description: The time, in Unix seconds, at which the service graph started.
+        ServiceGraphEndTime:
+          allOf:
+          - $ref: '#/components/schemas/Timestamp'
+          description: The time, in Unix seconds, at which the service graph ended.
+        Services:
+          allOf:
+          - $ref: '#/components/schemas/InsightImpactGraphServiceList'
+          description: The Amazon Web Services instrumented services related to the
+            insight.
+        NextToken:
+          allOf:
+          - $ref: '#/components/schemas/Token'
+          description: Pagination token.
+    GetInsightRequest:
+      type: object
+      properties:
+        InsightId:
+          allOf:
+          - $ref: '#/components/schemas/InsightId'
+          description: The insight's unique identifier. Use the GetInsightSummaries
+            action to retrieve an InsightId.
+      required:
+      - InsightId
+    GetInsightResult:
+      type: object
+      properties:
+        Insight:
+          allOf:
+          - $ref: '#/components/schemas/Insight'
+          description: The summary information of an insight.
     GetInsightSummariesMaxResults:
       type: integer
       minimum: 1
       maximum: 100
+    GetInsightSummariesRequest:
+      type: object
+      properties:
+        States:
+          allOf:
+          - $ref: '#/components/schemas/InsightStateList'
+          description: The list of insight states.
+        GroupARN:
+          allOf:
+          - $ref: '#/components/schemas/GroupARN'
+          description: The Amazon Resource Name (ARN) of the group. Required if the
+            GroupName isn't provided.
+        GroupName:
+          allOf:
+          - $ref: '#/components/schemas/GroupName'
+          description: The name of the group. Required if the GroupARN isn't provided.
+        StartTime:
+          allOf:
+          - $ref: '#/components/schemas/Timestamp'
+          description: The beginning of the time frame in which the insights started.
+            The start time can't be more than 30 days old.
+        EndTime:
+          allOf:
+          - $ref: '#/components/schemas/Timestamp'
+          description: The end of the time frame in which the insights ended. The
+            end time can't be more than 30 days old.
+        MaxResults:
+          allOf:
+          - $ref: '#/components/schemas/GetInsightSummariesMaxResults'
+          description: The maximum number of results to display.
+        NextToken:
+          allOf:
+          - $ref: '#/components/schemas/Token'
+          description: Pagination token.
+      required:
+      - StartTime
+      - EndTime
+    GetInsightSummariesResult:
+      type: object
+      properties:
+        InsightSummaries:
+          allOf:
+          - $ref: '#/components/schemas/InsightSummaryList'
+          description: The summary of each insight within the group matching the provided
+            filters. The summary contains the InsightID, start and end time, the root
+            cause service, the root cause and client impact statistics, the top anomalous
+            services, and the status of the insight.
+        NextToken:
+          allOf:
+          - $ref: '#/components/schemas/Token'
+          description: Pagination token.
+    GetRetrievedTracesGraphRequest:
+      type: object
+      properties:
+        RetrievalToken:
+          allOf:
+          - $ref: '#/components/schemas/RetrievalToken'
+          description: Retrieval token.
+        NextToken:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: Specify the pagination token returned by a previous request
+            to retrieve the next page of indexes.
+      required:
+      - RetrievalToken
+    GetRetrievedTracesGraphResult:
+      type: object
+      properties:
+        RetrievalStatus:
+          allOf:
+          - $ref: '#/components/schemas/RetrievalStatus'
+          description: Status of the retrieval.
+        Services:
+          allOf:
+          - $ref: '#/components/schemas/RetrievedServicesList'
+          description: Retrieved services.
+        NextToken:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: Specify the pagination token returned by a previous request
+            to retrieve the next page of indexes.
+    GetSamplingRulesRequest:
+      type: object
+      properties:
+        NextToken:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: Pagination token.
+    GetSamplingRulesResult:
+      type: object
+      properties:
+        SamplingRuleRecords:
+          allOf:
+          - $ref: '#/components/schemas/SamplingRuleRecordList'
+          description: Rule definitions and metadata.
+        NextToken:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: Pagination token.
+    GetSamplingStatisticSummariesRequest:
+      type: object
+      properties:
+        NextToken:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: Pagination token.
+    GetSamplingStatisticSummariesResult:
+      type: object
+      properties:
+        SamplingStatisticSummaries:
+          allOf:
+          - $ref: '#/components/schemas/SamplingStatisticSummaryList'
+          description: Information about the number of requests instrumented for each
+            sampling rule.
+        NextToken:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: Pagination token.
+    GetSamplingTargetsRequest:
+      type: object
+      properties:
+        SamplingStatisticsDocuments:
+          allOf:
+          - $ref: '#/components/schemas/SamplingStatisticsDocumentList'
+          description: Information about rules that the service is using to sample
+            requests.
+      required:
+      - SamplingStatisticsDocuments
+    GetSamplingTargetsResult:
+      type: object
+      properties:
+        SamplingTargetDocuments:
+          allOf:
+          - $ref: '#/components/schemas/SamplingTargetDocumentList'
+          description: Updated rules that the service should use to sample requests.
+        LastRuleModification:
+          allOf:
+          - $ref: '#/components/schemas/Timestamp'
+          description: The last time a user changed the sampling rule configuration.
+            If the sampling rule configuration changed since the service last retrieved
+            it, the service should call [GetSamplingRules](https://docs.aws.amazon.com/xray/latest/api/API_GetSamplingRules.html)
+            to get the latest version.
+        UnprocessedStatistics:
+          allOf:
+          - $ref: '#/components/schemas/UnprocessedStatisticsList'
+          description: Information about [SamplingStatisticsDocument](https://docs.aws.amazon.com/xray/latest/api/API_SamplingStatisticsDocument.html)
+            that X-Ray could not process.
+    GetServiceGraphRequest:
+      type: object
+      properties:
+        StartTime:
+          allOf:
+          - $ref: '#/components/schemas/Timestamp'
+          description: The start of the time frame for which to generate a graph.
+        EndTime:
+          allOf:
+          - $ref: '#/components/schemas/Timestamp'
+          description: The end of the timeframe for which to generate a graph.
+        GroupName:
+          allOf:
+          - $ref: '#/components/schemas/GroupName'
+          description: The name of a group based on which you want to generate a graph.
+        GroupARN:
+          allOf:
+          - $ref: '#/components/schemas/GroupARN'
+          description: The Amazon Resource Name (ARN) of a group based on which you
+            want to generate a graph.
+        NextToken:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: Pagination token.
+      required:
+      - StartTime
+      - EndTime
+    GetServiceGraphResult:
+      type: object
+      properties:
+        StartTime:
+          allOf:
+          - $ref: '#/components/schemas/Timestamp'
+          description: The start of the time frame for which the graph was generated.
+        EndTime:
+          allOf:
+          - $ref: '#/components/schemas/Timestamp'
+          description: The end of the time frame for which the graph was generated.
+        Services:
+          allOf:
+          - $ref: '#/components/schemas/ServiceList'
+          description: The services that have processed a traced request during the
+            specified time frame.
+        ContainsOldGroupVersions:
+          allOf:
+          - $ref: '#/components/schemas/Boolean'
+          description: A flag indicating whether the group's filter expression has
+            been consistent, or if the returned service graph may show traces from
+            an older version of the group's filter expression.
+        NextToken:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: Pagination token.
+    GetTimeSeriesServiceStatisticsRequest:
+      type: object
+      properties:
+        StartTime:
+          allOf:
+          - $ref: '#/components/schemas/Timestamp'
+          description: The start of the time frame for which to aggregate statistics.
+        EndTime:
+          allOf:
+          - $ref: '#/components/schemas/Timestamp'
+          description: The end of the time frame for which to aggregate statistics.
+        GroupName:
+          allOf:
+          - $ref: '#/components/schemas/GroupName'
+          description: The case-sensitive name of the group for which to pull statistics
+            from.
+        GroupARN:
+          allOf:
+          - $ref: '#/components/schemas/GroupARN'
+          description: The Amazon Resource Name (ARN) of the group for which to pull
+            statistics from.
+        EntitySelectorExpression:
+          allOf:
+          - $ref: '#/components/schemas/EntitySelectorExpression'
+          description: A filter expression defining entities that will be aggregated
+            for statistics. Supports ID, service, and edge functions. If no selector
+            expression is specified, edge statistics are returned.
+        Period:
+          allOf:
+          - $ref: '#/components/schemas/NullableInteger'
+          description: Aggregation period in seconds.
+        ForecastStatistics:
+          allOf:
+          - $ref: '#/components/schemas/NullableBoolean'
+          description: The forecasted high and low fault count values. Forecast enabled
+            requests require the EntitySelectorExpression ID be provided.
+        NextToken:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: Pagination token.
+      required:
+      - StartTime
+      - EndTime
+    GetTimeSeriesServiceStatisticsResult:
+      type: object
+      properties:
+        TimeSeriesServiceStatistics:
+          allOf:
+          - $ref: '#/components/schemas/TimeSeriesServiceStatisticsList'
+          description: The collection of statistics.
+        ContainsOldGroupVersions:
+          allOf:
+          - $ref: '#/components/schemas/Boolean'
+          description: A flag indicating whether or not a group's filter expression
+            has been consistent, or if a returned aggregation might show statistics
+            from an older version of the group's filter expression.
+        NextToken:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: Pagination token.
+    GetTraceGraphRequest:
+      type: object
+      properties:
+        TraceIds:
+          allOf:
+          - $ref: '#/components/schemas/TraceIdList'
+          description: Trace IDs of requests for which to generate a service graph.
+        NextToken:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: Pagination token.
+      required:
+      - TraceIds
+    GetTraceGraphResult:
+      type: object
+      properties:
+        Services:
+          allOf:
+          - $ref: '#/components/schemas/ServiceList'
+          description: The services that have processed one of the specified requests.
+        NextToken:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: Pagination token.
+    GetTraceSegmentDestinationRequest:
+      type: object
+      properties: {}
+    GetTraceSegmentDestinationResult:
+      type: object
+      properties:
+        Destination:
+          allOf:
+          - $ref: '#/components/schemas/TraceSegmentDestination'
+          description: Retrieves the current destination.
+        Status:
+          allOf:
+          - $ref: '#/components/schemas/TraceSegmentDestinationStatus'
+          description: Status of the retrieval.
+    GetTraceSummariesRequest:
+      type: object
+      properties:
+        StartTime:
+          allOf:
+          - $ref: '#/components/schemas/Timestamp'
+          description: The start of the time frame for which to retrieve traces.
+        EndTime:
+          allOf:
+          - $ref: '#/components/schemas/Timestamp'
+          description: The end of the time frame for which to retrieve traces.
+        TimeRangeType:
+          allOf:
+          - $ref: '#/components/schemas/TimeRangeType'
+          description: Query trace summaries by TraceId (trace start time), Event
+            (trace update time), or Service (trace segment end time).
+        Sampling:
+          allOf:
+          - $ref: '#/components/schemas/NullableBoolean'
+          description: Set to `true` to get summaries for only a subset of available
+            traces.
+        SamplingStrategy:
+          allOf:
+          - $ref: '#/components/schemas/SamplingStrategy'
+          description: A parameter to indicate whether to enable sampling on trace
+            summaries. Input parameters are Name and Value.
+        FilterExpression:
+          allOf:
+          - $ref: '#/components/schemas/FilterExpression'
+          description: Specify a filter expression to retrieve trace summaries for
+            services or requests that meet certain requirements.
+        NextToken:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: Specify the pagination token returned by a previous request
+            to retrieve the next page of results.
+      required:
+      - StartTime
+      - EndTime
+    GetTraceSummariesResult:
+      type: object
+      properties:
+        TraceSummaries:
+          allOf:
+          - $ref: '#/components/schemas/TraceSummaryList'
+          description: Trace IDs and annotations for traces that were found in the
+            specified time frame.
+        ApproximateTime:
+          allOf:
+          - $ref: '#/components/schemas/Timestamp'
+          description: The start time of this page of results.
+        TracesProcessedCount:
+          allOf:
+          - $ref: '#/components/schemas/NullableLong'
+          description: The total number of traces processed, including traces that
+            did not match the specified filter expression.
+        NextToken:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: If the requested time frame contained more than one page of
+            results, you can use this token to retrieve the next page. The first page
+            contains the most recent results, closest to the end of the time frame.
+    GraphLink:
+      type: object
+      properties:
+        ReferenceType:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: Relationship of a trace to the corresponding service.
+        SourceTraceId:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: Source trace of a link relationship.
+        DestinationTraceIds:
+          allOf:
+          - $ref: '#/components/schemas/TraceIdList'
+          description: Destination traces of a link relationship.
+      description: The relation between two services.
+    Group:
+      type: object
+      properties:
+        GroupName:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The unique case-sensitive name of the group.
+        GroupARN:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The Amazon Resource Name (ARN) of the group generated based
+            on the GroupName.
+        FilterExpression:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The filter expression defining the parameters to include traces.
+        InsightsConfiguration:
+          allOf:
+          - $ref: '#/components/schemas/InsightsConfiguration'
+          description: "The structure containing configurations related to insights.\n\
+            \n  * The InsightsEnabled boolean can be set to true to enable insights\
+            \ for the group or false to disable insights for the group.\n\n  * The\
+            \ NotificationsEnabled boolean can be set to true to enable insights notifications\
+            \ through Amazon EventBridge for the group."
+      description: Details and metadata for a group.
     GroupARN:
       type: string
       minLength: 1
@@ -193,6 +2654,31 @@ components:
       type: string
       minLength: 1
       maxLength: 32
+    GroupSummary:
+      type: object
+      properties:
+        GroupName:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The unique case-sensitive name of the group.
+        GroupARN:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The ARN of the group generated based on the GroupName.
+        FilterExpression:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The filter expression defining the parameters to include traces.
+        InsightsConfiguration:
+          allOf:
+          - $ref: '#/components/schemas/InsightsConfiguration'
+          description: "The structure containing configurations related to insights.\n\
+            \n  * The InsightsEnabled boolean can be set to true to enable insights\
+            \ for the group or false to disable insights for the group.\n\n  * The\
+            \ NotificationsEnabled boolean can be set to true to enable insights notifications.\
+            \ Notifications can only be enabled on a group with InsightsEnabled set\
+            \ to true."
+      description: Details for a group without metadata.
     GroupSummaryList:
       type: array
       items:
@@ -205,6 +2691,20 @@ components:
       type: array
       items:
         $ref: '#/components/schemas/HistogramEntry'
+    HistogramEntry:
+      type: object
+      properties:
+        Value:
+          allOf:
+          - $ref: '#/components/schemas/Double'
+          description: The value of the entry.
+        Count:
+          allOf:
+          - $ref: '#/components/schemas/Integer'
+          description: The prevalence of the entry.
+      description: An entry in a histogram for a statistic. A histogram maps the range
+        of observed values on the X axis, and the prevalence of each value on the
+        Y axis.
     Host:
       type: string
       minLength: 0
@@ -213,6 +2713,47 @@ components:
       type: string
       minLength: 0
       maxLength: 255
+    Http:
+      type: object
+      properties:
+        HttpURL:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The request URL.
+        HttpStatus:
+          allOf:
+          - $ref: '#/components/schemas/NullableInteger'
+          description: The response status.
+        HttpMethod:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The request method.
+        UserAgent:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The request's user agent string.
+        ClientIp:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The IP address of the requestor.
+      description: Information about an HTTP request.
+    IndexingRule:
+      type: object
+      properties:
+        Name:
+          allOf:
+          - $ref: '#/components/schemas/RuleName'
+          description: The name of the indexing rule.
+        ModifiedAt:
+          allOf:
+          - $ref: '#/components/schemas/Timestamp'
+          description: Displays when the rule was last modified, in Unix time seconds.
+        Rule:
+          allOf:
+          - $ref: '#/components/schemas/IndexingRuleValue'
+          description: The indexing rule.
+      description: Rule used to determine the server-side sampling rate for spans
+        ingested through the CloudWatchLogs destination and indexed by X-Ray.
     IndexingRuleList:
       type: array
       items:
@@ -233,6 +2774,63 @@ components:
           Indexing rule configuration that is used to probabilistically sample traceIds.
       description: |-
         Update to an indexing rule.
+    Insight:
+      type: object
+      properties:
+        InsightId:
+          allOf:
+          - $ref: '#/components/schemas/InsightId'
+          description: The insights unique identifier.
+        GroupARN:
+          allOf:
+          - $ref: '#/components/schemas/GroupARN'
+          description: The Amazon Resource Name (ARN) of the group that the insight
+            belongs to.
+        GroupName:
+          allOf:
+          - $ref: '#/components/schemas/GroupName'
+          description: The name of the group that the insight belongs to.
+        RootCauseServiceId:
+          $ref: '#/components/schemas/ServiceId'
+        Categories:
+          allOf:
+          - $ref: '#/components/schemas/InsightCategoryList'
+          description: The categories that label and describe the type of insight.
+        State:
+          allOf:
+          - $ref: '#/components/schemas/InsightState'
+          description: The current state of the insight.
+        StartTime:
+          allOf:
+          - $ref: '#/components/schemas/Timestamp'
+          description: The time, in Unix seconds, at which the insight began.
+        EndTime:
+          allOf:
+          - $ref: '#/components/schemas/Timestamp'
+          description: The time, in Unix seconds, at which the insight ended.
+        Summary:
+          allOf:
+          - $ref: '#/components/schemas/InsightSummaryText'
+          description: A brief description of the insight.
+        ClientRequestImpactStatistics:
+          allOf:
+          - $ref: '#/components/schemas/RequestImpactStatistics'
+          description: The impact statistics of the client side service. This includes
+            the number of requests to the client service and whether the requests
+            were faults or okay.
+        RootCauseServiceRequestImpactStatistics:
+          allOf:
+          - $ref: '#/components/schemas/RequestImpactStatistics'
+          description: The impact statistics of the root cause service. This includes
+            the number of requests to the client service and whether the requests
+            were faults or okay.
+        TopAnomalousServices:
+          allOf:
+          - $ref: '#/components/schemas/AnomalousServiceList'
+          description: The service within the insight that is most impacted by the
+            incident.
+      description: When fault rates go outside of the expected range, X-Ray creates
+        an insight. Insights tracks emergent issues within your applications.
     InsightCategory:
       type: string
       enum:
@@ -241,6 +2839,36 @@ components:
       type: array
       items:
         $ref: '#/components/schemas/InsightCategory'
+    InsightEvent:
+      type: object
+      properties:
+        Summary:
+          allOf:
+          - $ref: '#/components/schemas/EventSummaryText'
+          description: A brief description of the event.
+        EventTime:
+          allOf:
+          - $ref: '#/components/schemas/Timestamp'
+          description: The time, in Unix seconds, at which the event was recorded.
+        ClientRequestImpactStatistics:
+          allOf:
+          - $ref: '#/components/schemas/RequestImpactStatistics'
+          description: The impact statistics of the client side service. This includes
+            the number of requests to the client service and whether the requests
+            were faults or okay.
+        RootCauseServiceRequestImpactStatistics:
+          allOf:
+          - $ref: '#/components/schemas/RequestImpactStatistics'
+          description: The impact statistics of the root cause service. This includes
+            the number of requests to the client service and whether the requests
+            were faults or okay.
+        TopAnomalousServices:
+          allOf:
+          - $ref: '#/components/schemas/AnomalousServiceList'
+          description: The service during the event that is most impacted by the incident.
+      description: X-Ray reevaluates insights periodically until they are resolved,
+        and records each intermediate state in an event. You can review incident events
+        in the Impact Timeline on the Inspect page in the X-Ray console.
     InsightEventList:
       type: array
       items:
@@ -248,10 +2876,59 @@ components:
     InsightId:
       type: string
       pattern: ^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-5][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}$
+    InsightImpactGraphEdge:
+      type: object
+      properties:
+        ReferenceId:
+          allOf:
+          - $ref: '#/components/schemas/NullableInteger'
+          description: Identifier of the edge. Unique within a service map.
+      description: The connection between two service in an insight impact graph.
     InsightImpactGraphEdgeList:
       type: array
       items:
         $ref: '#/components/schemas/InsightImpactGraphEdge'
+    InsightImpactGraphService:
+      type: object
+      properties:
+        ReferenceId:
+          allOf:
+          - $ref: '#/components/schemas/NullableInteger'
+          description: Identifier for the service. Unique within the service map.
+        Type:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: "Identifier for the service. Unique within the service map.\n\
+            \n  * Amazon Web Services Resource - The type of an Amazon Web Services\
+            \ resource. For example, AWS::EC2::Instance for an application running\
+            \ on Amazon EC2 or AWS::DynamoDB::Table for an Amazon DynamoDB table that\
+            \ the application used. \n\n  * Amazon Web Services Service - The type\
+            \ of an Amazon Web Services service. For example, AWS::DynamoDB for downstream\
+            \ calls to Amazon DynamoDB that didn't target a specific table. \n\n \
+            \ * Amazon Web Services Service - The type of an Amazon Web Services service.\
+            \ For example, AWS::DynamoDB for downstream calls to Amazon DynamoDB that\
+            \ didn't target a specific table. \n\n  * remote - A downstream service\
+            \ of indeterminate type."
+        Name:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The canonical name of the service.
+        Names:
+          allOf:
+          - $ref: '#/components/schemas/ServiceNames'
+          description: A list of names for the service, including the canonical name.
+        AccountId:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: Identifier of the Amazon Web Services account in which the
+            service runs.
+        Edges:
+          allOf:
+          - $ref: '#/components/schemas/InsightImpactGraphEdgeList'
+          description: Connections to downstream services.
+      description: Information about an application that processed requests, users
+        that made requests, or downstream services, resources, and applications that
+        an application used.
     InsightImpactGraphServiceList:
       type: array
       items:
@@ -265,19 +2942,217 @@ components:
       type: array
       items:
         $ref: '#/components/schemas/InsightState'
+    InsightSummary:
+      type: object
+      properties:
+        InsightId:
+          allOf:
+          - $ref: '#/components/schemas/InsightId'
+          description: The insights unique identifier.
+        GroupARN:
+          allOf:
+          - $ref: '#/components/schemas/GroupARN'
+          description: The Amazon Resource Name (ARN) of the group that the insight
+            belongs to.
+        GroupName:
+          allOf:
+          - $ref: '#/components/schemas/GroupName'
+          description: The name of the group that the insight belongs to.
+        RootCauseServiceId:
+          $ref: '#/components/schemas/ServiceId'
+        Categories:
+          allOf:
+          - $ref: '#/components/schemas/InsightCategoryList'
+          description: Categories The categories that label and describe the type
+            of insight.
+        State:
+          allOf:
+          - $ref: '#/components/schemas/InsightState'
+          description: The current state of the insight.
+        StartTime:
+          allOf:
+          - $ref: '#/components/schemas/Timestamp'
+          description: The time, in Unix seconds, at which the insight began.
+        EndTime:
+          allOf:
+          - $ref: '#/components/schemas/Timestamp'
+          description: The time, in Unix seconds, at which the insight ended.
+        Summary:
+          allOf:
+          - $ref: '#/components/schemas/InsightSummaryText'
+          description: A brief description of the insight.
+        ClientRequestImpactStatistics:
+          allOf:
+          - $ref: '#/components/schemas/RequestImpactStatistics'
+          description: The impact statistics of the client side service. This includes
+            the number of requests to the client service and whether the requests
+            were faults or okay.
+        RootCauseServiceRequestImpactStatistics:
+          allOf:
+          - $ref: '#/components/schemas/RequestImpactStatistics'
+          description: The impact statistics of the root cause service. This includes
+            the number of requests to the client service and whether the requests
+            were faults or okay.
+        TopAnomalousServices:
+          allOf:
+          - $ref: '#/components/schemas/AnomalousServiceList'
+          description: The service within the insight that is most impacted by the
+            incident.
+        LastUpdateTime:
+          allOf:
+          - $ref: '#/components/schemas/Timestamp'
+          description: The time, in Unix seconds, that the insight was last updated.
+      description: Information that describes an insight.
     InsightSummaryList:
       type: array
       items:
         $ref: '#/components/schemas/InsightSummary'
     InsightSummaryText:
       type: string
+    InsightsConfiguration:
+      type: object
+      properties:
+        InsightsEnabled:
+          allOf:
+          - $ref: '#/components/schemas/NullableBoolean'
+          description: Set the InsightsEnabled value to true to enable insights or
+            false to disable insights.
+        NotificationsEnabled:
+          allOf:
+          - $ref: '#/components/schemas/NullableBoolean'
+          description: Set the NotificationsEnabled value to true to enable insights
+            notifications. Notifications can only be enabled on a group with InsightsEnabled
+            set to true.
+      description: The structure containing configurations related to insights.
+    InstanceIdDetail:
+      type: object
+      properties:
+        Id:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The ID of a corresponding EC2 instance.
+      description: A list of EC2 instance IDs corresponding to the segments in a trace.
     Integer:
       type: integer
       default: 0
+    InvalidPolicyRevisionIdException:
+      type: object
+      properties:
+        Message:
+          $ref: '#/components/schemas/ErrorMessage'
+      description: A policy revision id was provided which does not match the latest
+        policy revision. This exception is also if a policy revision id of 0 is provided
+        via `PutResourcePolicy` and a policy with the same name already exists.
+    InvalidRequestException:
+      type: object
+      properties:
+        Message:
+          $ref: '#/components/schemas/ErrorMessage'
+      description: The request is missing required parameters or has invalid parameters.
     LinksList:
       type: array
       items:
         $ref: '#/components/schemas/GraphLink'
+    ListResourcePoliciesRequest:
+      type: object
+      properties:
+        NextToken:
+          allOf:
+          - $ref: '#/components/schemas/ResourcePolicyNextToken'
+          description: Not currently supported.
+    ListResourcePoliciesResult:
+      type: object
+      properties:
+        ResourcePolicies:
+          allOf:
+          - $ref: '#/components/schemas/ResourcePolicyList'
+          description: The list of resource policies in the target Amazon Web Services
+            account.
+        NextToken:
+          allOf:
+          - $ref: '#/components/schemas/ResourcePolicyNextToken'
+          description: Pagination token. Not currently supported.
+    ListRetrievedTracesRequest:
+      type: object
+      properties:
+        RetrievalToken:
+          allOf:
+          - $ref: '#/components/schemas/RetrievalToken'
+          description: Retrieval token.
+        TraceFormat:
+          allOf:
+          - $ref: '#/components/schemas/TraceFormatType'
+          description: Format of the requested traces.
+        NextToken:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: Specify the pagination token returned by a previous request
+            to retrieve the next page of indexes.
+      required:
+      - RetrievalToken
+    ListRetrievedTracesResult:
+      type: object
+      properties:
+        RetrievalStatus:
+          allOf:
+          - $ref: '#/components/schemas/RetrievalStatus'
+          description: Status of the retrieval.
+        TraceFormat:
+          allOf:
+          - $ref: '#/components/schemas/TraceFormatType'
+          description: Format of the requested traces.
+        Traces:
+          allOf:
+          - $ref: '#/components/schemas/TraceSpanList'
+          description: Full traces for the specified requests.
+        NextToken:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: Specify the pagination token returned by a previous request
+            to retrieve the next page of indexes.
+    ListTagsForResourceRequest:
+      type: object
+      properties:
+        ResourceARN:
+          allOf:
+          - $ref: '#/components/schemas/AmazonResourceName'
+          description: The Amazon Resource Number (ARN) of an X-Ray group or sampling
+            rule.
+        NextToken:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: A pagination token. If multiple pages of results are returned,
+            use the `NextToken` value returned with the current page of results as
+            the value of this parameter to get the next page of results.
+      required:
+      - ResourceARN
+    ListTagsForResourceResponse:
+      type: object
+      properties:
+        Tags:
+          allOf:
+          - $ref: '#/components/schemas/TagList'
+          description: A list of tags, as key and value pairs, that is associated
+            with the specified X-Ray group or sampling rule.
+        NextToken:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: A pagination token. If multiple pages of results are returned,
+            use the `NextToken` value returned with the current page of results to
+            get the next page of results.
+    LockoutPreventionException:
+      type: object
+      properties:
+        Message:
+          $ref: '#/components/schemas/ErrorMessage'
+      description: The provided resource policy would prevent the caller of this request
+        from calling PutResourcePolicy in the future.
+    MalformedPolicyDocumentException:
+      type: object
+      properties:
+        Message:
+          $ref: '#/components/schemas/ErrorMessage'
+      description: Invalid policy document provided in request.
     NullableBoolean:
       type: boolean
     NullableDouble:
@@ -288,6 +3163,13 @@ components:
     NullableLong:
       type: integer
       format: int64
+    PolicyCountLimitExceededException:
+      type: object
+      properties:
+        Message:
+          $ref: '#/components/schemas/ErrorMessage'
+      description: Exceeded the maximum number of resource policies for a target Amazon
+        Web Services account.
     PolicyDocument:
       type: string
     PolicyName:
@@ -297,14 +3179,184 @@ components:
       maxLength: 128
     PolicyRevisionId:
       type: string
+    PolicySizeLimitExceededException:
+      type: object
+      properties:
+        Message:
+          $ref: '#/components/schemas/ErrorMessage'
+      description: Exceeded the maximum size for a resource policy.
     Priority:
       type: integer
       minimum: 1
       maximum: 9999
+    ProbabilisticRuleValue:
+      type: object
+      properties:
+        DesiredSamplingPercentage:
+          allOf:
+          - $ref: '#/components/schemas/NullableDouble'
+          description: Configured sampling percentage of traceIds. Note that sampling
+            can be subject to limits to ensure completeness of data.
+        ActualSamplingPercentage:
+          allOf:
+          - $ref: '#/components/schemas/NullableDouble'
+          description: Applied sampling percentage of traceIds.
+      required:
+      - DesiredSamplingPercentage
+      description: The indexing rule configuration for probabilistic sampling.
+    ProbabilisticRuleValueUpdate:
+      type: object
+      properties:
+        DesiredSamplingPercentage:
+          allOf:
+          - $ref: '#/components/schemas/NullableDouble'
+          description: Configured sampling percentage of traceIds. Note that sampling
+            can be subject to limits to ensure completeness of data.
+      required:
+      - DesiredSamplingPercentage
+      description: Update to the indexing rule configuration for probabilistic sampling.
+    PutEncryptionConfigRequest:
+      type: object
+      properties:
+        KeyId:
+          allOf:
+          - $ref: '#/components/schemas/EncryptionKeyId'
+          description: "An Amazon Web Services KMS key in one of the following formats:\n\
+            \n  * **Alias** \\- The name of the key. For example, `alias/MyKey`.\n\
+            \n  * **Key ID** \\- The KMS key ID of the key. For example, `ae4aa6d49-a4d8-9df9-a475-4ff6d7898456`.\
+            \ Amazon Web Services X-Ray does not support asymmetric KMS keys.\n\n\
+            \  * **ARN** \\- The full Amazon Resource Name of the key ID or alias.\
+            \ For example, `arn:aws:kms:us-east-2:123456789012:key/ae4aa6d49-a4d8-9df9-a475-4ff6d7898456`.\
+            \ Use this format to specify a key in a different account.\n\nOmit this\
+            \ key if you set `Type` to `NONE`."
+        Type:
+          allOf:
+          - $ref: '#/components/schemas/EncryptionType'
+          description: The type of encryption. Set to `KMS` to use your own key for
+            encryption. Set to `NONE` for default encryption.
+      required:
+      - Type
+    PutEncryptionConfigResult:
+      type: object
+      properties:
+        EncryptionConfig:
+          allOf:
+          - $ref: '#/components/schemas/EncryptionConfig'
+          description: The new encryption configuration.
+    PutResourcePolicyRequest:
+      type: object
+      properties:
+        PolicyName:
+          allOf:
+          - $ref: '#/components/schemas/PolicyName'
+          description: The name of the resource policy. Must be unique within a specific
+            Amazon Web Services account.
+        PolicyDocument:
+          allOf:
+          - $ref: '#/components/schemas/PolicyDocument'
+          description: The resource policy document, which can be up to 5kb in size.
+        PolicyRevisionId:
+          allOf:
+          - $ref: '#/components/schemas/PolicyRevisionId'
+          description: 'Specifies a specific policy revision, to ensure an atomic
+            create operation. By default the resource policy is created if it does
+            not exist, or updated with an incremented revision id. The revision id
+            is unique to each policy in the account.
+
+
+            If the policy revision id does not match the latest revision id, the operation
+            will fail with an `InvalidPolicyRevisionIdException` exception. You can
+            also provide a `PolicyRevisionId` of 0. In this case, the operation will
+            fail with an `InvalidPolicyRevisionIdException` exception if a resource
+            policy with the same name already exists.'
+        BypassPolicyLockoutCheck:
+          allOf:
+          - $ref: '#/components/schemas/Boolean'
+          description: 'A flag to indicate whether to bypass the resource policy lockout
+            safety check.
+
+
+            Setting this value to true increases the risk that the policy becomes
+            unmanageable. Do not set this value to true indiscriminately.
+
+
+            Use this parameter only when you include a policy in the request and you
+            intend to prevent the principal that is making the request from making
+            a subsequent `PutResourcePolicy` request.
+
+
+            The default value is false.'
+      required:
+      - PolicyName
+      - PolicyDocument
+    PutResourcePolicyResult:
+      type: object
+      properties:
+        ResourcePolicy:
+          allOf:
+          - $ref: '#/components/schemas/ResourcePolicy'
+          description: The resource policy document, as provided in the `PutResourcePolicyRequest`.
+    PutTelemetryRecordsRequest:
+      type: object
+      properties:
+        TelemetryRecords:
+          allOf:
+          - $ref: '#/components/schemas/TelemetryRecordList'
+          description: ''
+        EC2InstanceId:
+          allOf:
+          - $ref: '#/components/schemas/EC2InstanceId'
+          description: ''
+        Hostname:
+          allOf:
+          - $ref: '#/components/schemas/Hostname'
+          description: ''
+        ResourceARN:
+          allOf:
+          - $ref: '#/components/schemas/ResourceARN'
+          description: ''
+      required:
+      - TelemetryRecords
+    PutTelemetryRecordsResult:
+      type: object
+      properties: {}
+    PutTraceSegmentsRequest:
+      type: object
+      properties:
+        TraceSegmentDocuments:
+          allOf:
+          - $ref: '#/components/schemas/TraceSegmentDocumentList'
+          description: A string containing a JSON document defining one or more segments
+            or subsegments.
+      required:
+      - TraceSegmentDocuments
+    PutTraceSegmentsResult:
+      type: object
+      properties:
+        UnprocessedTraceSegments:
+          allOf:
+          - $ref: '#/components/schemas/UnprocessedTraceSegmentList'
+          description: Segments that failed processing.
     RequestCount:
       type: integer
       default: 0
       minimum: 0
+    RequestImpactStatistics:
+      type: object
+      properties:
+        FaultCount:
+          allOf:
+          - $ref: '#/components/schemas/NullableLong'
+          description: The number of requests that have resulted in a fault,
+        OkCount:
+          allOf:
+          - $ref: '#/components/schemas/NullableLong'
+          description: The number of successful requests.
+        TotalCount:
+          allOf:
+          - $ref: '#/components/schemas/NullableLong'
+          description: The total number of requests to the service.
+      description: Statistics that describe how the incident has impacted a service.
     ReservoirSize:
       type: integer
       default: 0
@@ -313,6 +3365,46 @@ components:
       type: string
       minLength: 0
       maxLength: 500
+    ResourceARNDetail:
+      type: object
+      properties:
+        ARN:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The ARN of a corresponding resource.
+      description: A list of resources ARNs corresponding to the segments in a trace.
+    ResourceNotFoundException:
+      type: object
+      properties:
+        Message:
+          $ref: '#/components/schemas/ErrorMessage'
+        ResourceName:
+          $ref: '#/components/schemas/AmazonResourceName'
+      description: The resource was not found. Verify that the name or Amazon Resource
+        Name (ARN) of the resource is correct.
+    ResourcePolicy:
+      type: object
+      properties:
+        PolicyName:
+          allOf:
+          - $ref: '#/components/schemas/PolicyName'
+          description: The name of the resource policy. Must be unique within a specific
+            Amazon Web Services account.
+        PolicyDocument:
+          allOf:
+          - $ref: '#/components/schemas/PolicyDocument'
+          description: The resource policy document, which can be up to 5kb in size.
+        PolicyRevisionId:
+          allOf:
+          - $ref: '#/components/schemas/PolicyRevisionId'
+          description: Returns the current policy revision id for this policy name.
+        LastUpdatedTime:
+          allOf:
+          - $ref: '#/components/schemas/Timestamp'
+          description: When the policy was last updated, in Unix time seconds.
+      description: A resource policy grants one or more Amazon Web Services services
+        and accounts permissions to access X-Ray. Each resource policy is associated
+        with a specific Amazon Web Services account.
     ResourcePolicyList:
       type: array
       items:
@@ -321,10 +3413,70 @@ components:
       type: string
       minLength: 1
       maxLength: 100
+    ResponseTimeRootCause:
+      type: object
+      properties:
+        Services:
+          allOf:
+          - $ref: '#/components/schemas/ResponseTimeRootCauseServices'
+          description: A list of corresponding services. A service identifies a segment
+            and contains a name, account ID, type, and inferred flag.
+        ClientImpacting:
+          allOf:
+          - $ref: '#/components/schemas/NullableBoolean'
+          description: A flag that denotes that the root cause impacts the trace client.
+      description: The root cause information for a response time warning.
+    ResponseTimeRootCauseEntity:
+      type: object
+      properties:
+        Name:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The name of the entity.
+        Coverage:
+          allOf:
+          - $ref: '#/components/schemas/NullableDouble'
+          description: The type and messages of the exceptions.
+        Remote:
+          allOf:
+          - $ref: '#/components/schemas/NullableBoolean'
+          description: A flag that denotes a remote subsegment.
+      description: A collection of segments and corresponding subsegments associated
+        to a response time warning.
     ResponseTimeRootCauseEntityPath:
       type: array
       items:
         $ref: '#/components/schemas/ResponseTimeRootCauseEntity'
+    ResponseTimeRootCauseService:
+      type: object
+      properties:
+        Name:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The service name.
+        Names:
+          allOf:
+          - $ref: '#/components/schemas/ServiceNames'
+          description: A collection of associated service names.
+        Type:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The type associated to the service.
+        AccountId:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The account ID associated to the service.
+        EntityPath:
+          allOf:
+          - $ref: '#/components/schemas/ResponseTimeRootCauseEntityPath'
+          description: The path of root cause entities found on the service.
+        Inferred:
+          allOf:
+          - $ref: '#/components/schemas/NullableBoolean'
+          description: A Boolean value indicating if the service is inferred from
+            the trace.
+      description: A collection of fields identifying the service in a response time
+        warning.
     ResponseTimeRootCauseServices:
       type: array
       items:
@@ -346,14 +3498,61 @@ components:
       type: string
       minLength: 0
       maxLength: 1020
+    RetrievedService:
+      type: object
+      properties:
+        Service:
+          $ref: '#/components/schemas/Service'
+        Links:
+          allOf:
+          - $ref: '#/components/schemas/LinksList'
+          description: Relation between two 2 services.
+      description: Retrieved information about an application that processed requests,
+        users that made requests, or downstream services, resources, and applications
+        that an application used.
     RetrievedServicesList:
       type: array
       items:
         $ref: '#/components/schemas/RetrievedService'
+    RetrievedTrace:
+      type: object
+      properties:
+        Id:
+          allOf:
+          - $ref: '#/components/schemas/TraceId'
+          description: The unique identifier for the span.
+        Duration:
+          allOf:
+          - $ref: '#/components/schemas/NullableDouble'
+          description: The length of time in seconds between the start time of the
+            root span and the end time of the last span that completed.
+        Spans:
+          allOf:
+          - $ref: '#/components/schemas/SpanList'
+          description: Spans that comprise the trace.
+      description: Retrieved collection of spans with matching trace IDs.
+    RootCauseException:
+      type: object
+      properties:
+        Name:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The name of the exception.
+        Message:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The message of the exception.
+      description: The exception associated with a root cause.
     RootCauseExceptions:
       type: array
       items:
         $ref: '#/components/schemas/RootCauseException'
+    RuleLimitExceededException:
+      type: object
+      properties:
+        Message:
+          $ref: '#/components/schemas/ErrorMessage'
+      description: You have reached the maximum number of sampling rules.
     RuleName:
       type: string
       minLength: 1
@@ -362,27 +3561,303 @@ components:
       type: integer
       default: 0
       minimum: 0
+    SamplingRule:
+      type: object
+      properties:
+        RuleName:
+          allOf:
+          - $ref: '#/components/schemas/RuleName'
+          description: The name of the sampling rule. Specify a rule by either name
+            or ARN, but not both.
+        RuleARN:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The ARN of the sampling rule. Specify a rule by either name
+            or ARN, but not both.
+        ResourceARN:
+          allOf:
+          - $ref: '#/components/schemas/ResourceARN'
+          description: Matches the ARN of the Amazon Web Services resource on which
+            the service runs.
+        Priority:
+          allOf:
+          - $ref: '#/components/schemas/Priority'
+          description: The priority of the sampling rule.
+        FixedRate:
+          allOf:
+          - $ref: '#/components/schemas/FixedRate'
+          description: The percentage of matching requests to instrument, after the
+            reservoir is exhausted.
+        ReservoirSize:
+          allOf:
+          - $ref: '#/components/schemas/ReservoirSize'
+          description: A fixed number of matching requests to instrument per second,
+            prior to applying the fixed rate. The reservoir is not used directly by
+            services, but applies to all services using the rule collectively.
+        ServiceName:
+          allOf:
+          - $ref: '#/components/schemas/ServiceName'
+          description: Matches the `name` that the service uses to identify itself
+            in segments.
+        ServiceType:
+          allOf:
+          - $ref: '#/components/schemas/ServiceType'
+          description: Matches the `origin` that the service uses to identify its
+            type in segments.
+        Host:
+          allOf:
+          - $ref: '#/components/schemas/Host'
+          description: Matches the hostname from a request URL.
+        HTTPMethod:
+          allOf:
+          - $ref: '#/components/schemas/HTTPMethod'
+          description: Matches the HTTP method of a request.
+        URLPath:
+          allOf:
+          - $ref: '#/components/schemas/URLPath'
+          description: Matches the path from a request URL.
+        Version:
+          allOf:
+          - $ref: '#/components/schemas/Version'
+          description: The version of the sampling rule format (`1`).
+        Attributes:
+          allOf:
+          - $ref: '#/components/schemas/AttributeMap'
+          description: Matches attributes derived from the request.
+      required:
+      - ResourceARN
+      - Priority
+      - FixedRate
+      - ReservoirSize
+      - ServiceName
+      - ServiceType
+      - Host
+      - HTTPMethod
+      - URLPath
+      - Version
+      description: A sampling rule that services use to decide whether to instrument
+        a request. Rule fields can match properties of the service, or properties
+        of a request. The service can ignore rules that don't match its properties.
+    SamplingRuleRecord:
+      type: object
+      properties:
+        SamplingRule:
+          allOf:
+          - $ref: '#/components/schemas/SamplingRule'
+          description: The sampling rule.
+        CreatedAt:
+          allOf:
+          - $ref: '#/components/schemas/Timestamp'
+          description: When the rule was created.
+        ModifiedAt:
+          allOf:
+          - $ref: '#/components/schemas/Timestamp'
+          description: When the rule was last modified.
+      description: A [SamplingRule](https://docs.aws.amazon.com/xray/latest/api/API_SamplingRule.html)
+        and its metadata.
     SamplingRuleRecordList:
       type: array
       items:
         $ref: '#/components/schemas/SamplingRuleRecord'
+    SamplingRuleUpdate:
+      type: object
+      properties:
+        RuleName:
+          allOf:
+          - $ref: '#/components/schemas/RuleName'
+          description: The name of the sampling rule. Specify a rule by either name
+            or ARN, but not both.
+        RuleARN:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The ARN of the sampling rule. Specify a rule by either name
+            or ARN, but not both.
+        ResourceARN:
+          allOf:
+          - $ref: '#/components/schemas/ResourceARN'
+          description: Matches the ARN of the Amazon Web Services resource on which
+            the service runs.
+        Priority:
+          allOf:
+          - $ref: '#/components/schemas/NullableInteger'
+          description: The priority of the sampling rule.
+        FixedRate:
+          allOf:
+          - $ref: '#/components/schemas/NullableDouble'
+          description: The percentage of matching requests to instrument, after the
+            reservoir is exhausted.
+        ReservoirSize:
+          allOf:
+          - $ref: '#/components/schemas/NullableInteger'
+          description: A fixed number of matching requests to instrument per second,
+            prior to applying the fixed rate. The reservoir is not used directly by
+            services, but applies to all services using the rule collectively.
+        Host:
+          allOf:
+          - $ref: '#/components/schemas/Host'
+          description: Matches the hostname from a request URL.
+        ServiceName:
+          allOf:
+          - $ref: '#/components/schemas/ServiceName'
+          description: Matches the `name` that the service uses to identify itself
+            in segments.
+        ServiceType:
+          allOf:
+          - $ref: '#/components/schemas/ServiceType'
+          description: Matches the `origin` that the service uses to identify its
+            type in segments.
+        HTTPMethod:
+          allOf:
+          - $ref: '#/components/schemas/HTTPMethod'
+          description: Matches the HTTP method of a request.
+        URLPath:
+          allOf:
+          - $ref: '#/components/schemas/URLPath'
+          description: Matches the path from a request URL.
+        Attributes:
+          allOf:
+          - $ref: '#/components/schemas/AttributeMap'
+          description: Matches attributes derived from the request.
+      description: A document specifying changes to a sampling rule's configuration.
+    SamplingStatisticSummary:
+      type: object
+      properties:
+        RuleName:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The name of the sampling rule.
+        Timestamp:
+          allOf:
+          - $ref: '#/components/schemas/Timestamp'
+          description: The start time of the reporting window.
+        RequestCount:
+          allOf:
+          - $ref: '#/components/schemas/Integer'
+          description: The number of requests that matched the rule.
+        BorrowCount:
+          allOf:
+          - $ref: '#/components/schemas/Integer'
+          description: The number of requests recorded with borrowed reservoir quota.
+        SampledCount:
+          allOf:
+          - $ref: '#/components/schemas/Integer'
+          description: The number of requests recorded.
+      description: Aggregated request sampling data for a sampling rule across all
+        services for a 10-second window.
     SamplingStatisticSummaryList:
       type: array
       items:
         $ref: '#/components/schemas/SamplingStatisticSummary'
+    SamplingStatisticsDocument:
+      type: object
+      properties:
+        RuleName:
+          allOf:
+          - $ref: '#/components/schemas/RuleName'
+          description: The name of the sampling rule.
+        ClientID:
+          allOf:
+          - $ref: '#/components/schemas/ClientID'
+          description: A unique identifier for the service in hexadecimal.
+        Timestamp:
+          allOf:
+          - $ref: '#/components/schemas/Timestamp'
+          description: The current time.
+        RequestCount:
+          allOf:
+          - $ref: '#/components/schemas/RequestCount'
+          description: The number of requests that matched the rule.
+        SampledCount:
+          allOf:
+          - $ref: '#/components/schemas/SampledCount'
+          description: The number of requests recorded.
+        BorrowCount:
+          allOf:
+          - $ref: '#/components/schemas/BorrowCount'
+          description: The number of requests recorded with borrowed reservoir quota.
+      required:
+      - RuleName
+      - ClientID
+      - Timestamp
+      - RequestCount
+      - SampledCount
+      description: Request sampling results for a single rule from a service. Results
+        are for the last 10 seconds unless the service has been assigned a longer
+        reporting interval after a previous call to [GetSamplingTargets](https://docs.aws.amazon.com/xray/latest/api/API_GetSamplingTargets.html).
     SamplingStatisticsDocumentList:
       type: array
       items:
         $ref: '#/components/schemas/SamplingStatisticsDocument'
+    SamplingStrategy:
+      type: object
+      properties:
+        Name:
+          allOf:
+          - $ref: '#/components/schemas/SamplingStrategyName'
+          description: The name of a sampling rule.
+        Value:
+          allOf:
+          - $ref: '#/components/schemas/NullableDouble'
+          description: The value of a sampling rule.
+      description: The name and value of a sampling rule to apply to a trace summary.
     SamplingStrategyName:
       type: string
       enum:
       - PartialScan
       - FixedRate
+    SamplingTargetDocument:
+      type: object
+      properties:
+        RuleName:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The name of the sampling rule.
+        FixedRate:
+          allOf:
+          - $ref: '#/components/schemas/Double'
+          description: The percentage of matching requests to instrument, after the
+            reservoir is exhausted.
+        ReservoirQuota:
+          allOf:
+          - $ref: '#/components/schemas/NullableInteger'
+          description: The number of requests per second that X-Ray allocated for
+            this service.
+        ReservoirQuotaTTL:
+          allOf:
+          - $ref: '#/components/schemas/Timestamp'
+          description: When the reservoir quota expires.
+        Interval:
+          allOf:
+          - $ref: '#/components/schemas/NullableInteger'
+          description: The number of seconds for the service to wait before getting
+            sampling targets again.
+      description: Temporary changes to a sampling rule configuration. To meet the
+        global sampling target for a rule, X-Ray calculates a new reservoir for each
+        service based on the recent sampling results of all services that called [GetSamplingTargets](https://docs.aws.amazon.com/xray/latest/api/API_GetSamplingTargets.html).
     SamplingTargetDocumentList:
       type: array
       items:
         $ref: '#/components/schemas/SamplingTargetDocument'
+    Segment:
+      type: object
+      properties:
+        Id:
+          allOf:
+          - $ref: '#/components/schemas/SegmentId'
+          description: The segment's ID.
+        Document:
+          allOf:
+          - $ref: '#/components/schemas/SegmentDocument'
+          description: The segment document.
+      description: 'A segment from a trace that has been ingested by the X-Ray service.
+        The segment can be compiled from documents uploaded with [PutTraceSegments](https://docs.aws.amazon.com/xray/latest/api/API_PutTraceSegments.html),
+        or an `inferred` segment for a downstream service, generated from a subsegment
+        sent by the service that called it.
+
+
+        For the full segment document schema, see [Amazon Web Services X-Ray segment
+        documents](https://docs.aws.amazon.com/xray/latest/devguide/aws-xray-interface-api.html#xray-api-segmentdocuments)
+        in the _Amazon Web Services X-Ray Developer Guide_.'
     SegmentDocument:
       type: string
       minLength: 1
@@ -392,6 +3867,94 @@ components:
       type: array
       items:
         $ref: '#/components/schemas/Segment'
+    Service:
+      type: object
+      properties:
+        ReferenceId:
+          allOf:
+          - $ref: '#/components/schemas/NullableInteger'
+          description: Identifier for the service. Unique within the service map.
+        Name:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The canonical name of the service.
+        Names:
+          allOf:
+          - $ref: '#/components/schemas/ServiceNames'
+          description: A list of names for the service, including the canonical name.
+        Root:
+          allOf:
+          - $ref: '#/components/schemas/NullableBoolean'
+          description: Indicates that the service was the first service to process
+            a request.
+        AccountId:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: Identifier of the Amazon Web Services account in which the
+            service runs.
+        Type:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: "The type of service.\n\n  * Amazon Web Services Resource -\
+            \ The type of an Amazon Web Services resource. For example, `AWS::EC2::Instance`\
+            \ for an application running on Amazon EC2 or `AWS::DynamoDB::Table` for\
+            \ an Amazon DynamoDB table that the application used.\n\n  * Amazon Web\
+            \ Services Service - The type of an Amazon Web Services service. For example,\
+            \ `AWS::DynamoDB` for downstream calls to Amazon DynamoDB that didn't\
+            \ target a specific table.\n\n  * `client` \\- Represents the clients\
+            \ that sent requests to a root service.\n\n  * `remote` \\- A downstream\
+            \ service of indeterminate type."
+        State:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The service's state.
+        StartTime:
+          allOf:
+          - $ref: '#/components/schemas/Timestamp'
+          description: The start time of the first segment that the service generated.
+        EndTime:
+          allOf:
+          - $ref: '#/components/schemas/Timestamp'
+          description: The end time of the last segment that the service generated.
+        Edges:
+          allOf:
+          - $ref: '#/components/schemas/EdgeList'
+          description: Connections to downstream services.
+        SummaryStatistics:
+          allOf:
+          - $ref: '#/components/schemas/ServiceStatistics'
+          description: Aggregated statistics for the service.
+        DurationHistogram:
+          allOf:
+          - $ref: '#/components/schemas/Histogram'
+          description: A histogram that maps the spread of service durations.
+        ResponseTimeHistogram:
+          allOf:
+          - $ref: '#/components/schemas/Histogram'
+          description: A histogram that maps the spread of service response times.
+      description: Information about an application that processed requests, users
+        that made requests, or downstream services, resources, and applications that
+        an application used.
+    ServiceId:
+      type: object
+      properties:
+        Name:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: ''
+        Names:
+          allOf:
+          - $ref: '#/components/schemas/ServiceNames'
+          description: ''
+        AccountId:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: ''
+        Type:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: ''
+      description: ''
     ServiceIds:
       type: array
       items:
@@ -408,10 +3971,50 @@ components:
       type: array
       items:
         $ref: '#/components/schemas/String'
+    ServiceStatistics:
+      type: object
+      properties:
+        OkCount:
+          allOf:
+          - $ref: '#/components/schemas/NullableLong'
+          description: The number of requests that completed with a 2xx Success status
+            code.
+        ErrorStatistics:
+          allOf:
+          - $ref: '#/components/schemas/ErrorStatistics'
+          description: Information about requests that failed with a 4xx Client Error
+            status code.
+        FaultStatistics:
+          allOf:
+          - $ref: '#/components/schemas/FaultStatistics'
+          description: Information about requests that failed with a 5xx Server Error
+            status code.
+        TotalCount:
+          allOf:
+          - $ref: '#/components/schemas/NullableLong'
+          description: The total number of completed requests.
+        TotalResponseTime:
+          allOf:
+          - $ref: '#/components/schemas/NullableDouble'
+          description: The aggregate response time of completed requests.
+      description: Response statistics for a service.
     ServiceType:
       type: string
       minLength: 0
       maxLength: 64
+    Span:
+      type: object
+      properties:
+        Id:
+          allOf:
+          - $ref: '#/components/schemas/SpanId'
+          description: The span ID.
+        Document:
+          allOf:
+          - $ref: '#/components/schemas/SpanDocument'
+          description: The span document.
+      description: A span from a trace that has been ingested by the X-Ray service.
+        A span represents a unit of work or an operation performed by a service.
     SpanDocument:
       type: string
       minLength: 0
@@ -424,8 +4027,66 @@ components:
       type: array
       items:
         $ref: '#/components/schemas/Span'
+    StartTraceRetrievalRequest:
+      type: object
+      properties:
+        TraceIds:
+          allOf:
+          - $ref: '#/components/schemas/TraceIdListForRetrieval'
+          description: Specify the trace IDs of the traces to be retrieved.
+        StartTime:
+          allOf:
+          - $ref: '#/components/schemas/Timestamp'
+          description: The start of the time range to retrieve traces. The range is
+            inclusive, so the specified start time is included in the query. Specified
+            as epoch time, the number of seconds since January 1, 1970, 00:00:00 UTC.
+        EndTime:
+          allOf:
+          - $ref: '#/components/schemas/Timestamp'
+          description: The end of the time range to retrieve traces. The range is
+            inclusive, so the specified end time is included in the query. Specified
+            as epoch time, the number of seconds since January 1, 1970, 00:00:00 UTC.
+      required:
+      - TraceIds
+      - StartTime
+      - EndTime
+    StartTraceRetrievalResult:
+      type: object
+      properties:
+        RetrievalToken:
+          allOf:
+          - $ref: '#/components/schemas/RetrievalToken'
+          description: Retrieval token.
     String:
       type: string
+    Tag:
+      type: object
+      properties:
+        Key:
+          allOf:
+          - $ref: '#/components/schemas/TagKey'
+          description: 'A tag key, such as `Stage` or `Name`. A tag key cannot be
+            empty. The key can be a maximum of 128 characters, and can contain only
+            Unicode letters, numbers, or separators, or the following special characters:
+            `+ - = . _ : /`'
+        Value:
+          allOf:
+          - $ref: '#/components/schemas/TagValue'
+          description: 'An optional tag value, such as `Production` or `test-only`.
+            The value can be a maximum of 255 characters, and contain only Unicode
+            letters, numbers, or separators, or the following special characters:
+            `+ - = . _ : /`'
+      required:
+      - Key
+      - Value
+      description: "A map that contains tag keys and tag values to attach to an Amazon\
+        \ Web Services X-Ray group or sampling rule. For more information about ways\
+        \ to use tags, see [Tagging Amazon Web Services resources](https://docs.aws.amazon.com/general/latest/gr/aws_tagging.html)\
+        \ in the _Amazon Web Services General Reference_.\n\nThe following restrictions\
+        \ apply to tags:\n\n  * Maximum number of user-applied tags per resource:\
+        \ 50\n\n  * Tag keys and values are case sensitive.\n\n  * Don't use `aws:`\
+        \ as a prefix for keys; it's reserved for Amazon Web Services use. You cannot\
+        \ edit or delete system tags."
     TagKey:
       type: string
       minLength: 1
@@ -438,20 +4099,104 @@ components:
       type: array
       items:
         $ref: '#/components/schemas/Tag'
+    TagResourceRequest:
+      type: object
+      properties:
+        ResourceARN:
+          allOf:
+          - $ref: '#/components/schemas/AmazonResourceName'
+          description: The Amazon Resource Number (ARN) of an X-Ray group or sampling
+            rule.
+        Tags:
+          allOf:
+          - $ref: '#/components/schemas/TagList'
+          description: "A map that contains one or more tag keys and tag values to\
+            \ attach to an X-Ray group or sampling rule. For more information about\
+            \ ways to use tags, see [Tagging Amazon Web Services resources](https://docs.aws.amazon.com/general/latest/gr/aws_tagging.html)\
+            \ in the _Amazon Web Services General Reference_.\n\nThe following restrictions\
+            \ apply to tags:\n\n  * Maximum number of user-applied tags per resource:\
+            \ 50\n\n  * Maximum tag key length: 128 Unicode characters\n\n  * Maximum\
+            \ tag value length: 256 Unicode characters\n\n  * Valid values for key\
+            \ and value: a-z, A-Z, 0-9, space, and the following characters: _ . :\
+            \ / = + - and @\n\n  * Tag keys and values are case sensitive.\n\n  *\
+            \ Don't use `aws:` as a prefix for keys; it's reserved for Amazon Web\
+            \ Services use. You cannot edit or delete system tags."
+      required:
+      - ResourceARN
+      - Tags
+    TagResourceResponse:
+      type: object
+      properties: {}
     TagValue:
       type: string
       minLength: 0
       maxLength: 256
+    TelemetryRecord:
+      type: object
+      properties:
+        Timestamp:
+          allOf:
+          - $ref: '#/components/schemas/Timestamp'
+          description: ''
+        SegmentsReceivedCount:
+          allOf:
+          - $ref: '#/components/schemas/NullableInteger'
+          description: ''
+        SegmentsSentCount:
+          allOf:
+          - $ref: '#/components/schemas/NullableInteger'
+          description: ''
+        SegmentsSpilloverCount:
+          allOf:
+          - $ref: '#/components/schemas/NullableInteger'
+          description: ''
+        SegmentsRejectedCount:
+          allOf:
+          - $ref: '#/components/schemas/NullableInteger'
+          description: ''
+        BackendConnectionErrors:
+          allOf:
+          - $ref: '#/components/schemas/BackendConnectionErrors'
+          description: ''
+      required:
+      - Timestamp
+      description: ''
     TelemetryRecordList:
       type: array
       items:
         $ref: '#/components/schemas/TelemetryRecord'
+    ThrottledException:
+      type: object
+      properties:
+        Message:
+          $ref: '#/components/schemas/ErrorMessage'
+      description: The request exceeds the maximum number of requests per second.
     TimeRangeType:
       type: string
       enum:
       - TraceId
       - Event
       - Service
+    TimeSeriesServiceStatistics:
+      type: object
+      properties:
+        Timestamp:
+          allOf:
+          - $ref: '#/components/schemas/Timestamp'
+          description: Timestamp of the window for which statistics are aggregated.
+        EdgeSummaryStatistics:
+          $ref: '#/components/schemas/EdgeStatistics'
+        ServiceSummaryStatistics:
+          $ref: '#/components/schemas/ServiceStatistics'
+        ServiceForecastStatistics:
+          allOf:
+          - $ref: '#/components/schemas/ForecastStatistics'
+          description: The forecasted high and low fault count values.
+        ResponseTimeHistogram:
+          allOf:
+          - $ref: '#/components/schemas/Histogram'
+          description: The response time histogram for the selected entities.
+      description: A list of TimeSeriesStatistic structures.
     TimeSeriesServiceStatisticsList:
       type: array
       items:
@@ -463,6 +4208,41 @@ components:
       type: string
       minLength: 1
       maxLength: 2000
+    TooManyTagsException:
+      type: object
+      properties:
+        Message:
+          $ref: '#/components/schemas/ErrorMessage'
+        ResourceName:
+          $ref: '#/components/schemas/AmazonResourceName'
+      description: You have exceeded the maximum number of tags you can apply to this
+        resource.
+    Trace:
+      type: object
+      properties:
+        Id:
+          allOf:
+          - $ref: '#/components/schemas/TraceId'
+          description: The unique identifier for the request that generated the trace's
+            segments and subsegments.
+        Duration:
+          allOf:
+          - $ref: '#/components/schemas/NullableDouble'
+          description: The length of time in seconds between the start time of the
+            root segment and the end time of the last segment that completed.
+        LimitExceeded:
+          allOf:
+          - $ref: '#/components/schemas/NullableBoolean'
+          description: LimitExceeded is set to true when the trace has exceeded the
+            `Trace document size` limit. For more information about this limit and
+            other X-Ray limits and quotas, see [Amazon Web Services X-Ray endpoints
+            and quotas](https://docs.aws.amazon.com/general/latest/gr/xray.html).
+        Segments:
+          allOf:
+          - $ref: '#/components/schemas/SegmentList'
+          description: Segment documents for the segments and subsegments that comprise
+            the trace.
+      description: A collection of segment documents with matching trace IDs.
     TraceAvailabilityZones:
       type: array
       items:
@@ -516,10 +4296,123 @@ components:
       type: array
       items:
         $ref: '#/components/schemas/RetrievedTrace'
+    TraceSummary:
+      type: object
+      properties:
+        Id:
+          allOf:
+          - $ref: '#/components/schemas/TraceId'
+          description: The unique identifier for the request that generated the trace's
+            segments and subsegments.
+        StartTime:
+          allOf:
+          - $ref: '#/components/schemas/Timestamp'
+          description: The start time of a trace, based on the earliest trace segment
+            start time.
+        Duration:
+          allOf:
+          - $ref: '#/components/schemas/NullableDouble'
+          description: The length of time in seconds between the start time of the
+            root segment and the end time of the last segment that completed.
+        ResponseTime:
+          allOf:
+          - $ref: '#/components/schemas/NullableDouble'
+          description: The length of time in seconds between the start and end times
+            of the root segment. If the service performs work asynchronously, the
+            response time measures the time before the response is sent to the user,
+            while the duration measures the amount of time before the last traced
+            activity completes.
+        HasFault:
+          allOf:
+          - $ref: '#/components/schemas/NullableBoolean'
+          description: The root segment document has a 500 series error.
+        HasError:
+          allOf:
+          - $ref: '#/components/schemas/NullableBoolean'
+          description: The root segment document has a 400 series error.
+        HasThrottle:
+          allOf:
+          - $ref: '#/components/schemas/NullableBoolean'
+          description: One or more of the segment documents has a 429 throttling error.
+        IsPartial:
+          allOf:
+          - $ref: '#/components/schemas/NullableBoolean'
+          description: One or more of the segment documents is in progress.
+        Http:
+          allOf:
+          - $ref: '#/components/schemas/Http'
+          description: Information about the HTTP request served by the trace.
+        Annotations:
+          allOf:
+          - $ref: '#/components/schemas/Annotations'
+          description: Annotations from the trace's segment documents.
+        Users:
+          allOf:
+          - $ref: '#/components/schemas/TraceUsers'
+          description: Users from the trace's segment documents.
+        ServiceIds:
+          allOf:
+          - $ref: '#/components/schemas/ServiceIds'
+          description: Service IDs from the trace's segment documents.
+        ResourceARNs:
+          allOf:
+          - $ref: '#/components/schemas/TraceResourceARNs'
+          description: A list of resource ARNs for any resource corresponding to the
+            trace segments.
+        InstanceIds:
+          allOf:
+          - $ref: '#/components/schemas/TraceInstanceIds'
+          description: A list of EC2 instance IDs for any instance corresponding to
+            the trace segments.
+        AvailabilityZones:
+          allOf:
+          - $ref: '#/components/schemas/TraceAvailabilityZones'
+          description: A list of Availability Zones for any zone corresponding to
+            the trace segments.
+        EntryPoint:
+          allOf:
+          - $ref: '#/components/schemas/ServiceId'
+          description: The root of a trace.
+        FaultRootCauses:
+          allOf:
+          - $ref: '#/components/schemas/FaultRootCauses'
+          description: A collection of FaultRootCause structures corresponding to
+            the trace segments.
+        ErrorRootCauses:
+          allOf:
+          - $ref: '#/components/schemas/ErrorRootCauses'
+          description: A collection of ErrorRootCause structures corresponding to
+            the trace segments.
+        ResponseTimeRootCauses:
+          allOf:
+          - $ref: '#/components/schemas/ResponseTimeRootCauses'
+          description: A collection of ResponseTimeRootCause structures corresponding
+            to the trace segments.
+        Revision:
+          allOf:
+          - $ref: '#/components/schemas/Integer'
+          description: The revision number of a trace.
+        MatchedEventTime:
+          allOf:
+          - $ref: '#/components/schemas/Timestamp'
+          description: The matched time stamp of a defined event.
+      description: Metadata generated from the segment documents in a trace.
     TraceSummaryList:
       type: array
       items:
         $ref: '#/components/schemas/TraceSummary'
+    TraceUser:
+      type: object
+      properties:
+        UserName:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The user's name.
+        ServiceIds:
+          allOf:
+          - $ref: '#/components/schemas/ServiceIds'
+          description: Services that the user's request hit.
+      description: Information about a user recorded in segment documents.
     TraceUsers:
       type: array
       items:
@@ -528,6 +4421,23 @@ components:
       type: string
       minLength: 0
       maxLength: 128
+    UnprocessedStatistics:
+      type: object
+      properties:
+        RuleName:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The name of the sampling rule.
+        ErrorCode:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The error code.
+        Message:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The error message.
+      description: Sampling statistics from a call to [GetSamplingTargets](https://docs.aws.amazon.com/xray/latest/api/API_GetSamplingTargets.html)
+        that X-Ray could not process.
     UnprocessedStatisticsList:
       type: array
       items:
@@ -536,10 +4446,146 @@ components:
       type: array
       items:
         $ref: '#/components/schemas/TraceId'
+    UnprocessedTraceSegment:
+      type: object
+      properties:
+        Id:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The segment's ID.
+        ErrorCode:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The error that caused processing to fail.
+        Message:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The error message.
+      description: Information about a segment that failed processing.
     UnprocessedTraceSegmentList:
       type: array
       items:
         $ref: '#/components/schemas/UnprocessedTraceSegment'
+    UntagResourceRequest:
+      type: object
+      properties:
+        ResourceARN:
+          allOf:
+          - $ref: '#/components/schemas/AmazonResourceName'
+          description: The Amazon Resource Number (ARN) of an X-Ray group or sampling
+            rule.
+        TagKeys:
+          allOf:
+          - $ref: '#/components/schemas/TagKeyList'
+          description: Keys for one or more tags that you want to remove from an X-Ray
+            group or sampling rule.
+      required:
+      - ResourceARN
+      - TagKeys
+    UntagResourceResponse:
+      type: object
+      properties: {}
+    UpdateGroupRequest:
+      type: object
+      properties:
+        GroupName:
+          allOf:
+          - $ref: '#/components/schemas/GroupName'
+          description: The case-sensitive name of the group.
+        GroupARN:
+          allOf:
+          - $ref: '#/components/schemas/GroupARN'
+          description: The ARN that was generated upon creation.
+        FilterExpression:
+          allOf:
+          - $ref: '#/components/schemas/FilterExpression'
+          description: The updated filter expression defining criteria by which to
+            group traces.
+        InsightsConfiguration:
+          allOf:
+          - $ref: '#/components/schemas/InsightsConfiguration'
+          description: "The structure containing configurations related to insights.\n\
+            \n  * The InsightsEnabled boolean can be set to true to enable insights\
+            \ for the group or false to disable insights for the group.\n\n  * The\
+            \ NotificationsEnabled boolean can be set to true to enable insights notifications\
+            \ for the group. Notifications can only be enabled on a group with InsightsEnabled\
+            \ set to true."
+    UpdateGroupResult:
+      type: object
+      properties:
+        Group:
+          allOf:
+          - $ref: '#/components/schemas/Group'
+          description: The group that was updated. Contains the name of the group
+            that was updated, the ARN of the group that was updated, the updated filter
+            expression, and the updated insight configuration assigned to the group.
+    UpdateIndexingRuleRequest:
+      type: object
+      properties:
+        Name:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: Name of the indexing rule to be updated.
+        Rule:
+          allOf:
+          - $ref: '#/components/schemas/IndexingRuleValueUpdate'
+          description: Rule configuration to be updated.
+      required:
+      - Name
+      - Rule
+    UpdateIndexingRuleResult:
+      type: object
+      properties:
+        IndexingRule:
+          allOf:
+          - $ref: '#/components/schemas/IndexingRule'
+          description: Updated indexing rule.
+    UpdateSamplingRuleRequest:
+      type: object
+      properties:
+        SamplingRuleUpdate:
+          allOf:
+          - $ref: '#/components/schemas/SamplingRuleUpdate'
+          description: The rule and fields to change.
+      required:
+      - SamplingRuleUpdate
+    UpdateSamplingRuleResult:
+      type: object
+      properties:
+        SamplingRuleRecord:
+          allOf:
+          - $ref: '#/components/schemas/SamplingRuleRecord'
+          description: The updated rule definition and metadata.
+    UpdateTraceSegmentDestinationRequest:
+      type: object
+      properties:
+        Destination:
+          allOf:
+          - $ref: '#/components/schemas/TraceSegmentDestination'
+          description: The configured destination of trace segments.
+    UpdateTraceSegmentDestinationResult:
+      type: object
+      properties:
+        Destination:
+          allOf:
+          - $ref: '#/components/schemas/TraceSegmentDestination'
+          description: The destination of the trace segments.
+        Status:
+          allOf:
+          - $ref: '#/components/schemas/TraceSegmentDestinationStatus'
+          description: The status of the update.
+    ValueWithServiceIds:
+      type: object
+      properties:
+        AnnotationValue:
+          allOf:
+          - $ref: '#/components/schemas/AnnotationValue'
+          description: Values of the annotation.
+        ServiceIds:
+          allOf:
+          - $ref: '#/components/schemas/ServiceIds'
+          description: Services to which the annotation applies.
+      description: Information about a segment annotation.
     ValuesWithServiceIds:
       type: array
       items:

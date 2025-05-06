@@ -7,7 +7,7 @@ info:
   x-stackql-serviceName: chime_sdk_meetings
   x-aws-serviceName: chimesdkmeetings
   x-aws-protocol: aws.protocols#restJson1
-  x-dateGenerated: '2025-05-05'
+  x-dateGenerated: '2025-05-07'
   version: '2021-07-15'
   title: Amazon Chime SDK Meetings
   description: |-
@@ -43,7 +43,1212 @@ servers:
       - sa-east-1
       - me-south-1
       default: us-east-1
-paths: {}
+paths:
+  /meetings/{MeetingId}/attendees?operation=batch-create:
+    post:
+      operationId: BatchCreateAttendee
+      description: |-
+        Creates up to 100 attendees for an active Amazon Chime SDK meeting. For more information about the Amazon Chime SDK, see [Using the Amazon Chime SDK](https://docs.aws.amazon.com/chime/latest/dg/meetings-sdk.html) in the _Amazon Chime Developer Guide_.
+      parameters:
+      - name: MeetingId
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/GuidString'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                Attendees:
+                  $ref: '#/components/schemas/CreateAttendeeRequestItemList'
+      responses:
+        '200': {}
+        '400':
+          description: |-
+            The request exceeds the resource limit.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LimitExceededException'
+        '403':
+          description: |-
+            The client is permanently forbidden from making the request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ForbiddenException'
+        '404':
+          description: |-
+            One or more of the resources in the request does not exist in the system.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFoundException'
+        '500':
+          description: |-
+            The service encountered an unexpected error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServiceFailureException'
+        '503':
+          description: |-
+            The service is currently unavailable.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServiceUnavailableException'
+        '429':
+          description: |-
+            The number of customer requests exceeds the request rate limit.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThrottlingException'
+        '401':
+          description: |-
+            The user isn't authorized to request a resource.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnauthorizedException'
+        '422':
+          description: |-
+            The request was well-formed but was unable to be followed due to semantic errors.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnprocessableEntityException'
+  /meetings/{MeetingId}/attendees/capabilities?operation=batch-update-except:
+    put:
+      operationId: BatchUpdateAttendeeCapabilitiesExcept
+      description: |-
+        Updates `AttendeeCapabilities` except the capabilities listed in an `ExcludedAttendeeIds` table.
+
+        You use the capabilities with a set of values that control what the capabilities can do, such as `SendReceive` data. For more information about those values, see .
+
+        When using capabilities, be aware of these corner cases:
+
+          * If you specify `MeetingFeatures:Video:MaxResolution:None` when you create a meeting, all API requests that include `SendReceive`, `Send`, or `Receive` for `AttendeeCapabilities:Video` will be rejected with `ValidationError 400`.
+
+          * If you specify `MeetingFeatures:Content:MaxResolution:None` when you create a meeting, all API requests that include `SendReceive`, `Send`, or `Receive` for `AttendeeCapabilities:Content` will be rejected with `ValidationError 400`.
+
+          * You can't set `content` capabilities to `SendReceive` or `Receive` unless you also set `video` capabilities to `SendReceive` or `Receive`. If you don't set the `video` capability to receive, the response will contain an HTTP 400 Bad Request status code. However, you can set your `video` capability to receive and you set your `content` capability to not receive.
+
+          * When you change an `audio` capability from `None` or `Receive` to `Send` or `SendReceive` , and if the attendee left their microphone unmuted, audio will flow from the attendee to the other meeting participants.
+
+          * When you change a `video` or `content` capability from `None` or `Receive` to `Send` or `SendReceive` , and if the attendee turned on their video or content streams, remote attendees can receive those streams, but only after media renegotiation between the client and the Amazon Chime back-end server.
+      parameters:
+      - name: MeetingId
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/GuidString'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                ExcludedAttendeeIds:
+                  $ref: '#/components/schemas/AttendeeIdsList'
+                Capabilities:
+                  $ref: '#/components/schemas/AttendeeCapabilities'
+      responses:
+        '200': {}
+        '400':
+          description: |-
+            The input parameters don't match the service's restrictions.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequestException'
+        '409':
+          description: |-
+            Multiple instances of the same request have been made simultaneously.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConflictException'
+        '403':
+          description: |-
+            The client is permanently forbidden from making the request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ForbiddenException'
+        '404':
+          description: |-
+            One or more of the resources in the request does not exist in the system.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFoundException'
+        '500':
+          description: |-
+            The service encountered an unexpected error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServiceFailureException'
+        '503':
+          description: |-
+            The service is currently unavailable.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServiceUnavailableException'
+        '429':
+          description: |-
+            The number of customer requests exceeds the request rate limit.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThrottlingException'
+        '401':
+          description: |-
+            The user isn't authorized to request a resource.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnauthorizedException'
+  /meetings/{MeetingId}/attendees:
+    post:
+      operationId: CreateAttendee
+      description: |-
+        Creates a new attendee for an active Amazon Chime SDK meeting. For more information about the Amazon Chime SDK, see [Using the Amazon Chime SDK](https://docs.aws.amazon.com/chime/latest/dg/meetings-sdk.html) in the _Amazon Chime Developer Guide_.
+      parameters:
+      - name: MeetingId
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/GuidString'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                ExternalUserId:
+                  $ref: '#/components/schemas/ExternalUserId'
+                Capabilities:
+                  $ref: '#/components/schemas/AttendeeCapabilities'
+      responses:
+        '200': {}
+        '400':
+          description: |-
+            The request exceeds the resource limit.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LimitExceededException'
+        '403':
+          description: |-
+            The client is permanently forbidden from making the request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ForbiddenException'
+        '404':
+          description: |-
+            One or more of the resources in the request does not exist in the system.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFoundException'
+        '500':
+          description: |-
+            The service encountered an unexpected error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServiceFailureException'
+        '503':
+          description: |-
+            The service is currently unavailable.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServiceUnavailableException'
+        '429':
+          description: |-
+            The number of customer requests exceeds the request rate limit.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThrottlingException'
+        '401':
+          description: |-
+            The user isn't authorized to request a resource.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnauthorizedException'
+        '422':
+          description: |-
+            The request was well-formed but was unable to be followed due to semantic errors.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnprocessableEntityException'
+    get:
+      operationId: ListAttendees
+      description: |-
+        Lists the attendees for the specified Amazon Chime SDK meeting. For more information about the Amazon Chime SDK, see [Using the Amazon Chime SDK](https://docs.aws.amazon.com/chime/latest/dg/meetings-sdk.html) in the _Amazon Chime Developer Guide_.
+      parameters:
+      - name: MeetingId
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/GuidString'
+      - name: next-token
+        in: query
+        required: false
+        schema:
+          $ref: '#/components/schemas/String'
+      - name: max-results
+        in: query
+        required: false
+        schema:
+          $ref: '#/components/schemas/ResultMax'
+      responses:
+        '200': {}
+        '400':
+          description: |-
+            The input parameters don't match the service's restrictions.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequestException'
+        '403':
+          description: |-
+            The client is permanently forbidden from making the request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ForbiddenException'
+        '404':
+          description: |-
+            One or more of the resources in the request does not exist in the system.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFoundException'
+        '500':
+          description: |-
+            The service encountered an unexpected error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServiceFailureException'
+        '503':
+          description: |-
+            The service is currently unavailable.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServiceUnavailableException'
+        '429':
+          description: |-
+            The number of customer requests exceeds the request rate limit.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThrottlingException'
+        '401':
+          description: |-
+            The user isn't authorized to request a resource.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnauthorizedException'
+  /meetings:
+    post:
+      operationId: CreateMeeting
+      description: |-
+        Creates a new Amazon Chime SDK meeting in the specified media Region with no initial attendees. For more information about specifying media Regions, see [Amazon Chime SDK Media Regions](https://docs.aws.amazon.com/chime/latest/dg/chime-sdk-meetings-regions.html) in the _Amazon Chime Developer Guide_. For more information about the Amazon Chime SDK, see [Using the Amazon Chime SDK](https://docs.aws.amazon.com/chime/latest/dg/meetings-sdk.html) in the _Amazon Chime Developer Guide_.
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                ClientRequestToken:
+                  $ref: '#/components/schemas/ClientRequestToken'
+                MediaRegion:
+                  $ref: '#/components/schemas/MediaRegion'
+                MeetingHostId:
+                  $ref: '#/components/schemas/ExternalUserId'
+                ExternalMeetingId:
+                  $ref: '#/components/schemas/ExternalMeetingId'
+                NotificationsConfiguration:
+                  $ref: '#/components/schemas/NotificationsConfiguration'
+                MeetingFeatures:
+                  $ref: '#/components/schemas/MeetingFeaturesConfiguration'
+                PrimaryMeetingId:
+                  $ref: '#/components/schemas/PrimaryMeetingId'
+                TenantIds:
+                  $ref: '#/components/schemas/TenantIdList'
+                Tags:
+                  $ref: '#/components/schemas/TagList'
+      responses:
+        '200': {}
+        '400':
+          description: |-
+            The request exceeds the resource limit.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LimitExceededException'
+        '409':
+          description: |-
+            Multiple instances of the same request have been made simultaneously.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConflictException'
+        '403':
+          description: |-
+            The client is permanently forbidden from making the request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ForbiddenException'
+        '500':
+          description: |-
+            The service encountered an unexpected error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServiceFailureException'
+        '503':
+          description: |-
+            The service is currently unavailable.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServiceUnavailableException'
+        '429':
+          description: |-
+            The number of customer requests exceeds the request rate limit.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThrottlingException'
+        '401':
+          description: |-
+            The user isn't authorized to request a resource.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnauthorizedException'
+  /meetings?operation=create-attendees:
+    post:
+      operationId: CreateMeetingWithAttendees
+      description: |-
+        Creates a new Amazon Chime SDK meeting in the specified media Region, with attendees. For more information about specifying media Regions, see [Amazon Chime SDK Media Regions](https://docs.aws.amazon.com/chime/latest/dg/chime-sdk-meetings-regions.html) in the _Amazon Chime Developer Guide_. For more information about the Amazon Chime SDK, see [Using the Amazon Chime SDK](https://docs.aws.amazon.com/chime/latest/dg/meetings-sdk.html) in the _Amazon Chime Developer Guide_.
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                ClientRequestToken:
+                  $ref: '#/components/schemas/ClientRequestToken'
+                MediaRegion:
+                  $ref: '#/components/schemas/MediaRegion'
+                MeetingHostId:
+                  $ref: '#/components/schemas/ExternalUserId'
+                ExternalMeetingId:
+                  $ref: '#/components/schemas/ExternalMeetingId'
+                MeetingFeatures:
+                  $ref: '#/components/schemas/MeetingFeaturesConfiguration'
+                NotificationsConfiguration:
+                  $ref: '#/components/schemas/NotificationsConfiguration'
+                Attendees:
+                  $ref: '#/components/schemas/CreateMeetingWithAttendeesRequestItemList'
+                PrimaryMeetingId:
+                  $ref: '#/components/schemas/PrimaryMeetingId'
+                TenantIds:
+                  $ref: '#/components/schemas/TenantIdList'
+                Tags:
+                  $ref: '#/components/schemas/TagList'
+      responses:
+        '200': {}
+        '400':
+          description: |-
+            The request exceeds the resource limit.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LimitExceededException'
+        '409':
+          description: |-
+            Multiple instances of the same request have been made simultaneously.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConflictException'
+        '403':
+          description: |-
+            The client is permanently forbidden from making the request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ForbiddenException'
+        '500':
+          description: |-
+            The service encountered an unexpected error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServiceFailureException'
+        '503':
+          description: |-
+            The service is currently unavailable.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServiceUnavailableException'
+        '429':
+          description: |-
+            The number of customer requests exceeds the request rate limit.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThrottlingException'
+        '401':
+          description: |-
+            The user isn't authorized to request a resource.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnauthorizedException'
+  /meetings/{MeetingId}/attendees/{AttendeeId}:
+    delete:
+      operationId: DeleteAttendee
+      description: |-
+        Deletes an attendee from the specified Amazon Chime SDK meeting and deletes their `JoinToken`. Attendees are automatically deleted when a Amazon Chime SDK meeting is deleted. For more information about the Amazon Chime SDK, see [Using the Amazon Chime SDK](https://docs.aws.amazon.com/chime/latest/dg/meetings-sdk.html) in the _Amazon Chime Developer Guide_.
+      parameters:
+      - name: MeetingId
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/GuidString'
+      - name: AttendeeId
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/GuidString'
+      responses:
+        '204': {}
+        '400':
+          description: |-
+            The input parameters don't match the service's restrictions.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequestException'
+        '403':
+          description: |-
+            The client is permanently forbidden from making the request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ForbiddenException'
+        '404':
+          description: |-
+            One or more of the resources in the request does not exist in the system.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFoundException'
+        '500':
+          description: |-
+            The service encountered an unexpected error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServiceFailureException'
+        '503':
+          description: |-
+            The service is currently unavailable.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServiceUnavailableException'
+        '429':
+          description: |-
+            The number of customer requests exceeds the request rate limit.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThrottlingException'
+        '401':
+          description: |-
+            The user isn't authorized to request a resource.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnauthorizedException'
+    get:
+      operationId: GetAttendee
+      description: |-
+        Gets the Amazon Chime SDK attendee details for a specified meeting ID and attendee ID. For more information about the Amazon Chime SDK, see [Using the Amazon Chime SDK](https://docs.aws.amazon.com/chime/latest/dg/meetings-sdk.html) in the _Amazon Chime Developer Guide_.
+      parameters:
+      - name: MeetingId
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/GuidString'
+      - name: AttendeeId
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/GuidString'
+      responses:
+        '200': {}
+        '400':
+          description: |-
+            The input parameters don't match the service's restrictions.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequestException'
+        '403':
+          description: |-
+            The client is permanently forbidden from making the request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ForbiddenException'
+        '404':
+          description: |-
+            One or more of the resources in the request does not exist in the system.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFoundException'
+        '500':
+          description: |-
+            The service encountered an unexpected error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServiceFailureException'
+        '503':
+          description: |-
+            The service is currently unavailable.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServiceUnavailableException'
+        '429':
+          description: |-
+            The number of customer requests exceeds the request rate limit.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThrottlingException'
+        '401':
+          description: |-
+            The user isn't authorized to request a resource.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnauthorizedException'
+  /meetings/{MeetingId}:
+    delete:
+      operationId: DeleteMeeting
+      description: |-
+        Deletes the specified Amazon Chime SDK meeting. The operation deletes all attendees, disconnects all clients, and prevents new clients from joining the meeting. For more information about the Amazon Chime SDK, see [Using the Amazon Chime SDK](https://docs.aws.amazon.com/chime/latest/dg/meetings-sdk.html) in the _Amazon Chime Developer Guide_.
+      parameters:
+      - name: MeetingId
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/GuidString'
+      responses:
+        '204': {}
+        '400':
+          description: |-
+            The input parameters don't match the service's restrictions.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequestException'
+        '403':
+          description: |-
+            The client is permanently forbidden from making the request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ForbiddenException'
+        '404':
+          description: |-
+            One or more of the resources in the request does not exist in the system.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFoundException'
+        '500':
+          description: |-
+            The service encountered an unexpected error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServiceFailureException'
+        '503':
+          description: |-
+            The service is currently unavailable.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServiceUnavailableException'
+        '429':
+          description: |-
+            The number of customer requests exceeds the request rate limit.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThrottlingException'
+        '401':
+          description: |-
+            The user isn't authorized to request a resource.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnauthorizedException'
+    get:
+      operationId: GetMeeting
+      description: |-
+        Gets the Amazon Chime SDK meeting details for the specified meeting ID. For more information about the Amazon Chime SDK, see [Using the Amazon Chime SDK](https://docs.aws.amazon.com/chime/latest/dg/meetings-sdk.html) in the _Amazon Chime Developer Guide_.
+      parameters:
+      - name: MeetingId
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/GuidString'
+      responses:
+        '200': {}
+        '400':
+          description: |-
+            The input parameters don't match the service's restrictions.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequestException'
+        '403':
+          description: |-
+            The client is permanently forbidden from making the request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ForbiddenException'
+        '404':
+          description: |-
+            One or more of the resources in the request does not exist in the system.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFoundException'
+        '500':
+          description: |-
+            The service encountered an unexpected error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServiceFailureException'
+        '503':
+          description: |-
+            The service is currently unavailable.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServiceUnavailableException'
+        '429':
+          description: |-
+            The number of customer requests exceeds the request rate limit.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThrottlingException'
+        '401':
+          description: |-
+            The user isn't authorized to request a resource.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnauthorizedException'
+  /tags:
+    get:
+      operationId: ListTagsForResource
+      description: |-
+        Returns a list of the tags available for the specified resource.
+      parameters:
+      - name: arn
+        in: query
+        required: true
+        schema:
+          $ref: '#/components/schemas/AmazonResourceName'
+      responses:
+        '200': {}
+        '400':
+          description: |-
+            The request exceeds the resource limit.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LimitExceededException'
+        '403':
+          description: |-
+            The client is permanently forbidden from making the request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ForbiddenException'
+        '404':
+          description: |-
+            The resource that you want to tag couldn't be found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+        '500':
+          description: |-
+            The service encountered an unexpected error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServiceFailureException'
+        '503':
+          description: |-
+            The service is currently unavailable.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServiceUnavailableException'
+        '429':
+          description: |-
+            The number of customer requests exceeds the request rate limit.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThrottlingException'
+        '401':
+          description: |-
+            The user isn't authorized to request a resource.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnauthorizedException'
+  /meetings/{MeetingId}/transcription?operation=start:
+    post:
+      operationId: StartMeetingTranscription
+      description: |-
+        Starts transcription for the specified `meetingId`. For more information, refer to [ Using Amazon Chime SDK live transcription ](https://docs.aws.amazon.com/chime-sdk/latest/dg/meeting-transcription.html) in the _Amazon Chime SDK Developer Guide_.
+
+        If you specify an invalid configuration, a `TranscriptFailed` event will be sent with the contents of the `BadRequestException` generated by Amazon Transcribe. For more information on each parameter and which combinations are valid, refer to the [StartStreamTranscription](https://docs.aws.amazon.com/transcribe/latest/APIReference/API_streaming_StartStreamTranscription.html) API in the _Amazon Transcribe Developer Guide_.
+
+        By default, Amazon Transcribe may use and store audio content processed by the service to develop and improve Amazon Web Services AI/ML services as further described in section 50 of the [Amazon Web Services Service Terms](https://aws.amazon.com/service-terms/). Using Amazon Transcribe may be subject to federal and state laws or regulations regarding the recording or interception of electronic communications. It is your and your end users’ responsibility to comply with all applicable laws regarding the recording, including properly notifying all participants in a recorded session or communication that the session or communication is being recorded, and obtaining all necessary consents. You can opt out from Amazon Web Services using audio content to develop and improve AWS AI/ML services by configuring an AI services opt out policy using Amazon Web Services Organizations.
+      parameters:
+      - name: MeetingId
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/GuidString'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                TranscriptionConfiguration:
+                  $ref: '#/components/schemas/TranscriptionConfiguration'
+      responses:
+        '200': {}
+        '400':
+          description: |-
+            The request exceeds the resource limit.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LimitExceededException'
+        '403':
+          description: |-
+            The client is permanently forbidden from making the request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ForbiddenException'
+        '404':
+          description: |-
+            One or more of the resources in the request does not exist in the system.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFoundException'
+        '500':
+          description: |-
+            The service encountered an unexpected error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServiceFailureException'
+        '503':
+          description: |-
+            The service is currently unavailable.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServiceUnavailableException'
+        '429':
+          description: |-
+            The number of customer requests exceeds the request rate limit.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThrottlingException'
+        '401':
+          description: |-
+            The user isn't authorized to request a resource.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnauthorizedException'
+        '422':
+          description: |-
+            The request was well-formed but was unable to be followed due to semantic errors.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnprocessableEntityException'
+  /meetings/{MeetingId}/transcription?operation=stop:
+    post:
+      operationId: StopMeetingTranscription
+      description: |-
+        Stops transcription for the specified `meetingId`. For more information, refer to [ Using Amazon Chime SDK live transcription ](https://docs.aws.amazon.com/chime-sdk/latest/dg/meeting-transcription.html) in the _Amazon Chime SDK Developer Guide_.
+
+        By default, Amazon Transcribe may use and store audio content processed by the service to develop and improve Amazon Web Services AI/ML services as further described in section 50 of the [Amazon Web Services Service Terms](https://aws.amazon.com/service-terms/). Using Amazon Transcribe may be subject to federal and state laws or regulations regarding the recording or interception of electronic communications. It is your and your end users’ responsibility to comply with all applicable laws regarding the recording, including properly notifying all participants in a recorded session or communication that the session or communication is being recorded, and obtaining all necessary consents. You can opt out from Amazon Web Services using audio content to develop and improve Amazon Web Services AI/ML services by configuring an AI services opt out policy using Amazon Web Services Organizations.
+      parameters:
+      - name: MeetingId
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/GuidString'
+      responses:
+        '200': {}
+        '400':
+          description: |-
+            The input parameters don't match the service's restrictions.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequestException'
+        '403':
+          description: |-
+            The client is permanently forbidden from making the request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ForbiddenException'
+        '404':
+          description: |-
+            One or more of the resources in the request does not exist in the system.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFoundException'
+        '500':
+          description: |-
+            The service encountered an unexpected error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServiceFailureException'
+        '503':
+          description: |-
+            The service is currently unavailable.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServiceUnavailableException'
+        '429':
+          description: |-
+            The number of customer requests exceeds the request rate limit.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThrottlingException'
+        '401':
+          description: |-
+            The user isn't authorized to request a resource.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnauthorizedException'
+        '422':
+          description: |-
+            The request was well-formed but was unable to be followed due to semantic errors.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnprocessableEntityException'
+  /tags?operation=tag-resource:
+    post:
+      operationId: TagResource
+      description: |-
+        The resource that supports tags.
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                ResourceARN:
+                  $ref: '#/components/schemas/AmazonResourceName'
+                Tags:
+                  $ref: '#/components/schemas/TagList'
+      responses:
+        '204': {}
+        '400':
+          description: |-
+            Too many tags were added to the specified resource.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TooManyTagsException'
+        '403':
+          description: |-
+            The client is permanently forbidden from making the request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ForbiddenException'
+        '404':
+          description: |-
+            The resource that you want to tag couldn't be found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+        '500':
+          description: |-
+            The service encountered an unexpected error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServiceFailureException'
+        '503':
+          description: |-
+            The service is currently unavailable.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServiceUnavailableException'
+        '429':
+          description: |-
+            The number of customer requests exceeds the request rate limit.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThrottlingException'
+        '401':
+          description: |-
+            The user isn't authorized to request a resource.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnauthorizedException'
+  /tags?operation=untag-resource:
+    post:
+      operationId: UntagResource
+      description: |-
+        Removes the specified tags from the specified resources. When you specify a tag key, the action removes both that key and its associated value. The operation succeeds even if you attempt to remove tags from a resource that were already removed. Note the following:
+
+          * To remove tags from a resource, you need the necessary permissions for the service that the resource belongs to as well as permissions for removing tags. For more information, see the documentation for the service whose resource you want to untag.
+
+          * You can only tag resources that are located in the specified Amazon Web Services Region for the calling Amazon Web Services account.
+
+        **Minimum permissions**
+
+        In addition to the `tag:UntagResources` permission required by this operation, you must also have the remove tags permission defined by the service that created the resource. For example, to remove the tags from an Amazon EC2 instance using the `UntagResources` operation, you must have both of the following permissions:
+
+        `tag:UntagResource`
+
+        `ChimeSDKMeetings:DeleteTags`
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                ResourceARN:
+                  $ref: '#/components/schemas/AmazonResourceName'
+                TagKeys:
+                  $ref: '#/components/schemas/TagKeyList'
+      responses:
+        '204': {}
+        '400':
+          description: |-
+            The request exceeds the resource limit.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LimitExceededException'
+        '403':
+          description: |-
+            The client is permanently forbidden from making the request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ForbiddenException'
+        '404':
+          description: |-
+            The resource that you want to tag couldn't be found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+        '500':
+          description: |-
+            The service encountered an unexpected error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServiceFailureException'
+        '503':
+          description: |-
+            The service is currently unavailable.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServiceUnavailableException'
+        '429':
+          description: |-
+            The number of customer requests exceeds the request rate limit.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThrottlingException'
+        '401':
+          description: |-
+            The user isn't authorized to request a resource.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnauthorizedException'
+  /meetings/{MeetingId}/attendees/{AttendeeId}/capabilities:
+    put:
+      operationId: UpdateAttendeeCapabilities
+      description: |-
+        The capabilities that you want to update.
+
+        You use the capabilities with a set of values that control what the capabilities can do, such as `SendReceive` data. For more information about those values, see .
+
+        When using capabilities, be aware of these corner cases:
+
+          * If you specify `MeetingFeatures:Video:MaxResolution:None` when you create a meeting, all API requests that include `SendReceive`, `Send`, or `Receive` for `AttendeeCapabilities:Video` will be rejected with `ValidationError 400`.
+
+          * If you specify `MeetingFeatures:Content:MaxResolution:None` when you create a meeting, all API requests that include `SendReceive`, `Send`, or `Receive` for `AttendeeCapabilities:Content` will be rejected with `ValidationError 400`.
+
+          * You can't set `content` capabilities to `SendReceive` or `Receive` unless you also set `video` capabilities to `SendReceive` or `Receive`. If you don't set the `video` capability to receive, the response will contain an HTTP 400 Bad Request status code. However, you can set your `video` capability to receive and you set your `content` capability to not receive.
+
+          * When you change an `audio` capability from `None` or `Receive` to `Send` or `SendReceive` , and if the attendee left their microphone unmuted, audio will flow from the attendee to the other meeting participants.
+
+          * When you change a `video` or `content` capability from `None` or `Receive` to `Send` or `SendReceive` , and if the attendee turned on their video or content streams, remote attendees can receive those streams, but only after media renegotiation between the client and the Amazon Chime back-end server.
+      parameters:
+      - name: MeetingId
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/GuidString'
+      - name: AttendeeId
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/GuidString'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                Capabilities:
+                  $ref: '#/components/schemas/AttendeeCapabilities'
+      responses:
+        '200': {}
+        '400':
+          description: |-
+            The input parameters don't match the service's restrictions.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequestException'
+        '409':
+          description: |-
+            Multiple instances of the same request have been made simultaneously.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConflictException'
+        '403':
+          description: |-
+            The client is permanently forbidden from making the request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ForbiddenException'
+        '404':
+          description: |-
+            One or more of the resources in the request does not exist in the system.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFoundException'
+        '500':
+          description: |-
+            The service encountered an unexpected error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServiceFailureException'
+        '503':
+          description: |-
+            The service is currently unavailable.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServiceUnavailableException'
+        '429':
+          description: |-
+            The number of customer requests exceeds the request rate limit.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThrottlingException'
+        '401':
+          description: |-
+            The user isn't authorized to request a resource.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnauthorizedException'
 components:
   schemas:
     AmazonResourceName:
@@ -56,6 +1261,129 @@ components:
       pattern: ^arn[\/\:\-\_\.a-zA-Z0-9]+$
       minLength: 1
       maxLength: 1024
+    Attendee:
+      type: object
+      properties:
+        ExternalUserId:
+          allOf:
+          - $ref: '#/components/schemas/ExternalUserId'
+          description: 'The Amazon Chime SDK external user ID. An idempotency token.
+            Links the attendee to an identity managed by a builder application.
+
+
+            Pattern: `[-_&@+=,(){}\[\]\/«».:|''"#a-zA-Z0-9À-ÿ\s]*`
+
+
+            Values that begin with `aws:` are reserved. You can''t configure a value
+            that uses this prefix. Case insensitive.'
+        AttendeeId:
+          allOf:
+          - $ref: '#/components/schemas/GuidString'
+          description: The Amazon Chime SDK attendee ID.
+        JoinToken:
+          allOf:
+          - $ref: '#/components/schemas/JoinTokenString'
+          description: The join token used by the Amazon Chime SDK attendee.
+        Capabilities:
+          allOf:
+          - $ref: '#/components/schemas/AttendeeCapabilities'
+          description: "The capabilities assigned to an attendee: audio, video, or\
+            \ content.\n\nYou use the capabilities with a set of values that control\
+            \ what the capabilities can do, such as `SendReceive` data. For more information\
+            \ about those values, see .\n\nWhen using capabilities, be aware of these\
+            \ corner cases:\n\n  * If you specify `MeetingFeatures:Video:MaxResolution:None`\
+            \ when you create a meeting, all API requests that include `SendReceive`,\
+            \ `Send`, or `Receive` for `AttendeeCapabilities:Video` will be rejected\
+            \ with `ValidationError 400`.\n\n  * If you specify `MeetingFeatures:Content:MaxResolution:None`\
+            \ when you create a meeting, all API requests that include `SendReceive`,\
+            \ `Send`, or `Receive` for `AttendeeCapabilities:Content` will be rejected\
+            \ with `ValidationError 400`.\n\n  * You can't set `content` capabilities\
+            \ to `SendReceive` or `Receive` unless you also set `video` capabilities\
+            \ to `SendReceive` or `Receive`. If you don't set the `video` capability\
+            \ to receive, the response will contain an HTTP 400 Bad Request status\
+            \ code. However, you can set your `video` capability to receive and you\
+            \ set your `content` capability to not receive.\n\n  * When you change\
+            \ an `audio` capability from `None` or `Receive` to `Send` or `SendReceive`\
+            \ , and if the attendee left their microphone unmuted, audio will flow\
+            \ from the attendee to the other meeting participants.\n\n  * When you\
+            \ change a `video` or `content` capability from `None` or `Receive` to\
+            \ `Send` or `SendReceive` , and if the attendee turned on their video\
+            \ or content streams, remote attendees can receive those streams, but\
+            \ only after media renegotiation between the client and the Amazon Chime\
+            \ back-end server."
+      description: 'An Amazon Chime SDK meeting attendee. Includes a unique `AttendeeId`
+        and `JoinToken`. The `JoinToken` allows a client to authenticate and join
+        as the specified attendee. The `JoinToken` expires when the meeting ends,
+        or when DeleteAttendee is called. After that, the attendee is unable to join
+        the meeting.
+
+
+        We recommend securely transferring each `JoinToken` from your server application
+        to the client so that no other client has access to the token except for the
+        one authorized to represent the attendee.'
+    AttendeeCapabilities:
+      type: object
+      properties:
+        Audio:
+          allOf:
+          - $ref: '#/components/schemas/MediaCapabilities'
+          description: The audio capability assigned to an attendee.
+        Video:
+          allOf:
+          - $ref: '#/components/schemas/MediaCapabilities'
+          description: The video capability assigned to an attendee.
+        Content:
+          allOf:
+          - $ref: '#/components/schemas/MediaCapabilities'
+          description: The content capability assigned to an attendee.
+      required:
+      - Audio
+      - Video
+      - Content
+      description: "The media capabilities of an attendee: audio, video, or content.\n\
+        \nYou use the capabilities with a set of values that control what the capabilities\
+        \ can do, such as `SendReceive` data. For more information, refer to and .\n\
+        \nWhen using capabilities, be aware of these corner cases:\n\n  * If you specify\
+        \ `MeetingFeatures:Video:MaxResolution:None` when you create a meeting, all\
+        \ API requests that include `SendReceive`, `Send`, or `Receive` for `AttendeeCapabilities:Video`\
+        \ will be rejected with `ValidationError 400`.\n\n  * If you specify `MeetingFeatures:Content:MaxResolution:None`\
+        \ when you create a meeting, all API requests that include `SendReceive`,\
+        \ `Send`, or `Receive` for `AttendeeCapabilities:Content` will be rejected\
+        \ with `ValidationError 400`.\n\n  * You can't set `content` capabilities\
+        \ to `SendReceive` or `Receive` unless you also set `video` capabilities to\
+        \ `SendReceive` or `Receive`. If you don't set the `video` capability to receive,\
+        \ the response will contain an HTTP 400 Bad Request status code. However,\
+        \ you can set your `video` capability to receive and you set your `content`\
+        \ capability to not receive.\n\n  * When you change an `audio` capability\
+        \ from `None` or `Receive` to `Send` or `SendReceive` , and an attendee unmutes\
+        \ their microphone, audio flows from the attendee to the other meeting participants.\n\
+        \n  * When you change a `video` or `content` capability from `None` or `Receive`\
+        \ to `Send` or `SendReceive` , and the attendee turns on their video or content\
+        \ streams, remote attendees can receive those streams, but only after media\
+        \ renegotiation between the client and the Amazon Chime back-end server."
+    AttendeeFeatures:
+      type: object
+      properties:
+        MaxCount:
+          allOf:
+          - $ref: '#/components/schemas/AttendeeMax'
+          description: The maximum number of attendees allowed into the meeting.
+      description: 'Lists the maximum number of attendees allowed into the meeting.
+
+
+        If you specify `FHD` for `MeetingFeatures:Video:MaxResolution`, or if you
+        specify `UHD` for `MeetingFeatures:Content:MaxResolution`, the maximum number
+        of attendees changes from the default of `250` to `25`.'
+    AttendeeIdItem:
+      type: object
+      properties:
+        AttendeeId:
+          allOf:
+          - $ref: '#/components/schemas/GuidString'
+          description: A list of one or more attendee IDs.
+      required:
+      - AttendeeId
+      description: A structure that contains one or more attendee IDs.
     AttendeeIdsList:
       type: array
       items:
@@ -68,10 +1396,84 @@ components:
       type: integer
       minimum: 1
       maximum: 250
+    AudioFeatures:
+      type: object
+      properties:
+        EchoReduction:
+          allOf:
+          - $ref: '#/components/schemas/MeetingFeatureStatus'
+          description: Makes echo reduction available to clients who connect to the
+            meeting.
+      description: An optional category of meeting features that contains audio-specific
+        configurations, such as operating parameters for Amazon Voice Focus.
+    BadRequestException:
+      type: object
+      properties:
+        Code:
+          $ref: '#/components/schemas/String'
+        Message:
+          $ref: '#/components/schemas/String'
+        RequestId:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The request id associated with the call responsible for the
+            exception.
+      description: The input parameters don't match the service's restrictions.
     BatchCreateAttendeeErrorList:
       type: array
       items:
         $ref: '#/components/schemas/CreateAttendeeError'
+    BatchCreateAttendeeRequest:
+      type: object
+      properties:
+        MeetingId:
+          allOf:
+          - $ref: '#/components/schemas/GuidString'
+          description: The Amazon Chime SDK ID of the meeting to which you're adding
+            attendees.
+        Attendees:
+          allOf:
+          - $ref: '#/components/schemas/CreateAttendeeRequestItemList'
+          description: The attendee information, including attendees' IDs and join
+            tokens.
+      required:
+      - MeetingId
+      - Attendees
+    BatchCreateAttendeeResponse:
+      type: object
+      properties:
+        Attendees:
+          allOf:
+          - $ref: '#/components/schemas/AttendeeList'
+          description: The attendee information, including attendees' IDs and join
+            tokens.
+        Errors:
+          allOf:
+          - $ref: '#/components/schemas/BatchCreateAttendeeErrorList'
+          description: If the action fails for one or more of the attendees in the
+            request, a list of the attendees is returned, along with error codes and
+            error messages.
+    BatchUpdateAttendeeCapabilitiesExceptRequest:
+      type: object
+      properties:
+        MeetingId:
+          allOf:
+          - $ref: '#/components/schemas/GuidString'
+          description: The ID of the meeting associated with the update request.
+        ExcludedAttendeeIds:
+          allOf:
+          - $ref: '#/components/schemas/AttendeeIdsList'
+          description: The `AttendeeIDs` that you want to exclude from one or more
+            capabilities.
+        Capabilities:
+          allOf:
+          - $ref: '#/components/schemas/AttendeeCapabilities'
+          description: The capabilities (`audio`, `video`, or `content`) that you
+            want to update.
+      required:
+      - MeetingId
+      - ExcludedAttendeeIds
+      - Capabilities
     Boolean:
       type: boolean
       default: false
@@ -80,20 +1482,621 @@ components:
       pattern: ^[-_a-zA-Z0-9]*$
       minLength: 2
       maxLength: 64
+    ConflictException:
+      type: object
+      properties:
+        Code:
+          $ref: '#/components/schemas/String'
+        Message:
+          $ref: '#/components/schemas/String'
+        RequestId:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The ID of the request involved in the conflict.
+      description: Multiple instances of the same request have been made simultaneously.
+    ContentFeatures:
+      type: object
+      properties:
+        MaxResolution:
+          allOf:
+          - $ref: '#/components/schemas/ContentResolution'
+          description: 'The maximum resolution for the meeting content.
+
+
+            Defaults to `FHD`. To use `UHD`, you must also provide a `MeetingFeatures:Attendee:MaxCount`
+            value and override the default size limit of 250 attendees.'
+      description: 'Lists the content (screen share) features for the meeting. Applies
+        to all attendees.
+
+
+        If you specify `MeetingFeatures:Content:MaxResolution:None` when you create
+        a meeting, all API requests that include `SendReceive`, `Send`, or `Receive`
+        for `AttendeeCapabilities:Content` will be rejected with `ValidationError
+        400`.'
     ContentResolution:
       type: string
       enum:
       - None
       - FHD
       - UHD
+    CreateAttendeeError:
+      type: object
+      properties:
+        ExternalUserId:
+          allOf:
+          - $ref: '#/components/schemas/ExternalUserId'
+          description: 'The Amazon Chime SDK external user ID. An idempotency token.
+            Links the attendee to an identity managed by a builder application.
+
+
+            Pattern: `[-_&@+=,(){}\[\]\/«».:|''"#a-zA-Z0-9À-ÿ\s]*`
+
+
+            Values that begin with `aws:` are reserved. You can''t configure a value
+            that uses this prefix. Case insensitive.'
+        ErrorCode:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The error code.
+        ErrorMessage:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The error message.
+      description: The list of errors returned when errors are encountered during
+        the BatchCreateAttendee and CreateAttendee actions. This includes external
+        user IDs, error codes, and error messages.
+    CreateAttendeeRequest:
+      type: object
+      properties:
+        MeetingId:
+          allOf:
+          - $ref: '#/components/schemas/GuidString'
+          description: The unique ID of the meeting.
+        ExternalUserId:
+          allOf:
+          - $ref: '#/components/schemas/ExternalUserId'
+          description: 'The Amazon Chime SDK external user ID. An idempotency token.
+            Links the attendee to an identity managed by a builder application.
+
+
+            Pattern: `[-_&@+=,(){}\[\]\/«».:|''"#a-zA-Z0-9À-ÿ\s]*`
+
+
+            Values that begin with `aws:` are reserved. You can''t configure a value
+            that uses this prefix.'
+        Capabilities:
+          allOf:
+          - $ref: '#/components/schemas/AttendeeCapabilities'
+          description: "The capabilities (`audio`, `video`, or `content`) that you\
+            \ want to grant an attendee. If you don't specify capabilities, all users\
+            \ have send and receive capabilities on all media channels by default.\n\
+            \nYou use the capabilities with a set of values that control what the\
+            \ capabilities can do, such as `SendReceive` data. For more information\
+            \ about those values, see .\n\nWhen using capabilities, be aware of these\
+            \ corner cases:\n\n  * If you specify `MeetingFeatures:Video:MaxResolution:None`\
+            \ when you create a meeting, all API requests that include `SendReceive`,\
+            \ `Send`, or `Receive` for `AttendeeCapabilities:Video` will be rejected\
+            \ with `ValidationError 400`.\n\n  * If you specify `MeetingFeatures:Content:MaxResolution:None`\
+            \ when you create a meeting, all API requests that include `SendReceive`,\
+            \ `Send`, or `Receive` for `AttendeeCapabilities:Content` will be rejected\
+            \ with `ValidationError 400`.\n\n  * You can't set `content` capabilities\
+            \ to `SendReceive` or `Receive` unless you also set `video` capabilities\
+            \ to `SendReceive` or `Receive`. If you don't set the `video` capability\
+            \ to receive, the response will contain an HTTP 400 Bad Request status\
+            \ code. However, you can set your `video` capability to receive and you\
+            \ set your `content` capability to not receive.\n\n  * When you change\
+            \ an `audio` capability from `None` or `Receive` to `Send` or `SendReceive`\
+            \ , and if the attendee left their microphone unmuted, audio will flow\
+            \ from the attendee to the other meeting participants.\n\n  * When you\
+            \ change a `video` or `content` capability from `None` or `Receive` to\
+            \ `Send` or `SendReceive` , and if the attendee turned on their video\
+            \ or content streams, remote attendees can receive those streams, but\
+            \ only after media renegotiation between the client and the Amazon Chime\
+            \ back-end server."
+      required:
+      - MeetingId
+      - ExternalUserId
+    CreateAttendeeRequestItem:
+      type: object
+      properties:
+        ExternalUserId:
+          allOf:
+          - $ref: '#/components/schemas/ExternalUserId'
+          description: 'The Amazon Chime SDK external user ID. An idempotency token.
+            Links the attendee to an identity managed by a builder application.
+
+
+            Pattern: `[-_&@+=,(){}\[\]\/«».:|''"#a-zA-Z0-9À-ÿ\s]*`
+
+
+            Values that begin with `aws:` are reserved. You can''t configure a value
+            that uses this prefix. Case insensitive.'
+        Capabilities:
+          allOf:
+          - $ref: '#/components/schemas/AttendeeCapabilities'
+          description: A list of one or more capabilities.
+      required:
+      - ExternalUserId
+      description: The Amazon Chime SDK attendee fields to create, used with the BatchCreateAttendee
+        action.
     CreateAttendeeRequestItemList:
       type: array
       items:
         $ref: '#/components/schemas/CreateAttendeeRequestItem'
+    CreateAttendeeResponse:
+      type: object
+      properties:
+        Attendee:
+          allOf:
+          - $ref: '#/components/schemas/Attendee'
+          description: The attendee information, including attendee ID and join token.
+    CreateMeetingRequest:
+      type: object
+      properties:
+        ClientRequestToken:
+          allOf:
+          - $ref: '#/components/schemas/ClientRequestToken'
+          description: The unique identifier for the client request. Use a different
+            token for different meetings.
+        MediaRegion:
+          allOf:
+          - $ref: '#/components/schemas/MediaRegion'
+          description: 'The Region in which to create the meeting.
+
+
+            Available values: `af-south-1`, `ap-northeast-1`, `ap-northeast-2`, `ap-south-1`,
+            `ap-southeast-1`, `ap-southeast-2`, `ca-central-1`, `eu-central-1`, `eu-north-1`,
+            `eu-south-1`, `eu-west-1`, `eu-west-2`, `eu-west-3`, `sa-east-1`, `us-east-1`,
+            `us-east-2`, `us-west-1`, `us-west-2`.
+
+
+            Available values in Amazon Web Services GovCloud (US) Regions: `us-gov-east-1`,
+            `us-gov-west-1`.'
+        MeetingHostId:
+          allOf:
+          - $ref: '#/components/schemas/ExternalUserId'
+          description: Reserved.
+        ExternalMeetingId:
+          allOf:
+          - $ref: '#/components/schemas/ExternalMeetingId'
+          description: 'The external meeting ID.
+
+
+            Pattern: `[-_&@+=,(){}\[\]\/«».:|''"#a-zA-Z0-9À-ÿ\s]*`
+
+
+            Values that begin with `aws:` are reserved. You can''t configure a value
+            that uses this prefix. Case insensitive.'
+        NotificationsConfiguration:
+          allOf:
+          - $ref: '#/components/schemas/NotificationsConfiguration'
+          description: The configuration for resource targets to receive notifications
+            when meeting and attendee events occur.
+        MeetingFeatures:
+          allOf:
+          - $ref: '#/components/schemas/MeetingFeaturesConfiguration'
+          description: Lists the audio and video features enabled for a meeting, such
+            as echo reduction.
+        PrimaryMeetingId:
+          allOf:
+          - $ref: '#/components/schemas/PrimaryMeetingId'
+          description: When specified, replicates the media from the primary meeting
+            to the new meeting.
+        TenantIds:
+          allOf:
+          - $ref: '#/components/schemas/TenantIdList'
+          description: A consistent and opaque identifier, created and maintained
+            by the builder to represent a segment of their users.
+        Tags:
+          allOf:
+          - $ref: '#/components/schemas/TagList'
+          description: "Applies one or more tags to an Amazon Chime SDK meeting. Note\
+            \ the following:\n\n  * Not all resources have tags. For a list of services\
+            \ with resources that support tagging using this operation, see [Services\
+            \ that support the Resource Groups Tagging API](https://docs.aws.amazon.com/resourcegroupstagging/latest/APIReference/supported-services.html).\
+            \ If the resource doesn't yet support this operation, the resource's service\
+            \ might support tagging using its own API operations. For more information,\
+            \ refer to the documentation for that service.\n\n  * Each resource can\
+            \ have up to 50 tags. For other limits, see [Tag Naming and Usage Conventions](https://docs.aws.amazon.com/general/latest/gr/aws_tagging.html#tag-conventions)\
+            \ in the _AWS General Reference_.\n\n  * You can only tag resources that\
+            \ are located in the specified Amazon Web Services Region for the Amazon\
+            \ Web Services account.\n\n  * To add tags to a resource, you need the\
+            \ necessary permissions for the service that the resource belongs to as\
+            \ well as permissions for adding tags. For more information, see the documentation\
+            \ for each service.\n\nDo not store personally identifiable information\
+            \ (PII) or other confidential or sensitive information in tags. We use\
+            \ tags to provide you with billing and administration services. Tags are\
+            \ not intended to be used for private or sensitive data.\n\n**Minimum\
+            \ permissions**\n\nIn addition to the `tag:TagResources` permission required\
+            \ by this operation, you must also have the tagging permission defined\
+            \ by the service that created the resource. For example, to tag a `ChimeSDKMeetings`\
+            \ instance using the `TagResources` operation, you must have both of the\
+            \ following permissions:\n\n`tag:TagResources`\n\n`ChimeSDKMeetings:CreateTags`\n\
+            \nSome services might have specific requirements for tagging some resources.\
+            \ For example, to tag an Amazon S3 bucket, you must also have the `s3:GetBucketTagging`\
+            \ permission. If the expected minimum permissions don't work, check the\
+            \ documentation for that service's tagging APIs for more information."
+      required:
+      - ClientRequestToken
+      - MediaRegion
+      - ExternalMeetingId
+    CreateMeetingResponse:
+      type: object
+      properties:
+        Meeting:
+          allOf:
+          - $ref: '#/components/schemas/Meeting'
+          description: The meeting information, including the meeting ID and `MediaPlacement`.
+    CreateMeetingWithAttendeesRequest:
+      type: object
+      properties:
+        ClientRequestToken:
+          allOf:
+          - $ref: '#/components/schemas/ClientRequestToken'
+          description: The unique identifier for the client request. Use a different
+            token for different meetings.
+        MediaRegion:
+          allOf:
+          - $ref: '#/components/schemas/MediaRegion'
+          description: 'The Region in which to create the meeting.
+
+
+            Available values: `af-south-1`, `ap-northeast-1`, `ap-northeast-2`, `ap-south-1`,
+            `ap-southeast-1`, `ap-southeast-2`, `ca-central-1`, `eu-central-1`, `eu-north-1`,
+            `eu-south-1`, `eu-west-1`, `eu-west-2`, `eu-west-3`, `sa-east-1`, `us-east-1`,
+            `us-east-2`, `us-west-1`, `us-west-2`.
+
+
+            Available values in Amazon Web Services GovCloud (US) Regions: `us-gov-east-1`,
+            `us-gov-west-1`.'
+        MeetingHostId:
+          allOf:
+          - $ref: '#/components/schemas/ExternalUserId'
+          description: Reserved.
+        ExternalMeetingId:
+          allOf:
+          - $ref: '#/components/schemas/ExternalMeetingId'
+          description: 'The external meeting ID.
+
+
+            Pattern: `[-_&@+=,(){}\[\]\/«».:|''"#a-zA-Z0-9À-ÿ\s]*`
+
+
+            Values that begin with `aws:` are reserved. You can''t configure a value
+            that uses this prefix. Case insensitive.'
+        MeetingFeatures:
+          allOf:
+          - $ref: '#/components/schemas/MeetingFeaturesConfiguration'
+          description: Lists the audio and video features enabled for a meeting, such
+            as echo reduction.
+        NotificationsConfiguration:
+          allOf:
+          - $ref: '#/components/schemas/NotificationsConfiguration'
+          description: The configuration for resource targets to receive notifications
+            when meeting and attendee events occur.
+        Attendees:
+          allOf:
+          - $ref: '#/components/schemas/CreateMeetingWithAttendeesRequestItemList'
+          description: The attendee information, including attendees' IDs and join
+            tokens.
+        PrimaryMeetingId:
+          allOf:
+          - $ref: '#/components/schemas/PrimaryMeetingId'
+          description: When specified, replicates the media from the primary meeting
+            to the new meeting.
+        TenantIds:
+          allOf:
+          - $ref: '#/components/schemas/TenantIdList'
+          description: A consistent and opaque identifier, created and maintained
+            by the builder to represent a segment of their users.
+        Tags:
+          allOf:
+          - $ref: '#/components/schemas/TagList'
+          description: The tags in the request.
+      required:
+      - ClientRequestToken
+      - MediaRegion
+      - ExternalMeetingId
+      - Attendees
     CreateMeetingWithAttendeesRequestItemList:
       type: array
       items:
         $ref: '#/components/schemas/CreateAttendeeRequestItem'
+    CreateMeetingWithAttendeesResponse:
+      type: object
+      properties:
+        Meeting:
+          allOf:
+          - $ref: '#/components/schemas/Meeting'
+          description: The meeting information, including the meeting ID and `MediaPlacement`.
+        Attendees:
+          allOf:
+          - $ref: '#/components/schemas/AttendeeList'
+          description: The attendee information, including attendees' IDs and join
+            tokens.
+        Errors:
+          allOf:
+          - $ref: '#/components/schemas/BatchCreateAttendeeErrorList'
+          description: If the action fails for one or more of the attendees in the
+            request, a list of the attendees is returned, along with error codes and
+            error messages.
+    DeleteAttendeeRequest:
+      type: object
+      properties:
+        MeetingId:
+          allOf:
+          - $ref: '#/components/schemas/GuidString'
+          description: The Amazon Chime SDK meeting ID.
+        AttendeeId:
+          allOf:
+          - $ref: '#/components/schemas/GuidString'
+          description: The Amazon Chime SDK attendee ID.
+      required:
+      - MeetingId
+      - AttendeeId
+    DeleteMeetingRequest:
+      type: object
+      properties:
+        MeetingId:
+          allOf:
+          - $ref: '#/components/schemas/GuidString'
+          description: The Amazon Chime SDK meeting ID.
+      required:
+      - MeetingId
+    EngineTranscribeMedicalSettings:
+      type: object
+      properties:
+        LanguageCode:
+          allOf:
+          - $ref: '#/components/schemas/TranscribeMedicalLanguageCode'
+          description: The language code specified for the Amazon Transcribe Medical
+            engine.
+        Specialty:
+          allOf:
+          - $ref: '#/components/schemas/TranscribeMedicalSpecialty'
+          description: The specialty specified for the Amazon Transcribe Medical engine.
+        Type:
+          allOf:
+          - $ref: '#/components/schemas/TranscribeMedicalType'
+          description: The type of transcription.
+        VocabularyName:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The name of the vocabulary passed to Amazon Transcribe Medical.
+        Region:
+          allOf:
+          - $ref: '#/components/schemas/TranscribeMedicalRegion'
+          description: The Amazon Web Services Region passed to Amazon Transcribe
+            Medical. If you don't specify a Region, Amazon Chime uses the meeting's
+            Region.
+        ContentIdentificationType:
+          allOf:
+          - $ref: '#/components/schemas/TranscribeMedicalContentIdentificationType'
+          description: Set this field to `PHI` to identify personal health information
+            in the transcription output.
+      required:
+      - LanguageCode
+      - Specialty
+      - Type
+      description: Settings specific to the Amazon Transcribe Medical engine.
+    EngineTranscribeSettings:
+      type: object
+      properties:
+        LanguageCode:
+          allOf:
+          - $ref: '#/components/schemas/TranscribeLanguageCode'
+          description: 'Specify the language code that represents the language spoken.
+
+
+            If you''re unsure of the language spoken in your audio, consider using
+            `IdentifyLanguage` to enable automatic language identification.'
+        VocabularyFilterMethod:
+          allOf:
+          - $ref: '#/components/schemas/TranscribeVocabularyFilterMethod'
+          description: 'Specify how you want your vocabulary filter applied to your
+            transcript.
+
+
+            To replace words with `***`, choose `mask`.
+
+
+            To delete words, choose `remove`.
+
+
+            To flag words without changing them, choose `tag`.'
+        VocabularyFilterName:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: 'Specify the name of the custom vocabulary filter that you
+            want to use when processing your transcription. Note that vocabulary filter
+            names are case sensitive.
+
+
+            If you use Amazon Transcribe in multiple Regions, the vocabulary filter
+            must be available in Amazon Transcribe in each Region.
+
+
+            If you include `IdentifyLanguage` and want to use one or more vocabulary
+            filters with your transcription, use the `VocabularyFilterNames` parameter
+            instead.'
+        VocabularyName:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: 'Specify the name of the custom vocabulary that you want to
+            use when processing your transcription. Note that vocabulary names are
+            case sensitive.
+
+
+            If you use Amazon Transcribe multiple Regions, the vocabulary must be
+            available in Amazon Transcribe in each Region.
+
+
+            If you include `IdentifyLanguage` and want to use one or more custom vocabularies
+            with your transcription, use the `VocabularyNames` parameter instead.'
+        Region:
+          allOf:
+          - $ref: '#/components/schemas/TranscribeRegion'
+          description: 'The Amazon Web Services Region in which to use Amazon Transcribe.
+
+
+            If you don''t specify a Region, then the [MediaRegion](https://docs.aws.amazon.com/chime-sdk/latest/APIReference/API_meeting-chime_CreateMeeting.html)
+            of the meeting is used. However, if Amazon Transcribe is not available
+            in the `MediaRegion`, then a `TranscriptFailed` event is sent.
+
+
+            Use `auto` to use Amazon Transcribe in a Region near the meeting’s `MediaRegion`.
+            For more information, refer to [Choosing a transcription Region](https://docs.aws.amazon.com/chime-sdk/latest/dg/transcription-options.html#choose-region)
+            in the _Amazon Chime SDK Developer Guide_.'
+        EnablePartialResultsStabilization:
+          allOf:
+          - $ref: '#/components/schemas/Boolean'
+          description: Enables partial result stabilization for your transcription.
+            Partial result stabilization can reduce latency in your output, but may
+            impact accuracy.
+        PartialResultsStability:
+          allOf:
+          - $ref: '#/components/schemas/TranscribePartialResultsStability'
+          description: 'Specify the level of stability to use when you enable partial
+            results stabilization (`EnablePartialResultsStabilization`).
+
+
+            Low stability provides the highest accuracy. High stability transcribes
+            faster, but with slightly lower accuracy.'
+        ContentIdentificationType:
+          allOf:
+          - $ref: '#/components/schemas/TranscribeContentIdentificationType'
+          description: 'Labels all personally identifiable information (PII) identified
+            in your transcript. If you don''t include `PiiEntityTypes`, all PII is
+            identified.
+
+
+            You can’t set `ContentIdentificationType` and `ContentRedactionType`.'
+        ContentRedactionType:
+          allOf:
+          - $ref: '#/components/schemas/TranscribeContentRedactionType'
+          description: 'Content redaction is performed at the segment level. If you
+            don''t include `PiiEntityTypes`, all PII is redacted.
+
+
+            You can’t set `ContentRedactionType` and `ContentIdentificationType`.'
+        PiiEntityTypes:
+          allOf:
+          - $ref: '#/components/schemas/TranscribePiiEntityTypes'
+          description: 'Specify which types of personally identifiable information
+            (PII) you want to redact in your transcript. You can include as many types
+            as you''d like, or you can select `ALL`.
+
+
+            Values must be comma-separated and can include: `ADDRESS`, `BANK_ACCOUNT_NUMBER`,
+            `BANK_ROUTING`, `CREDIT_DEBIT_CVV`, `CREDIT_DEBIT_EXPIRY` `CREDIT_DEBIT_NUMBER`,
+            `EMAIL`,`NAME`, `PHONE`, `PIN`, `SSN`, or `ALL`.
+
+
+            Note that if you include `PiiEntityTypes`, you must also include `ContentIdentificationType`
+            or `ContentRedactionType`.
+
+
+            If you include `ContentRedactionType` or `ContentIdentificationType`,
+            but do not include PiiEntityTypes, all PII is redacted or identified.'
+        LanguageModelName:
+          allOf:
+          - $ref: '#/components/schemas/TranscribeLanguageModelName'
+          description: 'Specify the name of the custom language model that you want
+            to use when processing your transcription. Note that language model names
+            are case sensitive.
+
+
+            The language of the specified language model must match the language code.
+            If the languages don''t match, the custom language model isn''t applied.
+            There are no errors or warnings associated with a language mismatch.
+
+
+            If you use Amazon Transcribe in multiple Regions, the custom language
+            model must be available in Amazon Transcribe in each Region.'
+        IdentifyLanguage:
+          allOf:
+          - $ref: '#/components/schemas/Boolean'
+          description: 'Enables automatic language identification for your transcription.
+
+
+            If you include `IdentifyLanguage`, you can optionally use `LanguageOptions`
+            to include a list of language codes that you think may be present in your
+            audio stream. Including language options can improve transcription accuracy.
+
+
+            You can also use `PreferredLanguage` to include a preferred language.
+            Doing so can help Amazon Transcribe identify the language faster.
+
+
+            You must include either `LanguageCode` or `IdentifyLanguage`.
+
+
+            Language identification can''t be combined with custom language models
+            or redaction.'
+        LanguageOptions:
+          allOf:
+          - $ref: '#/components/schemas/TranscribeLanguageOptions'
+          description: 'Specify two or more language codes that represent the languages
+            you think may be present in your media; including more than five is not
+            recommended. If you''re unsure what languages are present, do not include
+            this parameter.
+
+
+            Including language options can improve the accuracy of language identification.
+
+
+            If you include `LanguageOptions`, you must also include `IdentifyLanguage`.
+
+
+            You can only include one language dialect per language. For example, you
+            cannot include `en-US` and `en-AU`.'
+        PreferredLanguage:
+          allOf:
+          - $ref: '#/components/schemas/TranscribeLanguageCode'
+          description: 'Specify a preferred language from the subset of languages
+            codes you specified in `LanguageOptions`.
+
+
+            You can only use this parameter if you include `IdentifyLanguage` and
+            `LanguageOptions`.'
+        VocabularyNames:
+          allOf:
+          - $ref: '#/components/schemas/TranscribeVocabularyNamesOrFilterNamesString'
+          description: 'Specify the names of the custom vocabularies that you want
+            to use when processing your transcription. Note that vocabulary names
+            are case sensitive.
+
+
+            If you use Amazon Transcribe in multiple Regions, the vocabulary must
+            be available in Amazon Transcribe in each Region.
+
+
+            If you don''t include `IdentifyLanguage` and want to use a custom vocabulary
+            with your transcription, use the `VocabularyName` parameter instead.'
+        VocabularyFilterNames:
+          allOf:
+          - $ref: '#/components/schemas/TranscribeVocabularyNamesOrFilterNamesString'
+          description: 'Specify the names of the custom vocabulary filters that you
+            want to use when processing your transcription. Note that vocabulary filter
+            names are case sensitive.
+
+
+            If you use Amazon Transcribe in multiple Regions, the vocabulary filter
+            must be available in Amazon Transcribe in each Region.
+
+
+            If you''re _not_ including `IdentifyLanguage` and want to use a custom
+            vocabulary filter with your transcription, use the `VocabularyFilterName`
+            parameter instead.'
+      description: 'Settings specific for Amazon Transcribe as the live transcription
+        engine.
+
+
+        If you specify an invalid combination of parameters, a `TranscriptFailed`
+        event will be sent with the contents of the `BadRequestException` generated
+        by Amazon Transcribe. For more information on each parameter and which combinations
+        are valid, refer to the [StartStreamTranscription](https://docs.aws.amazon.com/transcribe/latest/APIReference/API_streaming_StartStreamTranscription.html)
+        API in the _Amazon Transcribe Developer Guide_.'
     ExternalMeetingId:
       type: string
       minLength: 2
@@ -102,6 +2105,56 @@ components:
       type: string
       minLength: 2
       maxLength: 64
+    ForbiddenException:
+      type: object
+      properties:
+        Code:
+          $ref: '#/components/schemas/String'
+        Message:
+          $ref: '#/components/schemas/String'
+        RequestId:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The request id associated with the call responsible for the
+            exception.
+      description: The client is permanently forbidden from making the request.
+    GetAttendeeRequest:
+      type: object
+      properties:
+        MeetingId:
+          allOf:
+          - $ref: '#/components/schemas/GuidString'
+          description: The Amazon Chime SDK meeting ID.
+        AttendeeId:
+          allOf:
+          - $ref: '#/components/schemas/GuidString'
+          description: The Amazon Chime SDK attendee ID.
+      required:
+      - MeetingId
+      - AttendeeId
+    GetAttendeeResponse:
+      type: object
+      properties:
+        Attendee:
+          allOf:
+          - $ref: '#/components/schemas/Attendee'
+          description: The Amazon Chime SDK attendee information.
+    GetMeetingRequest:
+      type: object
+      properties:
+        MeetingId:
+          allOf:
+          - $ref: '#/components/schemas/GuidString'
+          description: The Amazon Chime SDK meeting ID.
+      required:
+      - MeetingId
+    GetMeetingResponse:
+      type: object
+      properties:
+        Meeting:
+          allOf:
+          - $ref: '#/components/schemas/Meeting'
+          description: The Amazon Chime SDK meeting information.
     GuidString:
       type: string
       pattern: ^[a-fA-F0-9]{8}(?:-[a-fA-F0-9]{4}){3}-[a-fA-F0-9]{12}$
@@ -109,6 +2162,63 @@ components:
       type: string
       minLength: 2
       maxLength: 2048
+    LimitExceededException:
+      type: object
+      properties:
+        Code:
+          $ref: '#/components/schemas/String'
+        Message:
+          $ref: '#/components/schemas/String'
+        RequestId:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The request id associated with the call responsible for the
+            exception.
+      description: The request exceeds the resource limit.
+    ListAttendeesRequest:
+      type: object
+      properties:
+        MeetingId:
+          allOf:
+          - $ref: '#/components/schemas/GuidString'
+          description: The Amazon Chime SDK meeting ID.
+        NextToken:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The token to use to retrieve the next page of results.
+        MaxResults:
+          allOf:
+          - $ref: '#/components/schemas/ResultMax'
+          description: The maximum number of results to return in a single call.
+      required:
+      - MeetingId
+    ListAttendeesResponse:
+      type: object
+      properties:
+        Attendees:
+          allOf:
+          - $ref: '#/components/schemas/AttendeeList'
+          description: The Amazon Chime SDK attendee information.
+        NextToken:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The token to use to retrieve the next page of results.
+    ListTagsForResourceRequest:
+      type: object
+      properties:
+        ResourceARN:
+          allOf:
+          - $ref: '#/components/schemas/AmazonResourceName'
+          description: The ARN of the resource.
+      required:
+      - ResourceARN
+    ListTagsForResourceResponse:
+      type: object
+      properties:
+        Tags:
+          allOf:
+          - $ref: '#/components/schemas/TagList'
+          description: The tags requested for the specified resource.
     MediaCapabilities:
       type: string
       enum:
@@ -116,29 +2226,278 @@ components:
       - Send
       - Receive
       - None
+    MediaPlacement:
+      type: object
+      properties:
+        AudioHostUrl:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The audio host URL.
+        AudioFallbackUrl:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The audio fallback URL.
+        SignalingUrl:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The signaling URL.
+        TurnControlUrl:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: 'The turn control URL.
+
+
+            **This parameter is deprecated and no longer used by the Amazon Chime
+            SDK.**'
+        ScreenDataUrl:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: 'The screen data URL.
+
+
+            **This parameter is deprecated and no longer used by the Amazon Chime
+            SDK.**'
+        ScreenViewingUrl:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: 'The screen viewing URL.
+
+
+            **This parameter is deprecated and no longer used by the Amazon Chime
+            SDK.**'
+        ScreenSharingUrl:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: 'The screen sharing URL.
+
+
+            **This parameter is deprecated and no longer used by the Amazon Chime
+            SDK.**'
+        EventIngestionUrl:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The event ingestion URL.
+      description: A set of endpoints used by clients to connect to the media service
+        group for an Amazon Chime SDK meeting.
     MediaRegion:
       type: string
       minLength: 2
       maxLength: 64
+    Meeting:
+      type: object
+      properties:
+        MeetingId:
+          allOf:
+          - $ref: '#/components/schemas/GuidString'
+          description: The Amazon Chime SDK meeting ID.
+        MeetingHostId:
+          allOf:
+          - $ref: '#/components/schemas/ExternalUserId'
+          description: Reserved.
+        ExternalMeetingId:
+          allOf:
+          - $ref: '#/components/schemas/ExternalMeetingId'
+          description: 'The external meeting ID.
+
+
+            Pattern: `[-_&@+=,(){}\[\]\/«».:|''"#a-zA-Z0-9À-ÿ\s]*`
+
+
+            Values that begin with `aws:` are reserved. You can''t configure a value
+            that uses this prefix. Case insensitive.'
+        MediaRegion:
+          allOf:
+          - $ref: '#/components/schemas/MediaRegion'
+          description: 'The Region in which you create the meeting. Available values:
+            `af-south-1`, `ap-northeast-1`, `ap-northeast-2`, `ap-south-1`, `ap-southeast-1`,
+            `ap-southeast-2`, `ca-central-1`, `eu-central-1`, `eu-north-1`, `eu-south-1`,
+            `eu-west-1`, `eu-west-2`, `eu-west-3`, `sa-east-1`, `us-east-1`, `us-east-2`,
+            `us-west-1`, `us-west-2`.
+
+
+            Available values in Amazon Web Services GovCloud (US) Regions: `us-gov-east-1`,
+            `us-gov-west-1`.'
+        MediaPlacement:
+          allOf:
+          - $ref: '#/components/schemas/MediaPlacement'
+          description: The media placement for the meeting.
+        MeetingFeatures:
+          allOf:
+          - $ref: '#/components/schemas/MeetingFeaturesConfiguration'
+          description: The features available to a meeting, such as echo reduction.
+        PrimaryMeetingId:
+          allOf:
+          - $ref: '#/components/schemas/PrimaryMeetingId'
+          description: When specified, replicates the media from the primary meeting
+            to this meeting.
+        TenantIds:
+          allOf:
+          - $ref: '#/components/schemas/TenantIdList'
+          description: Array of strings.
+        MeetingArn:
+          allOf:
+          - $ref: '#/components/schemas/AmazonResourceName'
+          description: The ARN of the meeting.
+      description: A meeting created using the Amazon Chime SDK.
     MeetingFeatureStatus:
       type: string
       enum:
       - AVAILABLE
       - UNAVAILABLE
+    MeetingFeaturesConfiguration:
+      type: object
+      properties:
+        Audio:
+          allOf:
+          - $ref: '#/components/schemas/AudioFeatures'
+          description: The configuration settings for the audio features available
+            to a meeting.
+        Video:
+          allOf:
+          - $ref: '#/components/schemas/VideoFeatures'
+          description: The configuration settings for the video features available
+            to a meeting.
+        Content:
+          allOf:
+          - $ref: '#/components/schemas/ContentFeatures'
+          description: The configuration settings for the content features available
+            to a meeting.
+        Attendee:
+          allOf:
+          - $ref: '#/components/schemas/AttendeeFeatures'
+          description: The configuration settings for the attendee features available
+            to a meeting.
+      description: The configuration settings of the features available to a meeting.
+    NotFoundException:
+      type: object
+      properties:
+        Code:
+          $ref: '#/components/schemas/String'
+        Message:
+          $ref: '#/components/schemas/String'
+        RequestId:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The request ID associated with the call responsible for the
+            exception.
+      description: One or more of the resources in the request does not exist in the
+        system.
+    NotificationsConfiguration:
+      type: object
+      properties:
+        LambdaFunctionArn:
+          allOf:
+          - $ref: '#/components/schemas/Arn'
+          description: The ARN of the Amazon Web Services Lambda function in the notifications
+            configuration.
+        SnsTopicArn:
+          allOf:
+          - $ref: '#/components/schemas/Arn'
+          description: The ARN of the SNS topic.
+        SqsQueueArn:
+          allOf:
+          - $ref: '#/components/schemas/Arn'
+          description: The ARN of the SQS queue.
+      description: The configuration for resource targets to receive notifications
+        when meeting and attendee events occur.
     PrimaryMeetingId:
       type: string
       minLength: 2
       maxLength: 64
+    ResourceNotFoundException:
+      type: object
+      properties:
+        Code:
+          $ref: '#/components/schemas/String'
+        Message:
+          $ref: '#/components/schemas/String'
+        RequestId:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The ID of the resource that couldn't be found.
+        ResourceName:
+          allOf:
+          - $ref: '#/components/schemas/AmazonResourceName'
+          description: The name of the resource that couldn't be found.
+      description: The resource that you want to tag couldn't be found.
     ResultMax:
       type: integer
       minimum: 1
       maximum: 100
     RetryAfterSeconds:
       type: string
+    ServiceFailureException:
+      type: object
+      properties:
+        Code:
+          $ref: '#/components/schemas/String'
+        Message:
+          $ref: '#/components/schemas/String'
+        RequestId:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The ID of the failed request.
+      description: The service encountered an unexpected error.
+    ServiceUnavailableException:
+      type: object
+      properties:
+        Code:
+          $ref: '#/components/schemas/String'
+        Message:
+          $ref: '#/components/schemas/String'
+        RequestId:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The request id associated with the call responsible for the
+            exception.
+        RetryAfterSeconds:
+          allOf:
+          - $ref: '#/components/schemas/RetryAfterSeconds'
+          description: The number of seconds the caller should wait before retrying.
+      description: The service is currently unavailable.
+    StartMeetingTranscriptionRequest:
+      type: object
+      properties:
+        MeetingId:
+          allOf:
+          - $ref: '#/components/schemas/GuidString'
+          description: The unique ID of the meeting being transcribed.
+        TranscriptionConfiguration:
+          allOf:
+          - $ref: '#/components/schemas/TranscriptionConfiguration'
+          description: The configuration for the current transcription operation.
+            Must contain `EngineTranscribeSettings` or `EngineTranscribeMedicalSettings`.
+      required:
+      - MeetingId
+      - TranscriptionConfiguration
+    StopMeetingTranscriptionRequest:
+      type: object
+      properties:
+        MeetingId:
+          allOf:
+          - $ref: '#/components/schemas/GuidString'
+          description: The unique ID of the meeting for which you stop transcription.
+      required:
+      - MeetingId
     String:
       type: string
       minLength: 0
       maxLength: 4096
+    Tag:
+      type: object
+      properties:
+        Key:
+          allOf:
+          - $ref: '#/components/schemas/TagKey'
+          description: The tag's key.
+        Value:
+          allOf:
+          - $ref: '#/components/schemas/TagValue'
+          description: The tag's value.
+      required:
+      - Key
+      - Value
+      description: A key-value pair that you define.
     TagKey:
       type: string
       pattern: ^[a-zA-Z+-=._:/]+$
@@ -152,6 +2511,23 @@ components:
       type: array
       items:
         $ref: '#/components/schemas/Tag'
+    TagResourceRequest:
+      type: object
+      properties:
+        ResourceARN:
+          allOf:
+          - $ref: '#/components/schemas/AmazonResourceName'
+          description: The ARN of the resource.
+        Tags:
+          allOf:
+          - $ref: '#/components/schemas/TagList'
+          description: Lists the requested tags.
+      required:
+      - ResourceARN
+      - Tags
+    TagResourceResponse:
+      type: object
+      properties: {}
     TagValue:
       type: string
       pattern: ^[\s\w+-=\.:/@]*$
@@ -166,6 +2542,34 @@ components:
       type: array
       items:
         $ref: '#/components/schemas/TenantId'
+    ThrottlingException:
+      type: object
+      properties:
+        Code:
+          $ref: '#/components/schemas/String'
+        Message:
+          $ref: '#/components/schemas/String'
+        RequestId:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The ID of the request that exceeded the throttling limit.
+      description: The number of customer requests exceeds the request rate limit.
+    TooManyTagsException:
+      type: object
+      properties:
+        Code:
+          $ref: '#/components/schemas/String'
+        Message:
+          $ref: '#/components/schemas/String'
+        RequestId:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The ID of the request that contains too many tags.
+        ResourceName:
+          allOf:
+          - $ref: '#/components/schemas/AmazonResourceName'
+          description: The name of the resource that received too many tags.
+      description: Too many tags were added to the specified resource.
     TranscribeContentIdentificationType:
       type: string
       enum:
@@ -271,6 +2675,108 @@ components:
       pattern: ^[a-zA-Z0-9,-._]+$
       minLength: 1
       maxLength: 3000
+    TranscriptionConfiguration:
+      type: object
+      properties:
+        EngineTranscribeSettings:
+          allOf:
+          - $ref: '#/components/schemas/EngineTranscribeSettings'
+          description: The transcription configuration settings passed to Amazon Transcribe.
+        EngineTranscribeMedicalSettings:
+          allOf:
+          - $ref: '#/components/schemas/EngineTranscribeMedicalSettings'
+          description: The transcription configuration settings passed to Amazon Transcribe
+            Medical.
+      description: The configuration for the current transcription operation. Must
+        contain `EngineTranscribeSettings` or `EngineTranscribeMedicalSettings`.
+    UnauthorizedException:
+      type: object
+      properties:
+        Code:
+          $ref: '#/components/schemas/String'
+        Message:
+          $ref: '#/components/schemas/String'
+        RequestId:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The request id associated with the call responsible for the
+            exception.
+      description: The user isn't authorized to request a resource.
+    UnprocessableEntityException:
+      type: object
+      properties:
+        Code:
+          $ref: '#/components/schemas/String'
+        Message:
+          $ref: '#/components/schemas/String'
+        RequestId:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The request id associated with the call responsible for the
+            exception.
+      description: The request was well-formed but was unable to be followed due to
+        semantic errors.
+    UntagResourceRequest:
+      type: object
+      properties:
+        ResourceARN:
+          allOf:
+          - $ref: '#/components/schemas/AmazonResourceName'
+          description: The ARN of the resource that you're removing tags from.
+        TagKeys:
+          allOf:
+          - $ref: '#/components/schemas/TagKeyList'
+          description: The tag keys being removed from the resources.
+      required:
+      - ResourceARN
+      - TagKeys
+    UntagResourceResponse:
+      type: object
+      properties: {}
+    UpdateAttendeeCapabilitiesRequest:
+      type: object
+      properties:
+        MeetingId:
+          allOf:
+          - $ref: '#/components/schemas/GuidString'
+          description: The ID of the meeting associated with the update request.
+        AttendeeId:
+          allOf:
+          - $ref: '#/components/schemas/GuidString'
+          description: The ID of the attendee associated with the update request.
+        Capabilities:
+          allOf:
+          - $ref: '#/components/schemas/AttendeeCapabilities'
+          description: The capabilities that you want to update.
+      required:
+      - MeetingId
+      - AttendeeId
+      - Capabilities
+    UpdateAttendeeCapabilitiesResponse:
+      type: object
+      properties:
+        Attendee:
+          allOf:
+          - $ref: '#/components/schemas/Attendee'
+          description: The updated attendee data.
+    VideoFeatures:
+      type: object
+      properties:
+        MaxResolution:
+          allOf:
+          - $ref: '#/components/schemas/VideoResolution'
+          description: 'The maximum video resolution for the meeting. Applies to all
+            attendees.
+
+
+            Defaults to `HD`. To use `FHD`, you must also provide a `MeetingFeatures:Attendee:MaxCount`
+            value and override the default size limit of 250 attendees.'
+      description: 'The video features set for the meeting. Applies to all attendees.
+
+
+        If you specify `MeetingFeatures:Video:MaxResolution:None` when you create
+        a meeting, all API requests that include `SendReceive`, `Send`, or `Receive`
+        for `AttendeeCapabilities:Video` will be rejected with `ValidationError 400`.'
     VideoResolution:
       type: string
       enum:

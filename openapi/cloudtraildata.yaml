@@ -7,7 +7,7 @@ info:
   x-stackql-serviceName: cloudtrail_data
   x-aws-serviceName: cloudtraildata
   x-aws-protocol: aws.protocols#restJson1
-  x-dateGenerated: '2025-05-05'
+  x-dateGenerated: '2025-05-07'
   version: '2021-08-11'
   title: AWS CloudTrail Data Service
   description: |-
@@ -43,13 +43,88 @@ servers:
       - sa-east-1
       - me-south-1
       default: us-east-1
-paths: {}
+paths:
+  /PutAuditEvents:
+    post:
+      operationId: PutAuditEvents
+      description: |-
+        Ingests your application events into CloudTrail Lake. A required parameter, `auditEvents`, accepts the JSON records (also called _payload_) of events that you want CloudTrail to ingest. You can add up to 100 of these events (or up to 1 MB) per `PutAuditEvents` request.
+      parameters:
+      - name: channelArn
+        in: query
+        required: true
+        schema:
+          $ref: '#/components/schemas/ChannelArn'
+      - name: externalId
+        in: query
+        required: false
+        schema:
+          $ref: '#/components/schemas/ExternalId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                auditEvents:
+                  $ref: '#/components/schemas/AuditEvents'
+      responses:
+        '200': {}
+        '400':
+          description: |-
+            The operation requested is not supported in this region or account.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnsupportedOperationException'
 components:
   schemas:
+    AuditEvent:
+      type: object
+      properties:
+        id:
+          allOf:
+          - $ref: '#/components/schemas/Uuid'
+          description: The original event ID from the source event.
+        eventData:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: The content of an audit event that comes from the event, such
+            as `userIdentity`, `userAgent`, and `eventSource`.
+        eventDataChecksum:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          description: 'A checksum is a base64-SHA256 algorithm that helps you verify
+            that CloudTrail receives the event that matches with the checksum. Calculate
+            the checksum by running a command like the following:
+
+
+            `printf %s _$eventdata_ | openssl dgst -binary -sha256 | base64`'
+      required:
+      - id
+      - eventData
+      description: An event from a source outside of Amazon Web Services that you
+        want CloudTrail to log.
     AuditEventResultEntries:
       type: array
       items:
         $ref: '#/components/schemas/AuditEventResultEntry'
+    AuditEventResultEntry:
+      type: object
+      properties:
+        id:
+          allOf:
+          - $ref: '#/components/schemas/Uuid'
+          description: The original event ID from the source event.
+        eventID:
+          allOf:
+          - $ref: '#/components/schemas/Uuid'
+          description: The event ID assigned by CloudTrail.
+      required:
+      - id
+      - eventID
+      description: A response that includes successful and failed event results.
     AuditEvents:
       type: array
       items:
@@ -57,6 +132,31 @@ components:
     ChannelArn:
       type: string
       pattern: ^arn:.*$
+    ChannelInsufficientPermission:
+      type: object
+      properties:
+        message:
+          $ref: '#/components/schemas/String'
+      description: The caller's account ID must be the same as the channel owner's
+        account ID.
+    ChannelNotFound:
+      type: object
+      properties:
+        message:
+          $ref: '#/components/schemas/String'
+      description: The channel could not be found.
+    ChannelUnsupportedSchema:
+      type: object
+      properties:
+        message:
+          $ref: '#/components/schemas/String'
+      description: The schema type of the event is not supported.
+    DuplicatedAuditEventId:
+      type: object
+      properties:
+        message:
+          $ref: '#/components/schemas/String'
+      description: Two or more entries in the request have the same event ID.
     ErrorCode:
       type: string
       minLength: 1
@@ -70,10 +170,86 @@ components:
       pattern: ^[\w+=,.@:\/-]*$
       minLength: 2
       maxLength: 1224
+    InvalidChannelARN:
+      type: object
+      properties:
+        message:
+          $ref: '#/components/schemas/String'
+      description: The specified channel ARN is not a valid channel ARN.
+    PutAuditEventsRequest:
+      type: object
+      properties:
+        auditEvents:
+          allOf:
+          - $ref: '#/components/schemas/AuditEvents'
+          description: The JSON payload of events that you want to ingest. You can
+            also point to the JSON event payload in a file.
+        channelArn:
+          allOf:
+          - $ref: '#/components/schemas/ChannelArn'
+          description: The ARN or ID (the ARN suffix) of a channel.
+        externalId:
+          allOf:
+          - $ref: '#/components/schemas/ExternalId'
+          description: A unique identifier that is conditionally required when the
+            channel's resource policy includes an external ID. This value can be any
+            string, such as a passphrase or account number.
+      required:
+      - auditEvents
+      - channelArn
+    PutAuditEventsResponse:
+      type: object
+      properties:
+        successful:
+          allOf:
+          - $ref: '#/components/schemas/AuditEventResultEntries'
+          description: Lists events in the provided event payload that were successfully
+            ingested into CloudTrail.
+        failed:
+          allOf:
+          - $ref: '#/components/schemas/ResultErrorEntries'
+          description: Lists events in the provided event payload that could not be
+            ingested into CloudTrail, and includes the error code and error message
+            returned for events that could not be ingested.
+      required:
+      - successful
+      - failed
     ResultErrorEntries:
       type: array
       items:
         $ref: '#/components/schemas/ResultErrorEntry'
+    ResultErrorEntry:
+      type: object
+      properties:
+        id:
+          allOf:
+          - $ref: '#/components/schemas/Uuid'
+          description: The original event ID from the source event that could not
+            be ingested by CloudTrail.
+        errorCode:
+          allOf:
+          - $ref: '#/components/schemas/ErrorCode'
+          description: 'The error code for events that could not be ingested by CloudTrail.
+            Possible error codes include: `FieldTooLong`, `FieldNotFound`, `InvalidChecksum`,
+            `InvalidData`, `InvalidRecipient`, `InvalidEventSource`, `AccountNotSubscribed`,
+            `Throttling`, and `InternalFailure`.'
+        errorMessage:
+          allOf:
+          - $ref: '#/components/schemas/ErrorMessage'
+          description: The message that describes the error for events that could
+            not be ingested by CloudTrail.
+      required:
+      - id
+      - errorCode
+      - errorMessage
+      description: Includes the error code and error message for events that could
+        not be ingested by CloudTrail.
+    UnsupportedOperationException:
+      type: object
+      properties:
+        message:
+          $ref: '#/components/schemas/String'
+      description: The operation requested is not supported in this region or account.
     Uuid:
       type: string
       pattern: ^[-_A-Za-z0-9]+$

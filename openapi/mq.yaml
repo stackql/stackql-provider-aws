@@ -7,7 +7,7 @@ info:
   x-stackql-serviceName: mq
   x-aws-serviceName: mq
   x-aws-protocol: aws.protocols#restJson1
-  x-dateGenerated: '2025-05-05'
+  x-dateGenerated: '2025-05-07'
   version: '2017-11-27'
   title: AmazonMQ
   description: |-
@@ -43,9 +43,1276 @@ servers:
       - sa-east-1
       - me-south-1
       default: us-east-1
-paths: {}
+paths:
+  /v1/brokers:
+    post:
+      operationId: CreateBroker
+      description: |-
+        Creates a broker. Note: This API is asynchronous.
+
+        To create a broker, you must either use the AmazonMQFullAccess IAM policy or include the following EC2 permissions in your IAM policy.
+
+          * ec2:CreateNetworkInterface
+
+        This permission is required to allow Amazon MQ to create an elastic network interface (ENI) on behalf of your account.
+
+          * ec2:CreateNetworkInterfacePermission
+
+        This permission is required to attach the ENI to the broker instance.
+
+          * ec2:DeleteNetworkInterface
+
+          * ec2:DeleteNetworkInterfacePermission
+
+          * ec2:DetachNetworkInterface
+
+          * ec2:DescribeInternetGateways
+
+          * ec2:DescribeNetworkInterfaces
+
+          * ec2:DescribeNetworkInterfacePermissions
+
+          * ec2:DescribeRouteTables
+
+          * ec2:DescribeSecurityGroups
+
+          * ec2:DescribeSubnets
+
+          * ec2:DescribeVpcs
+
+        For more information, see [Create an IAM User and Get Your Amazon Web Services Credentials](https://docs.aws.amazon.com//amazon-mq/latest/developer-guide/amazon-mq-setting-up.html#create-iam-user) and [Never Modify or Delete the Amazon MQ Elastic Network Interface](https://docs.aws.amazon.com//amazon-mq/latest/developer-guide/connecting-to-amazon-mq.html#never-modify-delete-elastic-network-interface) in the _Amazon MQ Developer Guide_.
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                AuthenticationStrategy:
+                  $ref: '#/components/schemas/AuthenticationStrategy'
+                AutoMinorVersionUpgrade:
+                  $ref: '#/components/schemas/__boolean'
+                BrokerName:
+                  $ref: '#/components/schemas/__string'
+                Configuration:
+                  $ref: '#/components/schemas/ConfigurationId'
+                CreatorRequestId:
+                  $ref: '#/components/schemas/__string'
+                DeploymentMode:
+                  $ref: '#/components/schemas/DeploymentMode'
+                EncryptionOptions:
+                  $ref: '#/components/schemas/EncryptionOptions'
+                EngineType:
+                  $ref: '#/components/schemas/EngineType'
+                EngineVersion:
+                  $ref: '#/components/schemas/__string'
+                HostInstanceType:
+                  $ref: '#/components/schemas/__string'
+                LdapServerMetadata:
+                  $ref: '#/components/schemas/LdapServerMetadataInput'
+                Logs:
+                  $ref: '#/components/schemas/Logs'
+                MaintenanceWindowStartTime:
+                  $ref: '#/components/schemas/WeeklyStartTime'
+                PubliclyAccessible:
+                  $ref: '#/components/schemas/__boolean'
+                SecurityGroups:
+                  $ref: '#/components/schemas/__listOf__string'
+                StorageType:
+                  $ref: '#/components/schemas/BrokerStorageType'
+                SubnetIds:
+                  $ref: '#/components/schemas/__listOf__string'
+                Tags:
+                  $ref: '#/components/schemas/__mapOf__string'
+                Users:
+                  $ref: '#/components/schemas/__listOfUser'
+                DataReplicationMode:
+                  $ref: '#/components/schemas/DataReplicationMode'
+                DataReplicationPrimaryBrokerArn:
+                  $ref: '#/components/schemas/__string'
+      responses:
+        '200': {}
+        '400':
+          description: |-
+            Returns information about an error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequestException'
+        '409':
+          description: |-
+            Returns information about an error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConflictException'
+        '403':
+          description: |-
+            Returns information about an error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ForbiddenException'
+        '500':
+          description: |-
+            Returns information about an error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerErrorException'
+        '401':
+          description: |-
+            Returns information about an error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnauthorizedException'
+    get:
+      operationId: ListBrokers
+      description: |-
+        Returns a list of all brokers.
+      parameters:
+      - name: maxResults
+        in: query
+        required: false
+        schema:
+          $ref: '#/components/schemas/MaxResults'
+      - name: nextToken
+        in: query
+        required: false
+        schema:
+          $ref: '#/components/schemas/__string'
+      responses:
+        '200': {}
+        '400':
+          description: |-
+            Returns information about an error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequestException'
+        '403':
+          description: |-
+            Returns information about an error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ForbiddenException'
+        '500':
+          description: |-
+            Returns information about an error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerErrorException'
+  /v1/configurations:
+    post:
+      operationId: CreateConfiguration
+      description: |-
+        Creates a new configuration for the specified configuration name. Amazon MQ uses the default configuration (the engine type and version).
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                AuthenticationStrategy:
+                  $ref: '#/components/schemas/AuthenticationStrategy'
+                EngineType:
+                  $ref: '#/components/schemas/EngineType'
+                EngineVersion:
+                  $ref: '#/components/schemas/__string'
+                Name:
+                  $ref: '#/components/schemas/__string'
+                Tags:
+                  $ref: '#/components/schemas/__mapOf__string'
+      responses:
+        '200': {}
+        '400':
+          description: |-
+            Returns information about an error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequestException'
+        '409':
+          description: |-
+            Returns information about an error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConflictException'
+        '403':
+          description: |-
+            Returns information about an error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ForbiddenException'
+        '500':
+          description: |-
+            Returns information about an error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerErrorException'
+    get:
+      operationId: ListConfigurations
+      description: |-
+        Returns a list of all configurations.
+      parameters:
+      - name: maxResults
+        in: query
+        required: false
+        schema:
+          $ref: '#/components/schemas/MaxResults'
+      - name: nextToken
+        in: query
+        required: false
+        schema:
+          $ref: '#/components/schemas/__string'
+      responses:
+        '200': {}
+        '400':
+          description: |-
+            Returns information about an error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequestException'
+        '403':
+          description: |-
+            Returns information about an error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ForbiddenException'
+        '500':
+          description: |-
+            Returns information about an error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerErrorException'
+  /v1/tags/{ResourceArn}:
+    post:
+      operationId: CreateTags
+      description: |-
+        Add a tag to a resource.
+      parameters:
+      - name: ResourceArn
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/__string'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                Tags:
+                  $ref: '#/components/schemas/__mapOf__string'
+      responses:
+        '204': {}
+        '400':
+          description: |-
+            Returns information about an error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequestException'
+        '403':
+          description: |-
+            Returns information about an error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ForbiddenException'
+        '500':
+          description: |-
+            Returns information about an error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerErrorException'
+        '404':
+          description: |-
+            Returns information about an error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFoundException'
+    delete:
+      operationId: DeleteTags
+      description: |-
+        Removes a tag from a resource.
+      parameters:
+      - name: ResourceArn
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/__string'
+      - name: tagKeys
+        in: query
+        required: true
+        schema:
+          $ref: '#/components/schemas/__listOf__string'
+      responses:
+        '204': {}
+        '400':
+          description: |-
+            Returns information about an error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequestException'
+        '403':
+          description: |-
+            Returns information about an error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ForbiddenException'
+        '500':
+          description: |-
+            Returns information about an error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerErrorException'
+        '404':
+          description: |-
+            Returns information about an error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFoundException'
+    get:
+      operationId: ListTags
+      description: |-
+        Lists tags for a resource.
+      parameters:
+      - name: ResourceArn
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/__string'
+      responses:
+        '200': {}
+        '400':
+          description: |-
+            Returns information about an error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequestException'
+        '403':
+          description: |-
+            Returns information about an error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ForbiddenException'
+        '500':
+          description: |-
+            Returns information about an error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerErrorException'
+        '404':
+          description: |-
+            Returns information about an error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFoundException'
+  /v1/brokers/{BrokerId}/users/{Username}:
+    post:
+      operationId: CreateUser
+      description: |-
+        Creates an ActiveMQ user.
+
+        Do not add personally identifiable information (PII) or other confidential or sensitive information in broker usernames. Broker usernames are accessible to other Amazon Web Services services, including CloudWatch Logs. Broker usernames are not intended to be used for private or sensitive data.
+      parameters:
+      - name: BrokerId
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/__string'
+      - name: Username
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/__string'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                ConsoleAccess:
+                  $ref: '#/components/schemas/__boolean'
+                Groups:
+                  $ref: '#/components/schemas/__listOf__string'
+                Password:
+                  $ref: '#/components/schemas/__string'
+                ReplicationUser:
+                  $ref: '#/components/schemas/__boolean'
+      responses:
+        '200': {}
+        '400':
+          description: |-
+            Returns information about an error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequestException'
+        '409':
+          description: |-
+            Returns information about an error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConflictException'
+        '403':
+          description: |-
+            Returns information about an error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ForbiddenException'
+        '500':
+          description: |-
+            Returns information about an error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerErrorException'
+        '404':
+          description: |-
+            Returns information about an error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFoundException'
+    delete:
+      operationId: DeleteUser
+      description: |-
+        Deletes an ActiveMQ user.
+      parameters:
+      - name: BrokerId
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/__string'
+      - name: Username
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/__string'
+      responses:
+        '200': {}
+        '400':
+          description: |-
+            Returns information about an error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequestException'
+        '403':
+          description: |-
+            Returns information about an error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ForbiddenException'
+        '500':
+          description: |-
+            Returns information about an error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerErrorException'
+        '404':
+          description: |-
+            Returns information about an error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFoundException'
+    get:
+      operationId: DescribeUser
+      description: |-
+        Returns information about an ActiveMQ user.
+      parameters:
+      - name: BrokerId
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/__string'
+      - name: Username
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/__string'
+      responses:
+        '200': {}
+        '400':
+          description: |-
+            Returns information about an error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequestException'
+        '403':
+          description: |-
+            Returns information about an error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ForbiddenException'
+        '500':
+          description: |-
+            Returns information about an error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerErrorException'
+        '404':
+          description: |-
+            Returns information about an error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFoundException'
+    put:
+      operationId: UpdateUser
+      description: |-
+        Updates the information for an ActiveMQ user.
+      parameters:
+      - name: BrokerId
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/__string'
+      - name: Username
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/__string'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                ConsoleAccess:
+                  $ref: '#/components/schemas/__boolean'
+                Groups:
+                  $ref: '#/components/schemas/__listOf__string'
+                Password:
+                  $ref: '#/components/schemas/__string'
+                ReplicationUser:
+                  $ref: '#/components/schemas/__boolean'
+      responses:
+        '200': {}
+        '400':
+          description: |-
+            Returns information about an error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequestException'
+        '409':
+          description: |-
+            Returns information about an error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConflictException'
+        '403':
+          description: |-
+            Returns information about an error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ForbiddenException'
+        '500':
+          description: |-
+            Returns information about an error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerErrorException'
+        '404':
+          description: |-
+            Returns information about an error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFoundException'
+  /v1/brokers/{BrokerId}:
+    delete:
+      operationId: DeleteBroker
+      description: |-
+        Deletes a broker. Note: This API is asynchronous.
+      parameters:
+      - name: BrokerId
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/__string'
+      responses:
+        '200': {}
+        '400':
+          description: |-
+            Returns information about an error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequestException'
+        '403':
+          description: |-
+            Returns information about an error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ForbiddenException'
+        '500':
+          description: |-
+            Returns information about an error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerErrorException'
+        '404':
+          description: |-
+            Returns information about an error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFoundException'
+    get:
+      operationId: DescribeBroker
+      description: |-
+        Returns information about the specified broker.
+      parameters:
+      - name: BrokerId
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/__string'
+      responses:
+        '200': {}
+        '400':
+          description: |-
+            Returns information about an error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequestException'
+        '403':
+          description: |-
+            Returns information about an error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ForbiddenException'
+        '500':
+          description: |-
+            Returns information about an error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerErrorException'
+        '404':
+          description: |-
+            Returns information about an error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFoundException'
+    put:
+      operationId: UpdateBroker
+      description: |-
+        Adds a pending configuration change to a broker.
+      parameters:
+      - name: BrokerId
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/__string'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                AuthenticationStrategy:
+                  $ref: '#/components/schemas/AuthenticationStrategy'
+                AutoMinorVersionUpgrade:
+                  $ref: '#/components/schemas/__boolean'
+                Configuration:
+                  $ref: '#/components/schemas/ConfigurationId'
+                EngineVersion:
+                  $ref: '#/components/schemas/__string'
+                HostInstanceType:
+                  $ref: '#/components/schemas/__string'
+                LdapServerMetadata:
+                  $ref: '#/components/schemas/LdapServerMetadataInput'
+                Logs:
+                  $ref: '#/components/schemas/Logs'
+                MaintenanceWindowStartTime:
+                  $ref: '#/components/schemas/WeeklyStartTime'
+                SecurityGroups:
+                  $ref: '#/components/schemas/__listOf__string'
+                DataReplicationMode:
+                  $ref: '#/components/schemas/DataReplicationMode'
+      responses:
+        '200': {}
+        '400':
+          description: |-
+            Returns information about an error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequestException'
+        '409':
+          description: |-
+            Returns information about an error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConflictException'
+        '403':
+          description: |-
+            Returns information about an error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ForbiddenException'
+        '500':
+          description: |-
+            Returns information about an error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerErrorException'
+        '404':
+          description: |-
+            Returns information about an error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFoundException'
+  /v1/configurations/{ConfigurationId}:
+    delete:
+      operationId: DeleteConfiguration
+      description: |-
+        Deletes the specified configuration.
+      parameters:
+      - name: ConfigurationId
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/__string'
+      responses:
+        '200': {}
+        '400':
+          description: |-
+            Returns information about an error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequestException'
+        '409':
+          description: |-
+            Returns information about an error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConflictException'
+        '403':
+          description: |-
+            Returns information about an error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ForbiddenException'
+        '500':
+          description: |-
+            Returns information about an error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerErrorException'
+        '404':
+          description: |-
+            Returns information about an error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFoundException'
+    get:
+      operationId: DescribeConfiguration
+      description: |-
+        Returns information about the specified configuration.
+      parameters:
+      - name: ConfigurationId
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/__string'
+      responses:
+        '200': {}
+        '400':
+          description: |-
+            Returns information about an error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequestException'
+        '403':
+          description: |-
+            Returns information about an error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ForbiddenException'
+        '500':
+          description: |-
+            Returns information about an error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerErrorException'
+        '404':
+          description: |-
+            Returns information about an error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFoundException'
+    put:
+      operationId: UpdateConfiguration
+      description: |-
+        Updates the specified configuration.
+      parameters:
+      - name: ConfigurationId
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/__string'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                Data:
+                  $ref: '#/components/schemas/__string'
+                Description:
+                  $ref: '#/components/schemas/__string'
+      responses:
+        '200': {}
+        '400':
+          description: |-
+            Returns information about an error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequestException'
+        '409':
+          description: |-
+            Returns information about an error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConflictException'
+        '403':
+          description: |-
+            Returns information about an error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ForbiddenException'
+        '500':
+          description: |-
+            Returns information about an error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerErrorException'
+        '404':
+          description: |-
+            Returns information about an error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFoundException'
+  /v1/broker-engine-types:
+    get:
+      operationId: DescribeBrokerEngineTypes
+      description: |-
+        Describe available engine types and versions.
+      parameters:
+      - name: engineType
+        in: query
+        required: false
+        schema:
+          $ref: '#/components/schemas/__string'
+      - name: maxResults
+        in: query
+        required: false
+        schema:
+          $ref: '#/components/schemas/MaxResults'
+      - name: nextToken
+        in: query
+        required: false
+        schema:
+          $ref: '#/components/schemas/__string'
+      responses:
+        '200': {}
+        '400':
+          description: |-
+            Returns information about an error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequestException'
+        '403':
+          description: |-
+            Returns information about an error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ForbiddenException'
+        '500':
+          description: |-
+            Returns information about an error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerErrorException'
+  /v1/broker-instance-options:
+    get:
+      operationId: DescribeBrokerInstanceOptions
+      description: |-
+        Describe available broker instance options.
+      parameters:
+      - name: engineType
+        in: query
+        required: false
+        schema:
+          $ref: '#/components/schemas/__string'
+      - name: hostInstanceType
+        in: query
+        required: false
+        schema:
+          $ref: '#/components/schemas/__string'
+      - name: maxResults
+        in: query
+        required: false
+        schema:
+          $ref: '#/components/schemas/MaxResults'
+      - name: nextToken
+        in: query
+        required: false
+        schema:
+          $ref: '#/components/schemas/__string'
+      - name: storageType
+        in: query
+        required: false
+        schema:
+          $ref: '#/components/schemas/__string'
+      responses:
+        '200': {}
+        '400':
+          description: |-
+            Returns information about an error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequestException'
+        '403':
+          description: |-
+            Returns information about an error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ForbiddenException'
+        '500':
+          description: |-
+            Returns information about an error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerErrorException'
+  /v1/configurations/{ConfigurationId}/revisions/{ConfigurationRevision}:
+    get:
+      operationId: DescribeConfigurationRevision
+      description: |-
+        Returns the specified configuration revision for the specified configuration.
+      parameters:
+      - name: ConfigurationId
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/__string'
+      - name: ConfigurationRevision
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/__string'
+      responses:
+        '200': {}
+        '400':
+          description: |-
+            Returns information about an error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequestException'
+        '403':
+          description: |-
+            Returns information about an error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ForbiddenException'
+        '500':
+          description: |-
+            Returns information about an error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerErrorException'
+        '404':
+          description: |-
+            Returns information about an error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFoundException'
+  /v1/configurations/{ConfigurationId}/revisions:
+    get:
+      operationId: ListConfigurationRevisions
+      description: |-
+        Returns a list of all revisions for the specified configuration.
+      parameters:
+      - name: ConfigurationId
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/__string'
+      - name: maxResults
+        in: query
+        required: false
+        schema:
+          $ref: '#/components/schemas/MaxResults'
+      - name: nextToken
+        in: query
+        required: false
+        schema:
+          $ref: '#/components/schemas/__string'
+      responses:
+        '200': {}
+        '400':
+          description: |-
+            Returns information about an error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequestException'
+        '403':
+          description: |-
+            Returns information about an error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ForbiddenException'
+        '500':
+          description: |-
+            Returns information about an error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerErrorException'
+        '404':
+          description: |-
+            Returns information about an error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFoundException'
+  /v1/brokers/{BrokerId}/users:
+    get:
+      operationId: ListUsers
+      description: |-
+        Returns a list of all ActiveMQ users.
+      parameters:
+      - name: BrokerId
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/__string'
+      - name: maxResults
+        in: query
+        required: false
+        schema:
+          $ref: '#/components/schemas/MaxResults'
+      - name: nextToken
+        in: query
+        required: false
+        schema:
+          $ref: '#/components/schemas/__string'
+      responses:
+        '200': {}
+        '400':
+          description: |-
+            Returns information about an error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequestException'
+        '403':
+          description: |-
+            Returns information about an error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ForbiddenException'
+        '500':
+          description: |-
+            Returns information about an error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerErrorException'
+        '404':
+          description: |-
+            Returns information about an error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFoundException'
+  /v1/brokers/{BrokerId}/promote:
+    post:
+      operationId: Promote
+      description: |-
+        Promotes a data replication replica broker to the primary broker role.
+      parameters:
+      - name: BrokerId
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/__string'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                Mode:
+                  $ref: '#/components/schemas/PromoteMode'
+      responses:
+        '200': {}
+        '400':
+          description: |-
+            Returns information about an error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequestException'
+        '403':
+          description: |-
+            Returns information about an error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ForbiddenException'
+        '500':
+          description: |-
+            Returns information about an error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerErrorException'
+        '404':
+          description: |-
+            Returns information about an error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFoundException'
+  /v1/brokers/{BrokerId}/reboot:
+    post:
+      operationId: RebootBroker
+      description: |-
+        Reboots a broker. Note: This API is asynchronous.
+      parameters:
+      - name: BrokerId
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/__string'
+      responses:
+        '200': {}
+        '400':
+          description: |-
+            Returns information about an error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequestException'
+        '403':
+          description: |-
+            Returns information about an error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ForbiddenException'
+        '500':
+          description: |-
+            Returns information about an error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerErrorException'
+        '404':
+          description: |-
+            Returns information about an error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFoundException'
 components:
   schemas:
+    ActionRequired:
+      type: object
+      properties:
+        ActionRequiredCode:
+          allOf:
+          - $ref: '#/components/schemas/__string'
+          description: The code you can use to find instructions on the action required
+            to resolve your broker issue.
+        ActionRequiredInfo:
+          allOf:
+          - $ref: '#/components/schemas/__string'
+          description: Information about the action required to resolve your broker
+            issue.
+      description: Action required for a broker.
     AuthenticationStrategy:
       type: string
       enum:
@@ -53,6 +1320,83 @@ components:
       - LDAP
       description: <p>Optional. The authentication strategy used to secure the broker.
         The default is SIMPLE.</p>
+    AvailabilityZone:
+      type: object
+      properties:
+        Name:
+          allOf:
+          - $ref: '#/components/schemas/__string'
+          description: Id for the availability zone.
+      description: Name of the availability zone.
+    BadRequestException:
+      type: object
+      properties:
+        ErrorAttribute:
+          allOf:
+          - $ref: '#/components/schemas/__string'
+          description: The attribute which caused the error.
+        Message:
+          allOf:
+          - $ref: '#/components/schemas/__string'
+          description: The explanation of the error.
+      description: Returns information about an error.
+    BrokerEngineType:
+      type: object
+      properties:
+        EngineType:
+          allOf:
+          - $ref: '#/components/schemas/EngineType'
+          description: The broker's engine type.
+        EngineVersions:
+          allOf:
+          - $ref: '#/components/schemas/__listOfEngineVersion'
+          description: The list of engine versions.
+      description: Types of broker engines.
+    BrokerInstance:
+      type: object
+      properties:
+        ConsoleURL:
+          allOf:
+          - $ref: '#/components/schemas/__string'
+          description: The brokers web console URL.
+        Endpoints:
+          allOf:
+          - $ref: '#/components/schemas/__listOf__string'
+          description: The broker's wire-level protocol endpoints.
+        IpAddress:
+          allOf:
+          - $ref: '#/components/schemas/__string'
+          description: The IP address of the Elastic Network Interface (ENI) attached
+            to the broker. Does not apply to RabbitMQ brokers.
+      description: Returns information about all brokers.
+    BrokerInstanceOption:
+      type: object
+      properties:
+        AvailabilityZones:
+          allOf:
+          - $ref: '#/components/schemas/__listOfAvailabilityZone'
+          description: The list of available az.
+        EngineType:
+          allOf:
+          - $ref: '#/components/schemas/EngineType'
+          description: The broker's engine type.
+        HostInstanceType:
+          allOf:
+          - $ref: '#/components/schemas/__string'
+          description: The broker's instance type.
+        StorageType:
+          allOf:
+          - $ref: '#/components/schemas/BrokerStorageType'
+          description: The broker's storage type.
+        SupportedDeploymentModes:
+          allOf:
+          - $ref: '#/components/schemas/__listOfDeploymentMode'
+          description: The list of supported deployment modes.
+        SupportedEngineVersions:
+          allOf:
+          - $ref: '#/components/schemas/__listOf__string'
+          description: The list of supported engine versions.
+      description: Option for host instance type.
     BrokerState:
       type: string
       enum:
@@ -71,6 +1415,48 @@ components:
       - EFS
       description: <p>The broker's storage type.</p> <important><p>EFS is not supported
         for RabbitMQ engine type.</p></important>
+    BrokerSummary:
+      type: object
+      properties:
+        BrokerArn:
+          allOf:
+          - $ref: '#/components/schemas/__string'
+          description: The broker's Amazon Resource Name (ARN).
+        BrokerId:
+          allOf:
+          - $ref: '#/components/schemas/__string'
+          description: The unique ID that Amazon MQ generates for the broker.
+        BrokerName:
+          allOf:
+          - $ref: '#/components/schemas/__string'
+          description: The broker's name. This value is unique in your Amazon Web
+            Services account, 1-50 characters long, and containing only letters, numbers,
+            dashes, and underscores, and must not contain white spaces, brackets,
+            wildcard characters, or special characters.
+        BrokerState:
+          allOf:
+          - $ref: '#/components/schemas/BrokerState'
+          description: The broker's status.
+        Created:
+          allOf:
+          - $ref: '#/components/schemas/__timestampIso8601'
+          description: The time when the broker was created.
+        DeploymentMode:
+          allOf:
+          - $ref: '#/components/schemas/DeploymentMode'
+          description: The broker's deployment mode.
+        EngineType:
+          allOf:
+          - $ref: '#/components/schemas/EngineType'
+          description: The type of broker engine.
+        HostInstanceType:
+          allOf:
+          - $ref: '#/components/schemas/__string'
+          description: The broker's instance type.
+      required:
+      - DeploymentMode
+      - EngineType
+      description: Returns information about all brokers.
     ChangeType:
       type: string
       enum:
@@ -78,6 +1464,447 @@ components:
       - UPDATE
       - DELETE
       description: <p>The type of change pending for the ActiveMQ user.</p>
+    Configuration:
+      type: object
+      properties:
+        Arn:
+          allOf:
+          - $ref: '#/components/schemas/__string'
+          description: Required. The ARN of the configuration.
+        AuthenticationStrategy:
+          allOf:
+          - $ref: '#/components/schemas/AuthenticationStrategy'
+          description: Optional. The authentication strategy associated with the configuration.
+            The default is SIMPLE.
+        Created:
+          allOf:
+          - $ref: '#/components/schemas/__timestampIso8601'
+          description: Required. The date and time of the configuration revision.
+        Description:
+          allOf:
+          - $ref: '#/components/schemas/__string'
+          description: Required. The description of the configuration.
+        EngineType:
+          allOf:
+          - $ref: '#/components/schemas/EngineType'
+          description: Required. The type of broker engine. Currently, Amazon MQ supports
+            ACTIVEMQ and RABBITMQ.
+        EngineVersion:
+          allOf:
+          - $ref: '#/components/schemas/__string'
+          description: The broker engine version. Defaults to the latest available
+            version for the specified broker engine type. For a list of supported
+            engine versions, see the [ActiveMQ version management](https://docs.aws.amazon.com//amazon-mq/latest/developer-guide/activemq-version-management.html)
+            and the [RabbitMQ version management](https://docs.aws.amazon.com//amazon-mq/latest/developer-guide/rabbitmq-version-management.html)
+            sections in the Amazon MQ Developer Guide.
+        Id:
+          allOf:
+          - $ref: '#/components/schemas/__string'
+          description: Required. The unique ID that Amazon MQ generates for the configuration.
+        LatestRevision:
+          allOf:
+          - $ref: '#/components/schemas/ConfigurationRevision'
+          description: Required. The latest revision of the configuration.
+        Name:
+          allOf:
+          - $ref: '#/components/schemas/__string'
+          description: Required. The name of the configuration. This value can contain
+            only alphanumeric characters, dashes, periods, underscores, and tildes
+            (- . _ ~). This value must be 1-150 characters long.
+        Tags:
+          allOf:
+          - $ref: '#/components/schemas/__mapOf__string'
+          description: The list of all tags associated with this configuration.
+      required:
+      - Arn
+      - AuthenticationStrategy
+      - Created
+      - Description
+      - EngineType
+      - EngineVersion
+      - Id
+      - LatestRevision
+      - Name
+      description: Returns information about all configurations.
+    ConfigurationId:
+      type: object
+      properties:
+        Id:
+          allOf:
+          - $ref: '#/components/schemas/__string'
+          description: Required. The unique ID that Amazon MQ generates for the configuration.
+        Revision:
+          allOf:
+          - $ref: '#/components/schemas/__integer'
+          description: The revision number of the configuration.
+      required:
+      - Id
+      description: A list of information about the configuration.
+    ConfigurationRevision:
+      type: object
+      properties:
+        Created:
+          allOf:
+          - $ref: '#/components/schemas/__timestampIso8601'
+          description: Required. The date and time of the configuration revision.
+        Description:
+          allOf:
+          - $ref: '#/components/schemas/__string'
+          description: The description of the configuration revision.
+        Revision:
+          allOf:
+          - $ref: '#/components/schemas/__integer'
+          description: Required. The revision number of the configuration.
+      required:
+      - Created
+      - Revision
+      description: Returns information about the specified configuration revision.
+    Configurations:
+      type: object
+      properties:
+        Current:
+          allOf:
+          - $ref: '#/components/schemas/ConfigurationId'
+          description: The broker's current configuration.
+        History:
+          allOf:
+          - $ref: '#/components/schemas/__listOfConfigurationId'
+          description: The history of configurations applied to the broker.
+        Pending:
+          allOf:
+          - $ref: '#/components/schemas/ConfigurationId'
+          description: The broker's pending configuration.
+      description: Broker configuration information
+    ConflictException:
+      type: object
+      properties:
+        ErrorAttribute:
+          allOf:
+          - $ref: '#/components/schemas/__string'
+          description: The attribute which caused the error.
+        Message:
+          allOf:
+          - $ref: '#/components/schemas/__string'
+          description: The explanation of the error.
+      description: Returns information about an error.
+    CreateBrokerRequest:
+      type: object
+      properties:
+        AuthenticationStrategy:
+          allOf:
+          - $ref: '#/components/schemas/AuthenticationStrategy'
+          description: Optional. The authentication strategy used to secure the broker.
+            The default is SIMPLE.
+        AutoMinorVersionUpgrade:
+          allOf:
+          - $ref: '#/components/schemas/__boolean'
+          description: 'Enables automatic upgrades to new patch versions for brokers
+            as new versions are released and supported by Amazon MQ. Automatic upgrades
+            occur during the scheduled maintenance window or after a manual broker
+            reboot. Set to true by default, if no value is specified.
+
+
+            Must be set to true for ActiveMQ brokers version 5.18 and above and for
+            RabbitMQ brokers version 3.13 and above.'
+        BrokerName:
+          allOf:
+          - $ref: '#/components/schemas/__string'
+          description: 'Required. The broker''s name. This value must be unique in
+            your Amazon Web Services account, 1-50 characters long, must contain only
+            letters, numbers, dashes, and underscores, and must not contain white
+            spaces, brackets, wildcard characters, or special characters.
+
+
+            Do not add personally identifiable information (PII) or other confidential
+            or sensitive information in broker names. Broker names are accessible
+            to other Amazon Web Services services, including CloudWatch Logs. Broker
+            names are not intended to be used for private or sensitive data.'
+        Configuration:
+          allOf:
+          - $ref: '#/components/schemas/ConfigurationId'
+          description: A list of information about the configuration.
+        CreatorRequestId:
+          allOf:
+          - $ref: '#/components/schemas/__string'
+          description: 'The unique ID that the requester receives for the created
+            broker. Amazon MQ passes your ID with the API action.
+
+
+            We recommend using a Universally Unique Identifier (UUID) for the creatorRequestId.
+            You may omit the creatorRequestId if your application doesn''t require
+            idempotency.'
+        DeploymentMode:
+          allOf:
+          - $ref: '#/components/schemas/DeploymentMode'
+          description: Required. The broker's deployment mode.
+        EncryptionOptions:
+          allOf:
+          - $ref: '#/components/schemas/EncryptionOptions'
+          description: Encryption options for the broker.
+        EngineType:
+          allOf:
+          - $ref: '#/components/schemas/EngineType'
+          description: Required. The type of broker engine. Currently, Amazon MQ supports
+            ACTIVEMQ and RABBITMQ.
+        EngineVersion:
+          allOf:
+          - $ref: '#/components/schemas/__string'
+          description: The broker engine version. Defaults to the latest available
+            version for the specified broker engine type. For more information, see
+            the [ActiveMQ version management](https://docs.aws.amazon.com//amazon-mq/latest/developer-guide/activemq-version-management.html)
+            and the [RabbitMQ version management](https://docs.aws.amazon.com//amazon-mq/latest/developer-guide/rabbitmq-version-management.html)
+            sections in the Amazon MQ Developer Guide.
+        HostInstanceType:
+          allOf:
+          - $ref: '#/components/schemas/__string'
+          description: Required. The broker's instance type.
+        LdapServerMetadata:
+          allOf:
+          - $ref: '#/components/schemas/LdapServerMetadataInput'
+          description: Optional. The metadata of the LDAP server used to authenticate
+            and authorize connections to the broker. Does not apply to RabbitMQ brokers.
+        Logs:
+          allOf:
+          - $ref: '#/components/schemas/Logs'
+          description: Enables Amazon CloudWatch logging for brokers.
+        MaintenanceWindowStartTime:
+          allOf:
+          - $ref: '#/components/schemas/WeeklyStartTime'
+          description: The parameters that determine the WeeklyStartTime.
+        PubliclyAccessible:
+          allOf:
+          - $ref: '#/components/schemas/__boolean'
+          description: Enables connections from applications outside of the VPC that
+            hosts the broker's subnets. Set to false by default, if no value is provided.
+        SecurityGroups:
+          allOf:
+          - $ref: '#/components/schemas/__listOf__string'
+          description: The list of rules (1 minimum, 125 maximum) that authorize connections
+            to brokers.
+        StorageType:
+          allOf:
+          - $ref: '#/components/schemas/BrokerStorageType'
+          description: The broker's storage type.
+        SubnetIds:
+          allOf:
+          - $ref: '#/components/schemas/__listOf__string'
+          description: 'The list of groups that define which subnets and IP ranges
+            the broker can use from different Availability Zones. If you specify more
+            than one subnet, the subnets must be in different Availability Zones.
+            Amazon MQ will not be able to create VPC endpoints for your broker with
+            multiple subnets in the same Availability Zone. A SINGLE_INSTANCE deployment
+            requires one subnet (for example, the default subnet). An ACTIVE_STANDBY_MULTI_AZ
+            Amazon MQ for ActiveMQ deployment requires two subnets. A CLUSTER_MULTI_AZ
+            Amazon MQ for RabbitMQ deployment has no subnet requirements when deployed
+            with public accessibility. Deployment without public accessibility requires
+            at least one subnet.
+
+
+            If you specify subnets in a [shared VPC](https://docs.aws.amazon.com/vpc/latest/userguide/vpc-sharing.html)
+            for a RabbitMQ broker, the associated VPC to which the specified subnets
+            belong must be owned by your Amazon Web Services account. Amazon MQ will
+            not be able to create VPC endpoints in VPCs that are not owned by your
+            Amazon Web Services account.'
+        Tags:
+          allOf:
+          - $ref: '#/components/schemas/__mapOf__string'
+          description: Create tags when creating the broker.
+        Users:
+          allOf:
+          - $ref: '#/components/schemas/__listOfUser'
+          description: The list of broker users (persons or applications) who can
+            access queues and topics. For Amazon MQ for RabbitMQ brokers, one and
+            only one administrative user is accepted and created when a broker is
+            first provisioned. All subsequent broker users are created by making RabbitMQ
+            API calls directly to brokers or via the RabbitMQ web console.
+        DataReplicationMode:
+          allOf:
+          - $ref: '#/components/schemas/DataReplicationMode'
+          description: Defines whether this broker is a part of a data replication
+            pair.
+        DataReplicationPrimaryBrokerArn:
+          allOf:
+          - $ref: '#/components/schemas/__string'
+          description: The Amazon Resource Name (ARN) of the primary broker that is
+            used to replicate data from in a data replication pair, and is applied
+            to the replica broker. Must be set when dataReplicationMode is set to
+            CRDR.
+      required:
+      - BrokerName
+      - DeploymentMode
+      - EngineType
+      - HostInstanceType
+      - PubliclyAccessible
+      - Users
+      description: Creates a broker using the specified properties.
+    CreateBrokerResponse:
+      type: object
+      properties:
+        BrokerArn:
+          allOf:
+          - $ref: '#/components/schemas/__string'
+          description: The broker's Amazon Resource Name (ARN).
+        BrokerId:
+          allOf:
+          - $ref: '#/components/schemas/__string'
+          description: The unique ID that Amazon MQ generates for the broker.
+    CreateConfigurationRequest:
+      type: object
+      properties:
+        AuthenticationStrategy:
+          allOf:
+          - $ref: '#/components/schemas/AuthenticationStrategy'
+          description: Optional. The authentication strategy associated with the configuration.
+            The default is SIMPLE.
+        EngineType:
+          allOf:
+          - $ref: '#/components/schemas/EngineType'
+          description: Required. The type of broker engine. Currently, Amazon MQ supports
+            ACTIVEMQ and RABBITMQ.
+        EngineVersion:
+          allOf:
+          - $ref: '#/components/schemas/__string'
+          description: The broker engine version. Defaults to the latest available
+            version for the specified broker engine type. For more information, see
+            the [ActiveMQ version management](https://docs.aws.amazon.com//amazon-mq/latest/developer-guide/activemq-version-management.html)
+            and the [RabbitMQ version management](https://docs.aws.amazon.com//amazon-mq/latest/developer-guide/rabbitmq-version-management.html)
+            sections in the Amazon MQ Developer Guide.
+        Name:
+          allOf:
+          - $ref: '#/components/schemas/__string'
+          description: Required. The name of the configuration. This value can contain
+            only alphanumeric characters, dashes, periods, underscores, and tildes
+            (- . _ ~). This value must be 1-150 characters long.
+        Tags:
+          allOf:
+          - $ref: '#/components/schemas/__mapOf__string'
+          description: Create tags when creating the configuration.
+      required:
+      - EngineType
+      - Name
+      description: Creates a new configuration for the specified configuration name.
+        Amazon MQ uses the default configuration (the engine type and version).
+    CreateConfigurationResponse:
+      type: object
+      properties:
+        Arn:
+          allOf:
+          - $ref: '#/components/schemas/__string'
+          description: Required. The Amazon Resource Name (ARN) of the configuration.
+        AuthenticationStrategy:
+          allOf:
+          - $ref: '#/components/schemas/AuthenticationStrategy'
+          description: Optional. The authentication strategy associated with the configuration.
+            The default is SIMPLE.
+        Created:
+          allOf:
+          - $ref: '#/components/schemas/__timestampIso8601'
+          description: Required. The date and time of the configuration.
+        Id:
+          allOf:
+          - $ref: '#/components/schemas/__string'
+          description: Required. The unique ID that Amazon MQ generates for the configuration.
+        LatestRevision:
+          allOf:
+          - $ref: '#/components/schemas/ConfigurationRevision'
+          description: The latest revision of the configuration.
+        Name:
+          allOf:
+          - $ref: '#/components/schemas/__string'
+          description: Required. The name of the configuration. This value can contain
+            only alphanumeric characters, dashes, periods, underscores, and tildes
+            (- . _ ~). This value must be 1-150 characters long.
+    CreateTagsRequest:
+      type: object
+      properties:
+        ResourceArn:
+          allOf:
+          - $ref: '#/components/schemas/__string'
+          description: The Amazon Resource Name (ARN) of the resource tag.
+        Tags:
+          allOf:
+          - $ref: '#/components/schemas/__mapOf__string'
+          description: The key-value pair for the resource tag.
+      required:
+      - ResourceArn
+      description: A map of the key-value pairs for the resource tag.
+    CreateUserRequest:
+      type: object
+      properties:
+        BrokerId:
+          allOf:
+          - $ref: '#/components/schemas/__string'
+          description: The unique ID that Amazon MQ generates for the broker.
+        ConsoleAccess:
+          allOf:
+          - $ref: '#/components/schemas/__boolean'
+          description: Enables access to the ActiveMQ Web Console for the ActiveMQ
+            user.
+        Groups:
+          allOf:
+          - $ref: '#/components/schemas/__listOf__string'
+          description: The list of groups (20 maximum) to which the ActiveMQ user
+            belongs. This value can contain only alphanumeric characters, dashes,
+            periods, underscores, and tildes (- . _ ~). This value must be 2-100 characters
+            long.
+        Password:
+          allOf:
+          - $ref: '#/components/schemas/__string'
+          description: Required. The password of the user. This value must be at least
+            12 characters long, must contain at least 4 unique characters, and must
+            not contain commas, colons, or equal signs (,:=).
+        Username:
+          allOf:
+          - $ref: '#/components/schemas/__string'
+          description: The username of the ActiveMQ user. This value can contain only
+            alphanumeric characters, dashes, periods, underscores, and tildes (- .
+            _ ~). This value must be 2-100 characters long.
+        ReplicationUser:
+          allOf:
+          - $ref: '#/components/schemas/__boolean'
+          description: Defines if this user is intended for CRDR replication purposes.
+      required:
+      - BrokerId
+      - Password
+      - Username
+      description: Creates a new ActiveMQ user.
+    CreateUserResponse:
+      type: object
+      properties: {}
+    DataReplicationCounterpart:
+      type: object
+      properties:
+        BrokerId:
+          allOf:
+          - $ref: '#/components/schemas/__string'
+          description: Required. The unique broker id generated by Amazon MQ.
+        Region:
+          allOf:
+          - $ref: '#/components/schemas/__string'
+          description: Required. The region of the broker.
+      required:
+      - BrokerId
+      - Region
+      description: Specifies a broker in a data replication pair.
+    DataReplicationMetadataOutput:
+      type: object
+      properties:
+        DataReplicationCounterpart:
+          allOf:
+          - $ref: '#/components/schemas/DataReplicationCounterpart'
+          description: Describes the replica/primary broker. Only returned if this
+            broker is currently set as a primary or replica in the broker's dataReplicationRole
+            property.
+        DataReplicationRole:
+          allOf:
+          - $ref: '#/components/schemas/__string'
+          description: Defines the role of this broker in a data replication pair.
+            When a replica broker is promoted to primary, this role is interchanged.
+      required:
+      - DataReplicationRole
+      description: The replication details of the data replication-enabled broker.
+        Only returned if dataReplicationMode or pendingDataReplicationMode is set
+        to CRDR.
     DataReplicationMode:
       type: string
       enum:
@@ -94,6 +1921,71 @@ components:
       - FRIDAY
       - SATURDAY
       - SUNDAY
+    DeleteBrokerRequest:
+      type: object
+      properties:
+        BrokerId:
+          allOf:
+          - $ref: '#/components/schemas/__string'
+          description: The unique ID that Amazon MQ generates for the broker.
+      required:
+      - BrokerId
+    DeleteBrokerResponse:
+      type: object
+      properties:
+        BrokerId:
+          allOf:
+          - $ref: '#/components/schemas/__string'
+          description: The unique ID that Amazon MQ generates for the broker.
+    DeleteConfigurationRequest:
+      type: object
+      properties:
+        ConfigurationId:
+          allOf:
+          - $ref: '#/components/schemas/__string'
+          description: The unique ID that Amazon MQ generates for the configuration.
+      required:
+      - ConfigurationId
+    DeleteConfigurationResponse:
+      type: object
+      properties:
+        ConfigurationId:
+          allOf:
+          - $ref: '#/components/schemas/__string'
+          description: The unique ID that Amazon MQ generates for the configuration.
+    DeleteTagsRequest:
+      type: object
+      properties:
+        ResourceArn:
+          allOf:
+          - $ref: '#/components/schemas/__string'
+          description: The Amazon Resource Name (ARN) of the resource tag.
+        TagKeys:
+          allOf:
+          - $ref: '#/components/schemas/__listOf__string'
+          description: An array of tag keys to delete
+      required:
+      - ResourceArn
+      - TagKeys
+    DeleteUserRequest:
+      type: object
+      properties:
+        BrokerId:
+          allOf:
+          - $ref: '#/components/schemas/__string'
+          description: The unique ID that Amazon MQ generates for the broker.
+        Username:
+          allOf:
+          - $ref: '#/components/schemas/__string'
+          description: The username of the ActiveMQ user. This value can contain only
+            alphanumeric characters, dashes, periods, underscores, and tildes (- .
+            _ ~). This value must be 2-100 characters long.
+      required:
+      - BrokerId
+      - Username
+    DeleteUserResponse:
+      type: object
+      properties: {}
     DeploymentMode:
       type: string
       enum:
@@ -101,22 +1993,909 @@ components:
       - ACTIVE_STANDBY_MULTI_AZ
       - CLUSTER_MULTI_AZ
       description: <p>The broker's deployment mode.</p>
+    DescribeBrokerEngineTypesRequest:
+      type: object
+      properties:
+        EngineType:
+          allOf:
+          - $ref: '#/components/schemas/__string'
+          description: Filter response by engine type.
+        MaxResults:
+          allOf:
+          - $ref: '#/components/schemas/MaxResults'
+          description: The maximum number of brokers that Amazon MQ can return per
+            page (20 by default). This value must be an integer from 5 to 100.
+        NextToken:
+          allOf:
+          - $ref: '#/components/schemas/__string'
+          description: The token that specifies the next page of results Amazon MQ
+            should return. To request the first page, leave nextToken empty.
+    DescribeBrokerEngineTypesResponse:
+      type: object
+      properties:
+        BrokerEngineTypes:
+          allOf:
+          - $ref: '#/components/schemas/__listOfBrokerEngineType'
+          description: List of available engine types and versions.
+        MaxResults:
+          allOf:
+          - $ref: '#/components/schemas/__integerMin5Max100'
+          description: Required. The maximum number of engine types that can be returned
+            per page (20 by default). This value must be an integer from 5 to 100.
+        NextToken:
+          allOf:
+          - $ref: '#/components/schemas/__string'
+          description: The token that specifies the next page of results Amazon MQ
+            should return. To request the first page, leave nextToken empty.
+    DescribeBrokerInstanceOptionsRequest:
+      type: object
+      properties:
+        EngineType:
+          allOf:
+          - $ref: '#/components/schemas/__string'
+          description: Filter response by engine type.
+        HostInstanceType:
+          allOf:
+          - $ref: '#/components/schemas/__string'
+          description: Filter response by host instance type.
+        MaxResults:
+          allOf:
+          - $ref: '#/components/schemas/MaxResults'
+          description: The maximum number of brokers that Amazon MQ can return per
+            page (20 by default). This value must be an integer from 5 to 100.
+        NextToken:
+          allOf:
+          - $ref: '#/components/schemas/__string'
+          description: The token that specifies the next page of results Amazon MQ
+            should return. To request the first page, leave nextToken empty.
+        StorageType:
+          allOf:
+          - $ref: '#/components/schemas/__string'
+          description: Filter response by storage type.
+    DescribeBrokerInstanceOptionsResponse:
+      type: object
+      properties:
+        BrokerInstanceOptions:
+          allOf:
+          - $ref: '#/components/schemas/__listOfBrokerInstanceOption'
+          description: List of available broker instance options.
+        MaxResults:
+          allOf:
+          - $ref: '#/components/schemas/__integerMin5Max100'
+          description: Required. The maximum number of instance options that can be
+            returned per page (20 by default). This value must be an integer from
+            5 to 100.
+        NextToken:
+          allOf:
+          - $ref: '#/components/schemas/__string'
+          description: The token that specifies the next page of results Amazon MQ
+            should return. To request the first page, leave nextToken empty.
+    DescribeBrokerRequest:
+      type: object
+      properties:
+        BrokerId:
+          allOf:
+          - $ref: '#/components/schemas/__string'
+          description: The unique ID that Amazon MQ generates for the broker.
+      required:
+      - BrokerId
+    DescribeBrokerResponse:
+      type: object
+      properties:
+        ActionsRequired:
+          allOf:
+          - $ref: '#/components/schemas/__listOfActionRequired'
+          description: Actions required for a broker.
+        AuthenticationStrategy:
+          allOf:
+          - $ref: '#/components/schemas/AuthenticationStrategy'
+          description: The authentication strategy used to secure the broker. The
+            default is SIMPLE.
+        AutoMinorVersionUpgrade:
+          allOf:
+          - $ref: '#/components/schemas/__boolean'
+          description: Enables automatic upgrades to new patch versions for brokers
+            as new versions are released and supported by Amazon MQ. Automatic upgrades
+            occur during the scheduled maintenance window or after a manual broker
+            reboot.
+        BrokerArn:
+          allOf:
+          - $ref: '#/components/schemas/__string'
+          description: The broker's Amazon Resource Name (ARN).
+        BrokerId:
+          allOf:
+          - $ref: '#/components/schemas/__string'
+          description: The unique ID that Amazon MQ generates for the broker.
+        BrokerInstances:
+          allOf:
+          - $ref: '#/components/schemas/__listOfBrokerInstance'
+          description: A list of information about allocated brokers.
+        BrokerName:
+          allOf:
+          - $ref: '#/components/schemas/__string'
+          description: The broker's name. This value must be unique in your Amazon
+            Web Services account account, 1-50 characters long, must contain only
+            letters, numbers, dashes, and underscores, and must not contain white
+            spaces, brackets, wildcard characters, or special characters.
+        BrokerState:
+          allOf:
+          - $ref: '#/components/schemas/BrokerState'
+          description: The broker's status.
+        Configurations:
+          allOf:
+          - $ref: '#/components/schemas/Configurations'
+          description: The list of all revisions for the specified configuration.
+        Created:
+          allOf:
+          - $ref: '#/components/schemas/__timestampIso8601'
+          description: The time when the broker was created.
+        DeploymentMode:
+          allOf:
+          - $ref: '#/components/schemas/DeploymentMode'
+          description: The broker's deployment mode.
+        EncryptionOptions:
+          allOf:
+          - $ref: '#/components/schemas/EncryptionOptions'
+          description: Encryption options for the broker.
+        EngineType:
+          allOf:
+          - $ref: '#/components/schemas/EngineType'
+          description: The type of broker engine. Currently, Amazon MQ supports ACTIVEMQ
+            and RABBITMQ.
+        EngineVersion:
+          allOf:
+          - $ref: '#/components/schemas/__string'
+          description: The broker engine version. For more information, see the [ActiveMQ
+            version management](https://docs.aws.amazon.com//amazon-mq/latest/developer-guide/activemq-version-management.html)
+            and the [RabbitMQ version management](https://docs.aws.amazon.com//amazon-mq/latest/developer-guide/rabbitmq-version-management.html)
+            sections in the Amazon MQ Developer Guide.
+        HostInstanceType:
+          allOf:
+          - $ref: '#/components/schemas/__string'
+          description: The broker's instance type.
+        LdapServerMetadata:
+          allOf:
+          - $ref: '#/components/schemas/LdapServerMetadataOutput'
+          description: The metadata of the LDAP server used to authenticate and authorize
+            connections to the broker.
+        Logs:
+          allOf:
+          - $ref: '#/components/schemas/LogsSummary'
+          description: The list of information about logs currently enabled and pending
+            to be deployed for the specified broker.
+        MaintenanceWindowStartTime:
+          allOf:
+          - $ref: '#/components/schemas/WeeklyStartTime'
+          description: The parameters that determine the WeeklyStartTime.
+        PendingAuthenticationStrategy:
+          allOf:
+          - $ref: '#/components/schemas/AuthenticationStrategy'
+          description: The authentication strategy that will be applied when the broker
+            is rebooted. The default is SIMPLE.
+        PendingEngineVersion:
+          allOf:
+          - $ref: '#/components/schemas/__string'
+          description: The broker engine version to upgrade to. For more information,
+            see the [ActiveMQ version management](https://docs.aws.amazon.com//amazon-mq/latest/developer-guide/activemq-version-management.html)
+            and the [RabbitMQ version management](https://docs.aws.amazon.com//amazon-mq/latest/developer-guide/rabbitmq-version-management.html)
+            sections in the Amazon MQ Developer Guide.
+        PendingHostInstanceType:
+          allOf:
+          - $ref: '#/components/schemas/__string'
+          description: The broker's host instance type to upgrade to. For a list of
+            supported instance types, see [Broker instance types](https://docs.aws.amazon.com//amazon-mq/latest/developer-guide/broker.html#broker-instance-types).
+        PendingLdapServerMetadata:
+          allOf:
+          - $ref: '#/components/schemas/LdapServerMetadataOutput'
+          description: The metadata of the LDAP server that will be used to authenticate
+            and authorize connections to the broker after it is rebooted.
+        PendingSecurityGroups:
+          allOf:
+          - $ref: '#/components/schemas/__listOf__string'
+          description: The list of pending security groups to authorize connections
+            to brokers.
+        PubliclyAccessible:
+          allOf:
+          - $ref: '#/components/schemas/__boolean'
+          description: Enables connections from applications outside of the VPC that
+            hosts the broker's subnets.
+        SecurityGroups:
+          allOf:
+          - $ref: '#/components/schemas/__listOf__string'
+          description: The list of rules (1 minimum, 125 maximum) that authorize connections
+            to brokers.
+        StorageType:
+          allOf:
+          - $ref: '#/components/schemas/BrokerStorageType'
+          description: The broker's storage type.
+        SubnetIds:
+          allOf:
+          - $ref: '#/components/schemas/__listOf__string'
+          description: The list of groups that define which subnets and IP ranges
+            the broker can use from different Availability Zones.
+        Tags:
+          allOf:
+          - $ref: '#/components/schemas/__mapOf__string'
+          description: The list of all tags associated with this broker.
+        Users:
+          allOf:
+          - $ref: '#/components/schemas/__listOfUserSummary'
+          description: The list of all broker usernames for the specified broker.
+        DataReplicationMetadata:
+          allOf:
+          - $ref: '#/components/schemas/DataReplicationMetadataOutput'
+          description: The replication details of the data replication-enabled broker.
+            Only returned if dataReplicationMode is set to CRDR.
+        DataReplicationMode:
+          allOf:
+          - $ref: '#/components/schemas/DataReplicationMode'
+          description: Describes whether this broker is a part of a data replication
+            pair.
+        PendingDataReplicationMetadata:
+          allOf:
+          - $ref: '#/components/schemas/DataReplicationMetadataOutput'
+          description: The pending replication details of the data replication-enabled
+            broker. Only returned if pendingDataReplicationMode is set to CRDR.
+        PendingDataReplicationMode:
+          allOf:
+          - $ref: '#/components/schemas/DataReplicationMode'
+          description: Describes whether this broker will be a part of a data replication
+            pair after reboot.
+    DescribeConfigurationRequest:
+      type: object
+      properties:
+        ConfigurationId:
+          allOf:
+          - $ref: '#/components/schemas/__string'
+          description: The unique ID that Amazon MQ generates for the configuration.
+      required:
+      - ConfigurationId
+    DescribeConfigurationResponse:
+      type: object
+      properties:
+        Arn:
+          allOf:
+          - $ref: '#/components/schemas/__string'
+          description: Required. The ARN of the configuration.
+        AuthenticationStrategy:
+          allOf:
+          - $ref: '#/components/schemas/AuthenticationStrategy'
+          description: Optional. The authentication strategy associated with the configuration.
+            The default is SIMPLE.
+        Created:
+          allOf:
+          - $ref: '#/components/schemas/__timestampIso8601'
+          description: Required. The date and time of the configuration revision.
+        Description:
+          allOf:
+          - $ref: '#/components/schemas/__string'
+          description: Required. The description of the configuration.
+        EngineType:
+          allOf:
+          - $ref: '#/components/schemas/EngineType'
+          description: Required. The type of broker engine. Currently, Amazon MQ supports
+            ACTIVEMQ and RABBITMQ.
+        EngineVersion:
+          allOf:
+          - $ref: '#/components/schemas/__string'
+          description: The broker engine version. Defaults to the latest available
+            version for the specified broker engine type. For a list of supported
+            engine versions, see the [ActiveMQ version management](https://docs.aws.amazon.com//amazon-mq/latest/developer-guide/activemq-version-management.html)
+            and the [RabbitMQ version management](https://docs.aws.amazon.com//amazon-mq/latest/developer-guide/rabbitmq-version-management.html)
+            sections in the Amazon MQ Developer Guide.
+        Id:
+          allOf:
+          - $ref: '#/components/schemas/__string'
+          description: Required. The unique ID that Amazon MQ generates for the configuration.
+        LatestRevision:
+          allOf:
+          - $ref: '#/components/schemas/ConfigurationRevision'
+          description: Required. The latest revision of the configuration.
+        Name:
+          allOf:
+          - $ref: '#/components/schemas/__string'
+          description: Required. The name of the configuration. This value can contain
+            only alphanumeric characters, dashes, periods, underscores, and tildes
+            (- . _ ~). This value must be 1-150 characters long.
+        Tags:
+          allOf:
+          - $ref: '#/components/schemas/__mapOf__string'
+          description: The list of all tags associated with this configuration.
+    DescribeConfigurationRevisionRequest:
+      type: object
+      properties:
+        ConfigurationId:
+          allOf:
+          - $ref: '#/components/schemas/__string'
+          description: The unique ID that Amazon MQ generates for the configuration.
+        ConfigurationRevision:
+          allOf:
+          - $ref: '#/components/schemas/__string'
+          description: The revision of the configuration.
+      required:
+      - ConfigurationId
+      - ConfigurationRevision
+    DescribeConfigurationRevisionResponse:
+      type: object
+      properties:
+        ConfigurationId:
+          allOf:
+          - $ref: '#/components/schemas/__string'
+          description: Required. The unique ID that Amazon MQ generates for the configuration.
+        Created:
+          allOf:
+          - $ref: '#/components/schemas/__timestampIso8601'
+          description: Required. The date and time of the configuration.
+        Data:
+          allOf:
+          - $ref: '#/components/schemas/__string'
+          description: 'Amazon MQ for ActiveMQ: the base64-encoded XML configuration.
+            Amazon MQ for RabbitMQ: base64-encoded Cuttlefish.'
+        Description:
+          allOf:
+          - $ref: '#/components/schemas/__string'
+          description: The description of the configuration.
+    DescribeUserRequest:
+      type: object
+      properties:
+        BrokerId:
+          allOf:
+          - $ref: '#/components/schemas/__string'
+          description: The unique ID that Amazon MQ generates for the broker.
+        Username:
+          allOf:
+          - $ref: '#/components/schemas/__string'
+          description: The username of the ActiveMQ user. This value can contain only
+            alphanumeric characters, dashes, periods, underscores, and tildes (- .
+            _ ~). This value must be 2-100 characters long.
+      required:
+      - BrokerId
+      - Username
+    DescribeUserResponse:
+      type: object
+      properties:
+        BrokerId:
+          allOf:
+          - $ref: '#/components/schemas/__string'
+          description: Required. The unique ID that Amazon MQ generates for the broker.
+        ConsoleAccess:
+          allOf:
+          - $ref: '#/components/schemas/__boolean'
+          description: Enables access to the the ActiveMQ Web Console for the ActiveMQ
+            user.
+        Groups:
+          allOf:
+          - $ref: '#/components/schemas/__listOf__string'
+          description: The list of groups (20 maximum) to which the ActiveMQ user
+            belongs. This value can contain only alphanumeric characters, dashes,
+            periods, underscores, and tildes (- . _ ~). This value must be 2-100 characters
+            long.
+        Pending:
+          allOf:
+          - $ref: '#/components/schemas/UserPendingChanges'
+          description: The status of the changes pending for the ActiveMQ user.
+        Username:
+          allOf:
+          - $ref: '#/components/schemas/__string'
+          description: Required. The username of the ActiveMQ user. This value can
+            contain only alphanumeric characters, dashes, periods, underscores, and
+            tildes (- . _ ~). This value must be 2-100 characters long.
+        ReplicationUser:
+          allOf:
+          - $ref: '#/components/schemas/__boolean'
+          description: Describes whether the user is intended for data replication
+    EncryptionOptions:
+      type: object
+      properties:
+        KmsKeyId:
+          allOf:
+          - $ref: '#/components/schemas/__string'
+          description: The customer master key (CMK) to use for the A KMS (KMS). This
+            key is used to encrypt your data at rest. If not provided, Amazon MQ will
+            use a default CMK to encrypt your data.
+        UseAwsOwnedKey:
+          allOf:
+          - $ref: '#/components/schemas/__boolean'
+          description: Enables the use of an Amazon Web Services owned CMK using KMS
+            (KMS). Set to true by default, if no value is provided, for example, for
+            RabbitMQ brokers.
+      required:
+      - UseAwsOwnedKey
+      description: Encryption options for the broker.
     EngineType:
       type: string
       enum:
       - ACTIVEMQ
       - RABBITMQ
       description: <p>The type of broker engine. Amazon MQ supports ActiveMQ and RabbitMQ.</p>
+    EngineVersion:
+      type: object
+      properties:
+        Name:
+          allOf:
+          - $ref: '#/components/schemas/__string'
+          description: Id for the version.
+      description: Id of the engine version.
+    ForbiddenException:
+      type: object
+      properties:
+        ErrorAttribute:
+          allOf:
+          - $ref: '#/components/schemas/__string'
+          description: The attribute which caused the error.
+        Message:
+          allOf:
+          - $ref: '#/components/schemas/__string'
+          description: The explanation of the error.
+      description: Returns information about an error.
+    InternalServerErrorException:
+      type: object
+      properties:
+        ErrorAttribute:
+          allOf:
+          - $ref: '#/components/schemas/__string'
+          description: The attribute which caused the error.
+        Message:
+          allOf:
+          - $ref: '#/components/schemas/__string'
+          description: The explanation of the error.
+      description: Returns information about an error.
+    LdapServerMetadataInput:
+      type: object
+      properties:
+        Hosts:
+          allOf:
+          - $ref: '#/components/schemas/__listOf__string'
+          description: Specifies the location of the LDAP server such as Directory
+            Service for Microsoft Active Directory. Optional failover server.
+        RoleBase:
+          allOf:
+          - $ref: '#/components/schemas/__string'
+          description: The distinguished name of the node in the directory information
+            tree (DIT) to search for roles or groups. For example, ou=group, ou=corp,
+            dc=corp, dc=example, dc=com.
+        RoleName:
+          allOf:
+          - $ref: '#/components/schemas/__string'
+          description: Specifies the LDAP attribute that identifies the group name
+            attribute in the object returned from the group membership query.
+        RoleSearchMatching:
+          allOf:
+          - $ref: '#/components/schemas/__string'
+          description: The LDAP search filter used to find roles within the roleBase.
+            The distinguished name of the user matched by userSearchMatching is substituted
+            into the {0} placeholder in the search filter. The client's username is
+            substituted into the {1} placeholder. For example, if you set this option
+            to (member=uid={1})for the user janedoe, the search filter becomes (member=uid=janedoe)
+            after string substitution. It matches all role entries that have a member
+            attribute equal to uid=janedoe under the subtree selected by the roleBase.
+        RoleSearchSubtree:
+          allOf:
+          - $ref: '#/components/schemas/__boolean'
+          description: The directory search scope for the role. If set to true, scope
+            is to search the entire subtree.
+        ServiceAccountPassword:
+          allOf:
+          - $ref: '#/components/schemas/__string'
+          description: Service account password. A service account is an account in
+            your LDAP server that has access to initiate a connection. For example,
+            cn=admin,dc=corp, dc=example, dc=com.
+        ServiceAccountUsername:
+          allOf:
+          - $ref: '#/components/schemas/__string'
+          description: Service account username. A service account is an account in
+            your LDAP server that has access to initiate a connection. For example,
+            cn=admin,dc=corp, dc=example, dc=com.
+        UserBase:
+          allOf:
+          - $ref: '#/components/schemas/__string'
+          description: Select a particular subtree of the directory information tree
+            (DIT) to search for user entries. The subtree is specified by a DN, which
+            specifies the base node of the subtree. For example, by setting this option
+            to ou=Users,ou=corp, dc=corp, dc=example, dc=com, the search for user
+            entries is restricted to the subtree beneath ou=Users, ou=corp, dc=corp,
+            dc=example, dc=com.
+        UserRoleName:
+          allOf:
+          - $ref: '#/components/schemas/__string'
+          description: Specifies the name of the LDAP attribute for the user group
+            membership.
+        UserSearchMatching:
+          allOf:
+          - $ref: '#/components/schemas/__string'
+          description: The LDAP search filter used to find users within the userBase.
+            The client's username is substituted into the {0} placeholder in the search
+            filter. For example, if this option is set to (uid={0}) and the received
+            username is janedoe, the search filter becomes (uid=janedoe) after string
+            substitution. It will result in matching an entry like uid=janedoe, ou=Users,ou=corp,
+            dc=corp, dc=example, dc=com.
+        UserSearchSubtree:
+          allOf:
+          - $ref: '#/components/schemas/__boolean'
+          description: The directory search scope for the user. If set to true, scope
+            is to search the entire subtree.
+      required:
+      - Hosts
+      - RoleBase
+      - RoleSearchMatching
+      - ServiceAccountPassword
+      - ServiceAccountUsername
+      - UserBase
+      - UserSearchMatching
+      description: 'Optional. The metadata of the LDAP server used to authenticate
+        and authorize connections to the broker.
+
+
+        Does not apply to RabbitMQ brokers.'
+    LdapServerMetadataOutput:
+      type: object
+      properties:
+        Hosts:
+          allOf:
+          - $ref: '#/components/schemas/__listOf__string'
+          description: Specifies the location of the LDAP server such as Directory
+            Service for Microsoft Active Directory. Optional failover server.
+        RoleBase:
+          allOf:
+          - $ref: '#/components/schemas/__string'
+          description: The distinguished name of the node in the directory information
+            tree (DIT) to search for roles or groups. For example, ou=group, ou=corp,
+            dc=corp, dc=example, dc=com.
+        RoleName:
+          allOf:
+          - $ref: '#/components/schemas/__string'
+          description: Specifies the LDAP attribute that identifies the group name
+            attribute in the object returned from the group membership query.
+        RoleSearchMatching:
+          allOf:
+          - $ref: '#/components/schemas/__string'
+          description: The LDAP search filter used to find roles within the roleBase.
+            The distinguished name of the user matched by userSearchMatching is substituted
+            into the {0} placeholder in the search filter. The client's username is
+            substituted into the {1} placeholder. For example, if you set this option
+            to (member=uid={1})for the user janedoe, the search filter becomes (member=uid=janedoe)
+            after string substitution. It matches all role entries that have a member
+            attribute equal to uid=janedoe under the subtree selected by the roleBase.
+        RoleSearchSubtree:
+          allOf:
+          - $ref: '#/components/schemas/__boolean'
+          description: The directory search scope for the role. If set to true, scope
+            is to search the entire subtree.
+        ServiceAccountUsername:
+          allOf:
+          - $ref: '#/components/schemas/__string'
+          description: Service account username. A service account is an account in
+            your LDAP server that has access to initiate a connection. For example,
+            cn=admin,dc=corp, dc=example, dc=com.
+        UserBase:
+          allOf:
+          - $ref: '#/components/schemas/__string'
+          description: Select a particular subtree of the directory information tree
+            (DIT) to search for user entries. The subtree is specified by a DN, which
+            specifies the base node of the subtree. For example, by setting this option
+            to ou=Users,ou=corp, dc=corp, dc=example, dc=com, the search for user
+            entries is restricted to the subtree beneath ou=Users, ou=corp, dc=corp,
+            dc=example, dc=com.
+        UserRoleName:
+          allOf:
+          - $ref: '#/components/schemas/__string'
+          description: Specifies the name of the LDAP attribute for the user group
+            membership.
+        UserSearchMatching:
+          allOf:
+          - $ref: '#/components/schemas/__string'
+          description: The LDAP search filter used to find users within the userBase.
+            The client's username is substituted into the {0} placeholder in the search
+            filter. For example, if this option is set to (uid={0}) and the received
+            username is janedoe, the search filter becomes (uid=janedoe) after string
+            substitution. It will result in matching an entry like uid=janedoe, ou=Users,ou=corp,
+            dc=corp, dc=example, dc=com.
+        UserSearchSubtree:
+          allOf:
+          - $ref: '#/components/schemas/__boolean'
+          description: The directory search scope for the user. If set to true, scope
+            is to search the entire subtree.
+      required:
+      - Hosts
+      - RoleBase
+      - RoleSearchMatching
+      - ServiceAccountUsername
+      - UserBase
+      - UserSearchMatching
+      description: Optional. The metadata of the LDAP server used to authenticate
+        and authorize connections to the broker.
+    ListBrokersRequest:
+      type: object
+      properties:
+        MaxResults:
+          allOf:
+          - $ref: '#/components/schemas/MaxResults'
+          description: The maximum number of brokers that Amazon MQ can return per
+            page (20 by default). This value must be an integer from 5 to 100.
+        NextToken:
+          allOf:
+          - $ref: '#/components/schemas/__string'
+          description: The token that specifies the next page of results Amazon MQ
+            should return. To request the first page, leave nextToken empty.
+    ListBrokersResponse:
+      type: object
+      properties:
+        BrokerSummaries:
+          allOf:
+          - $ref: '#/components/schemas/__listOfBrokerSummary'
+          description: A list of information about all brokers.
+        NextToken:
+          allOf:
+          - $ref: '#/components/schemas/__string'
+          description: The token that specifies the next page of results Amazon MQ
+            should return. To request the first page, leave nextToken empty.
+    ListConfigurationRevisionsRequest:
+      type: object
+      properties:
+        ConfigurationId:
+          allOf:
+          - $ref: '#/components/schemas/__string'
+          description: The unique ID that Amazon MQ generates for the configuration.
+        MaxResults:
+          allOf:
+          - $ref: '#/components/schemas/MaxResults'
+          description: The maximum number of brokers that Amazon MQ can return per
+            page (20 by default). This value must be an integer from 5 to 100.
+        NextToken:
+          allOf:
+          - $ref: '#/components/schemas/__string'
+          description: The token that specifies the next page of results Amazon MQ
+            should return. To request the first page, leave nextToken empty.
+      required:
+      - ConfigurationId
+    ListConfigurationRevisionsResponse:
+      type: object
+      properties:
+        ConfigurationId:
+          allOf:
+          - $ref: '#/components/schemas/__string'
+          description: The unique ID that Amazon MQ generates for the configuration.
+        MaxResults:
+          allOf:
+          - $ref: '#/components/schemas/__integer'
+          description: The maximum number of configuration revisions that can be returned
+            per page (20 by default). This value must be an integer from 5 to 100.
+        NextToken:
+          allOf:
+          - $ref: '#/components/schemas/__string'
+          description: The token that specifies the next page of results Amazon MQ
+            should return. To request the first page, leave nextToken empty.
+        Revisions:
+          allOf:
+          - $ref: '#/components/schemas/__listOfConfigurationRevision'
+          description: The list of all revisions for the specified configuration.
+    ListConfigurationsRequest:
+      type: object
+      properties:
+        MaxResults:
+          allOf:
+          - $ref: '#/components/schemas/MaxResults'
+          description: The maximum number of brokers that Amazon MQ can return per
+            page (20 by default). This value must be an integer from 5 to 100.
+        NextToken:
+          allOf:
+          - $ref: '#/components/schemas/__string'
+          description: The token that specifies the next page of results Amazon MQ
+            should return. To request the first page, leave nextToken empty.
+    ListConfigurationsResponse:
+      type: object
+      properties:
+        Configurations:
+          allOf:
+          - $ref: '#/components/schemas/__listOfConfiguration'
+          description: The list of all revisions for the specified configuration.
+        MaxResults:
+          allOf:
+          - $ref: '#/components/schemas/__integer'
+          description: The maximum number of configurations that Amazon MQ can return
+            per page (20 by default). This value must be an integer from 5 to 100.
+        NextToken:
+          allOf:
+          - $ref: '#/components/schemas/__string'
+          description: The token that specifies the next page of results Amazon MQ
+            should return. To request the first page, leave nextToken empty.
+    ListTagsRequest:
+      type: object
+      properties:
+        ResourceArn:
+          allOf:
+          - $ref: '#/components/schemas/__string'
+          description: The Amazon Resource Name (ARN) of the resource tag.
+      required:
+      - ResourceArn
+    ListTagsResponse:
+      type: object
+      properties:
+        Tags:
+          allOf:
+          - $ref: '#/components/schemas/__mapOf__string'
+          description: The key-value pair for the resource tag.
+    ListUsersRequest:
+      type: object
+      properties:
+        BrokerId:
+          allOf:
+          - $ref: '#/components/schemas/__string'
+          description: The unique ID that Amazon MQ generates for the broker.
+        MaxResults:
+          allOf:
+          - $ref: '#/components/schemas/MaxResults'
+          description: The maximum number of brokers that Amazon MQ can return per
+            page (20 by default). This value must be an integer from 5 to 100.
+        NextToken:
+          allOf:
+          - $ref: '#/components/schemas/__string'
+          description: The token that specifies the next page of results Amazon MQ
+            should return. To request the first page, leave nextToken empty.
+      required:
+      - BrokerId
+    ListUsersResponse:
+      type: object
+      properties:
+        BrokerId:
+          allOf:
+          - $ref: '#/components/schemas/__string'
+          description: Required. The unique ID that Amazon MQ generates for the broker.
+        MaxResults:
+          allOf:
+          - $ref: '#/components/schemas/__integerMin5Max100'
+          description: Required. The maximum number of ActiveMQ users that can be
+            returned per page (20 by default). This value must be an integer from
+            5 to 100.
+        NextToken:
+          allOf:
+          - $ref: '#/components/schemas/__string'
+          description: The token that specifies the next page of results Amazon MQ
+            should return. To request the first page, leave nextToken empty.
+        Users:
+          allOf:
+          - $ref: '#/components/schemas/__listOfUserSummary'
+          description: Required. The list of all ActiveMQ usernames for the specified
+            broker. Does not apply to RabbitMQ brokers.
+    Logs:
+      type: object
+      properties:
+        Audit:
+          allOf:
+          - $ref: '#/components/schemas/__boolean'
+          description: Enables audit logging. Every user management action made using
+            JMX or the ActiveMQ Web Console is logged. Does not apply to RabbitMQ
+            brokers.
+        General:
+          allOf:
+          - $ref: '#/components/schemas/__boolean'
+          description: Enables general logging.
+      description: The list of information about logs to be enabled for the specified
+        broker.
+    LogsSummary:
+      type: object
+      properties:
+        Audit:
+          allOf:
+          - $ref: '#/components/schemas/__boolean'
+          description: Enables audit logging. Every user management action made using
+            JMX or the ActiveMQ Web Console is logged.
+        AuditLogGroup:
+          allOf:
+          - $ref: '#/components/schemas/__string'
+          description: The location of the CloudWatch Logs log group where audit logs
+            are sent.
+        General:
+          allOf:
+          - $ref: '#/components/schemas/__boolean'
+          description: Enables general logging.
+        GeneralLogGroup:
+          allOf:
+          - $ref: '#/components/schemas/__string'
+          description: The location of the CloudWatch Logs log group where general
+            logs are sent.
+        Pending:
+          allOf:
+          - $ref: '#/components/schemas/PendingLogs'
+          description: The list of information about logs pending to be deployed for
+            the specified broker.
+      required:
+      - General
+      - GeneralLogGroup
+      description: The list of information about logs currently enabled and pending
+        to be deployed for the specified broker.
     MaxResults:
       type: integer
       minimum: 1
       maximum: 100
+    NotFoundException:
+      type: object
+      properties:
+        ErrorAttribute:
+          allOf:
+          - $ref: '#/components/schemas/__string'
+          description: The attribute which caused the error.
+        Message:
+          allOf:
+          - $ref: '#/components/schemas/__string'
+          description: The explanation of the error.
+      description: Returns information about an error.
+    PendingLogs:
+      type: object
+      properties:
+        Audit:
+          allOf:
+          - $ref: '#/components/schemas/__boolean'
+          description: Enables audit logging. Every user management action made using
+            JMX or the ActiveMQ Web Console is logged.
+        General:
+          allOf:
+          - $ref: '#/components/schemas/__boolean'
+          description: Enables general logging.
+      description: The list of information about logs to be enabled for the specified
+        broker.
     PromoteMode:
       type: string
       enum:
       - SWITCHOVER
       - FAILOVER
       description: <p>The Promote mode requested.</p>
+    PromoteRequest:
+      type: object
+      properties:
+        BrokerId:
+          allOf:
+          - $ref: '#/components/schemas/__string'
+          description: The unique ID that Amazon MQ generates for the broker.
+        Mode:
+          allOf:
+          - $ref: '#/components/schemas/PromoteMode'
+          description: 'The Promote mode requested. Note: Valid values for the parameter
+            are SWITCHOVER, FAILOVER.'
+      required:
+      - BrokerId
+      - Mode
+      description: Promotes a data replication replica broker to the primary broker
+        role.
+    PromoteResponse:
+      type: object
+      properties:
+        BrokerId:
+          allOf:
+          - $ref: '#/components/schemas/__string'
+          description: The unique ID that Amazon MQ generates for the broker.
+    RebootBrokerRequest:
+      type: object
+      properties:
+        BrokerId:
+          allOf:
+          - $ref: '#/components/schemas/__string'
+          description: The unique ID that Amazon MQ generates for the broker.
+      required:
+      - BrokerId
+    RebootBrokerResponse:
+      type: object
+      properties: {}
+    SanitizationWarning:
+      type: object
+      properties:
+        AttributeName:
+          allOf:
+          - $ref: '#/components/schemas/__string'
+          description: The name of the configuration attribute that has been sanitized.
+        ElementName:
+          allOf:
+          - $ref: '#/components/schemas/__string'
+          description: The name of the configuration element that has been sanitized.
+        Reason:
+          allOf:
+          - $ref: '#/components/schemas/SanitizationWarningReason'
+          description: The reason for which the configuration elements or attributes
+            were sanitized.
+      required:
+      - Reason
+      description: Returns information about the configuration element or attribute
+        that was sanitized in the configuration.
     SanitizationWarningReason:
       type: string
       enum:
@@ -125,6 +2904,363 @@ components:
       - INVALID_ATTRIBUTE_VALUE_REMOVED
       description: <p>The reason for which the configuration elements or attributes
         were sanitized.</p>
+    UnauthorizedException:
+      type: object
+      properties:
+        ErrorAttribute:
+          allOf:
+          - $ref: '#/components/schemas/__string'
+          description: The attribute which caused the error.
+        Message:
+          allOf:
+          - $ref: '#/components/schemas/__string'
+          description: The explanation of the error.
+      description: Returns information about an error.
+    UpdateBrokerRequest:
+      type: object
+      properties:
+        AuthenticationStrategy:
+          allOf:
+          - $ref: '#/components/schemas/AuthenticationStrategy'
+          description: Optional. The authentication strategy used to secure the broker.
+            The default is SIMPLE.
+        AutoMinorVersionUpgrade:
+          allOf:
+          - $ref: '#/components/schemas/__boolean'
+          description: 'Enables automatic upgrades to new patch versions for brokers
+            as new versions are released and supported by Amazon MQ. Automatic upgrades
+            occur during the scheduled maintenance window or after a manual broker
+            reboot.
+
+
+            Must be set to true for ActiveMQ brokers version 5.18 and above and for
+            RabbitMQ brokers version 3.13 and above.'
+        BrokerId:
+          allOf:
+          - $ref: '#/components/schemas/__string'
+          description: The unique ID that Amazon MQ generates for the broker.
+        Configuration:
+          allOf:
+          - $ref: '#/components/schemas/ConfigurationId'
+          description: A list of information about the configuration.
+        EngineVersion:
+          allOf:
+          - $ref: '#/components/schemas/__string'
+          description: 'The broker engine version. For more information, see the [ActiveMQ
+            version management](https://docs.aws.amazon.com//amazon-mq/latest/developer-guide/activemq-version-management.html)
+            and the [RabbitMQ version management](https://docs.aws.amazon.com//amazon-mq/latest/developer-guide/rabbitmq-version-management.html)
+            sections in the Amazon MQ Developer Guide.
+
+
+            When upgrading to ActiveMQ version 5.18 and above or RabbitMQ version
+            3.13 and above, you must have autoMinorVersionUpgrade set to true for
+            the broker.'
+        HostInstanceType:
+          allOf:
+          - $ref: '#/components/schemas/__string'
+          description: The broker's host instance type to upgrade to. For a list of
+            supported instance types, see [Broker instance types](https://docs.aws.amazon.com//amazon-mq/latest/developer-guide/broker.html#broker-instance-types).
+        LdapServerMetadata:
+          allOf:
+          - $ref: '#/components/schemas/LdapServerMetadataInput'
+          description: Optional. The metadata of the LDAP server used to authenticate
+            and authorize connections to the broker. Does not apply to RabbitMQ brokers.
+        Logs:
+          allOf:
+          - $ref: '#/components/schemas/Logs'
+          description: Enables Amazon CloudWatch logging for brokers.
+        MaintenanceWindowStartTime:
+          allOf:
+          - $ref: '#/components/schemas/WeeklyStartTime'
+          description: The parameters that determine the WeeklyStartTime.
+        SecurityGroups:
+          allOf:
+          - $ref: '#/components/schemas/__listOf__string'
+          description: The list of security groups (1 minimum, 5 maximum) that authorizes
+            connections to brokers.
+        DataReplicationMode:
+          allOf:
+          - $ref: '#/components/schemas/DataReplicationMode'
+          description: Defines whether this broker is a part of a data replication
+            pair.
+      required:
+      - BrokerId
+      description: Updates the broker using the specified properties.
+    UpdateBrokerResponse:
+      type: object
+      properties:
+        AuthenticationStrategy:
+          allOf:
+          - $ref: '#/components/schemas/AuthenticationStrategy'
+          description: Optional. The authentication strategy used to secure the broker.
+            The default is SIMPLE.
+        AutoMinorVersionUpgrade:
+          allOf:
+          - $ref: '#/components/schemas/__boolean'
+          description: Enables automatic upgrades to new patch versions for brokers
+            as new versions are released and supported by Amazon MQ. Automatic upgrades
+            occur during the scheduled maintenance window or after a manual broker
+            reboot.
+        BrokerId:
+          allOf:
+          - $ref: '#/components/schemas/__string'
+          description: Required. The unique ID that Amazon MQ generates for the broker.
+        Configuration:
+          allOf:
+          - $ref: '#/components/schemas/ConfigurationId'
+          description: The ID of the updated configuration.
+        EngineVersion:
+          allOf:
+          - $ref: '#/components/schemas/__string'
+          description: The broker engine version to upgrade to. For more information,
+            see the [ActiveMQ version management](https://docs.aws.amazon.com//amazon-mq/latest/developer-guide/activemq-version-management.html)
+            and the [RabbitMQ version management](https://docs.aws.amazon.com//amazon-mq/latest/developer-guide/rabbitmq-version-management.html)
+            sections in the Amazon MQ Developer Guide.
+        HostInstanceType:
+          allOf:
+          - $ref: '#/components/schemas/__string'
+          description: The broker's host instance type to upgrade to. For a list of
+            supported instance types, see [Broker instance types](https://docs.aws.amazon.com//amazon-mq/latest/developer-guide/broker.html#broker-instance-types).
+        LdapServerMetadata:
+          allOf:
+          - $ref: '#/components/schemas/LdapServerMetadataOutput'
+          description: Optional. The metadata of the LDAP server used to authenticate
+            and authorize connections to the broker. Does not apply to RabbitMQ brokers.
+        Logs:
+          allOf:
+          - $ref: '#/components/schemas/Logs'
+          description: The list of information about logs to be enabled for the specified
+            broker.
+        MaintenanceWindowStartTime:
+          allOf:
+          - $ref: '#/components/schemas/WeeklyStartTime'
+          description: The parameters that determine the WeeklyStartTime.
+        SecurityGroups:
+          allOf:
+          - $ref: '#/components/schemas/__listOf__string'
+          description: The list of security groups (1 minimum, 5 maximum) that authorizes
+            connections to brokers.
+        DataReplicationMetadata:
+          allOf:
+          - $ref: '#/components/schemas/DataReplicationMetadataOutput'
+          description: The replication details of the data replication-enabled broker.
+            Only returned if dataReplicationMode is set to CRDR.
+        DataReplicationMode:
+          allOf:
+          - $ref: '#/components/schemas/DataReplicationMode'
+          description: Describes whether this broker is a part of a data replication
+            pair.
+        PendingDataReplicationMetadata:
+          allOf:
+          - $ref: '#/components/schemas/DataReplicationMetadataOutput'
+          description: The pending replication details of the data replication-enabled
+            broker. Only returned if pendingDataReplicationMode is set to CRDR.
+        PendingDataReplicationMode:
+          allOf:
+          - $ref: '#/components/schemas/DataReplicationMode'
+          description: Describes whether this broker will be a part of a data replication
+            pair after reboot.
+    UpdateConfigurationRequest:
+      type: object
+      properties:
+        ConfigurationId:
+          allOf:
+          - $ref: '#/components/schemas/__string'
+          description: The unique ID that Amazon MQ generates for the configuration.
+        Data:
+          allOf:
+          - $ref: '#/components/schemas/__string'
+          description: 'Amazon MQ for Active MQ: The base64-encoded XML configuration.
+            Amazon MQ for RabbitMQ: the base64-encoded Cuttlefish configuration.'
+        Description:
+          allOf:
+          - $ref: '#/components/schemas/__string'
+          description: The description of the configuration.
+      required:
+      - ConfigurationId
+      - Data
+      description: Updates the specified configuration.
+    UpdateConfigurationResponse:
+      type: object
+      properties:
+        Arn:
+          allOf:
+          - $ref: '#/components/schemas/__string'
+          description: The Amazon Resource Name (ARN) of the configuration.
+        Created:
+          allOf:
+          - $ref: '#/components/schemas/__timestampIso8601'
+          description: Required. The date and time of the configuration.
+        Id:
+          allOf:
+          - $ref: '#/components/schemas/__string'
+          description: The unique ID that Amazon MQ generates for the configuration.
+        LatestRevision:
+          allOf:
+          - $ref: '#/components/schemas/ConfigurationRevision'
+          description: The latest revision of the configuration.
+        Name:
+          allOf:
+          - $ref: '#/components/schemas/__string'
+          description: The name of the configuration. This value can contain only
+            alphanumeric characters, dashes, periods, underscores, and tildes (- .
+            _ ~). This value must be 1-150 characters long.
+        Warnings:
+          allOf:
+          - $ref: '#/components/schemas/__listOfSanitizationWarning'
+          description: The list of the first 20 warnings about the configuration elements
+            or attributes that were sanitized.
+    UpdateUserRequest:
+      type: object
+      properties:
+        BrokerId:
+          allOf:
+          - $ref: '#/components/schemas/__string'
+          description: The unique ID that Amazon MQ generates for the broker.
+        ConsoleAccess:
+          allOf:
+          - $ref: '#/components/schemas/__boolean'
+          description: Enables access to the the ActiveMQ Web Console for the ActiveMQ
+            user.
+        Groups:
+          allOf:
+          - $ref: '#/components/schemas/__listOf__string'
+          description: The list of groups (20 maximum) to which the ActiveMQ user
+            belongs. This value can contain only alphanumeric characters, dashes,
+            periods, underscores, and tildes (- . _ ~). This value must be 2-100 characters
+            long.
+        Password:
+          allOf:
+          - $ref: '#/components/schemas/__string'
+          description: The password of the user. This value must be at least 12 characters
+            long, must contain at least 4 unique characters, and must not contain
+            commas, colons, or equal signs (,:=).
+        Username:
+          allOf:
+          - $ref: '#/components/schemas/__string'
+          description: The username of the ActiveMQ user. This value can contain only
+            alphanumeric characters, dashes, periods, underscores, and tildes (- .
+            _ ~). This value must be 2-100 characters long.
+        ReplicationUser:
+          allOf:
+          - $ref: '#/components/schemas/__boolean'
+          description: Defines whether the user is intended for data replication.
+      required:
+      - BrokerId
+      - Username
+      description: Updates the information for an ActiveMQ user.
+    UpdateUserResponse:
+      type: object
+      properties: {}
+    User:
+      type: object
+      properties:
+        ConsoleAccess:
+          allOf:
+          - $ref: '#/components/schemas/__boolean'
+          description: Enables access to the ActiveMQ Web Console for the ActiveMQ
+            user. Does not apply to RabbitMQ brokers.
+        Groups:
+          allOf:
+          - $ref: '#/components/schemas/__listOf__string'
+          description: The list of groups (20 maximum) to which the ActiveMQ user
+            belongs. This value can contain only alphanumeric characters, dashes,
+            periods, underscores, and tildes (- . _ ~). This value must be 2-100 characters
+            long. Does not apply to RabbitMQ brokers.
+        Password:
+          allOf:
+          - $ref: '#/components/schemas/__string'
+          description: Required. The password of the user. This value must be at least
+            12 characters long, must contain at least 4 unique characters, and must
+            not contain commas, colons, or equal signs (,:=).
+        Username:
+          allOf:
+          - $ref: '#/components/schemas/__string'
+          description: "The username of the broker user. The following restrictions\
+            \ apply to broker usernames:\n\n  * For Amazon MQ for ActiveMQ brokers,\
+            \ this value can contain only alphanumeric characters, dashes, periods,\
+            \ underscores, and tildes (- . _ ~). This value must be 2-100 characters\
+            \ long.\n\n  * para>For Amazon MQ for RabbitMQ brokers, this value can\
+            \ contain only alphanumeric characters, dashes, periods, underscores (-\
+            \ . _). This value must not contain a tilde (~) character. Amazon MQ prohibts\
+            \ using guest as a valid usename. This value must be 2-100 characters\
+            \ long.\n\nDo not add personally identifiable information (PII) or other\
+            \ confidential or sensitive information in broker usernames. Broker usernames\
+            \ are accessible to other Amazon Web Services services, including CloudWatch\
+            \ Logs. Broker usernames are not intended to be used for private or sensitive\
+            \ data."
+        ReplicationUser:
+          allOf:
+          - $ref: '#/components/schemas/__boolean'
+          description: Defines if this user is intended for CRDR replication purposes.
+      required:
+      - Password
+      - Username
+      description: A user associated with the broker. For Amazon MQ for RabbitMQ brokers,
+        one and only one administrative user is accepted and created when a broker
+        is first provisioned. All subsequent broker users are created by making RabbitMQ
+        API calls directly to brokers or via the RabbitMQ web console.
+    UserPendingChanges:
+      type: object
+      properties:
+        ConsoleAccess:
+          allOf:
+          - $ref: '#/components/schemas/__boolean'
+          description: Enables access to the the ActiveMQ Web Console for the ActiveMQ
+            user.
+        Groups:
+          allOf:
+          - $ref: '#/components/schemas/__listOf__string'
+          description: The list of groups (20 maximum) to which the ActiveMQ user
+            belongs. This value can contain only alphanumeric characters, dashes,
+            periods, underscores, and tildes (- . _ ~). This value must be 2-100 characters
+            long.
+        PendingChange:
+          allOf:
+          - $ref: '#/components/schemas/ChangeType'
+          description: Required. The type of change pending for the ActiveMQ user.
+      required:
+      - PendingChange
+      description: Returns information about the status of the changes pending for
+        the ActiveMQ user.
+    UserSummary:
+      type: object
+      properties:
+        PendingChange:
+          allOf:
+          - $ref: '#/components/schemas/ChangeType'
+          description: The type of change pending for the broker user.
+        Username:
+          allOf:
+          - $ref: '#/components/schemas/__string'
+          description: Required. The username of the broker user. This value can contain
+            only alphanumeric characters, dashes, periods, underscores, and tildes
+            (- . _ ~). This value must be 2-100 characters long.
+      required:
+      - Username
+      description: Returns a list of all broker users. Does not apply to RabbitMQ
+        brokers.
+    WeeklyStartTime:
+      type: object
+      properties:
+        DayOfWeek:
+          allOf:
+          - $ref: '#/components/schemas/DayOfWeek'
+          description: Required. The day of the week.
+        TimeOfDay:
+          allOf:
+          - $ref: '#/components/schemas/__string'
+          description: Required. The time, in 24-hour format.
+        TimeZone:
+          allOf:
+          - $ref: '#/components/schemas/__string'
+          description: The time zone, UTC by default, in either the Country/City format,
+            or the UTC offset format.
+      required:
+      - DayOfWeek
+      - TimeOfDay
+      description: The scheduled time period relative to UTC during which Amazon MQ
+        begins to apply pending updates or patches to the broker.
     __boolean:
       type: boolean
     __integer:
