@@ -328,7 +328,7 @@ def add_component_schema_map(openapi_spec, shape_name, shape):
 
     # Get value type
     value_target = shape.get("value", {}).get("target", "smithy.api#String")
-    value_type = value_target.split("#")[-1]
+    value_type = value_target.split("#")[-1].lower()
 
     # Handle scalar types
     scalar_map = {
