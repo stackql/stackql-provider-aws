@@ -41,7 +41,7 @@ def process(model_entry):
 
     model_path = Path(model_entry['filepath'])
 
-    with open(model_path, "r") as f:
+    with open(model_path, "r", encoding="utf-8") as f:
         model_data = json.load(f)
 
     # Basic OpenAPI structure

@@ -16,7 +16,7 @@ PROTOCOL_DISPATCH = {
 def extract_services(input_dir: Path):
     for model_file in input_dir.glob("*.json"):
         try:
-            with open(model_file, "r") as f:
+            with open(model_file, "r", encoding="utf-8") as f:
                 model_data = json.load(f)
 
             shapes = model_data.get("shapes", model_data)

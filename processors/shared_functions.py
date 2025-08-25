@@ -39,7 +39,8 @@ def init_openapi_spec(service_name, file_name, protocol):
     }
 
 def add_info(openapi_spec, service_shape):
-    openapi_spec["info"]["version"] = service_shape["version"]
+    if "version" in service_shape:
+        openapi_spec["info"]["version"] = service_shape["version"]
     openapi_spec["info"]["title"] = service_shape["traits"]["smithy.api#title"]
     openapi_spec["info"]["description"] = LiteralStr(html_to_md(service_shape["traits"]["smithy.api#documentation"]))
 
@@ -328,7 +329,7 @@ def add_component_schema_map(openapi_spec, shape_name, shape):
 
     # Get value type
     value_target = shape.get("value", {}).get("target", "smithy.api#String")
-    value_type = value_target.split("#")[-1]
+    value_type = value_target.split("#")[-1].lower()
 
     # Handle scalar types
     scalar_map = {
@@ -507,18 +508,24 @@ def add_operation(openapi_spec, shape_name, shape, shapes):
     print(f"adding operation {operation_id}")
     
     # process traits
-    path = shape["traits"]["smithy.api#http"]["uri"]
-    verb = shape["traits"]["smithy.api#http"]["method"].lower()
-    if "code" in shape["traits"]["smithy.api#http"]:
-        success_code = shape["traits"]["smithy.api#http"]["code"]
-    else:
-        success_code = 200
+    traits = shape.get("traits", {})
+    http = traits.get("smithy.api#http", {})
+    path = http.get("uri", None)
+    verb = http.get("method", None)
+    if verb:
+        verb = verb.lower()
+
+    if path is None or verb is None:
+        return
+
+    success_code = http.get("code", 200)
+
     if path not in openapi_spec["paths"]:
         openapi_spec["paths"][path] = {}
     if verb not in openapi_spec["paths"][path]:
         openapi_spec["paths"][path][verb] = {}
     openapi_spec["paths"][path][verb]["operationId"] = operation_id
-    if "smithy.api#documentation" in shape["traits"]:
+    if "smithy.api#documentation" in traits:
         description = LiteralStr(html_to_md(shape["traits"]["smithy.api#documentation"]))
         openapi_spec["paths"][path][verb]["description"] = description
     
