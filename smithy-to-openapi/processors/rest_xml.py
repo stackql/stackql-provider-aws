@@ -26,6 +26,12 @@ from processors.shared_functions import (
     add_component_schema_union,
     add_component_schema_structure,
     write_output_yaml,
+    derive_resource_name,
+    determine_stackql_verb,
+    detect_pagination_scheme,
+    add_pagination_to_info,
+    add_pagination_to_operation,
+    resolve_orphaned_schemas,
 )
 
 yaml.add_representer(LiteralStr, literal_str_representer)
@@ -53,6 +59,10 @@ def process(model_entry):
     openapi_spec = init_openapi_spec(service_name, service_dir, protocol, version, filename)
 
     shapes = model_data.get("shapes", model_data)
+
+    # Detect and add pagination metadata before processing operations
+    pagination_data = detect_pagination_scheme(shapes, protocol)
+    add_pagination_to_info(openapi_spec, pagination_data)
 
     for shape_name, shape in shapes.items():
         if shape.get("type") == "service":
@@ -89,6 +99,9 @@ def process(model_entry):
         elif shape.get("type") == "operation":
             add_operation_xml(openapi_spec, shape_name, shape, shapes)
 
+    # Resolve any orphaned schema references
+    resolve_orphaned_schemas(openapi_spec)
+
     # Write output YAML
     write_output_yaml(openapi_spec, service_dir)
 
@@ -118,6 +131,10 @@ def add_operation_xml(openapi_spec, shape_name, shape, shapes):
 
     openapi_spec["paths"][path][verb]["operationId"] = operation_id
     openapi_spec["paths"][path][verb]["x-aws-operation-name"] = operation_id
+
+    # Add StackQL-specific fields
+    openapi_spec["paths"][path][verb]["x-stackql-resource"] = derive_resource_name(operation_id)
+    openapi_spec["paths"][path][verb]["x-stackql-verb"] = determine_stackql_verb(verb, operation_id)
 
     if "smithy.api#documentation" in traits:
         description = LiteralStr(html_to_md(shape["traits"]["smithy.api#documentation"]))
@@ -241,3 +258,6 @@ def add_operation_xml(openapi_spec, shape_name, shape, shapes):
                 responses[str(error_code)]["description"] = LiteralStr(html_to_md(error_traits["smithy.api#documentation"]))
             else:
                 responses[str(error_code)]["description"] = error_component_name
+
+    # Add pagination override if this operation is an exception
+    add_pagination_to_operation(openapi_spec, shape_name, openapi_spec["paths"][path][verb])

@@ -27,6 +27,12 @@ from processors.shared_functions import (
     add_component_schema_union,
     add_component_schema_structure,
     write_output_yaml,
+    derive_resource_name,
+    determine_stackql_verb,
+    detect_pagination_scheme,
+    add_pagination_to_info,
+    add_pagination_to_operation,
+    resolve_orphaned_schemas,
 )
 
 yaml.add_representer(LiteralStr, literal_str_representer)
@@ -153,11 +159,21 @@ def process(model_entry):
     # Setup paths
     openapi_spec["paths"] = {}
 
+    # Detect and add pagination metadata before creating paths
+    pagination_data = detect_pagination_scheme(shapes, protocol)
+    add_pagination_to_info(openapi_spec, pagination_data)
+
     # Create path for each operation
     for operation in shapes_dict["operation"]:
         operation_name = operation["my_name"].split('#')[1]
         key_string = f"/#Action={operation_name}"
-        openapi_spec["paths"][key_string] = create_path(operation, api_version, shapes)
+        path_spec = create_path(operation, api_version, shapes)
+        openapi_spec["paths"][key_string] = path_spec
+        # Add pagination override if this operation is an exception
+        add_pagination_to_operation(openapi_spec, operation["my_name"], path_spec["get"])
+
+    # Resolve any orphaned schema references
+    resolve_orphaned_schemas(openapi_spec)
 
     # Write output YAML
     write_output_yaml(openapi_spec, service_dir)
@@ -181,7 +197,7 @@ def create_path(operation, api_version, shapes):
     result["get"] = create_get_operation(operation, operation_name, api_version, shapes)
 
     # POST method - parameters in body
-    result["post"] = create_post_operation(operation, operation_name, api_version)
+    result["post"] = create_post_operation(operation, operation_name, api_version, shapes)
 
     return result
 
@@ -192,6 +208,10 @@ def create_get_operation(operation, operation_name, api_version, shapes):
     op["x-aws-operation-name"] = operation_name
     op["operationId"] = f"GET_{operation_name}"
     op["description"] = LiteralStr(html_to_md(operation["traits"].get("smithy.api#documentation", "")))
+    
+    # Add StackQL-specific fields
+    op["x-stackql-resource"] = derive_resource_name(operation_name)
+    op["x-stackql-verb"] = determine_stackql_verb("GET", operation_name)
 
     # Build parameters list
     parameters = []
@@ -252,12 +272,16 @@ def create_get_operation(operation, operation_name, api_version, shapes):
     return op
 
 
-def create_post_operation(operation, operation_name, api_version):
+def create_post_operation(operation, operation_name, api_version, shapes):
     op = {}
 
     op["x-aws-operation-name"] = operation_name
     op["operationId"] = f"POST_{operation_name}"
     op["description"] = LiteralStr(html_to_md(operation["traits"].get("smithy.api#documentation", "")))
+    
+    # Add StackQL-specific fields
+    op["x-stackql-resource"] = derive_resource_name(operation_name)
+    op["x-stackql-verb"] = determine_stackql_verb("POST", operation_name)
 
     # Parameters (Action and Version in query string for POST too)
     op["parameters"] = [
@@ -294,7 +318,7 @@ def create_post_operation(operation, operation_name, api_version):
         }
 
     # Response
-    op["responses"] = create_responses(operation, {})
+    op["responses"] = create_responses(operation, shapes)
 
     return op
 

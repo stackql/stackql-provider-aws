@@ -25,4 +25,21 @@ This will convert each smithy model (for each AWS service) into a corresponding 
 
 ## 2. Generate StackQL Provider
 
+**[PREREQUISITES]** run `npm i` to install the necessary libraries (including `@stackql/pgwire-lite` and `@stackql/provider-utils`)
+
+**a. generate mappings from the converted openapi specs:**
+
+Generate the mapping configuration that connects OpenAPI operations to StackQL resources:
+
+```bash
+npm run generate-mappings -- \
+  --provider-name aws \
+  --input-dir smithy-to-openapi/openapi \
+  --output-dir stackql-provider/config
+```
+
+**a. prepare a virtual environment:**
+
+**a. prepare a virtual environment:**
+
 ## 3. Generate StackQL Provider Docs for `aws`

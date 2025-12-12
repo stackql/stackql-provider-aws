@@ -25,6 +25,10 @@ from processors.shared_functions import (
     add_component_schema_union,
     add_component_schema_structure,
     add_operation,
+    detect_pagination_scheme,
+    add_pagination_to_info,
+    add_pagination_to_operation,
+    resolve_orphaned_schemas,
     write_output_yaml,
 )
 
@@ -107,10 +111,20 @@ def process(model_entry):
     # Setup the "paths" attribute
     openapi_spec["paths"] = {}
 
+    # Detect and add pagination metadata before creating paths
+    pagination_data = detect_pagination_scheme(shapes, protocol)
+    add_pagination_to_info(openapi_spec, pagination_data)
+
     # create the path
     for operation in shapes_dict["operation"]:
         key_string = "/#X-Amz-Target=" + service_name2 + "." + operation["my_name"].split('#')[1]
-        openapi_spec["paths"][key_string] = create_path(operation, service_name2)
+        path_spec = create_path(operation, service_name2)
+        openapi_spec["paths"][key_string] = path_spec
+        # Add pagination override if this operation is an exception
+        add_pagination_to_operation(openapi_spec, operation["my_name"], path_spec["post"])
+
+    # Resolve any orphaned schema references
+    resolve_orphaned_schemas(openapi_spec)
 
     # Write output YAML
     write_output_yaml(openapi_spec, service_dir)

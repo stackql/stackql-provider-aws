@@ -23,6 +23,9 @@ from processors.shared_functions import (
     add_component_schema_union,
     add_component_schema_structure,
     add_operation,
+    detect_pagination_scheme,
+    add_pagination_to_info,
+    resolve_orphaned_schemas,
     write_output_yaml,
 )
 
@@ -51,6 +54,10 @@ def process(model_entry):
     openapi_spec = init_openapi_spec(service_name, service_dir, protocol, version, filename)
 
     shapes = model_data.get("shapes", model_data)
+
+    # Detect and add pagination metadata BEFORE processing operations
+    pagination_data = detect_pagination_scheme(shapes, protocol)
+    add_pagination_to_info(openapi_spec, pagination_data)
 
     for shape_name, shape in shapes.items():
         if shape.get("type") == "service": 
@@ -87,6 +94,8 @@ def process(model_entry):
         elif shape.get("type") == "operation":
             add_operation(openapi_spec, shape_name, shape, shapes)
 
+    # Resolve any orphaned schema references
+    resolve_orphaned_schemas(openapi_spec)
 
     # Write output YAML
     write_output_yaml(openapi_spec, service_dir)
