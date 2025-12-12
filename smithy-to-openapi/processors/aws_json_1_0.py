@@ -28,10 +28,9 @@ from processors.shared_functions import (
     write_output_yaml,
     derive_resource_name,
     determine_stackql_verb,
+    derive_method_name,
     detect_pagination_scheme,
     add_pagination_to_info,
-    add_pagination_to_operation,
-    resolve_orphaned_schemas,
 )
 
 yaml.add_representer(LiteralStr, literal_str_representer)
@@ -166,31 +165,22 @@ def process(model_entry):
     for operation in shapes_dict["operation"]:
         operation_name = operation["my_name"].split('#')[1]
         key_string = "/#X-Amz-Target=" + service_name2 + "." + operation_name
-        path_spec = create_path(operation, service_name2)
+        path_spec = create_path(operation, service_name2, openapi_spec)
         openapi_spec["paths"][key_string] = path_spec
-        # Add pagination override if this operation is an exception
-        add_pagination_to_operation(openapi_spec, operation["my_name"], path_spec["post"])
-
-    # Resolve any orphaned schema references
-    resolve_orphaned_schemas(openapi_spec)
 
     # Write output YAML
     write_output_yaml(openapi_spec, service_dir)
 
-def create_path(operation, service_name2):
+def create_path(operation, service_name2, openapi_spec):
     result = {}
     operation_name = operation["my_name"].split('#')[1]
+    path_key = "/#X-Amz-Target=" + service_name2 + "." + operation_name
 
     result["post"] = {}
     result_post = result["post"]
 
     result_post["operationId"] = operation_name
-    result_post["x-aws-operation-name"] = operation_name
     result_post["description"] = LiteralStr(html_to_md(operation["traits"].get("smithy.api#documentation", "")))
-    
-    # Add StackQL-specific fields
-    result_post["x-stackql-resource"] = derive_resource_name(operation_name)
-    result_post["x-stackql-verb"] = determine_stackql_verb("POST", operation_name)
 
     # Request body with JSON content
     result_post["requestBody"] = {}
@@ -264,5 +254,21 @@ def create_path(operation, service_name2):
                 }
             }
             error_code += 1
+
+    # Track operation for StackQL resource building
+    resource_name = derive_resource_name(operation_name)
+    stackql_verb = determine_stackql_verb("POST", operation_name)
+    method_name = derive_method_name(operation_name)
+
+    openapi_spec["_stackql_operations"].append({
+        "operation_id": operation_name,
+        "resource_name": resource_name,
+        "stackql_verb": stackql_verb,
+        "method_name": method_name,
+        "path": path_key,
+        "http_method": "post",
+        "success_code": "200",
+        "shape_name": operation["my_name"]
+    })
 
     return result

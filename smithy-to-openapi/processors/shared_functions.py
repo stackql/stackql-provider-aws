@@ -4,11 +4,19 @@ import sys,html2text
 from yaml.representer import SafeRepresenter
 from datetime import date
 from pathlib import Path
+from collections import defaultdict
 import yaml
 import inflect
+import re
 
 # Initialize inflect engine for pluralization
 _inflect_engine = inflect.engine()
+
+# Provider version constant
+PROVIDER_VERSION = "v00.00.00000"
+
+# Track all processed services for provider.yaml generation
+_processed_services = []
 
 class LiteralStr(str): pass
 
@@ -122,54 +130,54 @@ def _pluralize_resource(resource_name: str) -> str:
 def determine_stackql_verb(http_method: str, operation_id: str) -> str:
     """
     Determine the appropriate StackQL verb based on HTTP method and operation semantics.
-    
+
     StackQL verbs:
     - select: Read operations (GET, or POST operations that retrieve data like Describe, List, Get)
     - insert: Create operations
     - update: Update/modify operations
     - delete: Delete operations
     - exec: Other operations that don't fit the CRUD pattern
-    
+
     GUARDRAIL: HTTP DELETE method MUST ALWAYS map to 'delete' verb, regardless of operation name.
-    
+
     Note: POST operations that retrieve data (Describe*, List*, Get*) are treated as 'select'
     """
     http_method = http_method.upper()
-    
+
     # CRITICAL GUARDRAIL: HTTP DELETE must ALWAYS be 'delete'
     # This ensures we never have select/insert/update operations using DELETE
     if http_method == 'DELETE':
         return 'delete'
-    
+
     # Patterns for select operations (data retrieval)
     select_patterns = ['Describe', 'Get', 'List', 'Query', 'Search', 'Lookup', 'Find', 'Retrieve', 'Read', 'Show', 'Scan']
-    
+
     # Patterns for insert operations
     insert_patterns = ['Create', 'Put', 'Add', 'Register', 'Enable', 'Batch']
-    
+
     # Patterns for update operations
     update_patterns = ['Update', 'Modify', 'Set', 'Change', 'Replace', 'Edit', 'Apply', 'Attach', 'Detach']
-    
+
     # Patterns for delete operations
     delete_patterns = ['Delete', 'Remove', 'Terminate', 'Deregister', 'Disable', 'Cancel']
-    
+
     # Check operation ID patterns first (more specific than HTTP method)
     for pattern in select_patterns:
         if operation_id.startswith(pattern):
             return 'select'
-    
+
     for pattern in insert_patterns:
         if operation_id.startswith(pattern):
             return 'insert'
-    
+
     for pattern in update_patterns:
         if operation_id.startswith(pattern):
             return 'update'
-    
+
     for pattern in delete_patterns:
         if operation_id.startswith(pattern):
             return 'delete'
-    
+
     # Fall back to HTTP method mapping
     if http_method == 'GET':
         return 'select'
@@ -183,31 +191,55 @@ def determine_stackql_verb(http_method: str, operation_id: str) -> str:
     else:
         return 'exec'
 
+def derive_method_name(operation_id: str) -> str:
+    """
+    Derive the method name from the operationId.
+
+    Extracts the verb/action and converts to snake_case.
+
+    Examples:
+    - DescribeAutoScalingGroups -> describe_auto_scaling_groups
+    - CreateLaunchConfiguration -> create_launch_configuration
+    - GetObject -> get_object
+    - ListBuckets -> list_buckets
+    """
+    if not operation_id:
+        return ""
+
+    # Convert from PascalCase to snake_case
+    method_name = re.sub('(.)([A-Z][a-z]+)', r'\1_\2', operation_id)
+    method_name = re.sub('([a-z0-9])([A-Z])', r'\1_\2', method_name)
+    method_name = method_name.lower()
+
+    return method_name
+
 def init_openapi_spec(service_name, service_dir, protocol, version=None, filename=None):
     info = {
         "contact": {
             "name": "StackQL Studios",
             "url": "https://stackql.io/",
             "email": "info@stackql.io"
-        },
-        "x-stackql-serviceName": service_dir.replace("-", "_"),
-        "x-aws-serviceName": service_name,
-        "x-aws-protocol": protocol,
-        "x-dateGenerated": f"{date.today().isoformat()}"
+        }
     }
-    
+
     # Add GitHub deep link to model file if version and filename are provided
     if version and filename:
         info["x-aws-modelFile"] = f"https://github.com/aws/api-models-aws/tree/main/models/{service_dir}/service/{version}/{filename}"
-    
+
     return {
         "openapi": "3.1.0",
         "info": info,
         "servers": [],
         "paths": {},
         "components": {
-            "schemas": {}
-        }
+            "schemas": {},
+            "x-stackQL-resources": {}
+        },
+        # Internal tracking for building resources (removed before output)
+        "_stackql_operations": [],
+        "_service_name": service_dir.replace("-", "_"),
+        "_aws_service_name": service_name,
+        "_aws_protocol": protocol
     }
 
 def add_info(openapi_spec, service_shape, version=None):
@@ -676,7 +708,7 @@ def add_component_schema_structure(openapi_spec, shape_name, shape):
 def add_operation(openapi_spec, shape_name, shape, shapes):
     operation_id = shape_name.split("#")[-1]
     print(f"adding operation {operation_id}")
-    
+
     # process traits
     traits = shape.get("traits", {})
     http = traits.get("smithy.api#http", {})
@@ -698,17 +730,23 @@ def add_operation(openapi_spec, shape_name, shape, shapes):
     if "smithy.api#documentation" in traits:
         description = LiteralStr(html_to_md(shape["traits"]["smithy.api#documentation"]))
         openapi_spec["paths"][path][verb]["description"] = description
-    
-    # Add StackQL-specific fields
+
+    # Track operation info for building StackQL resources later
     resource_name = derive_resource_name(operation_id)
     stackql_verb = determine_stackql_verb(verb, operation_id)
-    
-    openapi_spec["paths"][path][verb]["x-stackql-resource"] = resource_name
-    openapi_spec["paths"][path][verb]["x-stackql-verb"] = stackql_verb
-    
-    # Add operation-level pagination metadata if this operation differs from dominant scheme
-    add_pagination_to_operation(openapi_spec, shape_name, openapi_spec["paths"][path][verb])
-    
+    method_name = derive_method_name(operation_id)
+
+    openapi_spec["_stackql_operations"].append({
+        "operation_id": operation_id,
+        "resource_name": resource_name,
+        "stackql_verb": stackql_verb,
+        "method_name": method_name,
+        "path": path,
+        "http_method": verb,
+        "success_code": str(success_code),
+        "shape_name": shape_name
+    })
+
     input_shape_name = shape.get("input", {}).get("target")
     if input_shape_name and input_shape_name != "smithy.api#Unit":
         input_shape = shapes[input_shape_name]
@@ -765,7 +803,7 @@ def add_operation(openapi_spec, shape_name, shape, shapes):
 
     # process output
     openapi_spec["paths"][path][verb]["responses"] = {}
-    
+
     # Handle success response with output shape
     output_shape_name = shape.get("output", {}).get("target")
     if output_shape_name and output_shape_name != "smithy.api#Unit":
@@ -783,7 +821,7 @@ def add_operation(openapi_spec, shape_name, shape, shapes):
         openapi_spec["paths"][path][verb]["responses"][str(success_code)] = {
             "description": "Success"
         }
-    
+
     if "errors" in shape:
         for error in shape["errors"]:
             error_component_name = error["target"].split("#")[-1]
@@ -946,43 +984,136 @@ def detect_pagination_scheme(shapes, protocol):
 
 def add_pagination_to_info(openapi_spec, pagination_data):
     """
-    Add pagination metadata to the OpenAPI spec's info section.
-    Uses the dominant scheme for service-level metadata.
-    
+    Store pagination data in the spec for later use when building StackQL config.
+
     Args:
         openapi_spec: The OpenAPI specification dictionary
         pagination_data: Dictionary with dominant_scheme and exceptions from detect_pagination_scheme
     """
     if not pagination_data:
+        openapi_spec["_pagination_data"] = None
         return
-    
-    dominant_scheme = pagination_data['dominant_scheme']
-    
-    openapi_spec["info"]["x-pagination-request-key"] = dominant_scheme['request_key']
-    openapi_spec["info"]["x-pagination-request-location"] = dominant_scheme['request_location']
-    openapi_spec["info"]["x-pagination-response-key"] = dominant_scheme['response_key']
-    openapi_spec["info"]["x-pagination-response-location"] = dominant_scheme['response_location']
-    
-    # Store exceptions for later use when adding operations
-    openapi_spec["_pagination_exceptions"] = pagination_data['exceptions']
+
+    openapi_spec["_pagination_data"] = pagination_data
 
 def add_pagination_to_operation(openapi_spec, shape_name, operation_spec):
     """
-    Add operation-level pagination metadata if this operation differs from the dominant scheme.
-    
-    Args:
-        openapi_spec: The OpenAPI specification dictionary
-        shape_name: The full shape name (e.g., 'com.amazonaws.service#OperationName')
-        operation_spec: The operation specification dictionary to potentially add pagination to
+    No longer adds operation-level pagination metadata directly.
+    This is now handled during resource building in build_stackql_resources.
+    Kept for backwards compatibility with processor calls.
     """
-    pagination_exceptions = openapi_spec.get("_pagination_exceptions", {})
-    
-    if shape_name in pagination_exceptions:
-        exception_scheme = pagination_exceptions[shape_name]
-        operation_spec["x-pagination-request-key"] = exception_scheme['request_key']
-        operation_spec["x-pagination-request-location"] = exception_scheme['request_location']
-        operation_spec["x-pagination-response-key"] = exception_scheme['response_key']
-        operation_spec["x-pagination-response-location"] = exception_scheme['response_location']
+    pass
+
+
+def _escape_path_for_ref(path: str) -> str:
+    """Escape a path string for use in JSON pointer ($ref)."""
+    # JSON pointer requires ~ to be encoded as ~0, / as ~1
+    return path.replace("~", "~0").replace("/", "~1")
+
+
+def build_stackql_resources(openapi_spec):
+    """
+    Build the x-stackQL-resources section from tracked operations.
+
+    Groups operations by resource name, creates methods referencing paths,
+    and builds sqlVerbs mappings.
+    """
+    service_name = openapi_spec.get("_service_name", "unknown")
+    operations = openapi_spec.get("_stackql_operations", [])
+
+    # Group operations by resource name
+    resources = defaultdict(lambda: {
+        "methods": {},
+        "sqlVerbs": {
+            "select": [],
+            "insert": [],
+            "update": [],
+            "delete": []
+        }
+    })
+
+    for op in operations:
+        resource_name = op["resource_name"]
+        method_name = op["method_name"]
+        path = op["path"]
+        http_method = op["http_method"]
+        stackql_verb = op["stackql_verb"]
+        success_code = op["success_code"]
+
+        # Build the path reference for the operation
+        escaped_path = _escape_path_for_ref(path)
+        operation_ref = f"#/paths/{escaped_path}/{http_method}"
+
+        # Build method definition
+        method_def = {
+            "operation": {
+                "$ref": operation_ref
+            },
+            "response": {
+                "mediaType": "application/json",
+                "openAPIDocKey": success_code
+            }
+        }
+
+        # Add request mediaType for write operations
+        if stackql_verb in ("insert", "update", "exec"):
+            method_def["request"] = {
+                "mediaType": "application/json"
+            }
+
+        resources[resource_name]["methods"][method_name] = method_def
+
+        # Add to appropriate sqlVerb list (exec operations don't get added to sqlVerbs)
+        if stackql_verb in resources[resource_name]["sqlVerbs"]:
+            method_ref = f"#/components/x-stackQL-resources/{resource_name}/methods/{method_name}"
+            resources[resource_name]["sqlVerbs"][stackql_verb].append({
+                "$ref": method_ref
+            })
+
+    # Build final resource definitions
+    stackql_resources = {}
+    for resource_name, resource_data in sorted(resources.items()):
+        stackql_resources[resource_name] = {
+            "id": f"aws.{service_name}.{resource_name}",
+            "name": resource_name,
+            "title": resource_name.replace("_", " ").title(),
+            "methods": resource_data["methods"],
+            "sqlVerbs": resource_data["sqlVerbs"]
+        }
+
+    openapi_spec["components"]["x-stackQL-resources"] = stackql_resources
+
+
+def build_stackql_config(openapi_spec):
+    """
+    Build the x-stackQL-config section with AWS authentication and pagination.
+    """
+    service_name = openapi_spec.get("_service_name", "unknown")
+    pagination_data = openapi_spec.get("_pagination_data")
+
+    config = {
+        "auth": {
+            "type": "aws_signing_v4",
+            "credentialsenvvar": "AWS_SECRET_ACCESS_KEY",
+            "keyIDenvvar": "AWS_ACCESS_KEY_ID"
+        }
+    }
+
+    # Add pagination config if detected
+    if pagination_data and pagination_data.get("dominant_scheme"):
+        scheme = pagination_data["dominant_scheme"]
+        config["pagination"] = {
+            "requestToken": {
+                "key": scheme["request_key"],
+                "location": scheme["request_location"]
+            },
+            "responseToken": {
+                "key": scheme["response_key"],
+                "location": scheme["response_location"]
+            }
+        }
+
+    openapi_spec["x-stackQL-config"] = config
 
 def resolve_orphaned_schemas(openapi_spec):
     """
@@ -1060,13 +1191,122 @@ def resolve_orphaned_schemas(openapi_spec):
         
         print(f"  ✓ Created placeholder definitions for orphaned schemas")
 
+def finalize_openapi_spec(openapi_spec):
+    """
+    Finalize the OpenAPI spec by building StackQL resources and config,
+    then cleaning up internal tracking fields.
+    """
+    # Build StackQL resources from tracked operations
+    build_stackql_resources(openapi_spec)
+
+    # Build StackQL config with auth and pagination
+    build_stackql_config(openapi_spec)
+
+    # Clean up internal tracking fields
+    internal_fields = [
+        "_stackql_operations",
+        "_service_name",
+        "_aws_service_name",
+        "_aws_protocol",
+        "_pagination_data",
+        "_pagination_exceptions"
+    ]
+    for field in internal_fields:
+        if field in openapi_spec:
+            del openapi_spec[field]
+
+
 def write_output_yaml(openapi_spec, service_dir):
-    # Clean up temporary pagination exceptions storage
-    if "_pagination_exceptions" in openapi_spec:
-        del openapi_spec["_pagination_exceptions"]
-    
-    outdir = Path("smithy-to-openapi/openapi")
-    outdir.mkdir(exist_ok=True)
-    outfile = outdir / f"{service_dir.replace('-', '_')}.yaml"
+    global _processed_services
+
+    # Finalize the spec (build resources, config, clean up)
+    finalize_openapi_spec(openapi_spec)
+
+    # Resolve any orphaned schema references
+    resolve_orphaned_schemas(openapi_spec)
+
+    # Create output directory structure
+    outdir = Path(f"smithy-to-openapi/openapi/src/aws/{PROVIDER_VERSION}/services")
+    outdir.mkdir(parents=True, exist_ok=True)
+
+    service_name = service_dir.replace('-', '_')
+    outfile = outdir / f"{service_name}.yaml"
+
     with open(outfile, "w", encoding="utf-8") as f:
         yaml.dump(openapi_spec, f, sort_keys=False, allow_unicode=True)
+
+    print(f"  ✓ Wrote {outfile}")
+
+    # Track this service for provider.yaml generation
+    _processed_services.append({
+        "name": service_name,
+        "title": openapi_spec.get("info", {}).get("title", service_name),
+        "description": openapi_spec.get("info", {}).get("description", ""),
+        "version": openapi_spec.get("info", {}).get("version", "1.0.0")
+    })
+
+
+def get_processed_services():
+    """Return the list of processed services."""
+    global _processed_services
+    return _processed_services
+
+
+def reset_processed_services():
+    """Reset the list of processed services (for testing)."""
+    global _processed_services
+    _processed_services = []
+
+
+def generate_provider_yaml():
+    """
+    Generate the provider.yaml file that indexes all processed services.
+    """
+    global _processed_services
+
+    if not _processed_services:
+        print("⚠️  No services processed, skipping provider.yaml generation")
+        return
+
+    provider = {
+        "id": "aws",
+        "name": "aws",
+        "title": "Amazon Web Services",
+        "version": PROVIDER_VERSION,
+        "description": "Cloud computing services from Amazon Web Services.",
+        "providerServices": {}
+    }
+
+    # Add each service to providerServices
+    for svc in sorted(_processed_services, key=lambda x: x["name"]):
+        service_name = svc["name"]
+        provider["providerServices"][service_name] = {
+            "id": f"aws.{service_name}",
+            "name": service_name,
+            "title": svc["title"],
+            "version": svc["version"],
+            "description": svc.get("description", "")[:200] if svc.get("description") else "",
+            "preferred": True,
+            "service": {
+                "$ref": f"services/{service_name}.yaml"
+            }
+        }
+
+    # Add provider-level config
+    provider["config"] = {
+        "auth": {
+            "type": "aws_signing_v4",
+            "credentialsenvvar": "AWS_SECRET_ACCESS_KEY",
+            "keyIDenvvar": "AWS_ACCESS_KEY_ID"
+        }
+    }
+
+    # Write provider.yaml
+    outdir = Path(f"smithy-to-openapi/openapi/src/aws/{PROVIDER_VERSION}")
+    outdir.mkdir(parents=True, exist_ok=True)
+    outfile = outdir / "provider.yaml"
+
+    with open(outfile, "w", encoding="utf-8") as f:
+        yaml.dump(provider, f, sort_keys=False, allow_unicode=True)
+
+    print(f"✓ Generated provider.yaml with {len(_processed_services)} services")

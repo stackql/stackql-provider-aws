@@ -28,10 +28,9 @@ from processors.shared_functions import (
     write_output_yaml,
     derive_resource_name,
     determine_stackql_verb,
+    derive_method_name,
     detect_pagination_scheme,
     add_pagination_to_info,
-    add_pagination_to_operation,
-    resolve_orphaned_schemas,
 )
 
 yaml.add_representer(LiteralStr, literal_str_representer)
@@ -99,10 +98,7 @@ def process(model_entry):
         elif shape.get("type") == "operation":
             add_operation_xml(openapi_spec, shape_name, shape, shapes)
 
-    # Resolve any orphaned schema references
-    resolve_orphaned_schemas(openapi_spec)
-
-    # Write output YAML
+    # Write output YAML (this also finalizes StackQL resources and resolves orphaned schemas)
     write_output_yaml(openapi_spec, service_dir)
 
 
@@ -130,11 +126,22 @@ def add_operation_xml(openapi_spec, shape_name, shape, shapes):
         openapi_spec["paths"][path][verb] = {}
 
     openapi_spec["paths"][path][verb]["operationId"] = operation_id
-    openapi_spec["paths"][path][verb]["x-aws-operation-name"] = operation_id
 
-    # Add StackQL-specific fields
-    openapi_spec["paths"][path][verb]["x-stackql-resource"] = derive_resource_name(operation_id)
-    openapi_spec["paths"][path][verb]["x-stackql-verb"] = determine_stackql_verb(verb, operation_id)
+    # Track operation for StackQL resource building
+    resource_name = derive_resource_name(operation_id)
+    stackql_verb = determine_stackql_verb(verb, operation_id)
+    method_name = derive_method_name(operation_id)
+
+    openapi_spec["_stackql_operations"].append({
+        "operation_id": operation_id,
+        "resource_name": resource_name,
+        "stackql_verb": stackql_verb,
+        "method_name": method_name,
+        "path": path,
+        "http_method": verb,
+        "success_code": str(success_code),
+        "shape_name": shape_name
+    })
 
     if "smithy.api#documentation" in traits:
         description = LiteralStr(html_to_md(shape["traits"]["smithy.api#documentation"]))
@@ -258,6 +265,3 @@ def add_operation_xml(openapi_spec, shape_name, shape, shapes):
                 responses[str(error_code)]["description"] = LiteralStr(html_to_md(error_traits["smithy.api#documentation"]))
             else:
                 responses[str(error_code)]["description"] = error_component_name
-
-    # Add pagination override if this operation is an exception
-    add_pagination_to_operation(openapi_spec, shape_name, openapi_spec["paths"][path][verb])

@@ -1,4 +1,6 @@
-# processors/rest_json1.py
+# processors/aws_json_1_1.py
+# AWS JSON 1.1 protocol processor
+# Uses X-Amz-Target header with POST requests
 
 import json, yaml
 from pathlib import Path
@@ -24,12 +26,12 @@ from processors.shared_functions import (
     add_component_schema_list,
     add_component_schema_union,
     add_component_schema_structure,
-    add_operation,
     detect_pagination_scheme,
     add_pagination_to_info,
-    add_pagination_to_operation,
-    resolve_orphaned_schemas,
     write_output_yaml,
+    derive_resource_name,
+    determine_stackql_verb,
+    derive_method_name,
 )
 
 yaml.add_representer(LiteralStr, literal_str_representer)
@@ -56,6 +58,52 @@ def process(model_entry):
     # Basic OpenAPI structure
     openapi_spec = init_openapi_spec(service_name, service_dir, protocol, version, filename)
 
+    # Add common AWS signature parameters
+    openapi_spec["components"]["parameters"] = {
+        "X-Amz-Content-Sha256": {
+            "name": "X-Amz-Content-Sha256",
+            "in": "header",
+            "required": False,
+            "schema": {"type": "string"}
+        },
+        "X-Amz-Date": {
+            "name": "X-Amz-Date",
+            "in": "header",
+            "required": False,
+            "schema": {"type": "string"}
+        },
+        "X-Amz-Algorithm": {
+            "name": "X-Amz-Algorithm",
+            "in": "header",
+            "required": False,
+            "schema": {"type": "string"}
+        },
+        "X-Amz-Credential": {
+            "name": "X-Amz-Credential",
+            "in": "header",
+            "required": False,
+            "schema": {"type": "string"}
+        },
+        "X-Amz-Security-Token": {
+            "name": "X-Amz-Security-Token",
+            "in": "header",
+            "required": False,
+            "schema": {"type": "string"}
+        },
+        "X-Amz-Signature": {
+            "name": "X-Amz-Signature",
+            "in": "header",
+            "required": False,
+            "schema": {"type": "string"}
+        },
+        "X-Amz-SignedHeaders": {
+            "name": "X-Amz-SignedHeaders",
+            "in": "header",
+            "required": False,
+            "schema": {"type": "string"}
+        }
+    }
+
     shapes = model_data.get("shapes", model_data)
 
     shapes_dict = {
@@ -64,7 +112,7 @@ def process(model_entry):
     }
 
     for shape_name, shape in shapes.items():
-        if shape.get("type") == "service": 
+        if shape.get("type") == "service":
             add_info(openapi_spec, shape, version)
             add_servers(openapi_spec, service_dir, shape)
             shape["my_name"] = shape_name
@@ -98,13 +146,12 @@ def process(model_entry):
         elif shape.get("type") == "structure":
             add_component_schema_structure(openapi_spec, shape_name, shape)
         elif shape.get("type") == "operation":
-            add_operation(openapi_spec, shape_name, shape, shapes)
             shape["my_name"] = shape_name
             shapes_dict["operation"].append(shape)
 
     # process the service to get the paths
     service_name2 = model_entry['servicename'].split('#')[1]
-    
+
     # Sort the operations, we will need them to be in alphabetic order for creating paths
     shapes_dict["operation"].sort(key=lambda x: x["my_name"])
 
@@ -117,52 +164,52 @@ def process(model_entry):
 
     # create the path
     for operation in shapes_dict["operation"]:
-        key_string = "/#X-Amz-Target=" + service_name2 + "." + operation["my_name"].split('#')[1]
-        path_spec = create_path(operation, service_name2)
+        operation_id = operation["my_name"].split('#')[1]
+        key_string = "/#X-Amz-Target=" + service_name2 + "." + operation_id
+        path_spec = create_path(operation, service_name2, openapi_spec)
         openapi_spec["paths"][key_string] = path_spec
-        # Add pagination override if this operation is an exception
-        add_pagination_to_operation(openapi_spec, operation["my_name"], path_spec["post"])
-
-    # Resolve any orphaned schema references
-    resolve_orphaned_schemas(openapi_spec)
 
     # Write output YAML
     write_output_yaml(openapi_spec, service_dir)
 
-def create_path(operation, service_name2):
+def create_path(operation, service_name2, openapi_spec):
     result = {}
+    operation_id = operation["my_name"].split('#')[1]
+    path_key = "/#X-Amz-Target=" + service_name2 + "." + operation_id
+
     result["post"] = {}
     result_post = result["post"]
-    
-    result_post["operationId"] = operation["my_name"].split('#')[1]
+
+    result_post["operationId"] = operation_id
     result_post["description"] = LiteralStr(html_to_md(operation["traits"].get("smithy.api#documentation", "")))
-    
+
     result_post["requestBody"] = {}
     result_request_body = result_post["requestBody"]
     result_request_body["required"] = True
     result_request_body["content"] = {}
     result_request_body["content"]["application/json"] = {}
-    result_request_body["content"]["application/json"]["schema"] = {}    
+    result_request_body["content"]["application/json"]["schema"] = {}
     result_request_body["content"]["application/json"]["schema"]["$ref"] = "#/components/schemas/" + operation["input"]["target"].split("#")[1]
 
-    result_post["parameters"] = {}
-    result_parameters_inside = result_post["parameters"]
-    result_parameters_inside["name"] = "X-Amz-Target"
-    result_parameters_inside["in"] = "header"
-    result_parameters_inside["required"] = True
-    result_parameters_inside["schema"] = {}
-    result_parameters_inside["schema"]["type"] = "string"
-    result_parameters_inside["schema"]["enum"] = [service_name2 + "." + operation["my_name"].split('#')[1]]
+    result_post["parameters"] = [{
+        "name": "X-Amz-Target",
+        "in": "header",
+        "required": True,
+        "schema": {
+            "type": "string",
+            "enum": [service_name2 + "." + operation_id]
+        }
+    }]
 
     # Static Information
     result["parameters"] = []
-    result["parameters"].append({ '$ref': '#/components/parameters/X-Amz-Content-Sha256'})
-    result["parameters"].append({ '$ref': '#/components/parameters/X-Amz-Date'})
-    result["parameters"].append({ '$ref': '#/components/parameters/X-Amz-Algorithm'})
-    result["parameters"].append({ '$ref': '#/components/parameters/X-Amz-Credential'})
-    result["parameters"].append({ '$ref': '#/components/parameters/X-Amz-Security-Token'})
-    result["parameters"].append({ '$ref': '#/components/parameters/X-Amz-Signature'})
-    result["parameters"].append({ '$ref': '#/components/parameters/X-Amz-SignedHeaders'})
+    result["parameters"].append({'$ref': '#/components/parameters/X-Amz-Content-Sha256'})
+    result["parameters"].append({'$ref': '#/components/parameters/X-Amz-Date'})
+    result["parameters"].append({'$ref': '#/components/parameters/X-Amz-Algorithm'})
+    result["parameters"].append({'$ref': '#/components/parameters/X-Amz-Credential'})
+    result["parameters"].append({'$ref': '#/components/parameters/X-Amz-Security-Token'})
+    result["parameters"].append({'$ref': '#/components/parameters/X-Amz-Signature'})
+    result["parameters"].append({'$ref': '#/components/parameters/X-Amz-SignedHeaders'})
 
     result_post["responses"] = {}
     result_responses = result_post["responses"]
@@ -187,5 +234,21 @@ def create_path(operation, service_name2):
             result_responses[error_string]["content"]["application/json"]["schema"] = {"$ref": ('#/components/schemas/' + error_name)}
 
             error_code += 1
+
+    # Track operation for StackQL resource building
+    resource_name = derive_resource_name(operation_id)
+    stackql_verb = determine_stackql_verb("POST", operation_id)
+    method_name = derive_method_name(operation_id)
+
+    openapi_spec["_stackql_operations"].append({
+        "operation_id": operation_id,
+        "resource_name": resource_name,
+        "stackql_verb": stackql_verb,
+        "method_name": method_name,
+        "path": path_key,
+        "http_method": "post",
+        "success_code": "200",
+        "shape_name": operation["my_name"]
+    })
 
     return result
