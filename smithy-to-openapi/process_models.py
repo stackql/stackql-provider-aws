@@ -6,6 +6,11 @@ from pathlib import Path
 from processors import (
     rest_json1, rest_xml, aws_json_1_0, aws_json_1_1, aws_query, ec2_query
 )
+from processors.shared_functions import (
+    reset_processed_services,
+    generate_provider_yaml,
+    PROVIDER_VERSION
+)
 
 PROTOCOL_DISPATCH = {
     "aws.protocols#restJson1": rest_json1.process,
@@ -86,25 +91,22 @@ if __name__ == "__main__":
 
     # Clean output directory if requested
     if args.clean:
-        output_dir = Path("smithy-to-openapi/openapi")
+        output_dir = Path(f"smithy-to-openapi/openapi/src/aws/{PROVIDER_VERSION}")
         if output_dir.exists():
             print(f"🧹 Cleaning output directory: {output_dir}")
-            # Preserve .gitignore if it exists
-            gitignore_path = output_dir / ".gitignore"
-            gitignore_content = None
-            if gitignore_path.exists():
-                gitignore_content = gitignore_path.read_text()
-            
             shutil.rmtree(output_dir)
-            output_dir.mkdir(parents=True, exist_ok=True)
-            
-            # Restore .gitignore if it existed
-            if gitignore_content:
-                gitignore_path.write_text(gitignore_content)
+        output_dir.mkdir(parents=True, exist_ok=True)
 
+    # Reset the processed services list
+    reset_processed_services()
+
+    # Process all services
     for svc in extract_services(Path("models")):
         protocol = svc["protocol"]
         if protocol in PROTOCOL_DISPATCH:
             PROTOCOL_DISPATCH[protocol](svc)
         else:
             print(f"❓ Skipping {svc['servicename']} — unknown protocol: {protocol}")
+
+    # Generate the provider.yaml index file
+    generate_provider_yaml()

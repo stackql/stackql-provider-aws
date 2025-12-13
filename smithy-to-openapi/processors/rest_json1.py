@@ -25,7 +25,6 @@ from processors.shared_functions import (
     add_operation,
     detect_pagination_scheme,
     add_pagination_to_info,
-    resolve_orphaned_schemas,
     write_output_yaml,
 )
 
@@ -94,8 +93,5 @@ def process(model_entry):
         elif shape.get("type") == "operation":
             add_operation(openapi_spec, shape_name, shape, shapes)
 
-    # Resolve any orphaned schema references
-    resolve_orphaned_schemas(openapi_spec)
-
-    # Write output YAML
+    # Write output YAML (this also finalizes StackQL resources and resolves orphaned schemas)
     write_output_yaml(openapi_spec, service_dir)
