@@ -1,6 +1,7 @@
 # processors/shared_functions.py
 
 import sys,html2text
+import csv
 from yaml.representer import SafeRepresenter
 from datetime import date
 from pathlib import Path
@@ -17,6 +18,12 @@ PROVIDER_VERSION = "v00.00.00000"
 
 # Track all processed services for provider.yaml generation
 _processed_services = []
+
+# Cache for loaded CSV manifests (service_name -> {operationId -> row})
+_csv_manifests = {}
+
+# Path to stackql-routes directory
+_ROUTES_DIR = Path("smithy-to-openapi/stackql-routes")
 
 class LiteralStr(str): pass
 
@@ -212,6 +219,96 @@ def derive_method_name(operation_id: str) -> str:
     method_name = method_name.lower()
 
     return method_name
+
+
+def load_csv_manifest(service_name: str) -> dict:
+    """
+    Load the CSV manifest for a service if it exists.
+
+    Args:
+        service_name: The service name (e.g., 'ec2', 's3', 'lambda')
+
+    Returns:
+        Dictionary mapping operationId to row data, or empty dict if no manifest exists.
+    """
+    global _csv_manifests
+
+    # Normalize service name
+    service_name = service_name.replace("-", "_")
+
+    # Check cache first
+    if service_name in _csv_manifests:
+        return _csv_manifests[service_name]
+
+    # Try to load from file
+    csv_path = _ROUTES_DIR / f"{service_name}.csv"
+    if not csv_path.exists():
+        _csv_manifests[service_name] = {}
+        return {}
+
+    manifest = {}
+    try:
+        with open(csv_path, "r", encoding="utf-8", newline="") as f:
+            reader = csv.DictReader(f)
+            for row in reader:
+                manifest[row["operationId"]] = row
+        _csv_manifests[service_name] = manifest
+        print(f"  Loaded CSV manifest with {len(manifest)} operations for {service_name}")
+    except Exception as e:
+        print(f"  Warning: Failed to load CSV manifest for {service_name}: {e}")
+        _csv_manifests[service_name] = {}
+
+    return manifest
+
+
+def get_operation_config(service_name: str, operation_id: str, http_method: str) -> dict:
+    """
+    Get operation configuration from CSV manifest or derive defaults.
+
+    Args:
+        service_name: The service name
+        operation_id: The operation ID (e.g., 'DescribeInstances')
+        http_method: The HTTP method (e.g., 'GET', 'POST')
+
+    Returns:
+        Dictionary with keys: resource_name, method_name, stackql_verb, object_key,
+        and optionally pagination override fields.
+    """
+    manifest = load_csv_manifest(service_name)
+
+    if operation_id in manifest:
+        row = manifest[operation_id]
+        config = {
+            "resource_name": row.get("resource", "") or derive_resource_name(operation_id),
+            "method_name": row.get("method", "") or derive_method_name(operation_id),
+            "stackql_verb": row.get("sqlVerb", "") or determine_stackql_verb(http_method, operation_id),
+            "object_key": row.get("objectKey", ""),
+        }
+
+        # Add pagination overrides if present
+        if row.get("reqPaginationKey"):
+            config["req_pagination_key"] = row["reqPaginationKey"]
+            config["req_pagination_location"] = row.get("reqPaginationLocation", "body")
+        if row.get("respPaginationKey"):
+            config["resp_pagination_key"] = row["respPaginationKey"]
+            config["resp_pagination_location"] = row.get("respPaginationLocation", "body")
+
+        return config
+
+    # Fall back to derived values
+    return {
+        "resource_name": derive_resource_name(operation_id),
+        "method_name": derive_method_name(operation_id),
+        "stackql_verb": determine_stackql_verb(http_method, operation_id),
+        "object_key": "",
+    }
+
+
+def clear_csv_manifests():
+    """Clear the CSV manifest cache."""
+    global _csv_manifests
+    _csv_manifests = {}
+
 
 def init_openapi_spec(service_name, service_dir, protocol, version=None, filename=None):
     info = {

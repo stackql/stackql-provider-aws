@@ -9,6 +9,7 @@ from processors import (
 from processors.shared_functions import (
     reset_processed_services,
     generate_provider_yaml,
+    clear_csv_manifests,
     PROVIDER_VERSION
 )
 
@@ -97,8 +98,9 @@ if __name__ == "__main__":
             shutil.rmtree(output_dir)
         output_dir.mkdir(parents=True, exist_ok=True)
 
-    # Reset the processed services list
+    # Reset the processed services list and CSV manifest cache
     reset_processed_services()
+    clear_csv_manifests()
 
     # Process all services
     for svc in extract_services(Path("models")):
