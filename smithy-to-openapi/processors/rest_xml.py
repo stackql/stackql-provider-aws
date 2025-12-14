@@ -26,9 +26,6 @@ from processors.shared_functions import (
     add_component_schema_union,
     add_component_schema_structure,
     write_output_yaml,
-    derive_resource_name,
-    determine_stackql_verb,
-    derive_method_name,
     detect_pagination_scheme,
     add_pagination_to_info,
 )
@@ -128,15 +125,10 @@ def add_operation_xml(openapi_spec, shape_name, shape, shapes):
     openapi_spec["paths"][path][verb]["operationId"] = operation_id
 
     # Track operation for StackQL resource building
-    resource_name = derive_resource_name(operation_id)
-    stackql_verb = determine_stackql_verb(verb, operation_id)
-    method_name = derive_method_name(operation_id)
-
+    # Note: Resource name, method name, and SQL verb will be resolved from CSV manifest
+    # in build_stackql_resources() using get_operation_config()
     openapi_spec["_stackql_operations"].append({
         "operation_id": operation_id,
-        "resource_name": resource_name,
-        "stackql_verb": stackql_verb,
-        "method_name": method_name,
         "path": path,
         "http_method": verb,
         "success_code": str(success_code),

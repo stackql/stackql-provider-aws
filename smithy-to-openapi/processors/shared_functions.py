@@ -265,6 +265,10 @@ def get_operation_config(service_name: str, operation_id: str, http_method: str)
     """
     Get operation configuration from CSV manifest or derive defaults.
 
+    The CSV manifest supports two resource name columns:
+    - 'resource': Human-overridden resource name (takes priority if set)
+    - 'originalResourceName': Auto-derived resource name (fallback)
+
     Args:
         service_name: The service name
         operation_id: The operation ID (e.g., 'DescribeInstances')
@@ -278,20 +282,28 @@ def get_operation_config(service_name: str, operation_id: str, http_method: str)
 
     if operation_id in manifest:
         row = manifest[operation_id]
+
+        # Resource name priority: resource (human override) > originalResourceName > derived
+        resource_name = row.get("resource", "").strip()
+        if not resource_name:
+            resource_name = row.get("originalResourceName", "").strip()
+        if not resource_name:
+            resource_name = derive_resource_name(operation_id)
+
         config = {
-            "resource_name": row.get("resource", "") or derive_resource_name(operation_id),
-            "method_name": row.get("method", "") or derive_method_name(operation_id),
-            "stackql_verb": row.get("sqlVerb", "") or determine_stackql_verb(http_method, operation_id),
-            "object_key": row.get("objectKey", ""),
+            "resource_name": resource_name,
+            "method_name": row.get("method", "").strip() or derive_method_name(operation_id),
+            "stackql_verb": row.get("sqlVerb", "").strip() or determine_stackql_verb(http_method, operation_id),
+            "object_key": row.get("objectKey", "").strip(),
         }
 
-        # Add pagination overrides if present
-        if row.get("reqPaginationKey"):
-            config["req_pagination_key"] = row["reqPaginationKey"]
-            config["req_pagination_location"] = row.get("reqPaginationLocation", "body")
-        if row.get("respPaginationKey"):
-            config["resp_pagination_key"] = row["respPaginationKey"]
-            config["resp_pagination_location"] = row.get("respPaginationLocation", "body")
+        # Add pagination overrides if present (operation-level overrides)
+        if row.get("reqPaginationKey", "").strip():
+            config["req_pagination_key"] = row["reqPaginationKey"].strip()
+            config["req_pagination_location"] = row.get("reqPaginationLocation", "body").strip() or "body"
+        if row.get("respPaginationKey", "").strip():
+            config["resp_pagination_key"] = row["respPaginationKey"].strip()
+            config["resp_pagination_location"] = row.get("respPaginationLocation", "body").strip() or "body"
 
         return config
 
@@ -829,15 +841,10 @@ def add_operation(openapi_spec, shape_name, shape, shapes):
         openapi_spec["paths"][path][verb]["description"] = description
 
     # Track operation info for building StackQL resources later
-    resource_name = derive_resource_name(operation_id)
-    stackql_verb = determine_stackql_verb(verb, operation_id)
-    method_name = derive_method_name(operation_id)
-
+    # Note: Resource name, method name, and SQL verb will be resolved from CSV manifest
+    # in build_stackql_resources() using get_operation_config()
     openapi_spec["_stackql_operations"].append({
         "operation_id": operation_id,
-        "resource_name": resource_name,
-        "stackql_verb": stackql_verb,
-        "method_name": method_name,
         "path": path,
         "http_method": verb,
         "success_code": str(success_code),
@@ -1112,11 +1119,18 @@ def build_stackql_resources(openapi_spec):
     """
     Build the x-stackQL-resources section from tracked operations.
 
-    Groups operations by resource name, creates methods referencing paths,
-    and builds sqlVerbs mappings.
+    Groups operations by resource name (from CSV manifest), creates methods
+    referencing paths, and builds sqlVerbs mappings.
+
+    Pagination overrides at the operation level are added to method definitions
+    when they differ from the service-level pagination configuration.
     """
     service_name = openapi_spec.get("_service_name", "unknown")
     operations = openapi_spec.get("_stackql_operations", [])
+    pagination_data = openapi_spec.get("_pagination_data")
+
+    # Get service-level pagination scheme for comparison
+    service_pagination = pagination_data.get("dominant_scheme") if pagination_data else None
 
     # Group operations by resource name
     resources = defaultdict(lambda: {
@@ -1130,11 +1144,18 @@ def build_stackql_resources(openapi_spec):
     })
 
     for op in operations:
-        resource_name = op["resource_name"]
-        method_name = op["method_name"]
+        # Get operation config from CSV manifest (includes resource_name, method_name, pagination overrides)
+        operation_id = op.get("operation_id", "").replace("GET_", "").replace("POST_", "")
+        op_config = get_operation_config(service_name, operation_id, op["http_method"].upper())
+
+        # Use CSV manifest values (with fallbacks already handled in get_operation_config)
+        resource_name = op_config["resource_name"]
+        method_name = op_config["method_name"]
+        stackql_verb = op_config["stackql_verb"]
+        object_key = op_config.get("object_key", "")
+
         path = op["path"]
         http_method = op["http_method"]
-        stackql_verb = op["stackql_verb"]
         success_code = op["success_code"]
 
         # Build the path reference for the operation
@@ -1152,11 +1173,49 @@ def build_stackql_resources(openapi_spec):
             }
         }
 
+        # Add objectKey if specified in CSV manifest
+        if object_key:
+            method_def["response"]["objectKey"] = object_key
+
         # Add request mediaType for write operations
         if stackql_verb in ("insert", "update", "exec"):
             method_def["request"] = {
                 "mediaType": "application/json"
             }
+
+        # Add operation-level pagination override if it differs from service-level
+        if "req_pagination_key" in op_config or "resp_pagination_key" in op_config:
+            # Check if this differs from service-level pagination
+            needs_override = False
+            if service_pagination:
+                req_key = op_config.get("req_pagination_key", "")
+                req_loc = op_config.get("req_pagination_location", "body")
+                resp_key = op_config.get("resp_pagination_key", "")
+                resp_loc = op_config.get("resp_pagination_location", "body")
+
+                if (req_key != service_pagination.get("request_key", "") or
+                    req_loc != service_pagination.get("request_location", "body") or
+                    resp_key != service_pagination.get("response_key", "") or
+                    resp_loc != service_pagination.get("response_location", "body")):
+                    needs_override = True
+            else:
+                # No service-level pagination, so any operation-level pagination is an override
+                needs_override = True
+
+            if needs_override:
+                pagination_override = {}
+                if op_config.get("req_pagination_key"):
+                    pagination_override["requestToken"] = {
+                        "key": op_config["req_pagination_key"],
+                        "location": op_config.get("req_pagination_location", "body")
+                    }
+                if op_config.get("resp_pagination_key"):
+                    pagination_override["responseToken"] = {
+                        "key": op_config["resp_pagination_key"],
+                        "location": op_config.get("resp_pagination_location", "body")
+                    }
+                if pagination_override:
+                    method_def["pagination"] = pagination_override
 
         resources[resource_name]["methods"][method_name] = method_def
 
