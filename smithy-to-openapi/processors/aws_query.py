@@ -27,9 +27,6 @@ from processors.shared_functions import (
     add_component_schema_union,
     add_component_schema_structure,
     write_output_yaml,
-    derive_resource_name,
-    determine_stackql_verb,
-    derive_method_name,
     detect_pagination_scheme,
     add_pagination_to_info,
 )
@@ -260,15 +257,10 @@ def create_get_operation(operation, operation_name, api_version, shapes, openapi
     op["responses"] = create_responses(operation, shapes)
 
     # Track operation for StackQL resource building (GET version)
-    resource_name = derive_resource_name(operation_name)
-    stackql_verb = determine_stackql_verb("GET", operation_name)
-    method_name = derive_method_name(operation_name)
-
+    # Note: Resource name, method name, and SQL verb will be resolved from CSV manifest
+    # in build_stackql_resources() using get_operation_config()
     openapi_spec["_stackql_operations"].append({
-        "operation_id": f"GET_{operation_name}",
-        "resource_name": resource_name,
-        "stackql_verb": stackql_verb,
-        "method_name": method_name,
+        "operation_id": operation_name,
         "path": path_key,
         "http_method": "get",
         "success_code": "200",

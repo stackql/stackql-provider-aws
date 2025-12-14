@@ -15,8 +15,12 @@ Output:
     stackql-routes/{service}.csv - One CSV per service with operation mappings
 
 CSV Format:
-    operationId,path,verb,description,resource,method,sqlVerb,objectKey,
+    operationId,path,verb,description,resource,originalResourceName,method,sqlVerb,objectKey,
     reqPaginationKey,reqPaginationLocation,respPaginationKey,respPaginationLocation
+
+Note: For new operations, 'resource' is left empty and 'originalResourceName' contains the
+auto-derived name. If 'resource' is provided, it overrides 'originalResourceName'. Existing
+operations are preserved as-is to maintain human overrides.
 """
 
 import csv
@@ -152,7 +156,8 @@ def extract_operations_from_model(model_path: Path, service_name: str, protocol:
             "path": path,
             "verb": verb,
             "description": truncate_description(description),
-            "resource": resource,
+            "resource": "",  # Left empty for human override; use originalResourceName if not set
+            "originalResourceName": resource,  # Auto-derived resource name preserved here
             "method": method,
             "sqlVerb": sql_verb,
             "objectKey": "",  # To be filled in by human review if needed
@@ -267,6 +272,7 @@ def main():
         "verb",
         "description",
         "resource",
+        "originalResourceName",
         "method",
         "sqlVerb",
         "objectKey",

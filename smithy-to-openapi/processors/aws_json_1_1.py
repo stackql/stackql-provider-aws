@@ -29,9 +29,6 @@ from processors.shared_functions import (
     detect_pagination_scheme,
     add_pagination_to_info,
     write_output_yaml,
-    derive_resource_name,
-    determine_stackql_verb,
-    derive_method_name,
 )
 
 yaml.add_representer(LiteralStr, literal_str_representer)
@@ -236,15 +233,10 @@ def create_path(operation, service_name2, openapi_spec):
             error_code += 1
 
     # Track operation for StackQL resource building
-    resource_name = derive_resource_name(operation_id)
-    stackql_verb = determine_stackql_verb("POST", operation_id)
-    method_name = derive_method_name(operation_id)
-
+    # Note: Resource name, method name, and SQL verb will be resolved from CSV manifest
+    # in build_stackql_resources() using get_operation_config()
     openapi_spec["_stackql_operations"].append({
         "operation_id": operation_id,
-        "resource_name": resource_name,
-        "stackql_verb": stackql_verb,
-        "method_name": method_name,
         "path": path_key,
         "http_method": "post",
         "success_code": "200",
