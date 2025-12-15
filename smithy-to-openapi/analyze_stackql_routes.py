@@ -118,8 +118,16 @@ def extract_operations_from_model(model_path: Path, service_name: str, protocol:
         resp_pagination_key = ""
         resp_pagination_location = ""
 
-        # Check if this operation has pagination that differs from dominant scheme
+        # Determine objectKey for paginated responses
+        # The smithy.api#paginated trait's 'items' field specifies the response field containing the list
+        object_key = ""
         paginated_trait = traits.get("smithy.api#paginated")
+        if paginated_trait:
+            items_field = paginated_trait.get("items")
+            if items_field:
+                object_key = f"$.{items_field}"
+
+        # Check if this operation has pagination that differs from dominant scheme
         if paginated_trait and dominant_scheme:
             input_token = paginated_trait.get("inputToken", "")
             output_token = paginated_trait.get("outputToken", "")
@@ -160,7 +168,7 @@ def extract_operations_from_model(model_path: Path, service_name: str, protocol:
             "originalResourceName": resource,  # Auto-derived resource name preserved here
             "method": method,
             "sqlVerb": sql_verb,
-            "objectKey": "",  # To be filled in by human review if needed
+            "objectKey": object_key,  # Auto-derived from smithy.api#paginated 'items' field
             "reqPaginationKey": req_pagination_key,
             "reqPaginationLocation": req_pagination_location,
             "respPaginationKey": resp_pagination_key,
@@ -312,15 +320,22 @@ def main():
         total_services += 1
 
         # Merge: keep existing entries, add new ones
+        # Also update objectKey for existing entries if it's empty and we have a derived value
         final_rows = []
         new_count = 0
         preserved_count = 0
+        updated_count = 0
 
         for op in operations:
             op_id = op["operationId"]
             if op_id in existing_ops:
                 # Preserve existing entry (may have human overrides)
-                final_rows.append(existing_ops[op_id])
+                existing_row = existing_ops[op_id]
+                # Update objectKey if existing is empty and we have a derived value
+                if not existing_row.get("objectKey", "").strip() and op.get("objectKey", "").strip():
+                    existing_row["objectKey"] = op["objectKey"]
+                    updated_count += 1
+                final_rows.append(existing_row)
                 preserved_count += 1
             else:
                 # Add new entry with inferred values
@@ -339,7 +354,10 @@ def main():
 
         status = ""
         if preserved_count > 0:
-            status = f"({new_count} new, {preserved_count} preserved)"
+            if updated_count > 0:
+                status = f"({new_count} new, {preserved_count} preserved, {updated_count} objectKey updated)"
+            else:
+                status = f"({new_count} new, {preserved_count} preserved)"
         else:
             status = f"({new_count} operations)"
 
