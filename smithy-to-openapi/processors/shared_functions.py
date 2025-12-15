@@ -1344,11 +1344,30 @@ def resolve_orphaned_schemas(openapi_spec):
         
         print(f"  ✓ Created placeholder definitions for orphaned schemas")
 
+def add_protocol_to_info(openapi_spec):
+    """
+    Add the AWS model protocol to the info section of the OpenAPI spec.
+
+    This adds the x-aws-modelProtocol extension to the info block, e.g.:
+    info:
+      x-aws-modelProtocol: aws.protocols#restJson1
+
+    Args:
+        openapi_spec: The OpenAPI specification dictionary
+    """
+    protocol = openapi_spec.get("_aws_protocol")
+    if protocol:
+        openapi_spec["info"]["x-aws-modelProtocol"] = protocol
+
+
 def finalize_openapi_spec(openapi_spec):
     """
     Finalize the OpenAPI spec by building StackQL resources and config,
     then cleaning up internal tracking fields.
     """
+    # Add protocol to info section
+    add_protocol_to_info(openapi_spec)
+
     # Build StackQL resources from tracked operations
     build_stackql_resources(openapi_spec)
 
