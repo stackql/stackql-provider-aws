@@ -1113,6 +1113,38 @@ def _escape_path_for_ref(path: str) -> str:
     # JSON pointer requires ~ to be encoded as ~0, / as ~1
     return path.replace("~", "~0").replace("/", "~1")
 
+def _get_media_types_from_path(openapi_spec, path, http_method, success_code):
+    """
+    Extract the actual request and response mediaTypes from the path definition.
+
+    Returns:
+        Tuple of (request_media_type, response_media_type) where request_media_type
+        may be None if no requestBody exists.
+    """
+    request_media_type = None
+    response_media_type = "application/json"  # Default fallback
+
+    path_def = openapi_spec.get("paths", {}).get(path, {})
+    method_def = path_def.get(http_method, {})
+
+    # Get request mediaType from requestBody if it exists
+    request_body = method_def.get("requestBody", {})
+    content = request_body.get("content", {})
+    if content:
+        # Get the first (and typically only) content type key
+        request_media_type = next(iter(content.keys()), None)
+
+    # Get response mediaType from the success response
+    responses = method_def.get("responses", {})
+    success_response = responses.get(success_code, responses.get(str(success_code), {}))
+    response_content = success_response.get("content", {})
+    if response_content:
+        # Get the first (and typically only) content type key
+        response_media_type = next(iter(response_content.keys()), "application/json")
+
+    return request_media_type, response_media_type
+
+
 def build_stackql_resources(openapi_spec):
     """
     Build the x-stackQL-resources section from tracked operations.
@@ -1156,6 +1188,11 @@ def build_stackql_resources(openapi_spec):
         http_method = op["http_method"]
         success_code = op["success_code"]
 
+        # Get actual mediaTypes from the path definition
+        request_media_type, response_media_type = _get_media_types_from_path(
+            openapi_spec, path, http_method, success_code
+        )
+
         # Build the path reference for the operation
         escaped_path = _escape_path_for_ref(path)
         operation_ref = f"#/paths/{escaped_path}/{http_method}"
@@ -1166,7 +1203,7 @@ def build_stackql_resources(openapi_spec):
                 "$ref": operation_ref
             },
             "response": {
-                "mediaType": "application/json",
+                "mediaType": response_media_type,
                 "openAPIDocKey": success_code
             }
         }
@@ -1175,10 +1212,10 @@ def build_stackql_resources(openapi_spec):
         if object_key:
             method_def["response"]["objectKey"] = object_key
 
-        # Add request mediaType for write operations
-        if stackql_verb in ("insert", "update", "exec"):
+        # Add request mediaType if the operation has a requestBody
+        if request_media_type:
             method_def["request"] = {
-                "mediaType": "application/json"
+                "mediaType": request_media_type
             }
 
         # Add operation-level pagination override if it differs from service-level
