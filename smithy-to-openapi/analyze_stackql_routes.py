@@ -3,9 +3,9 @@
 Analyze StackQL Routes
 
 This script analyzes all AWS service models and generates CSV manifest files
-for each service. These manifests contain inferred resource names, method names,
+for each service. These manifests contain operation mappings with method names,
 SQL verbs, and pagination configurations that can be reviewed and overridden
-by humans before being used by process_models.py.
+by humans (or AI) before being used by process_models.py.
 
 Usage:
     cd smithy-to-openapi
@@ -15,12 +15,23 @@ Output:
     stackql-routes/{service}.csv - One CSV per service with operation mappings
 
 CSV Format:
-    operationId,path,verb,description,resource,originalResourceName,method,sqlVerb,objectKey,
+    operationId,path,verb,description,resource,method,sqlVerb,objectKey,
     reqPaginationKey,reqPaginationLocation,respPaginationKey,respPaginationLocation
 
-Note: For new operations, 'resource' is left empty and 'originalResourceName' contains the
-auto-derived name. If 'resource' is provided, it overrides 'originalResourceName'. Existing
-operations are preserved as-is to maintain human overrides.
+Note: The 'resource' column is left empty for users or AI to fill before running
+process_models.py. Existing operations are preserved as-is to maintain human overrides.
+
+sqlVerb derivation rules (simplified):
+    - DELETE HTTP method always maps to 'delete'
+    - operationId starting with 'Delete...' -> 'delete'
+    - operationId starting with 'Create...' -> 'insert'
+    - operationId starting with 'Get...', 'Describe...', 'List...' -> 'select' (unless empty response)
+    - operationId starting with 'Update...' or 'Patch...' -> 'update'
+    - operationId starting with 'Replace...' or 'Put...' -> 'replace'
+    - Otherwise left blank for manual assignment
+
+Note: HTTP verb prefixes in operationId (e.g., GET_CompleteLifecycleAction) are stripped
+before applying these rules.
 """
 
 import csv
@@ -30,11 +41,9 @@ import re
 from pathlib import Path
 from collections import defaultdict
 
-# Import shared functions for deriving resource names, etc.
+# Import shared functions
 from processors.shared_functions import (
-    derive_resource_name,
     derive_method_name,
-    determine_stackql_verb,
     html_to_md,
     detect_pagination_scheme,
 )
@@ -49,6 +58,98 @@ def truncate_description(description: str, max_len: int = 50) -> str:
     if len(description) > max_len:
         return description[:max_len - 3] + "..."
     return description
+
+
+def _has_empty_or_map_response(shapes: dict, operation_shape: dict) -> bool:
+    """
+    Check if the operation's response has empty properties or is a map/additionalProperties.
+
+    This is used to determine if a 'select' operation should instead be 'exec'
+    because it won't return any useful columns.
+
+    Returns True if:
+    - No output defined
+    - Output is smithy.api#Unit (empty response)
+    - Response schema has empty 'properties' dict
+    - Response schema is a map type (has additionalProperties)
+    """
+    output_ref = operation_shape.get("output", {}).get("target")
+    if not output_ref:
+        return True  # No output means empty response
+
+    if output_ref == "smithy.api#Unit":
+        return True  # Unit type means empty response
+
+    output_shape = shapes.get(output_ref)
+    if not output_shape:
+        return True  # Shape not found, treat as empty
+
+    # Check if it's a structure with empty properties
+    if output_shape.get("type") == "structure":
+        members = output_shape.get("members", {})
+        if not members:
+            return True  # Empty properties
+
+    # Check if it's a map type
+    if output_shape.get("type") == "map":
+        return True
+
+    return False
+
+
+def determine_sql_verb_simplified(http_method: str, operation_id: str, shapes: dict, operation_shape: dict) -> str:
+    """
+    Determine the appropriate StackQL verb based on simplified rules.
+
+    Rules (in order):
+    1. HTTP DELETE method MUST ALWAYS map to 'delete' (guardrail)
+    2. operationId starting with 'Delete...' -> 'delete'
+    3. operationId starting with 'Create...' -> 'insert'
+    4. operationId starting with 'Get...', 'Describe...', or 'List...' -> 'select'
+       (but override to 'exec' if response is empty or map)
+    5. operationId starting with 'Update...' or 'Patch...' -> 'update'
+    6. operationId starting with 'Replace...' or 'Put...' -> 'replace'
+    7. Otherwise leave blank for manual assignment
+
+    Note: HTTP verb prefixes in operationId (e.g., GET_CompleteLifecycleAction)
+    are stripped before applying these rules.
+    """
+    http_method = http_method.upper()
+
+    # Strip prefix before and including '_' (e.g., GET_CompleteLifecycleAction -> CompleteLifecycleAction)
+    clean_op_id = operation_id
+    if '_' in operation_id:
+        clean_op_id = operation_id.split('_', 1)[1]
+
+    # Rule 1: HTTP DELETE must always be 'delete' (guardrail - never anything else)
+    if http_method == 'DELETE':
+        return 'delete'
+
+    # Rule 2: Delete... -> 'delete'
+    if clean_op_id.startswith('Delete'):
+        return 'delete'
+
+    # Rule 3: Create... -> 'insert'
+    if clean_op_id.startswith('Create'):
+        return 'insert'
+
+    # Rule 4: Get..., Describe..., List... -> 'select' (but check response)
+    if clean_op_id.startswith(('Get', 'Describe', 'List')):
+        # Check if response has empty properties or is a map
+        if _has_empty_or_map_response(shapes, operation_shape):
+            return 'exec'
+        return 'select'
+
+    # Rule 5: Update..., Patch... -> 'update'
+    if clean_op_id.startswith(('Update', 'Patch')):
+        return 'update'
+
+    # Rule 6: Replace..., Put... -> 'replace'
+    if clean_op_id.startswith(('Replace', 'Put')):
+        return 'replace'
+
+    # Rule 7: Otherwise leave blank for manual assignment
+    return ''
 
 
 def extract_operations_from_model(model_path: Path, service_name: str, protocol: str):
@@ -108,9 +209,8 @@ def extract_operations_from_model(model_path: Path, service_name: str, protocol:
             description = html_to_md(traits["smithy.api#documentation"])
 
         # Derive StackQL mappings
-        resource = derive_resource_name(operation_id)
         method = derive_method_name(operation_id)
-        sql_verb = determine_stackql_verb(verb, operation_id)
+        sql_verb = determine_sql_verb_simplified(verb, operation_id, shapes, shape)
 
         # Determine pagination overrides (only populated if different from service-level)
         req_pagination_key = ""
@@ -164,8 +264,7 @@ def extract_operations_from_model(model_path: Path, service_name: str, protocol:
             "path": path,
             "verb": verb,
             "description": truncate_description(description),
-            "resource": "",  # Left empty for human override; use originalResourceName if not set
-            "originalResourceName": resource,  # Auto-derived resource name preserved here
+            "resource": "",  # Left empty for users or AI to fill before running process_models.py
             "method": method,
             "sqlVerb": sql_verb,
             "objectKey": object_key,  # Auto-derived from smithy.api#paginated 'items' field
@@ -280,7 +379,6 @@ def main():
         "verb",
         "description",
         "resource",
-        "originalResourceName",
         "method",
         "sqlVerb",
         "objectKey",

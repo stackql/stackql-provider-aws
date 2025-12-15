@@ -265,9 +265,8 @@ def get_operation_config(service_name: str, operation_id: str, http_method: str)
     """
     Get operation configuration from CSV manifest or derive defaults.
 
-    The CSV manifest supports two resource name columns:
-    - 'resource': Human-overridden resource name (takes priority if set)
-    - 'originalResourceName': Auto-derived resource name (fallback)
+    The CSV manifest's 'resource' column contains the resource name assigned
+    by users or AI. If empty, the resource name is derived automatically.
 
     Args:
         service_name: The service name
@@ -283,10 +282,8 @@ def get_operation_config(service_name: str, operation_id: str, http_method: str)
     if operation_id in manifest:
         row = manifest[operation_id]
 
-        # Resource name priority: resource (human override) > originalResourceName > derived
+        # Resource name: use from CSV if provided, otherwise derive
         resource_name = row.get("resource", "").strip()
-        if not resource_name:
-            resource_name = row.get("originalResourceName", "").strip()
         if not resource_name:
             resource_name = derive_resource_name(operation_id)
 
