@@ -116,7 +116,7 @@ npm run server-status
 Run some test queries against the provider using the `stackql shell`:
 
 ```bash
-PROVIDER_REGISTRY_ROOT_DIR="$(pwd)/provider-dev/openapi"
+PROVIDER_REGISTRY_ROOT_DIR="$(pwd)/smithy-to-openapi/openapi"
 REG_STR='{"url": "file://'${PROVIDER_REGISTRY_ROOT_DIR}'", "localDocRoot": "'${PROVIDER_REGISTRY_ROOT_DIR}'", "verifyConfig": {"nopVerify": true}}'
 ./stackql shell --registry="${REG_STR}"
 ```
