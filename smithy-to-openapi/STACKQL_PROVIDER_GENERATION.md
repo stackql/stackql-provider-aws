@@ -1,3 +1,4 @@
+
 # StackQL Provider Generation
 
 This document describes the workflow for generating StackQL-compatible OpenAPI specifications from AWS Smithy models.
@@ -11,13 +12,21 @@ The generation process converts AWS Smithy IDL models into OpenAPI specification
 
 ## Prerequisites
 
+### Python Env Setup
+
 Install required Python packages:
 
 ```bash
-pip install html2text inflect pyyaml
+python3 -m venv .ven
+source .venv/bin/activate
+pip install -r smithy-to-openapi/requirements.txt
 ```
 
 Ensure the `models` directory contains AWS Smithy models (from [aws/api-models-aws](https://github.com/aws/api-models-aws)).
+
+### Node Env setup
+
+The `@stackql/pgwire-lite` and `@stackql/provider-utils` node libraries are used to generate docs and to test the provider, install these using `npm i`.
 
 ## Workflow
 
@@ -26,8 +35,7 @@ Ensure the `models` directory contains AWS Smithy models (from [aws/api-models-a
 Run the analysis script to generate CSV manifests:
 
 ```bash
-cd smithy-to-openapi
-python analyze_stackql_routes.py
+python smithy-to-openapi/analyze_stackql_routes.py
 ```
 
 This creates/updates CSV files in `stackql-routes/{service}.csv` with one row per operation.
@@ -42,7 +50,8 @@ Review the generated CSV files. Each file contains:
 | `path` | The API path |
 | `verb` | HTTP method (GET, POST, etc.) |
 | `description` | Truncated operation description |
-| `resource` | Inferred StackQL resource name (e.g., `instances`) |
+| `resource` | TODO Update with the appropriate StackQL resource name |
+| `originalResourceName` | Inferred StackQL resource name (e.g., `instances`) |
 | `method` | Inferred method name (e.g., `describe_instances`) |
 | `sqlVerb` | StackQL SQL verb (`select`, `insert`, `update`, `delete`, `exec`) |
 | `objectKey` | Response object key for data extraction (optional) |
@@ -56,12 +65,12 @@ Review the generated CSV files. Each file contains:
 - Maintain human-reviewed mappings across regenerations
 - Only new operations are appended to existing CSVs
 
-### Step 3: Generate OpenAPI Specs
+### Step 3: Generate OpenAPI Specs and StackQL Provider
 
 Run the processing script:
 
 ```bash
-python process_models.py [--clean]
+python smithy-to-openapi/process_models.py --clean
 ```
 
 Options:
@@ -71,86 +80,77 @@ Output is written to: `openapi/src/aws/v00.00.00000/services/`
 
 This also generates `provider.yaml` which indexes all services.
 
-## CSV Manifest Rules
+### Step 4: Test StackQL Provider
 
-### Resource Names
+#### Starting the StackQL Server
 
-Resource names should be:
-- Plural (e.g., `instances` not `instance`)
-- Snake_case (e.g., `auto_scaling_groups`)
-- Descriptive of the resource being operated on
+Before running tests, start a StackQL server with your provider:
 
-### SQL Verb Mapping
-
-| Pattern | SQL Verb |
-|---------|----------|
-| `Describe*`, `Get*`, `List*`, `Query*` | `select` |
-| `Create*`, `Put*`, `Add*` | `insert` |
-| `Update*`, `Modify*`, `Set*` | `update` |
-| `Delete*`, `Remove*`, `Terminate*` | `delete` |
-| Other | `exec` |
-
-### Object Keys
-
-The `objectKey` field specifies where to find the actual data in the response. For example:
-- S3 ListBuckets: `$.Buckets`
-- EC2 DescribeInstances: `$.Reservations[*].Instances[*]`
-
-### Pagination Overrides
-
-Pagination fields are only populated when an operation uses different pagination than the service default. The service-level pagination is detected automatically and applied via `x-stackQL-config`.
-
-## Directory Structure
-
-```
-smithy-to-openapi/
-├── analyze_stackql_routes.py  # Step 1: Analyze and generate CSVs
-├── process_models.py          # Step 2: Generate OpenAPI specs
-├── processors/
-│   ├── shared_functions.py    # Shared utilities
-│   ├── rest_json1.py          # restJson1 protocol handler
-│   ├── rest_xml.py            # restXml protocol handler
-│   ├── aws_json_1_0.py        # awsJson1_0 protocol handler
-│   ├── aws_json_1_1.py        # awsJson1_1 protocol handler
-│   ├── aws_query.py           # awsQuery protocol handler
-│   └── ec2_query.py           # ec2Query protocol handler
-├── stackql-routes/            # CSV manifests per service
-│   ├── ec2.csv
-│   ├── s3.csv
-│   └── ...
-└── openapi/
-    └── src/aws/v00.00.00000/
-        ├── provider.yaml      # Provider index
-        └── services/
-            ├── ec2.yaml
-            ├── s3.yaml
-            └── ...
+```bash
+PROVIDER_REGISTRY_ROOT_DIR="$(pwd)/smithy-to-openapi/openapi"
+npm run start-server -- --provider aws --registry $PROVIDER_REGISTRY_ROOT_DIR
 ```
 
-## Examples
+#### Test Meta Routes
 
-### Correcting a Resource Name
+Test all metadata routes (services, resources, methods) in the provider:
 
-If `DescribeAutoScalingGroups` is incorrectly mapped to `groups`, edit `autoscaling.csv`:
-
-```csv
-operationId,path,verb,description,resource,method,sqlVerb,objectKey,...
-DescribeAutoScalingGroups,/#Action=DescribeAutoScalingGroups,GET,...,auto_scaling_groups,describe_auto_scaling_groups,select,$.AutoScalingGroups,...
+```bash
+npm run test-meta-routes -- aws --verbose
 ```
 
-### Adding Object Keys
+When you're done testing, stop the StackQL server:
 
-To extract data from nested responses:
-
-```csv
-operationId,path,verb,description,resource,method,sqlVerb,objectKey,...
-ListBuckets,/,GET,...,buckets,list_buckets,select,$.Buckets,...
+```bash
+npm run stop-server
 ```
 
-## Regenerating After Model Updates
+Use this command to view the server status:
 
-When AWS models are updated:
+```bash
+npm run server-status
+```
 
-1. Run `python analyze_stackql_routes.py` - New operations are appended, existing entries preserved
-2. Review new entries in CSV files
-3. Run `python process_models.py --clean` to regenerate all specs
+#### Run test queries
+
+Run some test queries against the provider using the `stackql shell`:
+
+```bash
+PROVIDER_REGISTRY_ROOT_DIR="$(pwd)/provider-dev/openapi"
+REG_STR='{"url": "file://'${PROVIDER_REGISTRY_ROOT_DIR}'", "localDocRoot": "'${PROVIDER_REGISTRY_ROOT_DIR}'", "verifyConfig": {"nopVerify": true}}'
+./stackql shell --registry="${REG_STR}"
+```
+
+Example queries to try:
+
+```sql
+-- List all zones
+SELECT 
+  id,
+  name,
+  status,
+  plan.name as plan_name
+FROM 
+  cloudflare.zones.zones;
+
+-- List all DNS records for a specific zone
+SELECT 
+  id,
+  name,
+  type,
+  content,
+  proxied
+FROM 
+  cloudflare.dns.records
+WHERE 
+  zone_id = 'your-zone-id';
+
+-- List all Worker scripts
+SELECT 
+  id,
+  script_name,
+  created_on,
+  modified_on
+FROM 
+  cloudflare.workers.scripts;
+```

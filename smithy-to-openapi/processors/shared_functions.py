@@ -1108,12 +1108,10 @@ def add_pagination_to_operation(openapi_spec, shape_name, operation_spec):
     """
     pass
 
-
 def _escape_path_for_ref(path: str) -> str:
     """Escape a path string for use in JSON pointer ($ref)."""
     # JSON pointer requires ~ to be encoded as ~0, / as ~1
     return path.replace("~", "~0").replace("/", "~1")
-
 
 def build_stackql_resources(openapi_spec):
     """
@@ -1238,7 +1236,6 @@ def build_stackql_resources(openapi_spec):
         }
 
     openapi_spec["components"]["x-stackQL-resources"] = stackql_resources
-
 
 def build_stackql_config(openapi_spec):
     """
@@ -1371,7 +1368,6 @@ def finalize_openapi_spec(openapi_spec):
         if field in openapi_spec:
             del openapi_spec[field]
 
-
 def write_output_yaml(openapi_spec, service_dir):
     global _processed_services
 
@@ -1401,18 +1397,15 @@ def write_output_yaml(openapi_spec, service_dir):
         "version": openapi_spec.get("info", {}).get("version", "1.0.0")
     })
 
-
 def get_processed_services():
     """Return the list of processed services."""
     global _processed_services
     return _processed_services
 
-
 def reset_processed_services():
     """Reset the list of processed services (for testing)."""
     global _processed_services
     _processed_services = []
-
 
 def generate_provider_yaml():
     """
@@ -1444,7 +1437,7 @@ def generate_provider_yaml():
             "description": svc.get("description", "")[:200] if svc.get("description") else "",
             "preferred": True,
             "service": {
-                "$ref": f"services/{service_name}.yaml"
+                "$ref": f"aws/{PROVIDER_VERSION}/services/{service_name}.yaml"
             }
         }
 
