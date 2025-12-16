@@ -109,7 +109,7 @@ def determine_sql_verb_simplified(http_method: str, operation_id: str, shapes: d
        (but override to 'exec' if response is empty or map)
     5. operationId starting with 'Update...' or 'Patch...' -> 'update'
     6. operationId starting with 'Replace...' or 'Put...' -> 'replace'
-    7. Otherwise leave blank for manual assignment
+    7. Otherwise leave as `exec`
 
     Note: HTTP verb prefixes in operationId (e.g., GET_CompleteLifecycleAction)
     are stripped before applying these rules.
@@ -149,7 +149,7 @@ def determine_sql_verb_simplified(http_method: str, operation_id: str, shapes: d
         return 'replace'
 
     # Rule 7: Otherwise leave blank for manual assignment
-    return ''
+    return 'exec'
 
 
 def extract_operations_from_model(model_path: Path, service_name: str, protocol: str):

@@ -51,7 +51,6 @@ Review the generated CSV files. Each file contains:
 | `verb` | HTTP method (GET, POST, etc.) |
 | `description` | Truncated operation description |
 | `resource` | TODO Update with the appropriate StackQL resource name |
-| `originalResourceName` | Inferred StackQL resource name (e.g., `instances`) |
 | `method` | Inferred method name (e.g., `describe_instances`) |
 | `sqlVerb` | StackQL SQL verb (`select`, `insert`, `update`, `delete`, `exec`) |
 | `objectKey` | Response object key for data extraction (optional) |
