@@ -7,11 +7,7 @@ from datetime import date
 from pathlib import Path
 from collections import defaultdict
 import yaml
-import inflect
 import re
-
-# Initialize inflect engine for pluralization
-_inflect_engine = inflect.engine()
 
 # Provider version constant
 PROVIDER_VERSION = "v00.00.00000"
@@ -37,166 +33,6 @@ def html_to_md(html_str: str) -> str:
     h.body_width = sys.maxsize  # prevent line wrapping
     h.skip_internal_links = True
     return h.handle(html_str).strip()
-
-def derive_resource_name(operation_id: str) -> str:
-    """
-    Derive the resource name from the operationId.
-    Resources are always plural by convention.
-    
-    Extracts the resource name by removing the first PascalCase token (the verb/action).
-    
-    Examples:
-    - DescribeAutoScalingGroups -> auto_scaling_groups
-    - CreateLaunchConfiguration -> launch_configurations
-    - DescribeAttachments -> attachments
-    - CreateAttachment -> attachments
-    - AttachLoadBalancerTargetGroups -> load_balancer_target_groups
-    - GetObject -> objects
-    - ListBuckets -> buckets
-    """
-    import re
-    
-    if not operation_id:
-        return ""
-    
-    # Match the first PascalCase token (verb) and capture the rest (noun/resource)
-    # Pattern: ^([A-Z][a-z]+)(.*)
-    # This captures:
-    #   Group 1: First token starting with capital letter followed by lowercase letters (the verb)
-    #   Group 2: Everything after (the resource name in PascalCase)
-    match = re.match(r'^([A-Z][a-z]+)(.*)', operation_id)
-    
-    if match:
-        # verb = match.group(1)  # We'll use this later for verb determination
-        resource_name = match.group(2)  # The rest is the resource name
-    else:
-        # Fallback: if no match (shouldn't happen with valid AWS operations), use the whole thing
-        resource_name = operation_id
-    
-    # Handle empty resource name (e.g., just "Get" with nothing after)
-    if not resource_name:
-        resource_name = operation_id.lower()
-    
-    # Convert from PascalCase to snake_case
-    # Insert underscore before uppercase letters
-    resource_name = re.sub('(.)([A-Z][a-z]+)', r'\1_\2', resource_name)
-    resource_name = re.sub('([a-z0-9])([A-Z])', r'\1_\2', resource_name)
-    resource_name = resource_name.lower()
-    
-    # Ensure resource name is plural (StackQL convention)
-    resource_name = _pluralize_resource(resource_name)
-    
-    return resource_name
-
-def _pluralize_resource(resource_name: str) -> str:
-    """
-    Convert resource name to plural form following StackQL conventions.
-    Uses inflect library for proper English pluralization.
-    """
-    if not resource_name:
-        return resource_name
-    
-    # Special cases that should not be pluralized (uncountable nouns)
-    unchanging = {
-        'data', 'metadata', 'information', 'software', 'hardware',
-        'feedback', 'equipment', 'traffic', 'analytics', 'metrics',
-        'statistics', 'access', 'progress', 'status', 'news', 'series'
-    }
-    
-    # Check if the resource name itself or its last component (after underscore) should not be pluralized
-    if resource_name in unchanging:
-        return resource_name
-    
-    # For compound names (with underscores), only pluralize the last word
-    if '_' in resource_name:
-        parts = resource_name.split('_')
-        last_word = parts[-1]
-        
-        # Don't pluralize if last word is unchanging
-        if last_word in unchanging:
-            return resource_name
-        
-        # Check if already plural using singular_noun
-        # If singular_noun returns a value, the word is plural
-        if _inflect_engine.singular_noun(last_word):
-            # Already plural, keep as is
-            return resource_name
-        
-        # Not plural yet, pluralize it
-        parts[-1] = _inflect_engine.plural_noun(last_word)
-        return '_'.join(parts)
-    
-    # Single word - check if already plural
-    if _inflect_engine.singular_noun(resource_name):
-        # Already plural
-        return resource_name
-    
-    # Not plural yet, pluralize it
-    return _inflect_engine.plural_noun(resource_name)
-
-def determine_stackql_verb(http_method: str, operation_id: str) -> str:
-    """
-    Determine the appropriate StackQL verb based on HTTP method and operation semantics.
-
-    StackQL verbs:
-    - select: Read operations (GET, or POST operations that retrieve data like Describe, List, Get)
-    - insert: Create operations
-    - update: Update/modify operations
-    - delete: Delete operations
-    - exec: Other operations that don't fit the CRUD pattern
-
-    GUARDRAIL: HTTP DELETE method MUST ALWAYS map to 'delete' verb, regardless of operation name.
-
-    Note: POST operations that retrieve data (Describe*, List*, Get*) are treated as 'select'
-    """
-    http_method = http_method.upper()
-
-    # CRITICAL GUARDRAIL: HTTP DELETE must ALWAYS be 'delete'
-    # This ensures we never have select/insert/update operations using DELETE
-    if http_method == 'DELETE':
-        return 'delete'
-
-    # Patterns for select operations (data retrieval)
-    select_patterns = ['Describe', 'Get', 'List', 'Query', 'Search', 'Lookup', 'Find', 'Retrieve', 'Read', 'Show', 'Scan']
-
-    # Patterns for insert operations
-    insert_patterns = ['Create', 'Put', 'Add', 'Register', 'Enable', 'Batch']
-
-    # Patterns for update operations
-    update_patterns = ['Update', 'Modify', 'Set', 'Change', 'Replace', 'Edit', 'Apply', 'Attach', 'Detach']
-
-    # Patterns for delete operations
-    delete_patterns = ['Delete', 'Remove', 'Terminate', 'Deregister', 'Disable', 'Cancel']
-
-    # Check operation ID patterns first (more specific than HTTP method)
-    for pattern in select_patterns:
-        if operation_id.startswith(pattern):
-            return 'select'
-
-    for pattern in insert_patterns:
-        if operation_id.startswith(pattern):
-            return 'insert'
-
-    for pattern in update_patterns:
-        if operation_id.startswith(pattern):
-            return 'update'
-
-    for pattern in delete_patterns:
-        if operation_id.startswith(pattern):
-            return 'delete'
-
-    # Fall back to HTTP method mapping
-    if http_method == 'GET':
-        return 'select'
-    elif http_method == 'POST':
-        # POST without a clear pattern defaults to exec
-        return 'exec'
-    elif http_method == 'PUT':
-        return 'update'
-    elif http_method == 'PATCH':
-        return 'update'
-    else:
-        return 'exec'
 
 def derive_method_name(operation_id: str) -> str:
     """
@@ -263,10 +99,10 @@ def load_csv_manifest(service_name: str) -> dict:
 
 def get_operation_config(service_name: str, operation_id: str, http_method: str) -> dict:
     """
-    Get operation configuration from CSV manifest or derive defaults.
+    Get operation configuration from CSV manifest.
 
-    The CSV manifest's 'resource' column contains the resource name assigned
-    by users or AI. If empty, the resource name is derived automatically.
+    The CSV manifest's 'resource' and 'sqlVerb' columns MUST contain values
+    for all operations. This function will raise an error if either is missing.
 
     Args:
         service_name: The service name
@@ -276,41 +112,49 @@ def get_operation_config(service_name: str, operation_id: str, http_method: str)
     Returns:
         Dictionary with keys: resource_name, method_name, stackql_verb, object_key,
         and optionally pagination override fields.
+    
+    Raises:
+        SystemExit: If the operation is not found in CSV manifest or if resource/sqlVerb is missing
     """
     manifest = load_csv_manifest(service_name)
 
-    if operation_id in manifest:
-        row = manifest[operation_id]
+    if operation_id not in manifest:
+        print(f"❌ ERROR: Operation '{operation_id}' not found in CSV manifest for service '{service_name}'")
+        print(f"   Please add this operation to stackql-routes/{service_name}.csv with resource and sqlVerb defined")
+        sys.exit(1)
 
-        # Resource name: use from CSV if provided, otherwise derive
-        resource_name = row.get("resource", "").strip()
-        if not resource_name:
-            resource_name = derive_resource_name(operation_id)
+    row = manifest[operation_id]
 
-        config = {
-            "resource_name": resource_name,
-            "method_name": row.get("method", "").strip() or derive_method_name(operation_id),
-            "stackql_verb": row.get("sqlVerb", "").strip() or determine_stackql_verb(http_method, operation_id),
-            "object_key": row.get("objectKey", "").strip(),
-        }
+    # Resource name: MUST be provided in CSV
+    resource_name = row.get("resource", "").strip()
+    if not resource_name:
+        print(f"❌ ERROR: Missing 'resource' field for operation '{operation_id}' in service '{service_name}'")
+        print(f"   Please update stackql-routes/{service_name}.csv to include a resource name for this operation")
+        sys.exit(1)
 
-        # Add pagination overrides if present (operation-level overrides)
-        if row.get("reqPaginationKey", "").strip():
-            config["req_pagination_key"] = row["reqPaginationKey"].strip()
-            config["req_pagination_location"] = row.get("reqPaginationLocation", "body").strip() or "body"
-        if row.get("respPaginationKey", "").strip():
-            config["resp_pagination_key"] = row["respPaginationKey"].strip()
-            config["resp_pagination_location"] = row.get("respPaginationLocation", "body").strip() or "body"
+    # SQL verb: MUST be provided in CSV
+    stackql_verb = row.get("sqlVerb", "").strip()
+    if not stackql_verb:
+        print(f"❌ ERROR: Missing 'sqlVerb' field for operation '{operation_id}' in service '{service_name}'")
+        print(f"   Please update stackql-routes/{service_name}.csv to include a sqlVerb for this operation")
+        sys.exit(1)
 
-        return config
-
-    # Fall back to derived values
-    return {
-        "resource_name": derive_resource_name(operation_id),
-        "method_name": derive_method_name(operation_id),
-        "stackql_verb": determine_stackql_verb(http_method, operation_id),
-        "object_key": "",
+    config = {
+        "resource_name": resource_name,
+        "method_name": row.get("method", "").strip() or derive_method_name(operation_id),
+        "stackql_verb": stackql_verb,
+        "object_key": row.get("objectKey", "").strip(),
     }
+
+    # Add pagination overrides if present (operation-level overrides)
+    if row.get("reqPaginationKey", "").strip():
+        config["req_pagination_key"] = row["reqPaginationKey"].strip()
+        config["req_pagination_location"] = row.get("reqPaginationLocation", "body").strip() or "body"
+    if row.get("respPaginationKey", "").strip():
+        config["resp_pagination_key"] = row["respPaginationKey"].strip()
+        config["resp_pagination_location"] = row.get("respPaginationLocation", "body").strip() or "body"
+
+    return config
 
 
 def clear_csv_manifests():

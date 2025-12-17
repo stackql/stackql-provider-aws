@@ -1,6 +1,6 @@
 # StackQL Provider Generation
 
-This repository is a fork of [__`aws/api-models-aws`__](https://github.com/aws/api-models-aws), it uses the [smithy models]() from the upstream repository to generate the [__`stackql`__](https://github.com/stackql/stackql) provider for AWS.  Steps to generate the __`aws`__ provider for __`stackql`__ are provided in [__STACKQL_PROVIDER_GENERATION.md__](smithy-to-openapi/STACKQL_PROVIDER_GENERATION.md).  
+This repository is a fork of [__`aws/api-models-aws`__](https://github.com/aws/api-models-aws), it uses the [smithy models](https://github.com/aws/api-models-aws) from the upstream repository to generate the [__`stackql`__](https://github.com/stackql/stackql) provider for AWS.  Steps to generate the __`aws`__ provider for __`stackql`__ are provided in [__STACKQL_PROVIDER_GENERATION.md__](smithy-to-openapi/STACKQL_PROVIDER_GENERATION.md).  
 
 # AWS API Models
 

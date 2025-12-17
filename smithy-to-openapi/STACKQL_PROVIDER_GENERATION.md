@@ -17,7 +17,7 @@ The generation process converts AWS Smithy IDL models into OpenAPI specification
 Install required Python packages:
 
 ```bash
-python3 -m venv .ven
+python3 -m venv .venv
 source .venv/bin/activate
 pip install -r smithy-to-openapi/requirements.txt
 ```
