@@ -12,6 +12,9 @@ import re
 # Provider version constant
 PROVIDER_VERSION = "v00.00.00000"
 
+# Valid SQL verbs for validation
+VALID_SQL_VERBS = {"exec", "insert", "select", "update", "replace", "delete"}
+
 # Track all processed services for provider.yaml generation
 _processed_services = []
 
@@ -34,6 +37,30 @@ def html_to_md(html_str: str) -> str:
     h.skip_internal_links = True
     return h.handle(html_str).strip()
 
+def to_snake_case(name: str) -> str:
+    """
+    Convert a string from PascalCase/camelCase to snake_case.
+    Also removes illegal characters like +, -, etc.
+
+    Examples:
+    - SomethingArn -> something_arn
+    - dataProtectionSettingsArn+ -> data_protection_settings_arn
+    - BucketName -> bucket_name
+    """
+    if not name:
+        return ""
+
+    # Remove illegal characters (anything that's not alphanumeric or underscore)
+    name = re.sub(r'[^a-zA-Z0-9_]', '', name)
+
+    # Convert from PascalCase/camelCase to snake_case
+    name = re.sub('(.)([A-Z][a-z]+)', r'\1_\2', name)
+    name = re.sub('([a-z0-9])([A-Z])', r'\1_\2', name)
+    name = name.lower()
+
+    return name
+
+
 def derive_method_name(operation_id: str) -> str:
     """
     Derive the method name from the operationId.
@@ -46,15 +73,7 @@ def derive_method_name(operation_id: str) -> str:
     - GetObject -> get_object
     - ListBuckets -> list_buckets
     """
-    if not operation_id:
-        return ""
-
-    # Convert from PascalCase to snake_case
-    method_name = re.sub('(.)([A-Z][a-z]+)', r'\1_\2', operation_id)
-    method_name = re.sub('([a-z0-9])([A-Z])', r'\1_\2', method_name)
-    method_name = method_name.lower()
-
-    return method_name
+    return to_snake_case(operation_id)
 
 
 def load_csv_manifest(service_name: str) -> dict:
@@ -132,11 +151,18 @@ def get_operation_config(service_name: str, operation_id: str, http_method: str)
         print(f"   Please update stackql-routes/{service_name}.csv to include a resource name for this operation")
         sys.exit(1)
 
-    # SQL verb: MUST be provided in CSV
+    # SQL verb: MUST be provided in CSV and be a valid verb
     stackql_verb = row.get("sqlVerb", "").strip()
     if not stackql_verb:
         print(f"❌ ERROR: Missing 'sqlVerb' field for operation '{operation_id}' in service '{service_name}'")
         print(f"   Please update stackql-routes/{service_name}.csv to include a sqlVerb for this operation")
+        sys.exit(1)
+    
+    # Validate that sqlVerb is one of the allowed values
+    if stackql_verb not in VALID_SQL_VERBS:
+        print(f"❌ ERROR: Invalid 'sqlVerb' value '{stackql_verb}' for operation '{operation_id}' in service '{service_name}'")
+        print(f"   Valid sqlVerbs are: {', '.join(sorted(VALID_SQL_VERBS))}")
+        print(f"   Please update stackql-routes/{service_name}.csv to use a valid sqlVerb")
         sys.exit(1)
 
     config = {
@@ -662,13 +688,25 @@ def add_operation(openapi_spec, shape_name, shape, shapes):
     # process traits
     traits = shape.get("traits", {})
     http = traits.get("smithy.api#http", {})
-    path = http.get("uri", None)
+    original_path = http.get("uri", None)
     verb = http.get("method", None)
     if verb:
         verb = verb.lower()
 
-    if path is None or verb is None:
+    if original_path is None or verb is None:
         return
+
+    # Convert path parameters to snake_case
+    # Extract param names, convert them, and rebuild the path
+    path = original_path
+    param_pattern = re.compile(r'\{([^}]+)\}')
+    
+    def convert_param(match):
+        param_name = match.group(1)
+        snake_param = to_snake_case(param_name)
+        return f'{{{snake_param}}}'
+    
+    path = param_pattern.sub(convert_param, original_path)
 
     success_code = http.get("code", 200)
 
@@ -693,6 +731,8 @@ def add_operation(openapi_spec, shape_name, shape, shapes):
     })
 
     input_shape_name = shape.get("input", {}).get("target")
+    required_body_params = []  # Track required body parameters
+    
     if input_shape_name and input_shape_name != "smithy.api#Unit":
         input_shape = shapes[input_shape_name]
         members = input_shape.get("members", {})
@@ -703,12 +743,15 @@ def add_operation(openapi_spec, shape_name, shape, shapes):
             traits = member_def.get("traits", {})
             target = member_def["target"]
             ref_name = target.split("#")[-1]
+            is_required = "smithy.api#required" in traits
 
             if "smithy.api#httpLabel" in traits:
+                # Convert path parameter name to snake_case
+                snake_param_name = to_snake_case(member_name)
                 parameters.append({
-                    "name": member_name,
+                    "name": snake_param_name,
                     "in": "path",
-                    "required": "smithy.api#required" in traits,
+                    "required": is_required,
                     "schema": { "$ref": f"#/components/schemas/{ref_name}" }
                 })
             elif "smithy.api#httpQuery" in traits:
@@ -716,7 +759,7 @@ def add_operation(openapi_spec, shape_name, shape, shapes):
                 parameters.append({
                     "name": param_name,
                     "in": "query",
-                    "required": "smithy.api#required" in traits,
+                    "required": is_required,
                     "schema": { "$ref": f"#/components/schemas/{ref_name}" }
                 })
             elif "smithy.api#httpHeader" in traits:
@@ -724,24 +767,32 @@ def add_operation(openapi_spec, shape_name, shape, shapes):
                 parameters.append({
                     "name": param_name,
                     "in": "header",
-                    "required": "smithy.api#required" in traits,
+                    "required": is_required,
                     "schema": { "$ref": f"#/components/schemas/{ref_name}" }
                 })
             else:
                 # default: treat as part of the body
                 body_fields[member_name] = { "$ref": f"#/components/schemas/{ref_name}" }
+                # Track required body parameters
+                if is_required:
+                    required_body_params.append(member_name)
 
         openapi_spec["paths"][path][verb]["parameters"] = parameters
 
         if body_fields:
+            body_schema = {
+                "type": "object",
+                "properties": body_fields
+            }
+            # Add required array if there are required body params
+            if required_body_params:
+                body_schema["required"] = required_body_params
+            
             openapi_spec["paths"][path][verb]["requestBody"] = {
                 "required": True,
                 "content": {
                     "application/json": {
-                        "schema": {
-                            "type": "object",
-                            "properties": body_fields
-                        }
+                        "schema": body_schema
                     }
                 }
             }
@@ -954,6 +1005,44 @@ def _escape_path_for_ref(path: str) -> str:
     # JSON pointer requires ~ to be encoded as ~0, / as ~1
     return path.replace("~", "~0").replace("/", "~1")
 
+def _count_required_params(openapi_spec, path, http_method):
+    """
+    Count required parameters for an operation (path + non-X-Amz query + body params).
+    Used for sorting methods by specificity.
+    
+    Returns:
+        Integer count of required parameters
+    """
+    path_def = openapi_spec.get("paths", {}).get(path, {})
+    method_def = path_def.get(http_method, {})
+    
+    count = 0
+    
+    # Count required path and query parameters (excluding X-Amz headers)
+    for param in method_def.get("parameters", []):
+        if param.get("required", False):
+            param_in = param.get("in", "")
+            param_name = param.get("name", "")
+            
+            # Count path params
+            if param_in == "path":
+                count += 1
+            # Count query params that don't start with X-Amz
+            elif param_in == "query" and not param_name.startswith("X-Amz"):
+                count += 1
+            # Skip header params per requirement
+    
+    # Count required body parameters
+    request_body = method_def.get("requestBody", {})
+    content = request_body.get("content", {})
+    json_content = content.get("application/json", {})
+    schema = json_content.get("schema", {})
+    required_body = schema.get("required", [])
+    count += len(required_body)
+    
+    return count
+
+
 def _get_media_types_from_path(openapi_spec, path, http_method, success_code):
     """
     Extract the actual request and response mediaTypes from the path definition.
@@ -1058,6 +1147,18 @@ def build_stackql_resources(openapi_spec):
             method_def["request"] = {
                 "mediaType": request_media_type
             }
+            
+            # Extract required body parameters from the path definition
+            path_def = openapi_spec.get("paths", {}).get(path, {})
+            method_path_def = path_def.get(http_method, {})
+            request_body = method_path_def.get("requestBody", {})
+            content = request_body.get("content", {})
+            json_content = content.get("application/json", {})
+            schema = json_content.get("schema", {})
+            required_body = schema.get("required", [])
+            
+            if required_body:
+                method_def["request"]["required"] = required_body
 
         # Add operation-level pagination override if it differs from service-level
         if "req_pagination_key" in op_config or "resp_pagination_key" in op_config:
@@ -1098,19 +1199,31 @@ def build_stackql_resources(openapi_spec):
         # Add to appropriate sqlVerb list (exec operations don't get added to sqlVerbs)
         if stackql_verb in resources[resource_name]["sqlVerbs"]:
             method_ref = f"#/components/x-stackQL-resources/{resource_name}/methods/{method_name}"
+            # Track the required parameter count for sorting
+            required_count = _count_required_params(openapi_spec, path, http_method)
             resources[resource_name]["sqlVerbs"][stackql_verb].append({
-                "$ref": method_ref
+                "$ref": method_ref,
+                "_required_count": required_count  # Temporary field for sorting
             })
 
     # Build final resource definitions
     stackql_resources = {}
     for resource_name, resource_data in sorted(resources.items()):
+        # Sort each sqlVerb's methods by required parameter count (descending)
+        # Most specific (most required params) come first
+        sorted_sql_verbs = {}
+        for verb, methods in resource_data["sqlVerbs"].items():
+            # Sort by required count (descending), then remove the temporary field
+            sorted_methods = sorted(methods, key=lambda m: m.get("_required_count", 0), reverse=True)
+            # Remove temporary sorting field
+            sorted_sql_verbs[verb] = [{"$ref": m["$ref"]} for m in sorted_methods]
+        
         stackql_resources[resource_name] = {
             "id": f"aws.{service_name}.{resource_name}",
             "name": resource_name,
             "title": resource_name.replace("_", " ").title(),
             "methods": resource_data["methods"],
-            "sqlVerbs": resource_data["sqlVerbs"]
+            "sqlVerbs": sorted_sql_verbs
         }
 
     openapi_spec["components"]["x-stackQL-resources"] = stackql_resources
