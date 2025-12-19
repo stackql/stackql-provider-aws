@@ -15,7 +15,8 @@ Output:
     stackql-routes/{service}.csv - One CSV per service with operation mappings
 
 CSV Format:
-    operationId,path,verb,description,resource,method,sqlVerb,objectKey,
+    operationId,path,verb,requiredPathParams,requiredHeaderParams,requiredQueryParams,
+    requiredReqBodyParams,description,resource,method,sqlVerb,objectKey,
     reqPaginationKey,reqPaginationLocation,respPaginationKey,respPaginationLocation
 
 Note: The 'resource' column is left empty for users or AI to fill before running
@@ -40,6 +41,7 @@ import sys
 import re
 from pathlib import Path
 from collections import defaultdict
+from typing import Set
 
 # Import shared functions
 from processors.shared_functions import (
@@ -58,6 +60,88 @@ def truncate_description(description: str, max_len: int = 50) -> str:
     if len(description) > max_len:
         return description[:max_len - 3] + "..."
     return description
+
+
+def extract_required_params(shapes: dict, operation_shape: dict, protocol: str, visited: Set[str] = None) -> tuple:
+    """
+    Extract required parameters from a Smithy operation shape.
+    
+    Returns a tuple of:
+    (required_path_params, required_header_params, required_query_params, required_body_params)
+    Each is a comma-separated string of parameter names.
+    
+    Excludes X-Amz-* headers (AWS signing/metadata headers).
+    Extracts actual required field names from request body schemas.
+    """
+    if visited is None:
+        visited = set()
+    
+    required_path: Set[str] = set()
+    required_header: Set[str] = set()
+    required_query: Set[str] = set()
+    required_body: Set[str] = set()
+    
+    # Get the input shape
+    input_ref = operation_shape.get("input", {}).get("target")
+    if not input_ref or input_ref in visited:
+        return ('', '', '', '')
+    
+    visited.add(input_ref)
+    input_shape = shapes.get(input_ref)
+    if not input_shape or input_shape.get("type") != "structure":
+        return ('', '', '', '')
+    
+    members = input_shape.get("members", {})
+    required_members = input_shape.get("traits", {}).get("smithy.api#required", [])
+    
+    # For JSON protocols, all required members go to body
+    if protocol in ("aws.protocols#awsJson1_0", "aws.protocols#awsJson1_1"):
+        for member_name, member_def in members.items():
+            member_traits = member_def.get("traits", {})
+            is_required = "smithy.api#required" in member_traits
+            
+            if is_required:
+                required_body.add(member_name)
+    else:
+        # For other protocols, check member traits for location
+        for member_name, member_def in members.items():
+            member_traits = member_def.get("traits", {})
+            is_required = "smithy.api#required" in member_traits
+            
+            if not is_required:
+                continue
+            
+            # Determine location from traits
+            if "smithy.api#httpLabel" in member_traits:
+                # Path parameter
+                required_path.add(member_name)
+            elif "smithy.api#httpQuery" in member_traits:
+                # Query parameter
+                query_name = member_traits.get("smithy.api#httpQuery")
+                if isinstance(query_name, str):
+                    required_query.add(query_name)
+                else:
+                    required_query.add(member_name)
+            elif "smithy.api#httpHeader" in member_traits:
+                # Header parameter - exclude X-Amz-* headers
+                header_name = member_traits.get("smithy.api#httpHeader")
+                if isinstance(header_name, str):
+                    if not header_name.startswith("X-Amz-"):
+                        required_header.add(header_name)
+                else:
+                    if not member_name.startswith("X-Amz-"):
+                        required_header.add(member_name)
+            else:
+                # Body parameter (no location trait means it goes in body/payload)
+                required_body.add(member_name)
+    
+    # Convert sets to sorted comma-separated strings
+    return (
+        ','.join(sorted(required_path)),
+        ','.join(sorted(required_header)),
+        ','.join(sorted(required_query)),
+        ','.join(sorted(required_body))
+    )
 
 
 def _has_empty_or_map_response(shapes: dict, operation_shape: dict) -> bool:
@@ -259,10 +343,17 @@ def extract_operations_from_model(model_path: Path, service_name: str, protocol:
                 resp_pagination_key = output_token
                 resp_pagination_location = op_resp_location
 
+        # Extract required parameters
+        req_path, req_header, req_query, req_body = extract_required_params(shapes, shape, protocol)
+
         yield {
             "operationId": operation_id,
             "path": path,
             "verb": verb,
+            "requiredPathParams": req_path,
+            "requiredHeaderParams": req_header,
+            "requiredQueryParams": req_query,
+            "requiredReqBodyParams": req_body,
             "description": truncate_description(description),
             "resource": "",  # Left empty for users or AI to fill before running process_models.py
             "method": method,
@@ -377,6 +468,10 @@ def main():
         "operationId",
         "path",
         "verb",
+        "requiredPathParams",
+        "requiredHeaderParams",
+        "requiredQueryParams",
+        "requiredReqBodyParams",
         "description",
         "resource",
         "method",
@@ -429,10 +524,17 @@ def main():
             if op_id in existing_ops:
                 # Preserve existing entry (may have human overrides)
                 existing_row = existing_ops[op_id]
+                
+                # Ensure new columns exist in existing row (for backward compatibility)
+                for col in ["requiredPathParams", "requiredHeaderParams", "requiredQueryParams", "requiredReqBodyParams"]:
+                    if col not in existing_row:
+                        existing_row[col] = op.get(col, "")
+                
                 # Update objectKey if existing is empty and we have a derived value
                 if not existing_row.get("objectKey", "").strip() and op.get("objectKey", "").strip():
                     existing_row["objectKey"] = op["objectKey"]
                     updated_count += 1
+                
                 final_rows.append(existing_row)
                 preserved_count += 1
             else:
