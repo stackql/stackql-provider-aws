@@ -253,13 +253,15 @@ def create_get_operation(operation, operation_name, api_version, shapes, openapi
 
             parameters.append(param)
 
-    # Action parameter
+    # Action and Version should never be required in StackQL
+    # Set required: false with default values from enums
     parameters.append({
         "name": "Action",
         "in": "query",
-        "required": True,
+        "required": False,
         "schema": {
             "type": "string",
+            "default": operation_name,
             "enum": [operation_name]
         }
     })
@@ -268,9 +270,10 @@ def create_get_operation(operation, operation_name, api_version, shapes, openapi
     parameters.append({
         "name": "Version",
         "in": "query",
-        "required": True,
+        "required": False,
         "schema": {
             "type": "string",
+            "default": api_version,
             "enum": [api_version]
         }
     })
@@ -311,23 +314,26 @@ def create_post_operation(operation, operation_name, api_version, shapes):
             }
         }
 
-    # Parameters (Action and Version in query string for POST)
+    # Action and Version should never be required in StackQL
+    # Set required: false with default values from enums
     op["parameters"] = [
         {
             "name": "Action",
             "in": "query",
-            "required": True,
+            "required": False,
             "schema": {
                 "type": "string",
+                "default": operation_name,
                 "enum": [operation_name]
             }
         },
         {
             "name": "Version",
             "in": "query",
-            "required": True,
+            "required": False,
             "schema": {
                 "type": "string",
+                "default": api_version,
                 "enum": [api_version]
             }
         }

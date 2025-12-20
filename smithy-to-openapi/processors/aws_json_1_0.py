@@ -192,15 +192,18 @@ def create_path(operation, service_name2, openapi_spec):
     else:
         result_request_body["content"]["application/x-amz-json-1.0"]["schema"]["type"] = "object"
 
-    # X-Amz-Target header parameter
+    # X-Amz-Target should never be required in StackQL
+    # Set required: false with default value from enum
+    target_value = service_name2 + "." + operation_name
     result_post["parameters"] = [
         {
             "name": "X-Amz-Target",
             "in": "header",
-            "required": True,
+            "required": False,
             "schema": {
                 "type": "string",
-                "enum": [service_name2 + "." + operation_name]
+                "default": target_value,
+                "enum": [target_value]
             }
         }
     ]

@@ -188,13 +188,17 @@ def create_path(operation, service_name2, openapi_spec):
     result_request_body["content"]["application/json"]["schema"] = {}
     result_request_body["content"]["application/json"]["schema"]["$ref"] = "#/components/schemas/" + operation["input"]["target"].split("#")[1]
 
+    # X-Amz-Target should never be required in StackQL
+    # Set required: false with default value from enum
+    target_value = service_name2 + "." + operation_id
     result_post["parameters"] = [{
         "name": "X-Amz-Target",
         "in": "header",
-        "required": True,
+        "required": False,
         "schema": {
             "type": "string",
-            "enum": [service_name2 + "." + operation_id]
+            "default": target_value,
+            "enum": [target_value]
         }
     }]
 

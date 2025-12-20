@@ -29,6 +29,20 @@ class LiteralStr(str): pass
 def literal_str_representer(dumper, data):
     return dumper.represent_scalar("tag:yaml.org,2002:str", data, style="|")
 
+# Custom YAML Dumper that quotes strings that would be interpreted as booleans
+class SafeQuoteDumper(yaml.Dumper):
+    pass
+
+def safe_str_representer(dumper, data):
+    if data in ('y', 'Y', 'n', 'N', 'yes', 'Yes', 'YES', 'no', 'No', 'NO', 
+                'true', 'True', 'TRUE', 'false', 'False', 'FALSE',
+                'on', 'On', 'ON', 'off', 'Off', 'OFF'):
+        return dumper.represent_scalar('tag:yaml.org,2002:str', data, style="'")
+    return dumper.represent_scalar('tag:yaml.org,2002:str', data)
+
+SafeQuoteDumper.add_representer(str, safe_str_representer)
+SafeQuoteDumper.add_representer(LiteralStr, literal_str_representer)
+
 def html_to_md(html_str: str) -> str:
     h = html2text.HTML2Text()
     h.ignore_links = False
@@ -1307,7 +1321,7 @@ def resolve_orphaned_schemas(openapi_spec):
     orphaned_schemas = referenced_schemas - existing_schemas
     
     if orphaned_schemas:
-        print(f"  ⚠️  Found {len(orphaned_schemas)} orphaned schema(s): {', '.join(sorted(orphaned_schemas))}")
+        print(f"  WARNING: Found {len(orphaned_schemas)} orphaned schema(s): {', '.join(sorted(orphaned_schemas))}")
         
         # Ensure components/schemas exists
         if "components" not in openapi_spec:
@@ -1395,7 +1409,7 @@ def write_output_yaml(openapi_spec, service_dir):
     outfile = outdir / f"{service_name}.yaml"
 
     with open(outfile, "w", encoding="utf-8") as f:
-        yaml.dump(openapi_spec, f, sort_keys=False, allow_unicode=True)
+        yaml.dump(openapi_spec, f, Dumper=SafeQuoteDumper, sort_keys=False, allow_unicode=True)
 
     print(f"  ✓ Wrote {outfile}")
 
@@ -1466,6 +1480,6 @@ def generate_provider_yaml():
     outfile = outdir / "provider.yaml"
 
     with open(outfile, "w", encoding="utf-8") as f:
-        yaml.dump(provider, f, sort_keys=False, allow_unicode=True)
+        yaml.dump(provider, f, Dumper=SafeQuoteDumper, sort_keys=False, allow_unicode=True)
 
     print(f"✓ Generated provider.yaml with {len(_processed_services)} services")
