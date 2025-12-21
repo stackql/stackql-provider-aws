@@ -109,7 +109,7 @@ def process(model_entry):
 
     for shape_name, shape in shapes.items():
         if shape.get("type") == "service":
-            add_info(openapi_spec, shape, version)
+            add_info(openapi_spec, shape, version, service_dir)
             add_servers(openapi_spec, service_dir, shape)
             shape["my_name"] = shape_name
             shapes_dict["service"].append(shape)

@@ -232,7 +232,7 @@ def init_openapi_spec(service_name, service_dir, protocol, version=None, filenam
         "_aws_protocol": protocol
     }
 
-def add_info(openapi_spec, service_shape, version=None):
+def add_info(openapi_spec, service_shape, version=None, service_dir=None):
     # Use version from service_shape, or fall back to passed version parameter
     if "version" in service_shape:
         openapi_spec["info"]["version"] = service_shape["version"]
@@ -240,6 +240,10 @@ def add_info(openapi_spec, service_shape, version=None):
         openapi_spec["info"]["version"] = version
     openapi_spec["info"]["title"] = service_shape["traits"]["smithy.api#title"]
     openapi_spec["info"]["description"] = LiteralStr(html_to_md(service_shape["traits"]["smithy.api#documentation"]))
+    # Add x-serviceName from aws.auth#sigv4.name trait
+    if "aws.auth#sigv4" in service_shape.get("traits", {}):
+        if "name" in service_shape["traits"]["aws.auth#sigv4"]:
+            openapi_spec["info"]["x-serviceName"] = service_shape["traits"]["aws.auth#sigv4"]["name"]
 
 def add_servers(openapi_spec, service_dir, service_shape):
 

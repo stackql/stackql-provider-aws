@@ -1,4 +1,3 @@
-
 # StackQL Provider Generation
 
 This document describes the workflow for generating StackQL-compatible OpenAPI specifications from AWS Smithy models.
